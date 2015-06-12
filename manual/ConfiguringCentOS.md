@@ -1,5 +1,5 @@
 # Configuring CentOS
-
+This manual explains how to do initial setup of CentOS. It is 
 
 ## Using yum
 Adding a -y option with yum keeps you from having to say "yes" to each install
@@ -59,6 +59,36 @@ ONBOOT=yes
 NM_CONTROLLED=no
 BOOTPROTO=static
 ```
+
+
+## Setup SSH
+To allow your VirtualBox client OS, CentOS, handle incoming SSH, run the following command:
+
+```
+yum -y install openssh-server openssh-clients
+chkconfig sshd on
+service sshd start
+```
+
+Port forwarding must be setup in your VirtualBox settings for ssh to work (we think). If you did not already do this in the [Setting up VirtualBox](SettingUpVirtualBox.md) chapter, do it now.
+
+
+## Configure iptables
+In order to access your VM from your host via HTTP, you'll need to open port 80. This requires you to edit "iptables".
+
+
+Allow HTTP (port 80) on eth1 (the host-only adapter)
+```bash
+iptables -I INPUT 5 -i eth1 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT
+```
+
+Save the changes to iptables so it survives reboot
+```bash
+service iptables save
+```
+
+This works for in this initial setup, but in the future we should consider a [method to define entire iptables config](http://blog.astaz3l.com/2015/03/06/secure-firewall-for-centos/).
+
 
 ## Install wget and Apache
 ```bash
