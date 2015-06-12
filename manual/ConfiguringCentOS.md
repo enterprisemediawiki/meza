@@ -5,10 +5,16 @@ This manual explains how to do initial setup of CentOS. It is
 Adding a -y option with yum keeps you from having to say "yes" to each install
 
 ## Setup networking
-Setup your eth0 networking adapter-thing:
+Setup your eth0 networking adapter. Change directory (cd) into your network-scripts directory:
 
 ```
-vi /etc/sysconfig/network-scripts/ifcfg-eth0
+cd /etc/sysconfig/network-scripts
+```
+
+Then edit your ifcfg-eth0 file:
+
+```
+vi ifcfg-eth0
 ```
 
 And make it look like this:
@@ -26,10 +32,10 @@ BOOTPROTO=dhcp
 Then check your eth1 (the "cat" command will display the contents of your eth1 file)
 
 ```
-cat /etc/sysconfig/network-scripts/ifcfg-eth1
+cat ifcfg-eth1
 ```
 
-This should be blank. Before adding it, run:
+This should return "No such file or directory". We'll need to add it, but first run:
 
 ```
 ifconfig eth1
@@ -38,16 +44,16 @@ ifconfig eth1
 The text that prints should include a first line including something like:
 
 ```
-HWaddr 08:00:27:39:12:6C
+HWaddr 12:34:56:78:90:AB
 ```
 
-Copy this address somewhere for later. Then create your eth1 config:
+Copy this address somewhere for later. **Copy the one from your computer, not what is written above.** 
 
 ```
-vi /etc/sysconfig/network-scripts/ifcfg-eth1
+vi ifcfg-eth1
 ```
 
-Add add to it the following, pasting in the hardware address you copied above.
+Edit the file so it looks like what you have below, pasting in the hardware address you copied when you ran "ifconfig eth1" above.
 
 ```
 DEVICE=eth1
@@ -60,6 +66,26 @@ NM_CONTROLLED=no
 BOOTPROTO=static
 ```
 
+## Restart networking
+Restart your networking service to make all your changes take effect:
+
+```
+service network restart
+```
+
+__Note: The first time I ran the above restart command, and attempted to ping google.com afterwards, the ping failed. I had hit "p" prematurely, when the restart was still running. I'm not sure if that was why. I re-ran "service network restart" and then the ping was successful.__
+
+**Create a snapshot**
+
+## Update yum
+To make sure eveything is up-to-date, run yum update:
+
+```
+yum -y update
+```
+
+Note: this takes a little while.
+
 
 ## Setup SSH
 To allow your VirtualBox client OS, CentOS, handle incoming SSH, run the following command:
@@ -71,6 +97,9 @@ service sshd start
 ```
 
 Port forwarding must be setup in your VirtualBox settings for ssh to work (we think). If you did not already do this in the [Setting up VirtualBox](SettingUpVirtualBox.md) chapter, do it now.
+
+## SSH into your virtual machine
+Using putty if you're on windows. SSH into 192.168.56.56 using your "root" user and password. If this works, then...**Create a snapshot**.
 
 
 ## Configure iptables
@@ -91,9 +120,27 @@ This works for in this initial setup, but in the future we should consider a [me
 
 
 ## Install wget and Apache
+There's no particular reason to install wget at this time, but you'll need it at some point and it was useful to the author when troubleshooting whether Apache was serving content.
+
 ```bash
-yum install wget
-yum install httpd
+yum -y install wget
+yum -y install httpd
 ```
 
+Create an index.html file at your webserver root:
+
+```
+cd /var/www/html
+vi index.html
+```
+
+Add whatever content you want to the file, like:
+
+```
+<h1>Hello, World!<h1>
+```
+
+**NOTE: My run-through is stuck here. I'm not getting through to 192.168.56.56 from my host, nor is wget able to access http://localhost/index.html. In both cases I'm getting "connection refused".**
+
+Navigate to http://192.168.56.56 from your host machine. If you're successful then Apache is working and your VM is serving over HTTP. Congratulations. **Create a snapshot**.
 

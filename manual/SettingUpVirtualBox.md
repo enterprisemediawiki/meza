@@ -1,16 +1,69 @@
 # Setting up VirtualBox
 
 ## Downloading and configuring VirtualBox
-@todo: start this section
+Start by downloading one of the minimal releases of CentOS. Below are list of possible mirrors you could download the versions from:
+
+* 32-bit: http://isoredirect.centos.org/centos/6/isos/i386/
+* 64-bit: http://isoredirect.centos.org/centos/6/isos/x86_64/
+
+Alternatively, just go to http://www.centos.org/ and download your preferred version.
+
+### 32 vs 64 bit versions
+Note that some computers have issues hosting 64-bit virtual machines, even if the host computer has a 64-bit architecture. In order to host the OS you may be required to update your BIOS to enable VT-x/AMD-V. If you cannot do this, use 32-bit.
+
 
 ## Setting up the VirtualBox Machine
-@todo: add a lot more content
+Setup your machine, following [this tutorial](https://extr3metech.wordpress.com/2012/10/25/centos-6-3-installation-in-virtual-box-with-screenshots/). Basic steps are below.
 
-Add steps for how to configure the VM. Add info about 32-bit requirement for James' laptop.
+1. Click "New"
+1. Name your machine
+1. Select type="Linux"
+1. Select version="Red Hat" or version="Red Hat (64 bit)"
+1. Click next, then set your RAM amount. 1024 should be sufficient.
+1. Select "Create a virtual hard drive now" and choose "VDI"
+1. Choose "Dynamically allocated"
+1. Select how large a hard disk you want. 10 GB is enough for most cases.
+1. Mount the CentOS disk image you downloaded earlier. This may require a program like [Virtual Clone Drive](http://www.slysoft.com/en/virtual-clonedrive.html) if you're on Windows.
 
-Make sure your networks are setup so Adapter 1 is NAT and Adapter 2 is Host-Only. These will correspond to eth0 and eth1, respectively.
+# Installing CentOS
+1. Start your virtual machine. Select the drive you mounted the disk image to.
+1. When the "Welcome to CentOS" banner comes up, select "Install or upgrade an existing system"
+1. Wait for about 1 minute.
+1. Skip testing the media (there is no media, you're not using a CD)
+1. Follow the on-screen install wizard. Many things are self-explanatory. Here are some suggestions:
+	1. Use "Basic Storage Devices"
+	1. The storage device may contain data, but who cares: it's a new virtual machine. Select "Yes, discard any data".
+	1. For the hostname, pick whatever you named your VM
+	1. For installation, "Use All Space"
+	1. Write changes to disk
+1. Once installation begins it'll take about five minutes.
+1. Reboot your virtual machine when prompted.
+1. Confirm you can login with your root username/password
+1. Shutdown your machine using 
+```bash
+shutdown -h now
+```
 
-### Port Forwarding
+# Take a snapshot
+
+Congratulations! You've successfully installed your virtual machine. Now take a snapshot so you can save the initial, untouched state. To do that, click the "snapshots" icon in the top-right of VirtualBox. Then click the camera icon to take the snapshot. Name it something like "initial". Throughout this manual we'll recommend taking snapshots at various times. It's on you to give them good, descriptive names.
+
+# Configure networking
+You will configure two network adapters: NAT and Host-only. Later you will have to configure your network from within your virtual machine. When you do this, NAT will correspond to "eth0" and Host-only will correspond to eth1. 
+
+NAT is what will allow your VM to communicate with the outside internet. It will do so using your host computer's IP address. If instead you were to use a "bridged" network adapter your VM would receive its own IP address and would appear as an independent machine to the outside world.
+
+The Host-only connection is for network operations between the host and client machines. This allows you to SSH from your computer to your VM.
+
+1. With your VM off, open its settings and go to "Network"
+1. Set "Adapter 1" to "NAT"
+1. In "Adapter 2" click "Enable Network Adapter"
+1. Change "Attached to" to "Host-only Adapter"
+
+
+# Optional: Port Forwarding
+Some tutorials say this is required, but it was not required on the author's Windows 7 setup. 
+
 In order to allow SSH from your computer to the virtual machine client you need to setup port forwarding. 
 
 Go to VirtualBox settings for your client, and go to the "Network" settings. Select Adapter 1 (which should have "Attached to" = "NAT") and click the "Port Forwarding" button. Your configuration should be:
