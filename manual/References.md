@@ -13,6 +13,7 @@ Below are some references that were used in setting all of this up. Perhaps noth
 * [PHP - install from source - complete tutorial for CentOS](http://blog.astaz3l.com/2015/02/25/php-install-from-source/)
 * [Compile php on your own - Programmer's Blog](http://gediminasm.org/post/compile-php)
 * [Instruction Guide to Install PHP5 from Source on Linux](http://www.thegeekstuff.com/2008/07/instruction-guide-to-install-php5-from-source-on-linux/)
+* [Digital Ocean: Apache logs and rotation](https://www.digitalocean.com/community/tutorials/how-to-configure-logging-and-log-rotation-in-apache-on-an-ubuntu-vps)
 
 ## These probably weren't used:
 * https://gist.github.com/fernandoaleman/2172388

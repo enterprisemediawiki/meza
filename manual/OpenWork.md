@@ -188,9 +188,20 @@ For now skip section titled "httpd-security.conf"
 
 @ref contents of script taken from: http://voidweb.com/2010/10/linux-apache-httpd-startup-init-d-script/
 
+cd /etc/init.d
 wget https://raw.githubusercontent.com/jamesmontalvo3/Meza1/buildapache/client_files/initd_httpd2.sh -O httpd
 chmod +x /etc/init.d/httpd
 
 service httpd status
 service httpd restart
+
+cd /etc/logrotate.d
+wget https://raw.githubusercontent.com/jamesmontalvo3/Meza1/buildapache/client_files/logrotated_httpd -O httpd
+
+logrotate --force /etc/logrotate.d/httpd
+
+
+
+
+
 

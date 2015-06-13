@@ -7,6 +7,6 @@
     sharedscripts
 
     postrotate
-        service httpd graceful > /dev/null
+        service httpd restart > /dev/null
     endscript
 }
