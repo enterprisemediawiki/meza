@@ -7,6 +7,7 @@ Below are some references that were used in setting all of this up. Perhaps noth
 * [CentOS.org: Adding a Network Device](https://www.centos.org/docs/5/html/Installation_Guide-en-US/s1-s390info-addnetdevice.html)
 * [Opening Port 80 in iptables](http://www.binarytides.com/open-http-port-iptables-centos/)
 * [Script to define iptables](http://blog.astaz3l.com/2015/03/06/secure-firewall-for-centos/)
+* [Install nano (and make it the default editor)](http://wiki.centos.org/EdHeron/EditorDefaultNano)
 
 ## Reference that haven't been used yet
 * [ansible-webserver on GitHub](https://github.com/astaz3l/ansible-webserver?files=1)
