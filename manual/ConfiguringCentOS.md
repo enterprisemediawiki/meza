@@ -127,6 +127,14 @@ yum -y install wget
 yum -y install httpd
 ```
 
+Start Apache:
+
+```
+chkconfig httpd on
+/etc/init.d/httpd start
+```
+
+
 Create an index.html file at your webserver root:
 
 ```
@@ -139,8 +147,6 @@ Add whatever content you want to the file, like:
 ```
 <h1>Hello, World!<h1>
 ```
-
-**NOTE: My run-through is stuck here. I'm not getting through to 192.168.56.56 from my host, nor is wget able to access http://localhost/index.html. In both cases I'm getting "connection refused".**
 
 Navigate to http://192.168.56.56 from your host machine. If you're successful then Apache is working and your VM is serving over HTTP. Congratulations. **Create a snapshot**.
 
