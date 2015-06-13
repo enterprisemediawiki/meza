@@ -182,5 +182,15 @@ Skip section (not titled) on httpd.conf "Supplemental configuration"
 Skip section titled "httpd-mpm.conf"
 Skip section titled "Vhosts for apache 2.4.12"
 
+@TODO: figure out if this section is necessary
 For now skip section titled "httpd-security.conf"
+
+
+@ref contents of script taken from: http://voidweb.com/2010/10/linux-apache-httpd-startup-init-d-script/
+
+wget https://raw.githubusercontent.com/jamesmontalvo3/Meza1/buildapache/client_files/initd_httpd2.sh -O httpd
+chmod +x /etc/init.d/httpd
+
+service httpd status
+service httpd restart
 
