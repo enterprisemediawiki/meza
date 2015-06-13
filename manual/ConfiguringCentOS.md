@@ -4,6 +4,8 @@ This manual explains how to do initial setup of CentOS. It is
 ## Using yum
 Adding a -y option with yum keeps you from having to say "yes" to each install
 
+Do "yum list installed" to list all installed packages
+
 ## Setup networking
 Setup your eth0 networking adapter. Change directory (cd) into your network-scripts directory:
 
@@ -122,7 +124,9 @@ This works for in this initial setup, but in the future we should consider a [me
 ## Install wget and Apache
 There's no particular reason to install wget at this time, but you'll need it at some point and it was useful to the author when troubleshooting whether Apache was serving content.
 
+
 ```bash
+yum -y install wget gcc pcre-devel openssl-devel
 yum -y install wget
 yum -y install httpd
 ```
@@ -150,3 +154,13 @@ Add whatever content you want to the file, like:
 
 Navigate to http://192.168.56.56 from your host machine. If you're successful then Apache is working and your VM is serving over HTTP. Congratulations. **Create a snapshot**.
 
+
+
+## Install EPEL
+
+FOR 64-bit:
+yum -y install http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+
+
+FOR 32-bit:
+yum -y install http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm

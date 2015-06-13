@@ -131,3 +131,56 @@ sed -i '/22/ i -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT'
 sed -i '/22/ i -A INPUT -m state --state NEW -m tcp -p tcp --dport 8000 -j ACCEPT' /etc/sysconfig/iptables
 /etc/init.d/iptables restart
 ```
+
+
+## Building Apache 2.4 from source
+
+We want to install the latest version of Apache, 2.4.x, versus using the 2.2.x available via yum.
+
+
+
+Using: http://blog.astaz3l.com/2015/02/09/how-to-install-apache-on-centos/
+
+
+
+
+yum install wget gcc pcre-devel openssl-devel -y
+cd ~
+mkdir sources
+cd sources
+wget http://ftp.piotrkosoft.net/pub/mirrors/ftp.apache.org//httpd/httpd-2.4.12.tar.gz
+wget http://ftp.ps.pl/pub/apache//apr/apr-1.5.2.tar.gz
+wget http://ftp.ps.pl/pub/apache//apr/apr-util-1.5.4.tar.gz
+tar -zxvf httpd-2.4.12.tar.gz
+tar -zxvf apr-1.5.2.tar.gz
+tar -zxvf apr-util-1.5.4.tar.gz
+cp -r apr-1.5.2 httpd-2.4.12/srclib/apr
+cp -r apr-util-1.5.4 httpd-2.4.12/srclib/apr-util
+cd httpd-2.4.12
+./configure --enable-ssl --enable-so --with-included-apr --with-mpm=event
+make
+make install
+
+
+
+groupadd www
+useradd -G www -r apache
+chown -R apache:www /usr/local/apache2
+
+
+
+mkdir /var/www
+mkdir /var/www/meza1
+mkdir /var/www/meza1/htdocs
+mkdir /var/www/meza1/logs
+chown -R apache:www /var/www
+chmod -R 775 /var/www
+
+
+
+Skip section (not titled) on httpd.conf "Supplemental configuration"
+Skip section titled "httpd-mpm.conf"
+Skip section titled "Vhosts for apache 2.4.12"
+
+For now skip section titled "httpd-security.conf"
+
