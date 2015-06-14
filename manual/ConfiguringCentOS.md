@@ -124,6 +124,7 @@ This works for in this initial setup, but in the future we should consider a [me
 ## Install wget and Apache
 There's no particular reason to install wget at this time, but you'll need it at some point and it was useful to the author when troubleshooting whether Apache was serving content.
 
+@todo: **This needs to be replaced with the build-from-source steps.**
 
 ```bash
 yum -y install wget gcc pcre-devel openssl-devel
@@ -164,3 +165,11 @@ yum -y install http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-
 
 FOR 32-bit:
 yum -y install http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+
+
+## Install PHP
+
+See [Install PHP](InstallPHP.md)
+
+
+## Install MySQL

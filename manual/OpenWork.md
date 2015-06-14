@@ -23,12 +23,26 @@ See: [INSTALL PHP 5.4 on CentOS 6.2](http://benramsey.com/blog/2012/03/build-php
 
 There is no yum package "libmcrypt-devel" (or libmcrypt, for that matter). Must install it manually by doing the following. See http://benramsey.com/blog/2012/03/build-php-54-on-centos-62/ for more info
 
-
+Change to user home directory:
 ```
-wget http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el6.rf.x86_64.rpm
+cd ~
+```
+
+If you're on a 32-bit system
+```
+wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.i686.rpm
+```
+
+If you're on a 64-bit system
+```
+wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+```
+
+Then run these:
+```
 rpm --import http://apt.sw.be/RPM-GPG-KEY.dag.txt
-rpm -K rpmforge-release-0.5.2-2.el6.rf.*.rpm # Verifies the package
-rpm -i rpmforge-release-0.5.2-2.el6.rf.*.rpm
+rpm -K rpmforge-release-0.5.3-1.el6.rf.*.rpm # Verifies the package
+rpm -i rpmforge-release-0.5.3-1.el6.rf.*.rpm
 yum install libmcrypt-devel
 ```
 
@@ -36,11 +50,10 @@ To install other PHP requirements, perform the following. First should determine
 
 ```
 yum install \
-	curl-devel \
-	libc-client-devel.i686 \
-	libc-client-devel \
+    curl-devel \
+    libc-client-devel.i686 \
+    libc-client-devel \
     libxml2-devel \
-    httpd-devel \
     libXpm-devel \
     gmp-devel \
     libicu-devel \
@@ -60,9 +73,10 @@ yum install \
 Download PHP. This is for PHP 5.4. Check into MediaWiki's and SMW's requirements and figure out what makes sense to download. 5.5? 5.6?
 
 ```
-wget http://www.php.net/get/php-5.4.0.tar.bz2/from/this/mirror
-tar jxf php-5.4.0.tar.bz2
-cd php-5.4.0/
+cd ~/sources
+wget http://php.net/get/php-5.6.10.tar.bz2/from/this/mirror -O php-5.6.10.tar.bz2
+tar jxf php-5.6.10.tar.bz2
+cd php-5.6.10/
 ```
 
 Configure and make PHP. See if these all make sense. Try to figure out if there are any else we need. Look at the mod2 phpinfo().
@@ -108,6 +122,14 @@ Configure and make PHP. See if these all make sense. Try to figure out if there 
 	--prefix=/usr/local/php
 make
 make install
+```
+
+## Add PHP to path
+
+Create a new profile file to add php to path
+
+```
+echo "export PATH=/usr/local/share/bin:\$PATH" > /etc/profile.d/php.sh
 ```
 
 
