@@ -23,3 +23,10 @@ sed -i '/22/ i -A INPUT -m state --state NEW -m tcp -p tcp --dport 8000 -j ACCEP
 /etc/init.d/iptables restart
 ```
 
+## How to configure PHP
+Consider adding the following to the configure step for PHP
+```
+    --with-apache2  ( has apxs2 )
+    --with-zlib ( has with-zlib-dir )
+    --with-dom
+```
