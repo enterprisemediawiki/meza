@@ -16,6 +16,8 @@ Below are some references that were used in setting all of this up. Perhaps noth
 * [Instruction Guide to Install PHP5 from Source on Linux](http://www.thegeekstuff.com/2008/07/instruction-guide-to-install-php5-from-source-on-linux/)
 * [Digital Ocean: Apache logs and rotation](https://www.digitalocean.com/community/tutorials/how-to-configure-logging-and-log-rotation-in-apache-on-an-ubuntu-vps)
 * [Installing PHP from source](http://wiki.helioviewer.org/wiki/Compiling_PHP_from_source_on_Ubuntu)
+* [Using make clean](http://programmers.stackexchange.com/questions/110167/is-there-a-general-rule-for-when-you-should-use-make-clean-instead-of-just-ma)
+* [Check if module loaded in httpd.conf](http://serverfault.com/questions/224407/is-it-safe-to-run-make-install-for-a-php-apache-module-upgrade)
 
 ## These probably weren't used:
 * https://gist.github.com/fernandoaleman/2172388
