@@ -121,43 +121,28 @@ service iptables save
 This works for in this initial setup, but in the future we should consider a [method to define entire iptables config](http://blog.astaz3l.com/2015/03/06/secure-firewall-for-centos/).
 
 
-## Install wget and Apache
-There's no particular reason to install wget at this time, but you'll need it at some point and it was useful to the author when troubleshooting whether Apache was serving content.
+## Install Apache
 
-@todo: **This needs to be replaced with the build-from-source steps.**
+Install Apache using [these steps](InstallApache.md).
 
-```bash
-yum -y install wget gcc pcre-devel openssl-devel
-yum -y install wget
-yum -y install httpd
-```
-
-Start Apache:
-
-```
-chkconfig httpd on
-/etc/init.d/httpd start
-```
-
+### Testing Apache
 
 Create an index.html file at your webserver root:
 
 ```
-cd /var/www/html
-vi index.html
-```
-
-Add whatever content you want to the file, like:
-
-```
-<h1>Hello, World!<h1>
+cd /var/www/meza1/htdocs
+echo "<h1>Hello, World!</h1>" > index.html
 ```
 
 Navigate to http://192.168.56.56 from your host machine. If you're successful then Apache is working and your VM is serving over HTTP. Congratulations. **Create a snapshot**.
 
 
-
 ## Install EPEL
+
+Some reasearch needs to be done to determine if this is really necessary. Some tutorials suggested it, and I don't see any reason not to install it.
+
+@todo: What is contained in EPEL? What benefit does it bring?
+@todo: Is this required?
 
 FOR 64-bit:
 yum -y install http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
@@ -169,7 +154,9 @@ yum -y install http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-
 
 ## Install PHP
 
-See [Install PHP](InstallPHP.md)
+See [Install PHP](InstallPHP.md). When complete, **create a snapshot**.
 
 
 ## Install MySQL
+
+Not yet started.
