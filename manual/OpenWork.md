@@ -31,38 +31,6 @@ Consider adding the following to the configure step for PHP
     --with-dom
 ```
 
-## Install MW from download
-
-### Composer
-
-```
-cd ~/sources
-curl -sS https://getcomposer.org/installer | php
-mv composer.phar /usr/local/bin/composer
-```
-
-### MW Option 1: Download tarball
-
-```
-wget https://releases.wikimedia.org/mediawiki/1.23/mediawiki-1.23.9.tar.gz -O wiki.tar.gz
-tar -zxvf wiki.tar.gz
-cd wiki
-```
-
-
-### MW Option 2: Git
-
-```
-cd /var/www/meza1/htdocs
-git clone https://git.wikimedia.org/git/mediawiki/core.git wiki
-cd wiki
-composer update
-cd skins
-git clone https://git.wikimedia.org/git/mediawiki/skins/Vector.git
-cd Vector
-git checkout REL1_25
-```
-
 
 
 ## Open issues
@@ -70,3 +38,12 @@ git checkout REL1_25
 Two warnings from MW Installer:
 * Warning: Could not find APC, XCache or WinCache.
 * Warning: The intl PECL extension is not available to handle Unicode normalization, falling back to slow pure-PHP implementation.
+
+
+## Another MW install option: Download tarball
+
+```
+wget https://releases.wikimedia.org/mediawiki/1.23/mediawiki-1.23.9.tar.gz -O wiki.tar.gz
+tar -zxvf wiki.tar.gz
+cd wiki
+```
