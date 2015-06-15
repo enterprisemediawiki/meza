@@ -5,7 +5,7 @@ This manual is exactly as the name implies: directions for **manual** setup.
 1. [Setting up VirtualBox](1.0-SettingUpVirtualBox.md)
 2. [Configuring CentOS](2.0-ConfiguringCentOS.md)
 3. [Setup LAMP](3.0-SetupLAMP.md)
-4. [Install MediaWiki](4.0-InstallMediaWiki)
+4. [Install MediaWiki](4.0-InstallMediaWiki.md)
 99. [Stuff that's not yet in actual chapters](CentOS_Notes.md)
 100. [References](References.md)
 
