@@ -17,6 +17,7 @@ sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' ./ifcfg-eth0
 
 # modify ifcfg-eth1 (host-only)
 cp ./ifcfg-eth0 ./ifcfg-eth1
+sed -r -i "s/DEVICE=eth0$/DEVICE=eth1/g;" ./ifcfg-eth1
 sed -r -i "s/HWADDR=.*$/HWADDR=\nIPADDR=192.168.56.56\nNETMASK=255.255.255.0/g;" ./ifcfg-eth1
 sed -r -i 's/BOOTPROTO=dhcp/BOOTPROTO=static/g;' ./ifcfg-eth1
 sed -i '/UUID=.*/d' ./ifcfg-eth1
@@ -32,13 +33,13 @@ service network restart
 #
 # Update everything managed by yum
 #
-yum -y update
+#temporary-comment-out# yum -y update
 
 #
 # Get development tools
 #
-# yum groupinstall -y development
-# yum install -y zlib-dev openssl-devel sqlite-devel bzip2-devel xz-libs
+#perhaps-permenanent-comment-out# yum groupinstall -y development
+#perhaps-permenanent-comment-out# yum install -y zlib-dev openssl-devel sqlite-devel bzip2-devel xz-libs
 
 #
 # Setup SSH
