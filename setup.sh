@@ -58,5 +58,5 @@ iptables -I INPUT 5 -i eth1 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -
 service iptables save
 
 
-echo -e "Network and SSH setup complete\n\nPlease login via SSH from your host machine, by doing:\n    ssh root@$ipaddr\nEnter your root password when prompted"
+echo -e "Network and SSH setup complete\n\n\n\n\n\nPlease login via SSH from your host machine, by doing:\n    ssh root@$ipaddr\n\nEnter your root password when prompted"
 
