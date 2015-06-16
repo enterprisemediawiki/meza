@@ -1,15 +1,15 @@
+#!/bin/bash
 #
-# To get this running on CentOS 6.6 minimal install, perform the following:
-#   ifup eth0
-#   yum -y install wget
-#   wget -O - https://raw.githubusercontent.com/enterprisemediawiki/Meza1/scripted/client_files/setup.sh | bash
-#
+# Setup network configuration for a CentOS 6.6 virtual machine on VirtualBox
+# Please see directions at https://github.com/enterprisemediawiki/meza1
 
 #
 # Modify network scripts in /etc/sysconfig/network-scripts, 
 # ifcfg-eth0 (for NAT network adapter) and ifcfg-eth1 (for host-only)
 #
 cd /etc/sysconfig/network-scripts
+
+ipaddr="192.168.56.56"
 
 # modify ifcfg-eth0 (NAT)
 sed -r -i 's/ONBOOT=no/ONBOOT=yes/g;' ./ifcfg-eth0
@@ -18,7 +18,7 @@ sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' ./ifcfg-eth0
 # modify ifcfg-eth1 (host-only)
 cp ./ifcfg-eth0 ./ifcfg-eth1
 sed -r -i "s/DEVICE=eth0$/DEVICE=eth1/g;" ./ifcfg-eth1
-sed -r -i "s/HWADDR=.*$/HWADDR=\nIPADDR=192.168.56.56\nNETMASK=255.255.255.0/g;" ./ifcfg-eth1
+sed -r -i "s/HWADDR=.*$/HWADDR=\nIPADDR=$ipaddr\nNETMASK=255.255.255.0/g;" ./ifcfg-eth1
 sed -r -i 's/BOOTPROTO=dhcp/BOOTPROTO=static/g;' ./ifcfg-eth1
 sed -i '/UUID=.*/d' ./ifcfg-eth1
 
@@ -57,7 +57,6 @@ service sshd start
 iptables -I INPUT 5 -i eth1 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT
 service iptables save
 
-#
-# @todo: setup EPEL, maybe
-#
+
+echo -e "Network and SSH setup complete\n\nPlease login via SSH from your host machine, by doing:\n    ssh root@$ipaddr\nEnter your root password when prompted"
 
