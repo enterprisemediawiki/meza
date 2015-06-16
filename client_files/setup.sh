@@ -15,13 +15,16 @@ cd /etc/sysconfig/network-scripts
 sed -r -i 's/ONBOOT=no/ONBOOT=yes/g;' ./ifcfg-eth0
 sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' ./ifcfg-eth0
 
-# get eth1 HWADDR from ifconfig
-eth1_hwaddr="$(ifconfig eth1 | grep '[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}' -o -P)"
-
 # modify ifcfg-eth1 (host-only)
 cp ./ifcfg-eth0 ./ifcfg-eth1
-sed -r -i "s/HWADDR=.*$/HWADDR=$eth1_hwaddr\nIPADDR=192.168.56.56\nNETMASK=255.255.255.0/g;" ./ifcfg-eth1
+sed -r -i "s/HWADDR=.*$/HWADDR=\nIPADDR=192.168.56.56\nNETMASK=255.255.255.0/g;" ./ifcfg-eth1
 sed -r -i 's/BOOTPROTO=dhcp/BOOTPROTO=static/g;' ./ifcfg-eth1
+sed -i '/UUID=.*/d' ./ifcfg-eth1
+
+
+# get eth1 HWADDR from ifconfig, insert int ifcfg-eth1
+eth1_hwaddr="$(ifconfig eth1 | grep '[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}' -o -P)"
+sed -r -i "s/HWADDR=.*$/HWADDR=$eth1_hwaddr/g;" ./ifcfg-eth1
 
 # restart networking
 service network restart
@@ -34,12 +37,13 @@ yum -y update
 #
 # Get development tools
 #
-yum groupinstall -y development
-yum install -y zlib-dev openssl-devel sqlite-devel bzip2-devel xz-libs openssh-server openssh-clients
+# yum groupinstall -y development
+# yum install -y zlib-dev openssl-devel sqlite-devel bzip2-devel xz-libs
 
 #
 # Setup SSH
 #
+yum install -y openssh-server openssh-clients
 chkconfig sshd on
 service sshd start
 
