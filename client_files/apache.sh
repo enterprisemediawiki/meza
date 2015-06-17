@@ -3,9 +3,7 @@
 # Setup Apache webserver
 
 # Setup source directory
-cd ~
-mkdir sources
-cd sources
+cd ~/sources
 
 #
 # Download Apache httpd, Apache Portable Runtime (APR) and APR-util
@@ -15,10 +13,9 @@ cd sources
 # [1] http://ftp.piotrkosoft.net/pub/mirrors/ftp.apache.org//httpd/
 # [2] http://ftp.ps.pl/pub/apache//apr/
 #
-wget http://ftp.piotrkosoft.net/pub/mirrors/ftp.apache.org//httpd/httpd-2.4.12.tar.gz
-wget http://ftp.ps.pl/pub/apache//apr/apr-1.5.2.tar.gz
-wget http://ftp.ps.pl/pub/apache//apr/apr-util-1.5.4.tar.gz
-
+wget http://www.us.apache.org/dist//httpd/httpd-2.4.12.tar.gz
+wget http://www.us.apache.org/dist//apr/apr-1.5.2.tar.gz
+wget http://www.us.apache.org/dist//apr/apr-util-1.5.4.tar.gz
 
 
 #
