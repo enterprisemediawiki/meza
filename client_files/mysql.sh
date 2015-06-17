@@ -39,7 +39,7 @@ mysqladmin -u root password "$1"
 #
 # Login to root
 #
-mysql -u root "--password=$1" -e"SELECT * FROM mysql.user; DELETE FROM mysql.user WHERE user=''; DELETE FROM mysql.user WHERE user='root' AND host NOT IN ('localhost', '127.0.0.1', '::1'); DROP DATABASE test;"
+mysql -u root "--password=$1" -e"DELETE FROM mysql.user WHERE user=''; DELETE FROM mysql.user WHERE user='root' AND host NOT IN ('localhost', '127.0.0.1', '::1'); DROP DATABASE test;"
 
 
 #
