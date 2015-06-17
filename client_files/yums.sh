@@ -4,6 +4,22 @@
 #
 
 #
+# First check whether we're using 32 or 64 bit
+#
+cd ~/sources
+if [ "$1" = "32" ]; then
+    echo "Downloading RPM for 32-bit"
+    wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.i686.rpm
+elif [ "$1" = "64" ]; then
+    echo "Downloading RPM for 64-bit"
+    wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+else
+    echo -e "No architecture specified. Execute this script like:\n  bash $0 32\n  -OR-\n  bash $0 64\nFor 32 or 64 bit architecture, respectively."
+    exit 1
+fi
+
+
+#
 # Update everything managed by yum
 #
 yum -y update
@@ -13,6 +29,15 @@ yum -y update
 # Get development tools
 #
 yum groupinstall -y development
+
+
+#
+# Import RPM repo so libmcrypt-devel can be installed (not in default repo)
+#
+rpm --import http://apt.sw.be/RPM-GPG-KEY.dag.txt
+rpm -K rpmforge-release-0.5.3-1.el6.rf.*.rpm # Verifies the package
+rpm -i rpmforge-release-0.5.3-1.el6.rf.*.rpm
+
 
 #
 # Install all packages you'll need thoughout LAMP setup
@@ -46,7 +71,8 @@ yum install -y \
     libpng-devel \
     freetype-devel \
     readline-devel \
-    libtidy-devel
+    libtidy-devel \
+    libmcrypt-devel
 
 
 #

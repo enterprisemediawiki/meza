@@ -2,7 +2,7 @@
 #
 # Setup Apache webserver
 
-# Setup source directory
+# change to sources directory
 cd ~/sources
 
 #
