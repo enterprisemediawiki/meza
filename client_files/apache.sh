@@ -79,18 +79,22 @@ cat ~/sources/meza1/client_files/httpd-conf-additions.conf >> ./httpd.conf
 # serve index.php as default file
 sed -r -i 's/DirectoryIndex\s*index.html/DirectoryIndex index.php index.html/g;' ./httpd.conf
 
-# restart apache
-service httpd restart
-
-
+# create service script
 cd /etc/init.d
 cp ~/sources/meza1/client_files/initd_httpd.sh ./httpd
 chmod +x /etc/init.d/httpd
-service httpd status
-service httpd restart
 
 # create logrotate file
 cd /etc/logrotate.d
-wget https://raw.githubusercontent.com/jamesmontalvo3/Meza1/buildapache/client_files/logrotated_httpd -O httpd
+cp ~/sources/meza1/client_files/logrotated_httpd ./httpd
 
+cd /var/www/meza1/htdocs
+touch index.html
+echo '<h1>It works!</h1><p>Congratulations, your Apache 2.4 webserver is running.</p>' > index.html
+
+# Start webserver service
+service httpd status
+service httpd restart
+
+echo -e "\n\nYour Apache 2.4 webserver has been setup.\n\nPlease use the web browser on your host computer to navigate to http://192.168.56.56 to test it out"
 
