@@ -16,12 +16,7 @@ sed -r -i 's/ONBOOT=no/ONBOOT=yes/g;' ./ifcfg-eth0
 sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' ./ifcfg-eth0
 
 # modify ifcfg-eth1 (host-only)
-# cp ./ifcfg-eth0 ./ifcfg-eth1
-# sed -r -i "s/DEVICE=eth0$/DEVICE=eth1/g;" ./ifcfg-eth1
-# sed -r -i "s/HWADDR=.*$/HWADDR=\nIPADDR=$ipaddr\nNETMASK=255.255.255.0/g;" ./ifcfg-eth1
-# sed -r -i 's/BOOTPROTO=dhcp/BOOTPROTO=static/g;' ./ifcfg-eth1
-# sed -i '/UUID=.*/d' ./ifcfg-eth1
-# @todo: update this to "master"
+# @todo: change "scripted" to "master" below during pull request
 wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/scripted/client_files/ifcfg-eth1
 
 # get eth1 HWADDR from ifconfig, insert int ifcfg-eth1
