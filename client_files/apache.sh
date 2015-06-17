@@ -10,8 +10,8 @@ cd ~/sources
 # Note that these links may break when new versions are released
 # See httpd [1] and APR [2] list of files to confirm versions before running.
 #
-# [1] http://ftp.piotrkosoft.net/pub/mirrors/ftp.apache.org//httpd/
-# [2] http://ftp.ps.pl/pub/apache//apr/
+# [1] http://www.us.apache.org/dist//httpd/
+# [2] http://www.us.apache.org/dist//apr
 #
 wget http://www.us.apache.org/dist//httpd/httpd-2.4.12.tar.gz
 wget http://www.us.apache.org/dist//apr/apr-1.5.2.tar.gz
@@ -65,5 +65,32 @@ chmod -R 775 /var/www
 
 #### NOT YET COMPLETE ####
 
+
+
+
+cd /usr/local/apache2/conf
+
+# update document root
+sed -r -i 's/\/usr\/local\/apache2\/htdocs/\/var\/www\/meza1\/htdocs/g;' ./httpd.conf
+
+# direct apache to execute PHP
+cat ~/sources/meza1/client_files/httpd-conf-additions.conf >> ./httpd.conf
+
+# serve index.php as default file
+sed -r -i 's/DirectoryIndex\s*index.html/DirectoryIndex index.php index.html/g;' ./httpd.conf
+
+# restart apache
+service httpd restart
+
+
+cd /etc/init.d
+cp ~/sources/meza1/client_files/initd_httpd.sh ./httpd
+chmod +x /etc/init.d/httpd
+service httpd status
+service httpd restart
+
+# create logrotate file
+cd /etc/logrotate.d
+wget https://raw.githubusercontent.com/jamesmontalvo3/Meza1/buildapache/client_files/logrotated_httpd -O httpd
 
 
