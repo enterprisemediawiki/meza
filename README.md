@@ -23,3 +23,24 @@ These three commands do the following:
 **wget ... bash** retrieves the setup script file, and pipes that script file into bash. This means that the script is executed once it is done downloading. It is recommended that you review the script beforehand to make sure you agree with all actions it takes. Requires about a minute or two to run.
 
 Once you have run these commands your SSH should work. The IP address of your VM is one of the last lines of output of the wget command. Login from your host machine's terminal (or Putty if you're on Windows). Once you've confirmed you can use SSH it is recommended that you don't use the VM's user interface any longer. Just SSH. When you boot the VM in the future, hold shift while clicking "start" to boot without creating a user interface window.
+
+Once you've logged in with SSH, move on to the LAMP setup scripts:
+
+## Running the setup scripts
+
+The scripts you'll need are below. They are downloaded during the initial setup.sh script you ran. I recommend running one at a time and taking a VirtualBox snapshot after each.
+
+```bash
+cd ~/sources/meza1/client_files
+bash yums.sh <architecture>
+bash apache.sh
+bash php.sh
+bash mysql.sh <mysql_root_password>
+bash mediawiki.sh
+```
+
+For the yums.sh and mysql.sh scripts you must provide some options.
+
+**yums.sh** requires you provide your platform architecture. This is either "32" or "64" (without the quotes). This means whether your computer architecture is 32-bit or 64-bit.
+
+**mysql.sh** requires you to provide the mysql root user's password. This is probably not the most secure way to do this, but hey...it's just a development virtual machine, right?
