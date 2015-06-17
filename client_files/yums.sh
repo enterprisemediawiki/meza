@@ -20,8 +20,6 @@ yum groupinstall -y development
 # safe than sorry--attempt to install them now anyway.
 #
 yum install -y \
-
-	# generically good things to have
 	zlib-dev \
 	sqlite-devel \
 	bzip2-devel \
@@ -29,14 +27,10 @@ yum install -y \
 	openssh-server \
 	openssh-clients \
 	perl \
-
-	# Apache requirements
 	wget \
 	gcc \
 	pcre-devel \
 	openssl-devel \
-
-	# PHP requirements
     curl-devel \
     libc-client-devel.i686 \
     libc-client-devel \
