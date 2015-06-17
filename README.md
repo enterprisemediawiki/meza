@@ -28,7 +28,7 @@ Once you've logged in with SSH, move on to the LAMP setup scripts:
 
 ## Running the setup scripts
 
-The scripts you'll need are below. They are downloaded during the initial setup.sh script you ran. I recommend running one at a time and taking a VirtualBox snapshot after each.
+The scripts you'll need are below. They are downloaded during the initial setup.sh script you ran. I recommend running one at a time and taking a VirtualBox snapshot after each. They should be run in the order shown below.
 
 ```bash
 cd ~/sources/meza1/client_files
