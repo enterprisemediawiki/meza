@@ -93,6 +93,7 @@ touch index.html
 echo '<h1>It works!</h1><p>Congratulations, your Apache 2.4 webserver is running.</p>' > index.html
 
 # Start webserver service
+chkconfig httpd on
 service httpd status
 service httpd restart
 

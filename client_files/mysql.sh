@@ -27,6 +27,7 @@ yum -y install mysql-community-server
 #
 # Start MySQL service
 #
+chkconfig mysqld on
 service mysqld start
 
 
