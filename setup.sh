@@ -16,8 +16,7 @@ sed -r -i 's/ONBOOT=no/ONBOOT=yes/g;' ./ifcfg-eth0
 sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' ./ifcfg-eth0
 
 # modify ifcfg-eth1 (host-only)
-# @todo: change "scripted" to "master" below during pull request
-wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/scripted/client_files/ifcfg-eth1
+wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/master/client_files/ifcfg-eth1
 
 # get eth1 HWADDR from ifconfig, insert int ifcfg-eth1
 eth1_hwaddr="$(ifconfig eth1 | grep '[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}' -o -P)"
