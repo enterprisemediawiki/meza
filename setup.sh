@@ -4,6 +4,16 @@
 # Please see directions at https://github.com/enterprisemediawiki/meza1
 
 #
+# Load Meza1 repository
+#
+cd ~
+mkdir sources
+cd sources
+wget https://github.com/enterprisemediawiki/Meza1/tarball/master -O meza1.tar.gz
+mkdir meza1
+tar xpvf meza1.tar.gz -C ./meza1 --strip-components 1
+
+#
 # Modify network scripts in /etc/sysconfig/network-scripts, 
 # ifcfg-eth0 (for NAT network adapter) and ifcfg-eth1 (for host-only)
 #
@@ -15,8 +25,8 @@ ipaddr="192.168.56.56"
 sed -r -i 's/ONBOOT=no/ONBOOT=yes/g;' ./ifcfg-eth0
 sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' ./ifcfg-eth0
 
-# modify ifcfg-eth1 (host-only)
-wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/master/client_files/ifcfg-eth1
+# copy ifcfg-eth1  (host-only)
+cp ~/sources/meza1/client_files/ifcfg-eth1 ./ifcfg-eth1
 
 # get eth1 HWADDR from ifconfig, insert int ifcfg-eth1
 eth1_hwaddr="$(ifconfig eth1 | grep '[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}' -o -P)"
