@@ -2,13 +2,25 @@
 #
 # Setup PHP
 
+
 #
-# Download PHP 5.6.10 source
+# Exit if PHP version not select
+#
+if [ -z "$1" ]; then
+    echo "No PHP version chosen. Visit http://php.net/downloads.php"
+    echo "Select a stable version and then re-run this command like:"
+    echo "  bash $0 5.6.7"
+    exit 1
+fi
+
+
+#
+# Download (for example) PHP 5.6.10, 5.5.26, or 5.4.42 source
 #
 cd ~/sources
-wget http://php.net/get/php-5.6.10.tar.bz2/from/this/mirror -O php-5.6.10.tar.bz2
-tar jxf php-5.6.10.tar.bz2
-cd php-5.6.10/
+wget "http://php.net/get/php-$1.tar.bz2/from/this/mirror" -O "php-$1.tar.bz2"
+tar jxf "php-$1.tar.bz2"
+cd "php-$1/"
 
 #
 # Configure, make, make install
@@ -65,7 +77,7 @@ echo "export PATH=/usr/local/php/bin:\$PATH" > /etc/profile.d/php.sh
 #
 # Initiate php.ini
 #
-cp ~/sources/php-5.6.10/php.ini-development /usr/local/php/lib/php.ini
+cp "~/sources/php-$1/php.ini-development" /usr/local/php/lib/php.ini
 
 
 # Check and make sure php5_module is enabled?
