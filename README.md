@@ -40,7 +40,7 @@ For the yums.sh, php.sh and mysql.sh scripts you must provide some options.
 cd ~/sources/meza1/client_files
 bash yums.sh <architecture>
 bash apache.sh
-bash php.sh
+bash php.sh <version>
 bash mysql.sh <mysql_root_password>
 bash mediawiki.sh
 ```
