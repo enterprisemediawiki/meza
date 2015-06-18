@@ -96,7 +96,7 @@ echo "export PATH=/usr/local/php/bin:\$PATH" > /etc/profile.d/php.sh
 #
 # Initiate php.ini
 #
-cp "~/sources/php-$1/php.ini-development" /usr/local/php/lib/php.ini
+cp ~/sources/meza1/client_files/php.ini-development /usr/local/php/lib/php.ini
 
 
 # Check and make sure php5_module is enabled?

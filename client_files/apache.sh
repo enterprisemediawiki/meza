@@ -79,6 +79,10 @@ cat ~/sources/meza1/client_files/httpd-conf-additions.conf >> ./httpd.conf
 # serve index.php as default file
 sed -r -i 's/DirectoryIndex\s*index.html/DirectoryIndex index.php index.html/g;' ./httpd.conf
 
+# modify user that will handle web requests
+sed -r -i 's/User\s*daemon/User apache/g;' ./httpd.conf
+sed -r -i 's/Group\s*daemon/Group www/g;' ./httpd.conf
+
 # create service script
 cd /etc/init.d
 cp ~/sources/meza1/client_files/initd_httpd.sh ./httpd

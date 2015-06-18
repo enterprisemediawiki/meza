@@ -19,6 +19,13 @@ cd /var/www/meza1/htdocs
 git clone https://github.com/wikimedia/mediawiki.git wiki
 cd wiki
 
+
+#
+# Give apache the right to modify images
+#
+chown -R apache:www ./images
+
+
 #
 # Checkout latest released version
 #

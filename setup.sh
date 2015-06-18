@@ -9,8 +9,7 @@
 cd ~
 mkdir sources
 cd sources
-# @todo: update "script-builds" to "master" on pull request
-wget https://github.com/enterprisemediawiki/Meza1/tarball/script-builds -O meza1.tar.gz
+wget https://github.com/enterprisemediawiki/Meza1/tarball/master -O meza1.tar.gz
 mkdir meza1
 tar xpvf meza1.tar.gz -C ./meza1 --strip-components 1
 
