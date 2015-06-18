@@ -9,7 +9,7 @@
 if [ -z "$1" ]; then
     echo "No PHP version chosen. Visit http://php.net/downloads.php"
     echo "Select a stable version and then re-run this command like:"
-    echo "  bash $0 5.6.7"
+    echo "  bash $0 5.6.10"
     exit 1
 fi
 
@@ -18,9 +18,28 @@ fi
 # Download (for example) PHP 5.6.10, 5.5.26, or 5.4.42 source
 #
 cd ~/sources
-wget "http://php.net/get/php-$1.tar.bz2/from/this/mirror" -O "php-$1.tar.bz2"
+tarfile="php-$1.tar.bz2"
+wget "http://php.net/get/php-$1.tar.bz2/from/this/mirror" -O "$tarfile"
+
+
+#
+# Check if PHP successfully downloaded, exit if not
+#
+if [ -f $tarfile ];
+then
+   echo "PHP v$1 downloaded. Unpacking."
+else
+   echo "PHP v$1 not downloaded. Exiting."
+   exit 1
+fi
+
+
+#
+# Unpack tar.bz2
+#
 tar jxf "php-$1.tar.bz2"
 cd "php-$1/"
+
 
 #
 # Configure, make, make install
