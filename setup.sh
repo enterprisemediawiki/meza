@@ -25,7 +25,7 @@ ipaddr="192.168.56.56"
 sed -r -i 's/ONBOOT=no/ONBOOT=yes/g;' ./ifcfg-eth0
 sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' ./ifcfg-eth0
 
-# copy ifcfg  (host-only)
+# copy ifcfg-eth1  (host-only)
 cp ~/sources/meza1/client_files/ifcfg-eth1 ./ifcfg-eth1
 
 # get eth1 HWADDR from ifconfig, insert int ifcfg-eth1
