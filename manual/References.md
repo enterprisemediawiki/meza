@@ -12,6 +12,7 @@ Below are some references that were used in setting all of this up. Perhaps noth
 * [Percona MySQL Config Generator](https://tools.percona.com/wizard)
 * [What does -devel mean in yum packages?](http://stackoverflow.com/questions/7941068/what-does-devel-mean-when-installing-a-library)
 * [Install nano (and make it the default editor)](http://wiki.centos.org/EdHeron/EditorDefaultNano)
+* [Digital Ocean setup Python on CentOS](https://www.digitalocean.com/community/tutorials/how-to-set-up-python-2-7-6-and-3-3-3-on-centos-6-4)
 
 ## Reference that haven't been used yet
 * [ansible-webserver on GitHub](https://github.com/astaz3l/ansible-webserver?files=1)
