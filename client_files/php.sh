@@ -98,6 +98,12 @@ echo "export PATH=/usr/local/php/bin:\$PATH" > /etc/profile.d/php.sh
 #
 cp ~/sources/meza1/client_files/php.ini-development /usr/local/php/lib/php.ini
 
+#
+# Create info.php
+#
+cd /var/www/meza1/htdocs
+touch info.php
+echo '<?php phpinfo();' > info.php
 
 # Check and make sure php5_module is enabled?
 # @todo: do we need this?
@@ -107,3 +113,5 @@ cp ~/sources/meza1/client_files/php.ini-development /usr/local/php/lib/php.ini
 # Restart Apache
 #
 service httpd restart
+
+echo -e "\n\nPHP has been setup.\n\nPlease use the web browser on your host computer to navigate to http://192.168.56.56/info.php to verify php is being executed."

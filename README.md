@@ -28,17 +28,19 @@ Once you've logged in with SSH, move on to the LAMP setup scripts:
 
 The scripts you'll need are below. They are downloaded during the initial setup.sh script you ran. I recommend running one at a time and taking a VirtualBox snapshot after each. They should be run in the order shown below.
 
+For the yums.sh, php.sh and mysql.sh scripts you must provide some options.
+
+**yums.sh** requires you to provide your platform architecture. This is either "32" or "64" (without the quotes). This means whether your computer architecture is 32-bit or 64-bit.
+
+**php.sh** requires you to provide the version of PHP you prefer. For example, "5.4.42", "5.5.26", or "5.6.10".
+
+**mysql.sh** requires you to provide the mysql root user's password. This is probably not the most secure way to do this, but hey...it's just a development virtual machine, right?
+
 ```bash
 cd ~/sources/meza1/client_files
 bash yums.sh <architecture>
 bash apache.sh
-bash php.sh
+bash php.sh <version>
 bash mysql.sh <mysql_root_password>
 bash mediawiki.sh
 ```
-
-For the yums.sh and mysql.sh scripts you must provide some options.
-
-**yums.sh** requires you provide your platform architecture. This is either "32" or "64" (without the quotes). This means whether your computer architecture is 32-bit or 64-bit.
-
-**mysql.sh** requires you to provide the mysql root user's password. This is probably not the most secure way to do this, but hey...it's just a development virtual machine, right?
