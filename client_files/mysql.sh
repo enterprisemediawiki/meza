@@ -9,7 +9,7 @@
 
 while [ -z "$mysql_root_pass" ]
 do
-echo -e "\n\n\n\nEnter the MySQL root password and press [ENTER]: "
+echo -e "\n\n\n\nChoose a MySQL root password and press [ENTER]: "
 read -s mysql_root_pass
 done
 
