@@ -8,6 +8,39 @@
 #   This script will prompt the user for several parameters
 #
 
+#
+# Prompt for parameters
+#
+while [ -z "$mysql_root_pass" ]
+do
+echo -e "\n\n\n\nEnter the MySQL root password and press [ENTER]: "
+read -s mysql_root_pass
+done
+
+while [ -z "$wiki_db_name" ]
+do
+echo -e "\n\nEnter the name of your wiki database and press [ENTER]: "
+read wiki_db_name
+done
+
+while [ -z "$wiki_name" ]
+do
+echo -e "\n\nEnter the name of your wiki and press [ENTER]: "
+read wiki_name
+done
+
+while [ -z "$wiki_admin_name"]
+do
+echo -e "\n\nEnter the name you would like for your wiki administrator account and press [ENTER]: "
+read wiki_admin_name
+done
+
+while [ -z "$wiki_admin_pass"]
+do
+echo -e "\n\nEnter the password you would like for your wiki administrator account and press [ENTER]: "
+read -s wiki_admin_pass
+done
+
 
 #
 # Install Composer
@@ -53,39 +86,6 @@ tar xpvf REL1_25.tar.gz -C ./Vector --strip-components 1
 # Install MW with install.php
 #
 cd ..
-#
-# Prompt for parameters
-#
-while [ -z "$mysql_root_pass" ]
-do
-echo -e "\n\n\n\nEnter the MySQL root password and press [ENTER]: "
-read -s mysql_root_pass
-done
-
-while [ -z "$wiki_db_name" ]
-do
-echo -e "\n\nEnter the name of your wiki database and press [ENTER]: "
-read wiki_db_name
-done
-
-while [ -z "$wiki_name" ]
-do
-echo -e "\n\nEnter the name of your wiki and press [ENTER]: "
-read wiki_name
-done
-
-while [ -z "$wiki_admin_name"]
-do
-echo -e "\n\nEnter the name you would like for your wiki administrator account and press [ENTER]: "
-read wiki_admin_name
-done
-
-while [ -z "$wiki_admin_pass"]
-do
-echo -e "\n\nEnter the password you would like for your wiki administrator account and press [ENTER]: "
-read -s wiki_admin_pass
-done
-
 php maintenance/install.php \
 	--dbtype mysql \
 	--dbuser root \
