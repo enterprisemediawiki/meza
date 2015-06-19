@@ -7,14 +7,21 @@
 # First check whether we're using 32 or 64 bit
 #
 cd ~/sources
-if [ "$1" = "32" ]; then
+
+while [ "$architecture" != "32" ] && [ "$architecture" != "64" ]
+do
+echo -e "\n\n\n\nWhich architecture are you using? Type 32 or 64 and press [ENTER]: "
+read architecture
+done
+
+if [ "$architecture" = "32" ]; then
     echo "Downloading RPM for 32-bit"
     wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.i686.rpm
-elif [ "$1" = "64" ]; then
+elif [ "$architecture" = "64" ]; then
     echo "Downloading RPM for 64-bit"
     wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
 else
-    echo -e "No architecture specified. Execute this script like:\n  bash $0 32\n  -OR-\n  bash $0 64\nFor 32 or 64 bit architecture, respectively."
+    echo -e "There was an error in choosing architecture."
     exit 1
 fi
 
@@ -45,17 +52,17 @@ rpm -i rpmforge-release-0.5.3-1.el6.rf.*.rpm
 # safe than sorry--attempt to install them now anyway.
 #
 yum install -y \
-	zlib-dev \
-	sqlite-devel \
-	bzip2-devel \
-	xz-libs \
-	openssh-server \
-	openssh-clients \
-	perl \
-	wget \
-	gcc \
-	pcre-devel \
-	openssl-devel \
+    zlib-dev \
+    sqlite-devel \
+    bzip2-devel \
+    xz-libs \
+    openssh-server \
+    openssh-clients \
+    perl \
+    wget \
+    gcc \
+    pcre-devel \
+    openssl-devel \
     curl-devel \
     libc-client-devel.i686 \
     libc-client-devel \

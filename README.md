@@ -30,27 +30,28 @@ The scripts you'll need are below. They are downloaded during the initial setup.
 
 For the yums.sh, php.sh and mysql.sh scripts you must provide some options.
 
-**yums.sh** requires you to provide your platform architecture. This is either "32" or "64" (without the quotes). This means whether your computer architecture is 32-bit or 64-bit.
+**yums.sh** prompts you to provide your platform architecture. This is either "32" or "64" (without the quotes). This means whether your computer architecture is 32-bit or 64-bit.
 
-**php.sh** requires you to provide the version of PHP you prefer. For example, "5.4.42", "5.5.26", or "5.6.10". See http://php.net/downloads.php for the latest stable versions.
+**php.sh** prompts you to provide the version of PHP you prefer. For example, "5.4.42", "5.5.26", or "5.6.10". See http://php.net/downloads.php for the latest stable versions.
 
-**mysql.sh** requires you to provide the mysql root user's password. This is probably not the most secure way to do this, but hey...it's just a development virtual machine, right?
+**mysql.sh** prompts you to provide the mysql root user's password.
+
+**mediawiki-quick.sh** only downloads MediaWiki version 1.25.1 and the associated version of the Vector skin. This makes the install go more quickly. If you prefer to install via git with the full repository, use the other option mentioned below.
 
 ```bash
 cd ~/sources/meza1/client_files
-bash yums.sh <architecture>
+bash yums.sh
 bash apache.sh
-bash php.sh <version>
-bash mysql.sh <mysql_root_password>
+bash php.sh
+bash mysql.sh
+bash mediawiki-quick.sh
+```
+
+### Optional MediaWiki Git Install
+
+The mediawiki.sh script uses git to retrieve the entire MediaWiki repository. It currently checks out MediaWiki 1.25.1 and the associated version of the Vector skin.
+
+```bash
 bash mediawiki.sh
 ```
 
-### Optional Quick MediaWiki Install
-
-The mediawiki.sh script uses git to retrieve the entire MediaWiki repository. Alternatively, you can use the mediawiki-quick.sh script in that step. This script pulls the tarball for MedaWiki 1.25.1 and for the matching version of the Vector skin. Note that this script currently requires options.
-
-```bash
-bash mediawiki-quick.sh <mysql_root_password> <wiki_admin_password>
-```
-
-Currently, this script names the wiki database "wiki_test", the wiki "TestWiki", and the administrator account "Admin".

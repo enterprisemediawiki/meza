@@ -4,12 +4,14 @@
 
 
 #
-# Exit if no password defined
+# Prompt for password
 #
-if [ -z "$1" ]; then
-    echo "No password defined for MySQL root user"
-    exit 1
-fi
+
+while [ -z "$mysql_root_pass" ]
+do
+echo -e "\n\n\n\nChoose a MySQL root password and press [ENTER]: "
+read -s mysql_root_pass
+done
 
 
 #
@@ -34,13 +36,13 @@ service mysqld start
 #
 # Set root password. Must be specified
 #
-mysqladmin -u root password "$1"
+mysqladmin -u root password "$mysql_root_pass"
 
 
 #
 # Login to root
 #
-mysql -u root "--password=$1" -e"DELETE FROM mysql.user WHERE user=''; DELETE FROM mysql.user WHERE user='root' AND host NOT IN ('localhost', '127.0.0.1', '::1'); DROP DATABASE test;"
+mysql -u root "--password=$mysql_root_pass" -e"DELETE FROM mysql.user WHERE user=''; DELETE FROM mysql.user WHERE user='root' AND host NOT IN ('localhost', '127.0.0.1', '::1'); DROP DATABASE test;"
 
 
 echo -e "\n\nMySQL setup complete\n"
