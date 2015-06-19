@@ -32,7 +32,7 @@ For the yums.sh, php.sh and mysql.sh scripts you must provide some options.
 
 **yums.sh** requires you to provide your platform architecture. This is either "32" or "64" (without the quotes). This means whether your computer architecture is 32-bit or 64-bit.
 
-**php.sh** requires you to provide the version of PHP you prefer. For example, "5.4.42", "5.5.26", or "5.6.10".
+**php.sh** requires you to provide the version of PHP you prefer. For example, "5.4.42", "5.5.26", or "5.6.10". See http://php.net/downloads.php for the latest stable versions.
 
 **mysql.sh** requires you to provide the mysql root user's password. This is probably not the most secure way to do this, but hey...it's just a development virtual machine, right?
 
