@@ -52,17 +52,17 @@ rpm -i rpmforge-release-0.5.3-1.el6.rf.*.rpm
 # safe than sorry--attempt to install them now anyway.
 #
 yum install -y \
-	zlib-dev \
-	sqlite-devel \
-	bzip2-devel \
-	xz-libs \
-	openssh-server \
-	openssh-clients \
-	perl \
-	wget \
-	gcc \
-	pcre-devel \
-	openssl-devel \
+    zlib-dev \
+    sqlite-devel \
+    bzip2-devel \
+    xz-libs \
+    openssh-server \
+    openssh-clients \
+    perl \
+    wget \
+    gcc \
+    pcre-devel \
+    openssl-devel \
     curl-devel \
     libc-client-devel.i686 \
     libc-client-devel \
