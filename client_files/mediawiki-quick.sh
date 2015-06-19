@@ -46,9 +46,9 @@ composer update
 # Download Vector skin tarball, REL1_25 branch
 #
 cd skins
-https://github.com/wikimedia/mediawiki-skins-Vector/archive/REL1_25.zip
+wget https://github.com/wikimedia/mediawiki-skins-Vector/archive/REL1_25.tar.gz
 mkdir Vector
-tar xpvf meza1.tar.gz -C ./Vector --strip-components 1
+tar xpvf mediawiki-skins-Vector-REL1_25.tar.gz -C ./Vector --strip-components 1
 
 
 #
