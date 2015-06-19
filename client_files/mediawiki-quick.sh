@@ -3,11 +3,9 @@
 # Setup MediaWiki (quick--not checking out whole core.git)
 #
 # Example:
-#   bash mediawiki-quick.sh <mysql-root-pass> <wiki-admin-pass>
+#   bash mediawiki-quick.sh
 #
-#   $1: mysql-root-pass: the password for your mysql root user
-#   $2: wiki-admin-pass: the user "Admin" will be created for this wiki
-#       and this will be used as Admin's password
+#   This script will prompt the user for several parameters
 #
 
 
@@ -48,19 +46,51 @@ composer update
 cd skins
 wget https://github.com/wikimedia/mediawiki-skins-Vector/archive/REL1_25.tar.gz
 mkdir Vector
-tar xpvf mediawiki-skins-Vector-REL1_25.tar.gz -C ./Vector --strip-components 1
+tar xpvf REL1_25.tar.gz -C ./Vector --strip-components 1
 
 
 #
 # Install MW with install.php
 #
 cd ..
+#
+# Prompt for parameters
+#
+while [ -z "$mysql_root_pass" ]
+do
+echo -e "\n\n\n\nEnter the MySQL root password and press [ENTER]: "
+read -s mysql_root_pass
+done
+
+while [ -z "$wiki_db_name" ]
+do
+echo -e "\n\nEnter the name of your wiki database and press [ENTER]: "
+read wiki_db_name
+done
+
+while [ -z "$wiki_name" ]
+do
+echo -e "\n\nEnter the name of your wiki and press [ENTER]: "
+read wiki_name
+done
+
+while [ -z "$wiki_admin_name"]
+do
+echo -e "\n\nEnter the name you would like for your wiki administrator account and press [ENTER]: "
+read wiki_admin_name
+done
+
+while [ -z "$wiki_admin_pass"]
+do
+echo -e "\n\nEnter the password you would like for your wiki administrator account and press [ENTER]: "
+read -s wiki_admin_pass
+done
+
 php maintenance/install.php \
 	--dbtype mysql \
 	--dbuser root \
-	--dbpass "$1" \
-	--dbname wiki_test \
-	--pass "$2" \
-	TestWiki Admin \
+	--dbpass "$mysql_root_pass" \
+	--dbname "$wiki_db_name" \
+	--pass "$wiki_admin_pass" \
+	"$wiki_name" "$wiki_admin_name" \
 	--scriptpath /wiki
-

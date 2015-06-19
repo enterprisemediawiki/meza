@@ -4,22 +4,22 @@
 
 
 #
-# Exit if PHP version not select
+# Prompt user for PHP version
 #
-if [ -z "$1" ]; then
-    echo "No PHP version chosen. Visit http://php.net/downloads.php"
-    echo "Select a stable version and then re-run this command like:"
-    echo "  bash $0 5.6.10"
-    exit 1
-fi
+while [ -z "$phpversion" ]
+do
+echo -e "\n\n\n\nVisit http://php.net/downloads.php"
+echo -e "\nEnter the version of PHP you would like (such as 5.4.42) and press [ENTER]: "
+read phpversion
+done
 
 
 #
 # Download (for example) PHP 5.6.10, 5.5.26, or 5.4.42 source
 #
 cd ~/sources
-tarfile="php-$1.tar.bz2"
-wget "http://php.net/get/php-$1.tar.bz2/from/this/mirror" -O "$tarfile"
+tarfile="php-$phpversion.tar.bz2"
+wget "http://php.net/get/php-$phpversion.tar.bz2/from/this/mirror" -O "$tarfile"
 
 
 #
@@ -27,9 +27,9 @@ wget "http://php.net/get/php-$1.tar.bz2/from/this/mirror" -O "$tarfile"
 #
 if [ -f $tarfile ];
 then
-   echo "PHP v$1 downloaded. Unpacking."
+   echo "PHP v$phpversion downloaded. Unpacking."
 else
-   echo "PHP v$1 not downloaded. Exiting."
+   echo "PHP v$phpversion not downloaded. Exiting."
    exit 1
 fi
 
@@ -37,8 +37,8 @@ fi
 #
 # Unpack tar.bz2
 #
-tar jxf "php-$1.tar.bz2"
-cd "php-$1/"
+tar jxf "php-$phpversion.tar.bz2"
+cd "php-$phpversion/"
 
 
 #
