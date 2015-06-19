@@ -44,3 +44,13 @@ bash php.sh <version>
 bash mysql.sh <mysql_root_password>
 bash mediawiki.sh
 ```
+
+### Optional Quick MediaWiki Install
+
+The mediawiki.sh script uses git to retrieve the entire MediaWiki repository. Alternatively, you can use the mediawiki-quick.sh script in that step. This script pulls the tarball for MedaWiki 1.25.1 and for the matching version of the Vector skin. Note that this script currently requires options.
+
+```bash
+bash mediawiki-quick.sh <mysql_root_password> <wiki_admin_password>
+```
+
+Currently, this script names the wiki database "wiki_test", the wiki "TestWiki", and the administrator account "Admin".
