@@ -59,12 +59,5 @@ bash mediawiki.sh
 To get some extensions installed, try the following using an experimental MediaWiki extension called [ExtensionLoader](https://github.com/jamesmontalvo3/ExtensionLoader). The commands below will load the extensions as described in [this file](https://github.com/jamesmontalvo3/ExtensionLoader/blob/master/ExtensionSettings.mod.php).
 
 ```bash
-cd /var/www/meza1/htdocs/wiki/extensions
-git clone https://github.com/jamesmontalvo3/ExtensionLoader.git
-cd ..
-cat ~/sources/meza1/client_files/LocalSettingsAdditions >> ./LocalSettings.php
-cat ./extensions/ExtensionLoader/LocalSettings-append >> ./LocalSettings.php
-cp ~/sources/meza1/client_files/ExtensionSettings.php ./ExtensionSettings.php
-php extensions/ExtensionLoader/updateExtensions.php
-php maintenance/update.php --quick
+cd ~/sources/meza1/client_files/extensions.sh
 ```

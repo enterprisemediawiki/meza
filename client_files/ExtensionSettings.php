@@ -1,27 +1,19 @@
 <?php
 
-// get config from: JSCMOD
-
-// handle bad file names from:
-// 'extensions/LabeledSectionTransclusion/lst.php' 
-// 'extensions/LabeledSectionTransclusion/lsth.php' 
-// "$IP/extensions/intersection/DynamicPageList.php"
-
-// move to composer?: SemanticMeetingMinutes
-// pretty sure this isn't needed with SMM: "$IP/extensions/Synopsize/Synopsize.php";
-
-
 /**
- * Extensions being considered
+ * May want to include ParserFunctionHelper in order to extension-ify templates
  */
 // 'ParserFunctionHelper' => array(
 // 	'git' => 'https://github.com/enterprisemediawiki/ParserFunctionHelper.git',
 // 	'branch' => 'master',
 // ),
 
-// not in wikimedia git, now in github/kghbln:
-// https://github.com/kghbln/ImportUsers  -- may not work well with newer versions of MW
-// consider taking into EMW
+/**
+ * ImportUsers is not in wikimedia git, now in github/kghbln. Also, it seems it
+ * may not work well with newer versions of MW
+ * @url: https://github.com/kghbln/ImportUsers
+ * Consider updating and taking into EMW.org
+ */
 // 'ImportUsers' => array(
 // 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/ImportUsers.git',
 // 	'branch' => 'master',
@@ -30,14 +22,22 @@
 // 	)
 // ),
 
-// In SVN, see https://www.mediawiki.org/wiki/Extension:Pipe_Escape
-// Do we use this?
+/**
+ * In SVN, see https://www.mediawiki.org/wiki/Extension:Pipe_Escape
+ * Do we use this? If so, should we migrate into EMW git?
+ */
 // 'PipeEscape' => array(
 // 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/PipeEscape.git',
 // 	'branch' => 'master',
 // ),
 
-
+/**
+ * Do we want to install this? Not used much with SMW...
+ */
+// 'DynamicPageList' => array(
+// 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/DynamicPageList.git',
+// 	'branch' => 'REL1_25',
+// ),
 
 $egExtensionLoaderConfig += array(
 
@@ -56,6 +56,11 @@ $egExtensionLoaderConfig += array(
 
 	'ExternalData' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/ExternalData.git',
+		'branch' => 'REL1_25',
+	),
+
+	'LabeledSectionTransclusion' => array(
+		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/LabeledSectionTransclusion.git',
 		'branch' => 'REL1_25',
 	),
 
@@ -85,20 +90,20 @@ $egExtensionLoaderConfig += array(
 		'branch' => 'REL1_25',
 	),
 
-	// 'SemanticForms' => array(
-	// 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticForms.git',
-	// 	'branch' => 'REL1_25',
-	// ),
+	'SemanticForms' => array(
+		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticForms.git',
+		'branch' => 'REL1_25',
+	),
 
-	// 'SemanticInternalObjects' => array(
-	// 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticInternalObjects.git',
-	// 	'branch' => 'REL1_25',
-	// ),
+	'SemanticInternalObjects' => array(
+		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticInternalObjects.git',
+		'branch' => 'REL1_25',
+	),
 
-	// 'SemanticCompoundQueries' => array(
-	// 	'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticCompoundQueries.git',
-	// 	'branch' => 'REL1_25',
-	// ),
+	'SemanticCompoundQueries' => array(
+		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/SemanticCompoundQueries.git',
+		'branch' => 'REL1_25',
+	),
 
 	'Arrays' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/Arrays.git',
