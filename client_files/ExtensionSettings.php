@@ -72,10 +72,11 @@ $egExtensionLoaderConfig += array(
 		),
 	),
 
-	'HeaderFooter' => array(
-		'git' => 'https://github.com/enterprisemediawiki/HeaderFooter.git',
-		'branch' => 'master',
-	),
+	// managed by composer due to use of SemanticMeetingMinutes
+	// 'HeaderFooter' => array(
+	// 	'git' => 'https://github.com/enterprisemediawiki/HeaderFooter.git',
+	// 	'branch' => 'master',
+	// ),
 
 	'WhoIsWatching' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/WhoIsWatching.git',
@@ -222,10 +223,11 @@ $egExtensionLoaderConfig += array(
 		),
 	),
 
-	'NumerAlpha' => array(
-		'git' => 'https://github.com/jamesmontalvo3/NumerAlpha.git',
-		'branch' => 'master',
-	),
+	// managed by composer due to use of SemanticMeetingMinutes
+	// 'NumerAlpha' => array(
+	// 	'git' => 'https://github.com/jamesmontalvo3/NumerAlpha.git',
+	// 	'branch' => 'master',
+	// ),
 
 	'Variables' => array(
 		'git' => 'https://git.wikimedia.org/git/mediawiki/extensions/Variables.git',
