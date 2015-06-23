@@ -1,0 +1,42 @@
+
+// opens external links in new window
+$wgExternalLinkTarget = '_blank';
+
+// added this line to allow linking. specifically to Imagery Online.
+$wgAllowExternalImages = true;
+$wgAllowImageTag = true;
+
+$wgVectorUseSimpleSearch = true;
+
+//$wgDefaultUserOptions['useeditwarning'] = 1;
+
+// disable page edit warning (edit warning affect Semantic Forms)
+$wgVectorFeatures['editwarning']['global'] = false;
+
+$wgDefaultUserOptions['rememberpassword'] = 1;
+
+// users watch pages by default (they can override in settings)
+$wgDefaultUserOptions['watchdefault'] = 1;
+$wgDefaultUserOptions['watchmoves'] = 1;
+$wgDefaultUserOptions['watchdeletion'] = 1;
+$wgDefaultUserOptions['watchcreations'] = 1;
+
+$wgEnableMWSuggest = true;
+
+// fixes login issue for some users (login issue fixed in MW version 1.18.1 supposedly)
+$wgDisableCookieCheck = true;
+
+#Set Default Timezone
+$wgLocaltimezone = "America/Chicago";
+$oldtz = getenv("TZ");
+putenv("TZ=$wgLocaltimezone");
+
+$wgMaxUploadSize = 1024*1024*40;
+//$wgUploadSizeWarning = 1024*1024*100;
+
+$wgFileExtensions[] = 'mp3';
+$wgFileExtensions[] = 'aac';
+$wgFileExtensions[] = 'msg';
+
+$wgMaxImageArea = 1.25e10; // Images on [[Snorkel]] fail without this
+// $wgMemoryLimit = 500000000; //Default is 50M. This is 500M.
