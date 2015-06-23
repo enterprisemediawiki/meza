@@ -62,9 +62,9 @@ To get some extensions installed, try the following using an experimental MediaW
 cd /var/www/meza1/htdocs/wiki/extensions
 git clone https://github.com/jamesmontalvo3/ExtensionLoader.git
 cd ..
-cat ./extensions/ExtensionLoader/BasicSettings >> ./LocalSettings.php
+cat ~/sources/meza1/client_files/LocalSettingsAdditions >> ./LocalSettings.php
 cat ./extensions/ExtensionLoader/LocalSettings-append >> ./LocalSettings.php
-cp ./extensions/ExtensionLoader/ExtensionSettings.mod.php ./ExtensionSettings.php
+cp ~/sources/meza1/client_files/ExtensionSettings.php ./ExtensionSettings.php
 php extensions/ExtensionLoader/updateExtensions.php
 php maintenance/update.php --quick
 ```
