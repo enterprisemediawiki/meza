@@ -82,6 +82,7 @@ cd "php-$phpversion/"
     --enable-mbregex \
     --enable-opcache \
     --enable-fpm \
+    --enable-intl \
     --prefix=/usr/local/php
 make
 make install
