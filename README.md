@@ -55,3 +55,9 @@ The mediawiki.sh script uses git to retrieve the entire MediaWiki repository. It
 bash mediawiki.sh
 ```
 
+## Initial Extension Install
+To get some extensions installed, try the following using an experimental MediaWiki extension called [ExtensionLoader](https://github.com/jamesmontalvo3/ExtensionLoader). The commands below will load the extensions as described in [this file](https://github.com/jamesmontalvo3/ExtensionLoader/blob/master/ExtensionSettings.mod.php).
+
+```bash
+bash ~/sources/meza1/client_files/extensions.sh
+```
