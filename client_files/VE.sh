@@ -19,7 +19,9 @@ cd /etc
 git clone https://gerrit.wikimedia.org/r/p/mediawiki/services/parsoid
 cd parsoid
 echo "******* Installing parsoid *******"
-npm install -g # install globally
+#npm install -g # install globally
+#attempt to install globally was resulting in several errors
+npm install
 # npm install results in "npm WARN prefer global jshint@2.8.0 should be installed with -g"
 
 echo "******* Testing parsoid *******"
@@ -83,6 +85,7 @@ chkconfig --add /etc/init.d/parsoid
 echo "******* Starting parsoid server *******"
 #chkconfig parsoid on
 service parsoid start
+sleep 10  # Waits 10 seconds
 echo "******* Please test VE in your wiki *******"
 
 # Note that you can't access the parsoid service via 192.168.56.58:8000 from host (at least by default)
