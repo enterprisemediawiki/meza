@@ -1,3 +1,5 @@
+
+// Begin info for VE
 //require_once "$IP/extensions/UniversalLanguageSelector/UniversalLanguageSelector.php";
 
 //require_once "$IP/extensions/VisualEditor/VisualEditor.php";
@@ -19,3 +21,5 @@ $wgVisualEditorParsoidURL = 'http://127.0.0.1:8000';
 // Interwiki prefix to pass to the Parsoid instance
 // Parsoid will be called as $url/$prefix/$pagename
 $wgVisualEditorParsoidPrefix = 'wiki';
+
+// End info for VE

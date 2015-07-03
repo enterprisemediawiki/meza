@@ -1,3 +1,5 @@
+
+# Add 2 extensions required for VE
 $egExtensionLoaderConfig += array(
 	'UniversalLanguageSelector' => array(
 		'git' => 'https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UniversalLanguageSelector.git',
@@ -8,3 +10,5 @@ $egExtensionLoaderConfig += array(
 		'branch' => 'REL1_25',
 	),
 );
+
+# End of VE additions
