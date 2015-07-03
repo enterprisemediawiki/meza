@@ -26,7 +26,7 @@ npm test #optional?
 # several warnings come out of npm test
 
 # Configure parsoid for wiki use
-# This part can be modified once localsettings.js is included in initial download of files
+# TODO This part can be modified once localsettings.js is included in initial download of files
 # TODO change client_files to master once merged
 # localsettings for parsoid
 echo "******* Downloading configuration files *******"
@@ -55,14 +55,28 @@ git submodule update --init
 # Read https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
 
 # Start the server
-echo "******* Starting parsoid server *******"
-node /etc/parsoid/api/server.js
-
-# Note that you can't access the parsoid service via 192.168.56.58:8000 from host (at least by default)
-# but you can use curl 127.0.0.1:8000 in ssh to verify it works
+#echo "******* Starting parsoid server *******"
+#node /etc/parsoid/api/server.js
 
 # Need to replace or add an automated way of starting the server (upon reboot)
 # https://www.mediawiki.org/wiki/Parsoid/Developer_Setup#Starting_the_Parsoid_service_automatically
+# http://www.tldp.org/HOWTO/HighQuality-Apps-HOWTO/boot.html
+# https://github.com/narath/brigopedia#setup-visualeditor-extension
+# Create service script
+echo "******* Creaing parsoid service *******"
+cd ~/sources/meza1/client_files
+# TODO This part can be modified once localsettings.js is included in initial download of files
+wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installVE/client_files/initd_parsoid.sh
+cp initd_parsoid.sh /etc/init.d/parsoid
+chmod +x /etc/init.d/parsoid
+
+# Start parsoid service
+echo "******* Starting parsoid server *******"
+chkconfig httpd on
+service httpd status
+
+# Note that you can't access the parsoid service via 192.168.56.58:8000 from host (at least by default)
+# but you can use curl 127.0.0.1:8000 in ssh to verify it works
 
 # Note documentation for multi-language support configuration: https://www.mediawiki.org/wiki/Extension:UniversalLanguageSelector
 
