@@ -83,6 +83,7 @@ chkconfig --add /etc/init.d/parsoid
 echo "******* Starting parsoid server *******"
 #chkconfig parsoid on
 service parsoid start
+echo "******* Please test VE in your wiki *******"
 
 # Note that you can't access the parsoid service via 192.168.56.58:8000 from host (at least by default)
 # but you can use curl 127.0.0.1:8000 in ssh to verify it works
