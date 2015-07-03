@@ -6,7 +6,7 @@ cd ~/sources
 wget https://nodejs.org/dist/v0.12.5/node-v0.12.5.tar.gz
 tar zxvf node-v0.12.5.tar.gz
 cd node-v0.12.5
-./configure --prefix=/etc/mediawiki/parsoid
+./configure --prefix=/etc/mediawiki/node
 make
 make install
 
@@ -22,12 +22,19 @@ npm test #optional?
 
 # Configure parsoid for wiki use
 # This part can be modified once localsettings.js is included in initial download of files
-cd ~/sources
-wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/master/client_files/localsettings.js
+# TODO change client_files to master once merged
+# localsettings for parsoid
+cd ~/sources/meza1/client_files
+wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installVE/client_files/localsettings.js
 cp localsettings.js /etc/mediawiki/parsoid/api/localsettings.js
-wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/master/client_files/ExtensionSettingsVE.php
+# Add VE and UniversalLanguageSelector to ExtensionSettings
+wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installVE/client_files/ExtensionSettingsVE.php
 cp ExtensionSettingsVE.php /var/www/meza1/htdocs/wiki/ExtensionSettingsVE.php
-wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/master/client_files/LocalSettingsVE.php
+cat /var/www/meza1/htdocs/wiki/ExtensionSettingsVE.php >> /var/www/meza1/htdocs/wiki/ExtensionSettings.php
+# Add VE settings to LocalSettings.php
+wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installVE/client_files/LocalSettingsVE.php
+cp LocalSettingsVE.php /var/www/meza1/htdocs/wiki/LocalSettingsVE.php
+cat /var/www/meza1/htdocs/wiki/LocalSettingsVE.php >> /var/www/meza1/htdocs/wiki/LocalSettings.php
 
 # Run updateExtensions to install UniversalLanguageSelector and VisualEditor
 php /var/www/meza1/htdocs/wiki/extensions/ExtensionLoader/updateExtensions.php
@@ -36,8 +43,6 @@ cd /usr/var/meza1/htdocs/wiki/extensions/VisualEditor
 # Will this git command work with the way ExtensionLoader installs the extension?
 git submodule update --init
 
-# Add VE settings to LocalSettings.php
-cat ~/sources/LocalSettingsVE.php >> /var/www/meza1/htdocs/wiki/LocalSettings.php
 
 # Read https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
 

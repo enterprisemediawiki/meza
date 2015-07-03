@@ -1,6 +1,6 @@
-require_once "$IP/extensions/UniversalLanguageSelector/UniversalLanguageSelector.php";
+//require_once "$IP/extensions/UniversalLanguageSelector/UniversalLanguageSelector.php";
 
-require_once "$IP/extensions/VisualEditor/VisualEditor.php";
+//require_once "$IP/extensions/VisualEditor/VisualEditor.php";
 
 // Enable by default for everybody
 $wgDefaultUserOptions['visualeditor-enable'] = 1;
