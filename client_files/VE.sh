@@ -3,6 +3,7 @@ echo "******* Downloading node.js *******"
 cd ~/sources
 
 # Download, compile, and install node
+# Ref: https://www.digitalocean.com/community/tutorials/how-to-install-and-run-a-node-js-app-on-centos-6-4-64bit
 wget https://nodejs.org/dist/v0.12.5/node-v0.12.5.tar.gz
 tar zxvf node-v0.12.5.tar.gz
 cd node-v0.12.5
@@ -58,7 +59,14 @@ git submodule update --init
 #echo "******* Starting parsoid server *******"
 #node /etc/parsoid/api/server.js
 
-# Need to replace or add an automated way of starting the server (upon reboot)
+# Create parsoid user to run parsoid node server
+cd /etc/parsoid #not sure if this is necessary
+useradd parsoid
+
+# Grant parsoid user ownership of /opt/services/parsoid
+chown parsoid:parsoid /etc/parsoid -R
+
+# I used the following references for an automated service for starting parsoid on boot:
 # https://www.mediawiki.org/wiki/Parsoid/Developer_Setup#Starting_the_Parsoid_service_automatically
 # http://www.tldp.org/HOWTO/HighQuality-Apps-HOWTO/boot.html
 # https://github.com/narath/brigopedia#setup-visualeditor-extension
@@ -68,12 +76,13 @@ cd ~/sources/meza1/client_files
 # TODO This part can be modified once localsettings.js is included in initial download of files
 wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installVE/client_files/initd_parsoid.sh
 cp initd_parsoid.sh /etc/init.d/parsoid
-chmod +x /etc/init.d/parsoid
+chmod 755 /etc/init.d/parsoid
+chkconfig --add /etc/init.d/parsoid
 
 # Start parsoid service
 echo "******* Starting parsoid server *******"
-chkconfig httpd on
-service httpd status
+#chkconfig parsoid on
+service parsoid start
 
 # Note that you can't access the parsoid service via 192.168.56.58:8000 from host (at least by default)
 # but you can use curl 127.0.0.1:8000 in ssh to verify it works
