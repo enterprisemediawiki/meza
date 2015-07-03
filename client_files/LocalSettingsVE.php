@@ -1,8 +1,5 @@
 
-// Begin info for VE
-//require_once "$IP/extensions/UniversalLanguageSelector/UniversalLanguageSelector.php";
-
-//require_once "$IP/extensions/VisualEditor/VisualEditor.php";
+// ******* Begin info for VE *******
 
 // Enable by default for everybody
 $wgDefaultUserOptions['visualeditor-enable'] = 1;
@@ -22,4 +19,4 @@ $wgVisualEditorParsoidURL = 'http://127.0.0.1:8000';
 // Parsoid will be called as $url/$prefix/$pagename
 $wgVisualEditorParsoidPrefix = 'wiki';
 
-// End info for VE
+// ******* End info for VE *******
