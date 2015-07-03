@@ -1,22 +1,27 @@
 
-
+echo "*** Downloading node.js ***"
 cd ~/sources
 
 # Download, compile, and install node
 wget https://nodejs.org/dist/v0.12.5/node-v0.12.5.tar.gz
 tar zxvf node-v0.12.5.tar.gz
 cd node-v0.12.5
-./configure --prefix=/etc/mediawiki/node
+./configure
+echo "*** Compiling node.js ***"
 make
+echo "*** Installing node.js ***"
 make install
 
-# Download and install parsoid
+# Download and install parsoid\
+echo "*** Downloading parsoid ***"
 cd /etc/mediawiki
 git clone https://gerrit.wikimedia.org/r/p/mediawiki/services/parsoid
 cd parsoid
+echo "*** Installing parsoid ***"
 npm install
 # npm install results in "npm WARN prefer global jshint@2.8.0 should be installed with -g"
 
+echo "*** Testing parsoid ***"
 npm test #optional?
 # several warnings come out of npm test
 
@@ -24,6 +29,7 @@ npm test #optional?
 # This part can be modified once localsettings.js is included in initial download of files
 # TODO change client_files to master once merged
 # localsettings for parsoid
+echo "*** Downloading configuration files ***"
 cd ~/sources/meza1/client_files
 wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installVE/client_files/localsettings.js
 cp localsettings.js /etc/mediawiki/parsoid/api/localsettings.js
@@ -37,8 +43,10 @@ cp LocalSettingsVE.php /var/www/meza1/htdocs/wiki/LocalSettingsVE.php
 cat /var/www/meza1/htdocs/wiki/LocalSettingsVE.php >> /var/www/meza1/htdocs/wiki/LocalSettings.php
 
 # Run updateExtensions to install UniversalLanguageSelector and VisualEditor
+echo "*** Installing extensions ***"
 php /var/www/meza1/htdocs/wiki/extensions/ExtensionLoader/updateExtensions.php
 
+echo "*** Installing VE ***"
 cd /usr/var/meza1/htdocs/wiki/extensions/VisualEditor
 # Will this git command work with the way ExtensionLoader installs the extension?
 git submodule update --init
@@ -47,6 +55,7 @@ git submodule update --init
 # Read https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
 
 # Start the server
+echo "*** Starting parsoid server ***"
 node ~/sources/parsoid/api/server.js
 
 # Note that you can't access the parsoid service via 192.168.56.58:8000 from host (at least by default)
