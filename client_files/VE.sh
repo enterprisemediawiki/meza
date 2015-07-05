@@ -13,7 +13,7 @@ make
 echo "******* Installing node.js *******"
 make install
 
-# Download and install parsoid\
+# Download and install parsoid
 echo "******* Downloading parsoid *******"
 cd /etc
 git clone https://gerrit.wikimedia.org/r/p/mediawiki/services/parsoid
@@ -34,16 +34,13 @@ npm test #optional?
 # localsettings for parsoid
 echo "******* Downloading configuration files *******"
 cd ~/sources/meza1/client_files
-wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installVE/client_files/localsettings.js
-cp localsettings.js /etc/parsoid/api/localsettings.js
+
+# Copy Parsoid settings from Meza to Parsoid install
+cp ./localsettings.js /etc/parsoid/api/localsettings.js
 # Add VE and UniversalLanguageSelector to ExtensionSettings
-wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installVE/client_files/ExtensionSettingsVE.php
-cp ExtensionSettingsVE.php /var/www/meza1/htdocs/wiki/ExtensionSettingsVE.php
-cat /var/www/meza1/htdocs/wiki/ExtensionSettingsVE.php >> /var/www/meza1/htdocs/wiki/ExtensionSettings.php
+cat ./ExtensionSettingsVE.php >> /var/www/meza1/htdocs/wiki/ExtensionSettings.php
 # Add VE settings to LocalSettings.php
-wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installVE/client_files/LocalSettingsVE.php
-cp LocalSettingsVE.php /var/www/meza1/htdocs/wiki/LocalSettingsVE.php
-cat /var/www/meza1/htdocs/wiki/LocalSettingsVE.php >> /var/www/meza1/htdocs/wiki/LocalSettings.php
+cat ./LocalSettingsVE.php >> /var/www/meza1/htdocs/wiki/LocalSettings.php
 
 # Run updateExtensions to install UniversalLanguageSelector and VisualEditor
 echo "******* Installing extensions *******"
@@ -51,18 +48,10 @@ php /var/www/meza1/htdocs/wiki/extensions/ExtensionLoader/updateExtensions.php
 
 echo "******* Installing VE *******"
 cd /var/www/meza1/htdocs/wiki/extensions/VisualEditor
-# Will this git command work with the way ExtensionLoader installs the extension?
 git submodule update --init
 
-
-# Read https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
-
-# Start the server
-#echo "******* Starting parsoid server *******"
-#node /etc/parsoid/api/server.js
-
 # Create parsoid user to run parsoid node server
-cd /etc/parsoid #not sure if this is necessary
+cd /etc/parsoid # @issue#48: is this necessary?
 useradd parsoid
 
 # Grant parsoid user ownership of /opt/services/parsoid
@@ -73,17 +62,15 @@ chown parsoid:parsoid /etc/parsoid -R
 # http://www.tldp.org/HOWTO/HighQuality-Apps-HOWTO/boot.html
 # https://github.com/narath/brigopedia#setup-visualeditor-extension
 # Create service script
-echo "******* Creaing parsoid service *******"
+echo "******* Creating parsoid service *******"
 cd ~/sources/meza1/client_files
-# TODO This part can be modified once localsettings.js is included in initial download of files
-wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installVE/client_files/initd_parsoid.sh
-cp initd_parsoid.sh /etc/init.d/parsoid
+cp ./initd_parsoid.sh /etc/init.d/parsoid
 chmod 755 /etc/init.d/parsoid
 chkconfig --add /etc/init.d/parsoid
 
 # Start parsoid service
 echo "******* Starting parsoid server *******"
-#chkconfig parsoid on
+#chkconfig parsoid on # @todo: not required?
 service parsoid start
 sleep 10  # Waits 10 seconds
 echo "******* Please test VE in your wiki *******"
