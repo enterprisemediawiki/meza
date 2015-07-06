@@ -50,6 +50,12 @@ echo "******* Installing VE *******"
 cd /var/www/meza1/htdocs/wiki/extensions/VisualEditor
 git submodule update --init
 
+# Any time you run updateExtensions.php it may be required to run
+# `php maintenance/update.php` since new extension versions may be installed
+echo "******* Running update.php to update database as required *******"
+cd /var/www/meza1/htdocs/wiki/maintenance
+php update.php
+
 # Create parsoid user to run parsoid node server
 cd /etc/parsoid # @issue#48: is this necessary?
 useradd parsoid
