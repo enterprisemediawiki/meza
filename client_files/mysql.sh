@@ -3,10 +3,16 @@
 # Setup MySQL
 
 
+# if the script was called in the form:
+# bash mysql.sh mypassword
+# then set mysql_root_pass to mypassword (meaning no user interaction required)
+if [ ! -z "$1" ]; then
+    mysql_root_pass="$1"
+fi
+
 #
 # Prompt for password
 #
-
 while [ -z "$mysql_root_pass" ]
 do
 echo -e "\n\n\n\nChoose a MySQL root password and press [ENTER]: "
