@@ -3,11 +3,18 @@
 # Setup everything that should be installed with yum. 
 #
 
-#
-# First check whether we're using 32 or 64 bit
-#
 cd ~/sources
 
+# if the script was called in the form:
+# bash yums.sh 32
+# then set architecture to 32 (meaning no user interaction required)
+if [ ! -z "$1" ]; then
+    architecture="$1"
+fi
+
+#
+# Force user to pick an architecture: 32 or 64 bit
+#
 while [ "$architecture" != "32" ] && [ "$architecture" != "64" ]
 do
 echo -e "\n\n\n\nWhich architecture are you using? Type 32 or 64 and press [ENTER]: "
