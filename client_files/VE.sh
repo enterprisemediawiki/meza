@@ -54,7 +54,7 @@ git submodule update --init
 # `php maintenance/update.php` since new extension versions may be installed
 echo "******* Running update.php to update database as required *******"
 cd /var/www/meza1/htdocs/wiki/maintenance
-php update.php
+php update.php --quick
 
 # Create parsoid user to run parsoid node server
 cd /etc/parsoid # @issue#48: is this necessary?
