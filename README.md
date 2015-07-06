@@ -61,3 +61,10 @@ To get some extensions installed, try the following using an experimental MediaW
 ```bash
 bash ~/sources/meza1/client_files/extensions.sh
 ```
+
+## Install Visual Editor
+To install Visual Editor, use the following command:
+
+```bash
+bash ~/sources/meza1/client_files/VE.sh
+```
