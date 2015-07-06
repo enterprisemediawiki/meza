@@ -24,7 +24,7 @@ do_start()
 
                 # Use "nohup" to prevent hang-up. Thanks to:
                 # http://stackoverflow.com/questions/5818202/how-to-run-node-js-app-forever-when-console-is-closed
-                runuser -l "$USER" -c "nohup $DAEMON $SERVER > $LOG_FILE &" && echo_success || echo_failure
+                runuser -l "$USER" -c "nohup $DAEMON $SERVER >> $LOG_FILE &" && echo_success || echo_failure
 
                 RETVAL=$?
                 echo
