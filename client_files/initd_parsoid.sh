@@ -21,7 +21,10 @@ do_start()
 {
         if [ ! -f "$LOCK_FILE" ] ; then
                 echo -n $"Starting $SERVER: "
-                runuser -l "$USER" -c "$DAEMON $SERVER >> $LOG_FILE &" && echo_success || echo_failure
+
+                # Use "nohup" to prevent hang-up. Thanks to:
+                # http://stackoverflow.com/questions/5818202/how-to-run-node-js-app-forever-when-console-is-closed
+                runuser -l "nohup $USER" -c "$DAEMON $SERVER > $LOG_FILE &" && echo_success || echo_failure
                 RETVAL=$?
                 echo
                 [ $RETVAL -eq 0 ] && touch $LOCK_FILE
