@@ -17,27 +17,41 @@
 #
 echo "******* Downloading and installing JAVA Development Kit *******"
 cd ~/sources/meza1/client_files
-wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.rpm
-rpm -ivh jdk-8u45-linux-x64.rpm
-java --version
-echo $JAVA_HOME
+yum -y install java-1.7.0-openjdk
+# Try this for JDK 8: http://tecadmin.net/install-java-8-on-centos-rhel-and-fedora/
+#wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.rpm
+#rpm -ivh jdk-8u45-linux-x64.rpm
+
+# Verify JAVA is installed
+java -version
+
+# Set $JAVA_HOME # Is this required?
+# http://askubuntu.com/questions/175514/how-to-set-java-home-for-openjdk
+echo "JAVA_HOME=\"/usr/bin\"" >> /etc/environment
+source /etc/environment
+echo $JAVA_HOME 
 
 #
 # Install Elasticsearch
 #
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html
+#
+
+# Install Elasticsearch via yum repository
+#
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-repositories.html
 # 
 
 # Download and install the public signing key:
 echo "******* Downloading and installing public signing key *******"
+cd ~/sources/meza1/client_files
 rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
 
 # Add yum repo file
 echo "******* Downloading yum repo file for Elasticsearch *******"
 cd ~/sources/meza1/client_files
 wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installElasticSearch/client_files/elasticsearch.repo
-cp ~/sources/meza1/client_files/elasticsearch.repo /etc/yum.repos.d/elasticsearch.repo
+cp ./elasticsearch.repo /etc/yum.repos.d/elasticsearch.repo
 
 # Install repo
 echo "******* Installing yum repo file for Elasticsearch *******"
@@ -47,11 +61,30 @@ yum -y install elasticsearch
 echo "******* Configuring Elasticsearch to start on boot *******"
 chkconfig --add elasticsearch
 
+# *** MANUAL INSTALLATION OPTION (delete) ***
+#cd ~/sources
+#curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.6.0.tar.gz
+#tar -xvf elasticsearch-1.6.0.tar.gz
+#cp -r elasticsearch-1.6.0 /etc/elasticsearch-1.6.0
+#cd /etc/elasticsearch-1.6.0/bin
+
 #
 # Elasticsearch Configuration
 #
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html
 # 
+
+# Add host name per https://github.com/elastic/elasticsearch/issues/6611
+echo "127.0.0.1 Meza1" >> /etc/hosts
+
+cd ~/sources/meza1/client_files
+wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installElasticSearch/client_files/elasticsearch.yml
+cp ./elasticsearch.yml /etc/elasticsearch-1.6.0/config
+# create a config file and copy it in elasticsearch.yml
+
+
+# Manually start Elasticsearch
+# /usr/share/elasticsearch/bin/elasticsearch #add -d to run in background
 
 # TODO: Start elasticsearch at this point or is there configuration to add?
 # service elasticsearch start #options:  --cluster.name my_cluster_name --node.name my_node_name
