@@ -142,11 +142,11 @@ node.name: "Meza1 Node"
 
 # Path to directory containing configuration (this file and logging.yml):
 #
-#path.conf: /path/to/conf
+path.conf: /etc/elasticsearch
 
 # Path to directory where to store index data allocated for this node.
 #
-#path.data: /path/to/data
+path.data: /var/data/elasticsearch
 #
 # Can optionally include more than one location, causing data to be striped across
 # the locations (a la RAID 0) on a file level, favouring locations with most free
@@ -156,11 +156,11 @@ node.name: "Meza1 Node"
 
 # Path to temporary files:
 #
-#path.work: /path/to/work
+path.work: /var/work/elasticsearch
 
 # Path to log files:
 #
-#path.logs: /path/to/logs
+path.logs: /var/log/elasticsearch
 
 # Path to where plugins are installed:
 #
@@ -383,3 +383,6 @@ node.name: "Meza1 Node"
 # it unless you need it is recommended (it is disabled by default).
 #
 #http.jsonp.enable: true
+
+# Enable dynamic scripting per https://www.mediawiki.org/wiki/Thread:Extension_talk:CirrusSearch/error_using_ElasticSearch
+script.disable_dynamic: false
