@@ -22,9 +22,6 @@ get_parsoid_process_id()
 {
 	echo `ps -aefw | grep "$DAEMON $SERVER" | grep -v " grep " | awk '{print $2}'`
 }
-
-
-
 parsoid_start_echo_success()
 {
 	# Wait 10 seconds since paroid takes some time to start and we don't have a
@@ -35,14 +32,21 @@ parsoid_start_echo_success()
 do_start()
 {
     pid=$(get_parsoid_process_id)
-    echo "Current parsoid process ID: $pid (end pid)"
 
-    echo -n $"Starting $SERVER: "
+    # if no parsoid process exists already
+	if [ -z "$pid" ]; then
 
-    # Use "nohup" to prevent hang-up. Thanks to:
-    # http://stackoverflow.com/questions/5818202/how-to-run-node-js-app-forever-when-console-is-closed
-    runuser -l "$USER" -c "nohup $DAEMON $SERVER >> $LOG_FILE &" && parsoid_start_echo_success || echo_failure
-    RETVAL=$?
+	    echo -n $"Starting $SERVER: "
+
+	    # Use "nohup" to prevent hang-up. Thanks to:
+	    # http://stackoverflow.com/questions/5818202/how-to-run-node-js-app-forever-when-console-is-closed
+	    runuser -l "$USER" -c "nohup $DAEMON $SERVER >> $LOG_FILE 2>&1 &" && parsoid_start_echo_success || echo_failure
+	    RETVAL=$?
+
+	else
+	    echo "Parsoid already running with process ID = $pid"
+	    RETVAL=1
+	fi
 }
 do_stop()
 {
@@ -50,6 +54,7 @@ do_stop()
     # pid=`ps -aefw | grep "$DAEMON $SERVER" | grep -v " grep " | awk '{print $2}'`
     pid=$(get_parsoid_process_id)
     kill -9 $pid > /dev/null 2>&1 && echo_success || echo_failure
+    echo ""
     RETVAL=$?
 }
 

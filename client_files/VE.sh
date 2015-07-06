@@ -72,7 +72,6 @@ chkconfig --add /etc/init.d/parsoid
 echo "******* Starting parsoid server *******"
 #chkconfig parsoid on # @todo: not required?
 service parsoid start
-sleep 10  # Waits 10 seconds
 echo "******* Please test VE in your wiki *******"
 
 # Note that you can't access the parsoid service via 192.168.56.58:8000 from host (at least by default)
