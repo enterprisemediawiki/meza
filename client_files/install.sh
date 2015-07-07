@@ -106,6 +106,11 @@ if ! hash git 2>/dev/null; then
     yum install git -y
 fi
 
+# if no sources directory, create it
+if [ ! -d ~/sources ]; then
+	mkdir ~/sources
+fi
+
 # function to install Meza1 via git
 install_via_git()
 {
@@ -115,10 +120,6 @@ install_via_git()
 	git checkout "$git_branch"
 }
 
-# if no sources directory, create it
-if [ ! -d ~/sources ]; then
-	mkdir ~/sources
-fi
 
 # no meza1 directory
 if [ ! -d ~/sources/meza1 ]; then
@@ -139,7 +140,11 @@ fi
 cd ~/sources/meza1/client_files
 bash yums.sh "$architecture" || exit 1
 bash apache.sh || exit 1
+
+# install PHP, then add php to PATH
 bash php.sh "$phpversion" || exit 1
+source /etc/profile.d/php.sh # allow usage of php command?
+
 bash mysql.sh "$mysql_root_pass" || exit 1
 
 # bash mediawiki-quick.sh <mysql pass> <wiki db name> <wiki name> <wiki admin name> <wiki admin pass>
