@@ -96,10 +96,10 @@ make install
 
 
 #
-# Add PHP to path
+# Add PHP to path and refresh bash
 #
 echo "export PATH=/usr/local/php/bin:\$PATH" > /etc/profile.d/php.sh
-
+exec bash
 
 #
 # Initiate php.ini
