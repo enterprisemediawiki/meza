@@ -1,13 +1,20 @@
 #
-# This script installs Extension:CirrusSearch
-# which provides Elasticsearch for MediaWiki
+# This script installs everything required to use elasticsearch in MediaWiki
 # 
 # Dependencies
 # - PHP compiled with cURL
 # - Elasticsearch
 #   - JAVA 7+
 # - Extension:Elastica
+# - Extension:CirrusSearch
 # 
+# Ref:
+# https://www.mediawiki.org/wiki/Extension:CirrusSearch
+# https://en.wikipedia.org/w/api.php?action=cirrus-config-dump&srbackend=CirrusSearch&format=json
+# https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
+# https://www.mediawiki.org/wiki/Extension:CirrusSearch/Tour
+# https://wikitech.wikimedia.org/wiki/Search
+#
 
 #
 # Install JAVA
@@ -18,15 +25,17 @@
 echo "******* Downloading and installing JAVA Development Kit *******"
 cd ~/sources/meza1/client_files
 yum -y install java-1.7.0-openjdk
-# Try this for JDK 8: http://tecadmin.net/install-java-8-on-centos-rhel-and-fedora/
+# Reference this for JDK 8: http://tecadmin.net/install-java-8-on-centos-rhel-and-fedora/
 #wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.rpm
 #rpm -ivh jdk-8u45-linux-x64.rpm
 
 # Verify JAVA is installed
 java -version
 
-# Set $JAVA_HOME # Is this required?
+# Set $JAVA_HOME
+#
 # http://askubuntu.com/questions/175514/how-to-set-java-home-for-openjdk
+#
 echo "JAVA_HOME=\"/usr/bin\"" >> /etc/environment
 source /etc/environment
 echo $JAVA_HOME 
@@ -35,24 +44,22 @@ echo $JAVA_HOME
 #
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-repositories.html
 # 
+echo "******* Installing Elasticsearch *******"
 
 # Download and install the public signing key:
-echo "******* Downloading and installing public signing key *******"
 cd ~/sources/meza1/client_files
 rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
 
 # Add yum repo file
-echo "******* Downloading yum repo file for Elasticsearch *******"
 cd ~/sources/meza1/client_files
 #wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installElasticSearch/client_files/elasticsearch.repo
 cp ./elasticsearch.repo /etc/yum.repos.d/elasticsearch.repo
 
 # Install repo
-echo "******* Installing yum repo file for Elasticsearch *******"
 yum -y install elasticsearch
 
 # Configure Elasticsearch to automatically start during bootup
-echo "******* Configuring Elasticsearch to start on boot *******"
+echo "******* Adding Elasticsearch service *******"
 chkconfig --add elasticsearch
 
 # *** MANUAL INSTALLATION OPTION (delete) ***
@@ -68,6 +75,7 @@ chkconfig --add elasticsearch
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html
 # 
 
+echo "******* Adding Elasticsearch configuration *******"
 # Add host name per https://github.com/elastic/elasticsearch/issues/6611
 echo "127.0.0.1 Meza1" >> /etc/hosts
 
@@ -96,7 +104,7 @@ chown -R elasticsearch /var/work/elasticsearch
 #
 # Install Extension:Elastica and Extension:CirrusSearch
 #
-echo "******* Downloading extensions *******"
+echo "******* Adding extensions to ExtensionLoader *******"
 cd ~/sources/meza1/client_files
 # Add Elastica and CirrusSearch to ExtensionSettings
 # TODO: This part can be modified if the user gets this file in the initial VM setup script
@@ -129,28 +137,35 @@ cd /var/www/meza1/htdocs/wiki/maintenance
 php update.php --quick
 
 # Start Elasticsearch
+echo "******* Starting elasticsearch service *******"
 service elasticsearch start
 
-# Incorporate steps from https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
-#Add this to LocalSettings.php:
-# $wgDisableSearchUpdate = true;
- 
-# Now run this script to generate your elasticsearch index:
+#
+# Generate ES index
+#
+# Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
+#
+echo "******* Generating elasticsearch index *******"
+
+# Add "$wgDisableSearchUpdate = true;" to LocalSettings.php
+# Ref: http://stackoverflow.com/questions/525592/find-and-replace-inside-a-text-file-from-a-bash-command
+cd /var/www/meza1/htdocs/wiki
+sed -i -e 's/\/\/ES-CONFIG-ANCHOR/$wgDisableSearchUpdate = true;/g' LocalSettings.php
+
+# Run script to generate elasticsearch index
 php /var/www/meza1/htdocs/wiki/extensions/CirrusSearch/maintenance/updateSearchIndexConfig.php
  
-# Now remove $wgDisableSearchUpdate = true from LocalSettings.php.  Updates should start heading to Elasticsearch.
- 
-#Next bootstrap the search index by running:
-# php $MW_INSTALL_PATH/extensions/CirrusSearch/maintenance/forceSearchIndex.php --skipLinks --indexOnSkip
-# php $MW_INSTALL_PATH/extensions/CirrusSearch/maintenance/forceSearchIndex.php --skipParse
-#Note that this can take some time.  For large wikis read "Bootstrapping large wikis" below.
- 
-#Once that is complete add this to LocalSettings.php to funnel queries to ElasticSearch:
-# $wgSearchType = 'CirrusSearch';
+# Remove $wgDisableSearchUpdate = true from LocalSettings.php (updates should start heading to elasticsearch)
+sed -i -e 's/$wgDisableSearchUpdate = true;/\/\/ES-CONFIG-ANCHOR/g' LocalSettings.php
 
-# Lots of things to add from
-# https://www.mediawiki.org/wiki/Extension:CirrusSearch
-# https://en.wikipedia.org/w/api.php?action=cirrus-config-dump&srbackend=CirrusSearch&format=json
-# https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
+# Bootstrap the search index
 #
+# Note that this can take some time
+# For large wikis read "Bootstrapping large wikis" in https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
+php /var/www/meza1/htdocs/wiki/extensions/CirrusSearch/maintenance/forceSearchIndex.php --skipLinks --indexOnSkip
+php /var/www/meza1/htdocs/wiki/extensions/CirrusSearch/maintenance/forceSearchIndex.php --skipParse
+ 
+# Add "$wgSearchType = 'CirrusSearch';" to LocalSettings.php to funnel queries to ElasticSearch
+sed -i -e 's/\/\/ES-CONFIG-ANCHOR/$wgSearchType = "CirrusSearch";/g' LocalSettings.php
+
 echo "******* Complete! *******"

@@ -2,6 +2,6 @@
 // ******* Begin info for Elastic Search *******
 
 //$wgCirrusSearchServers = array( 'search01', 'search02' );
+//ES-CONFIG-ANCHOR
 
-
-// ******* Begin info for Elastic Search *******
+// ******* End info for Elastic Search *******
