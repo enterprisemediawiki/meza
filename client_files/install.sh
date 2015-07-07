@@ -115,6 +115,11 @@ install_via_git()
 	git checkout "$git_branch"
 }
 
+# if no sources directory, create it
+if [ ! -d ~/sources ]; then
+	mkdir ~/sources
+fi
+
 # no meza1 directory
 if [ ! -d ~/sources/meza1 ]; then
 	install_via_git
