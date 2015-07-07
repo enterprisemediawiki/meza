@@ -104,7 +104,7 @@ done
 if ! hash git 2>/dev/null; then
     echo "************ git not installed, installing ************"
     yum install git -y
-else
+fi
 
 # function to install Meza1 via git
 install_via_git()
