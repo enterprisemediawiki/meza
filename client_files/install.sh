@@ -12,6 +12,9 @@
 #              <wiki_admin_name> \
 #              <wiki_admin_pass>
 # then set params accordingly (meaning no user interaction required)
+#
+# These are out of hand. Change them to GNU-style long-options, see:
+# http://mywiki.wooledge.org/BashFAQ/035
 if [ ! -z "$1" ]; then
     architecture="$1"
 fi
@@ -38,6 +41,10 @@ fi
 
 if [ ! -z "$7" ]; then
     wiki_admin_pass="$7"
+fi
+
+if [ ! -z "$8" ]; then
+    git_branch="$8"
 fi
 
 
@@ -86,6 +93,43 @@ echo -e "\n\nEnter the password you would like for your wiki administrator accou
 read -s wiki_admin_pass
 done
 
+while [ -z "$git_branch" ]
+do
+echo -e "\n\nEnter the git branch of Meza1 you want to use (generally this is \"master\") [ENTER]: "
+read -s git_branch
+done
+
+
+# Check if git installed, and install it if required
+if ! hash git 2>/dev/null; then
+    echo "************ git not installed, installing ************"
+    yum install git -y
+else
+
+# function to install Meza1 via git
+install_via_git()
+{
+	cd ~/sources
+	git clone https://github.com/enterprisemediawiki/Meza1 meza1
+	cd meza1
+	git checkout "$git_branch"
+}
+
+# no meza1 directory
+if [ ! -d ~/sources/meza1 ]; then
+	install_via_git
+
+# meza1 exists, but is not a git repo (hold over from older versions of meza1)
+elif [ ! -d ~/sources/meza1/.git ]; then
+	rm -rf ~/sources/meza1
+	install_via_git
+
+# meza1 exists and is a git repo: checkout latest branch
+else
+	cd ~/sources/meza1
+	git fetch origin
+	git checkout "$git_branch"
+fi
 
 cd ~/sources/meza1/client_files
 bash yums.sh "$architecture" || exit 1
