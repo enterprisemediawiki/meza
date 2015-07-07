@@ -96,7 +96,7 @@ done
 while [ -z "$git_branch" ]
 do
 echo -e "\n\nEnter the git branch of Meza1 you want to use (generally this is \"master\") [ENTER]: "
-read -s git_branch
+read git_branch
 done
 
 
