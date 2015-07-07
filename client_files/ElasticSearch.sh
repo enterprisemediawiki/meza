@@ -25,9 +25,9 @@
 echo "******* Downloading and installing JAVA Development Kit *******"
 cd ~/sources/meza1/client_files
 yum -y install java-1.7.0-openjdk
-# Reference this for JDK 8: http://tecadmin.net/install-java-8-on-centos-rhel-and-fedora/
-#wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.rpm
-#rpm -ivh jdk-8u45-linux-x64.rpm
+# Reference this for if we want to try JDK 8: http://tecadmin.net/install-java-8-on-centos-rhel-and-fedora/
+## wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.rpm
+## rpm -ivh jdk-8u45-linux-x64.rpm
 
 # Verify JAVA is installed
 java -version
@@ -52,7 +52,6 @@ rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
 
 # Add yum repo file
 cd ~/sources/meza1/client_files
-#wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installElasticSearch/client_files/elasticsearch.repo
 cp ./elasticsearch.repo /etc/yum.repos.d/elasticsearch.repo
 
 # Install repo
@@ -63,11 +62,11 @@ echo "******* Adding Elasticsearch service *******"
 chkconfig --add elasticsearch
 
 # *** MANUAL INSTALLATION OPTION (delete) ***
-#cd ~/sources
-#curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.6.0.tar.gz
-#tar -xvf elasticsearch-1.6.0.tar.gz
-#cp -r elasticsearch-1.6.0 /etc/elasticsearch-1.6.0
-#cd /etc/elasticsearch-1.6.0/bin
+# cd ~/sources
+# curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.6.0.tar.gz
+# tar -xvf elasticsearch-1.6.0.tar.gz
+# cp -r elasticsearch-1.6.0 /etc/elasticsearch-1.6.0
+# cd /etc/elasticsearch-1.6.0/bin
 
 #
 # Elasticsearch Configuration
@@ -83,7 +82,6 @@ echo "127.0.0.1 Meza1" >> /etc/hosts
 cd /etc/elasticsearch
 mv ./elasticsearch.yml ./elasticsearch-old.yml
 cd ~/sources/meza1/client_files
-# wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installElasticSearch/client_files/elasticsearch.yml
 cp ./elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 
 # Make directories called out in elasticsearch.yml
@@ -107,8 +105,6 @@ chown -R elasticsearch /var/work/elasticsearch
 echo "******* Adding extensions to ExtensionLoader *******"
 cd ~/sources/meza1/client_files
 # Add Elastica and CirrusSearch to ExtensionSettings
-# TODO: This part can be modified if the user gets this file in the initial VM setup script
-#wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installElasticSearch/client_files/ExtensionSettingsElasticSearch.php
 cp ~/sources/meza1/client_files/ExtensionSettingsElasticSearch.php /var/www/meza1/htdocs/wiki/ExtensionSettingsElasticSearch.php
 cat /var/www/meza1/htdocs/wiki/ExtensionSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/ExtensionSettings.php
 
@@ -119,7 +115,6 @@ cat /var/www/meza1/htdocs/wiki/ExtensionSettingsElasticSearch.php >> /var/www/me
 # Add CirrusSearch settings to LocalSettings.php
 echo "******* Downloading configuration files *******"
 cd ~/sources/meza1/client_files
-#wget https://raw.githubusercontent.com/enterprisemediawiki/Meza1/installElasticSearch/client_files/LocalSettingsElasticSearch.php
 cp ~/sources/meza1/client_files/LocalSettingsElasticSearch.php /var/www/meza1/htdocs/wiki/LocalSettingsElasticSearch.php
 cat /var/www/meza1/htdocs/wiki/LocalSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/LocalSettings.php
 
@@ -139,6 +134,7 @@ php update.php --quick
 # Start Elasticsearch
 echo "******* Starting elasticsearch service *******"
 service elasticsearch start
+sleep 10  # Waits 10 seconds
 
 #
 # Generate ES index
