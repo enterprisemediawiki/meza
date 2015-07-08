@@ -100,11 +100,10 @@ chown -R elasticsearch /var/work/elasticsearch
 
 #
 # Install Extension:Elastica and Extension:CirrusSearch
+# Add Elastica and CirrusSearch to ExtensionSettings
 #
 echo "******* Adding extensions to ExtensionLoader *******"
-cd ~/sources/meza1/client_files
-# Add Elastica and CirrusSearch to ExtensionSettings
-cat /var/www/meza1/htdocs/wiki/ExtensionSettingsElasticSearch.php >> ./ExtensionSettingsElasticSearch.php
+cat ~/sources/meza1/client_files/ExtensionSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/ExtensionSettingsElasticSearch.php
 
 #
 # MW Configuration
@@ -112,8 +111,7 @@ cat /var/www/meza1/htdocs/wiki/ExtensionSettingsElasticSearch.php >> ./Extension
 
 # Add CirrusSearch settings to LocalSettings.php
 echo "******* Downloading configuration files *******"
-cd ~/sources/meza1/client_files
-cat /var/www/meza1/htdocs/wiki/LocalSettingsElasticSearch.php >> ./LocalSettingsElasticSearch.php
+cat ~/sources/meza1/client_files/LocalSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/LocalSettingsElasticSearch.php
 
 # Run updateExtensions to install UniversalLanguageSelector and VisualEditor
 echo "******* Installing extensions *******"
