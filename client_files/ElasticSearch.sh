@@ -103,7 +103,7 @@ chown -R elasticsearch /var/work/elasticsearch
 # Add Elastica and CirrusSearch to ExtensionSettings
 #
 echo "******* Adding extensions to ExtensionLoader *******"
-cat ~/sources/meza1/client_files/ExtensionSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/ExtensionSettingsElasticSearch.php
+cat ~/sources/meza1/client_files/ExtensionSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/ExtensionSettings.php
 
 #
 # MW Configuration
@@ -111,7 +111,7 @@ cat ~/sources/meza1/client_files/ExtensionSettingsElasticSearch.php >> /var/www/
 
 # Add CirrusSearch settings to LocalSettings.php
 echo "******* Downloading configuration files *******"
-cat ~/sources/meza1/client_files/LocalSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/LocalSettingsElasticSearch.php
+cat ~/sources/meza1/client_files/LocalSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/LocalSettings.php
 
 # Run updateExtensions to install UniversalLanguageSelector and VisualEditor
 echo "******* Installing extensions *******"
