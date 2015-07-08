@@ -3,6 +3,13 @@
 # Setup PHP
 
 
+# if the script was called in the form:
+# bash php.sh 5.4.42
+# then set phpversion to 5.4.42 (meaning no user interaction required)
+if [ ! -z "$1" ]; then
+    phpversion="$1"
+fi
+
 #
 # Prompt user for PHP version
 #
@@ -89,7 +96,7 @@ make install
 
 
 #
-# Add PHP to path
+# Add PHP to path...refresh bash external to this script.
 #
 echo "export PATH=/usr/local/php/bin:\$PATH" > /etc/profile.d/php.sh
 
