@@ -129,7 +129,7 @@ php update.php --quick
 # Start Elasticsearch
 echo "******* Starting elasticsearch service *******"
 service elasticsearch start
-sleep 10  # Waits 10 seconds
+sleep 20  # Waits 10 seconds
 
 #
 # Generate ES index
