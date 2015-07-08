@@ -29,16 +29,16 @@ yum -y install java-1.7.0-openjdk
 ## wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.rpm
 ## rpm -ivh jdk-8u45-linux-x64.rpm
 
-# Verify JAVA is installed
+# Display java version for reference
 java -version
 
 # Set $JAVA_HOME
 #
 # http://askubuntu.com/questions/175514/how-to-set-java-home-for-openjdk
 #
-echo "JAVA_HOME=\"/usr/bin\"" >> /etc/environment
-source /etc/environment
-echo $JAVA_HOME 
+echo "export JAVA_HOME=/usr/bin" > /etc/profile.d/java.sh
+source /etc/profile.d/java.sh
+echo "JAVA_HOME = $JAVA_HOME"
 
 # Install Elasticsearch via yum repository
 #
@@ -51,7 +51,6 @@ cd ~/sources/meza1/client_files
 rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
 
 # Add yum repo file
-cd ~/sources/meza1/client_files
 cp ./elasticsearch.repo /etc/yum.repos.d/elasticsearch.repo
 
 # Install repo
@@ -101,12 +100,10 @@ chown -R elasticsearch /var/work/elasticsearch
 
 #
 # Install Extension:Elastica and Extension:CirrusSearch
+# Add Elastica and CirrusSearch to ExtensionSettings
 #
 echo "******* Adding extensions to ExtensionLoader *******"
-cd ~/sources/meza1/client_files
-# Add Elastica and CirrusSearch to ExtensionSettings
-cp ~/sources/meza1/client_files/ExtensionSettingsElasticSearch.php /var/www/meza1/htdocs/wiki/ExtensionSettingsElasticSearch.php
-cat /var/www/meza1/htdocs/wiki/ExtensionSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/ExtensionSettings.php
+cat ~/sources/meza1/client_files/ExtensionSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/ExtensionSettings.php
 
 #
 # MW Configuration
@@ -114,9 +111,7 @@ cat /var/www/meza1/htdocs/wiki/ExtensionSettingsElasticSearch.php >> /var/www/me
 
 # Add CirrusSearch settings to LocalSettings.php
 echo "******* Downloading configuration files *******"
-cd ~/sources/meza1/client_files
-cp ~/sources/meza1/client_files/LocalSettingsElasticSearch.php /var/www/meza1/htdocs/wiki/LocalSettingsElasticSearch.php
-cat /var/www/meza1/htdocs/wiki/LocalSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/LocalSettings.php
+cat ~/sources/meza1/client_files/LocalSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/LocalSettings.php
 
 # Run updateExtensions to install UniversalLanguageSelector and VisualEditor
 echo "******* Installing extensions *******"
