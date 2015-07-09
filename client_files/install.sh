@@ -11,9 +11,6 @@ cat << EOM
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 EOM
 
-# Display wiki pigeon
-cat client_files/pigeon.txt
-
 
 # if the script was called in the form:
 # bash install <architecture> \
@@ -218,3 +215,16 @@ cat << EOM
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 EOM
 bash VE.sh || exit 1
+
+
+cat << EOM
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                                                         #
+#  Meza1 installation complete. Woo-woo-woooo... WIKI!!!  #
+#                                                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+EOM
+
+# Display Most Plusquamperfekt Wiki Pigeon of Victory
+cat ~/sources/meza1/client_files/pigeon.txt
+
