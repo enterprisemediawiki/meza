@@ -60,21 +60,21 @@ fi
 # Force user to pick an architecture: 32 or 64 bit
 while [ "$architecture" != "32" ] && [ "$architecture" != "64" ]
 do
-echo -e "\n\n\n\nWhich architecture are you using? Type 32 or 64 and press [ENTER]: "
+echo -e "\n\nWhich architecture are you using? Type 32 or 64 and press [ENTER]: "
 read architecture
 done
 
 # Prompt user for PHP version
 while [ -z "$phpversion" ]
 do
-echo -e "\n\n\n\nVisit http://php.net/downloads.php"
+echo -e "\n\nVisit http://php.net/downloads.php"
 echo -e "\nEnter the version of PHP you would like (such as 5.4.42) and press [ENTER]: "
 read phpversion
 done
 
 while [ -z "$mysql_root_pass" ]
 do
-echo -e "\n\n\n\nEnter MySQL root password and press [ENTER]: "
+echo -e "\n\nEnter MySQL root password and press [ENTER]: "
 read -s mysql_root_pass
 done
 
