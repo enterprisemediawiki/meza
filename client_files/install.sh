@@ -163,7 +163,7 @@ cat << EOM
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 EOM
-# bash yums.sh "$architecture" || exit 1
+bash yums.sh "$architecture" || exit 1
 
 cat << EOM
 
@@ -174,7 +174,7 @@ cat << EOM
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 EOM
-# bash apache.sh || exit 1
+bash apache.sh || exit 1
 
 
 cat << EOM
@@ -236,7 +236,7 @@ cat << EOM
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 EOM
-bash VE.sh || exit 1
+# bash VE.sh || exit 1
 
 
 cat << EOM
