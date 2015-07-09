@@ -60,51 +60,51 @@ fi
 # Force user to pick an architecture: 32 or 64 bit
 while [ "$architecture" != "32" ] && [ "$architecture" != "64" ]
 do
-echo -e "\n\nWhich architecture are you using? Type 32 or 64 and press [ENTER]: "
+echo -e "\nWhich architecture are you using? Type 32 or 64 and press [ENTER]: "
 read architecture
 done
 
 # Prompt user for PHP version
 while [ -z "$phpversion" ]
 do
-echo -e "\n\nVisit http://php.net/downloads.php"
-echo -e "\nEnter the version of PHP you would like (such as 5.4.42) and press [ENTER]: "
+echo -e "\nVisit http://php.net/downloads.php for version numbers"
+echo -e "Enter version of PHP you would like (such as 5.4.42) and press [ENTER]: "
 read phpversion
 done
 
 while [ -z "$mysql_root_pass" ]
 do
-echo -e "\n\nEnter MySQL root password and press [ENTER]: "
+echo -e "\nEnter MySQL root password and press [ENTER]: "
 read -s mysql_root_pass
 done
 
 while [ -z "$wiki_db_name" ]
 do
-echo -e "\n\nEnter desired name of your wiki database and press [ENTER]: "
+echo -e "\nEnter desired name of your wiki database and press [ENTER]: "
 read wiki_db_name
 done
 
 while [ -z "$wiki_name" ]
 do
-echo -e "\n\nEnter desired name of your wiki and press [ENTER]: "
+echo -e "\nEnter desired name of your wiki and press [ENTER]: "
 read wiki_name
 done
 
 while [ -z "$wiki_admin_name" ]
 do
-echo -e "\n\nEnter desired administrator account username and press [ENTER]: "
+echo -e "\nEnter desired administrator account username and press [ENTER]: "
 read wiki_admin_name
 done
 
 while [ -z "$wiki_admin_pass" ]
 do
-echo -e "\n\nEnter the password you would like for your wiki administrator account and press [ENTER]: "
+echo -e "\nEnter password you would like for your wiki administrator account and press [ENTER]: "
 read -s wiki_admin_pass
 done
 
 while [ -z "$git_branch" ]
 do
-echo -e "\n\nEnter the git branch of Meza1 you want to use (generally this is \"master\") [ENTER]: "
+echo -e "\nEnter git branch of Meza1 you want to use (generally this is \"master\") [ENTER]: "
 read git_branch
 done
 
