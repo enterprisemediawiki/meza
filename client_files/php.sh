@@ -97,9 +97,9 @@ make install
 
 #
 # Add PHP to path...refresh bash external to this script.
-#
-echo "export PATH=/usr/local/php/bin:\$PATH" > /etc/profile.d/php.sh
-
+# @todo: clean this up, and the place in install.sh, if it solves the issue
+# ain't cutting it: echo "export PATH=/usr/local/php/bin:\$PATH" > /etc/profile.d/php.sh
+sudo ln -s /usr/local/php/bin/php /usr/bin/php
 
 #
 # Initiate php.ini

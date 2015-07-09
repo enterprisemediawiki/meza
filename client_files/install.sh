@@ -4,11 +4,13 @@
 
 
 cat << EOM
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                         #
 #  Welcome to the Meza1 MediaWiki server install script   #
 #                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 EOM
 
 
@@ -149,80 +151,96 @@ fi
 cd ~/sources/meza1/client_files
 
 cat << EOM
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                         #
 #  Installing many, many things via yum (yums.sh)         #
 #                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 EOM
 bash yums.sh "$architecture" || exit 1
 
 cat << EOM
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                         #
 #  Installing apache from source (apache.sh)              #
 #                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 EOM
 bash apache.sh || exit 1
 
 cat << EOM
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                         #
 #  Installing PHP from source (php.sh)                    #
 #                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 EOM
 bash php.sh "$phpversion" || exit 1
 
 # add PHP to path accessible at this parent level
-source /etc/profile.d/php.sh # allow usage of php command?
+# this ain't cutting it. Try symlink in php.sh source /etc/profile.d/php.sh # allow usage of php command?
 
 
 cat << EOM
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                         #
 #  Installing MySQL from MySQL .rpm (mysql.sh)            #
 #                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 EOM
 bash mysql.sh "$mysql_root_pass" || exit 1
 
 cat << EOM
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                         #
 #  Installing MediaWiki from tarball (mediawiki-quick.sh) #
 #                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 EOM
 # bash mediawiki-quick.sh <mysql pass> <wiki db name> <wiki name> <wiki admin name> <wiki admin pass>
 bash mediawiki-quick.sh "$mysql_root_pass" "$wiki_db_name" "$wiki_name" "$wiki_admin_name" "$wiki_admin_pass" || exit 1
 
 cat << EOM
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                         #
 #  Installing base MW extensions (extensions.sh)          #
 #                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 EOM
 bash extensions.sh || exit 1
 
 cat << EOM
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                         #
 #  Installing VisualEditor (VE.sh)                        #
 #                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 EOM
 bash VE.sh || exit 1
 
 
 cat << EOM
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                         #
 #  Meza1 installation complete. Woo-woo-woooo... WIKI!!!  #
 #                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 EOM
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
