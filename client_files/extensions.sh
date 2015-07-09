@@ -7,7 +7,7 @@ cd /var/www/meza1/htdocs/wiki
 
 # Install extensions installed via Composer
 echo -e "\n\n## Meza1: Install composer-supported extensions"
-composer require \
+php /usr/local/bin/composer require \
 	mediawiki/semantic-media-wiki:~2.0 \
 	mediawiki/semantic-result-formats:~2.0 \
 	mediawiki/sub-page-list:~1.1 \

@@ -118,7 +118,7 @@ echo "******* Installing extensions *******"
 php /var/www/meza1/htdocs/wiki/extensions/ExtensionLoader/updateExtensions.php
 # Install Elastica library via composer
 cd /var/www/meza1/htdocs/wiki/extensions/Elastica
-composer install
+php /usr/local/bin/composer install
 
 # Any time you run updateExtensions.php it may be required to run
 # `php maintenance/update.php` since new extension versions may be installed

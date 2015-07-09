@@ -35,7 +35,7 @@ git checkout tags/1.25.1
 #
 # Update Composer dependencies
 #
-composer update
+php /usr/local/bin/composer update
 
 
 #

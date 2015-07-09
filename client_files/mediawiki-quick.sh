@@ -95,8 +95,8 @@ chown -R apache:www ./images
 #
 # Update Composer dependencies
 #
-composer update
-
+# composer update
+php /usr/local/bin/composer update # @todo: why on initial install does it have to be done like this?
 
 #
 # Download Vector skin tarball, REL1_25 branch

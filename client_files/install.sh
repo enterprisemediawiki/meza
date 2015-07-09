@@ -163,7 +163,7 @@ cat << EOM
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 EOM
-bash yums.sh "$architecture" || exit 1
+# bash yums.sh "$architecture" || exit 1
 
 cat << EOM
 
@@ -174,7 +174,7 @@ cat << EOM
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 EOM
-bash apache.sh || exit 1
+# bash apache.sh || exit 1
 
 
 cat << EOM
@@ -186,8 +186,6 @@ cat << EOM
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 EOM
-echo "*** TEMPORARY SCRIPT END, pre PHP install ***"
-exit 0;
 bash php.sh "$phpversion" || exit 1
 
 # add PHP to path accessible at this parent level
