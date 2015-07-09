@@ -2,6 +2,10 @@
 #
 # Setup the entire Meza1 platform
 
+if [ "$(whoami)" != "root" ]; then
+	echo "Try running this script with sudo: \"sudo bash install.sh\""
+	exit 1
+fi
 
 cat << EOM
 
@@ -172,17 +176,8 @@ cat << EOM
 EOM
 bash apache.sh || exit 1
 
+
 cat << EOM
-
-
-
-
-echo "TEMPORARY SCRIPT END, pre MW install"
-exit
-
-
-
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                         #
@@ -191,6 +186,8 @@ exit
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 EOM
+echo "*** TEMPORARY SCRIPT END, pre PHP install ***"
+exit 0;
 bash php.sh "$phpversion" || exit 1
 
 # add PHP to path accessible at this parent level
