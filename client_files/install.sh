@@ -198,6 +198,20 @@ cat << EOM
 EOM
 bash mysql.sh "$mysql_root_pass" || exit 1
 
+
+
+
+
+
+
+echo "TEMPORARY SCRIPT END, pre MW install"
+exit
+
+
+
+
+
+
 cat << EOM
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
