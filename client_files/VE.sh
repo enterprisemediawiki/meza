@@ -13,6 +13,10 @@ make
 echo "******* Installing node.js *******"
 make install
 
+# for some reason node can't be accessed by a non-root user.
+# issue #90 has been submitted, and a Stack Overflow question will follow.
+sudo ln -s /usr/local/bin/node /usr/bin/node
+
 # Download and install parsoid
 echo "******* Downloading parsoid *******"
 cd /etc
@@ -21,11 +25,14 @@ cd parsoid
 echo "******* Installing parsoid *******"
 #npm install -g # install globally
 #attempt to install globally was resulting in several errors
-npm install
+
+# Issue #90: why do I need to acces npm in this way for a non-root user?
+node /usr/local/lib/node_modules/npm/bin/npm-cli.js install
 # npm install results in "npm WARN prefer global jshint@2.8.0 should be installed with -g"
 
 echo "******* Testing parsoid *******"
-npm test #optional?
+# Issue #90: why do I need to acces npm in this way for a non-root user?
+node /usr/local/lib/node_modules/npm/bin/npm-cli.js test #optional?
 # several warnings come out of npm test
 
 # Configure parsoid for wiki use

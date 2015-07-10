@@ -236,18 +236,9 @@ cat << EOM
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 EOM
-# bash VE.sh || exit 1
+bash VE.sh || exit 1
 
 
-cat << EOM
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#                                                         #
-#  Meza1 installation complete. Woo-woo-woooo... WIKI!!!  #
-#                                                         #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-EOM
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
 cat ~/sources/meza1/client_files/pigeon.txt
