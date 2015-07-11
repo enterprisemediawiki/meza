@@ -72,10 +72,7 @@ done
 #
 cd ~/sources
 curl -sS https://getcomposer.org/installer | php
-
-# Install composer in it's final location for use outside this script
-# For use inside install.sh do "php ~/sources/composer.phar <commands>"
-cp ./composer.phar /usr/local/bin/composer 
+mv composer.phar /usr/local/bin/composer 
 
 
 #
@@ -98,7 +95,8 @@ chown -R apache:www ./images
 #
 # Update Composer dependencies
 #
-php ~/sources/composer.phar update
+composer update
+
 
 #
 # Download Vector skin tarball, REL1_25 branch

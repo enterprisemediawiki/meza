@@ -94,11 +94,7 @@ cd "php-$phpversion/"
 make
 make install
 
-
-#
-# Add PHP to path...refresh bash external to this script.
-# @todo: clean this up, and the place in install.sh, if it solves the issue
-# ain't cutting it: echo "export PATH=/usr/local/php/bin:\$PATH" > /etc/profile.d/php.sh
+# add symlink to php binary in location already in path
 sudo ln -s /usr/local/php/bin/php /usr/bin/php
 
 #

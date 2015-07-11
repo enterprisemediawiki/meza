@@ -8,8 +8,8 @@
 #
 cd ~/sources
 curl -sS https://getcomposer.org/installer | php
-cp ./composer.phar /usr/local/bin/composer
-# for later use, do "php ~/sources/composer.phar <commands>"
+mv composer.phar /usr/local/bin/composer
+
 
 #
 # Download MediaWiki via Git
@@ -35,7 +35,7 @@ git checkout tags/1.25.1
 #
 # Update Composer dependencies
 #
-php ~/sources/composer.phar update
+composer update
 
 
 #
