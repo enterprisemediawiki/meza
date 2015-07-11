@@ -2,6 +2,7 @@
 #
 # Setup MediaWiki
 
+bash printTitle.sh "Begin $0"
 
 #
 # Install Composer

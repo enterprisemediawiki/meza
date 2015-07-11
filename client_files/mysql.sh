@@ -2,6 +2,7 @@
 #
 # Setup MySQL
 
+bash printTitle.sh "Begin $0"
 
 # if the script was called in the form:
 # bash mysql.sh mypassword

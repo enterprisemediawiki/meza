@@ -2,6 +2,8 @@
 #
 # Setup Apache webserver
 
+bash printTitle.sh "Begin $0"
+
 # change to sources directory
 cd ~/sources
 

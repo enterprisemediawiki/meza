@@ -1,3 +1,6 @@
+
+bash printTitle.sh "Begin $0"
+
 #
 # This script installs everything required to use elasticsearch in MediaWiki
 # 

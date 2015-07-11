@@ -2,6 +2,7 @@
 #
 # Setup PHP
 
+bash printTitle.sh "Begin $0"
 
 # if the script was called in the form:
 # bash php.sh 5.4.42

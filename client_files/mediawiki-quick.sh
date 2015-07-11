@@ -8,6 +8,8 @@
 #   This script will prompt the user for several parameters
 #
 
+bash printTitle.sh "Begin $0"
+
 # if the script was called in the form:
 # bash mediawiki-quick.sh <mysql pass> <wiki db name> <wiki name> <wiki admin name> <wiki admin pass>
 # then set params accordingly (meaning no user interaction required)
