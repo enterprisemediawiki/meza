@@ -10,7 +10,7 @@ fi
 # If /usr/local/bin is not in PATH then add it
 # Ref enterprisemediawiki/Meza1#68 "Run install.sh with non-root user"
 if [[ $PATH != *"/usr/local/bin"* ]]; then
-  PATH="/usr/local/php/bin:$PATH"
+  PATH="/usr/local/bin:$PATH"
 fi
 
 # if the script was called in the form:
