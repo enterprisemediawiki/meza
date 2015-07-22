@@ -13,7 +13,7 @@ cd ~/sources
 # [1] http://www.us.apache.org/dist//httpd/
 # [2] http://www.us.apache.org/dist//apr
 #
-wget http://www.us.apache.org/dist//httpd/httpd-2.4.12.tar.gz
+wget http://www.us.apache.org/dist//httpd/httpd-2.4.16.tar.gz
 wget http://www.us.apache.org/dist//apr/apr-1.5.2.tar.gz
 wget http://www.us.apache.org/dist//apr/apr-util-1.5.4.tar.gz
 
