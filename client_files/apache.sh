@@ -21,12 +21,12 @@ wget http://www.us.apache.org/dist//apr/apr-util-1.5.4.tar.gz
 #
 # Unpack and build Apache from source
 #
-tar -zxvf httpd-2.4.12.tar.gz
+tar -zxvf httpd-2.4.16.tar.gz
 tar -zxvf apr-1.5.2.tar.gz
 tar -zxvf apr-util-1.5.4.tar.gz
-cp -r apr-1.5.2 httpd-2.4.12/srclib/apr
-cp -r apr-util-1.5.4 httpd-2.4.12/srclib/apr-util
-cd httpd-2.4.12
+cp -r apr-1.5.2 httpd-2.4.16/srclib/apr
+cp -r apr-util-1.5.4 httpd-2.4.16/srclib/apr-util
+cd httpd-2.4.16
 ./configure --enable-ssl --enable-so --with-included-apr --with-mpm=event
 make
 make install
