@@ -15,7 +15,8 @@ cd ~/sources
 # [1] http://www.us.apache.org/dist//httpd/
 # [2] http://www.us.apache.org/dist//apr
 #
-wget http://www.us.apache.org/dist//httpd/httpd-2.4.12.tar.gz
+httpdversion="2.4.16"
+wget "http://www.us.apache.org/dist//httpd/httpd-$httpdversion.tar.gz"
 wget http://www.us.apache.org/dist//apr/apr-1.5.2.tar.gz
 wget http://www.us.apache.org/dist//apr/apr-util-1.5.4.tar.gz
 
@@ -23,12 +24,12 @@ wget http://www.us.apache.org/dist//apr/apr-util-1.5.4.tar.gz
 #
 # Unpack and build Apache from source
 #
-tar -zxvf httpd-2.4.12.tar.gz
+tar -zxvf "httpd-$httpdversion.tar.gz"
 tar -zxvf apr-1.5.2.tar.gz
 tar -zxvf apr-util-1.5.4.tar.gz
-cp -r apr-1.5.2 httpd-2.4.12/srclib/apr
-cp -r apr-util-1.5.4 httpd-2.4.12/srclib/apr-util
-cd httpd-2.4.12
+cp -r apr-1.5.2 "httpd-$httpdversion/srclib/apr"
+cp -r apr-util-1.5.4 "httpd-$httpdversion/srclib/apr-util"
+cd "httpd-$httpdversion"
 ./configure --enable-ssl --enable-so --with-included-apr --with-mpm=event
 make
 make install
