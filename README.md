@@ -1,13 +1,13 @@
 # Meza1
 
-Meza1 is a
+Meza1 configures a CentOS/RedHat server with a complete enterprise MediaWiki installation.
 
 ## Server setup 
 
 If you're installing on an existing server (or cloud hosting like [Digital Ocean](https://digitalocean.com), which we use) then you can skip this section. If you're installing on a virtual machine then do one of the following:
 
 * [Setup VirtualBox](manual/1.0-SettingUpVirtualBox.md): This will give you a virtual machine with very little installed and that is incapable of SSH. This is, of course, no fun.
-
+* VMWare steps to come
 
 ## Running the setup script
 
@@ -21,7 +21,7 @@ sudo bash install.sh
 
 This script will retrieve a script from the Meza1 repository, which will subsequently retrieve the entire Meza1 repository. The script will ask you several questions regarding how to setup your MediaWiki environment. The parameters requested are:
 
-* **architecture**: Whether you're using 32-bit or 64-bit
+* **Architecture**: Whether you're using 32-bit or 64-bit
 * **PHP version**: Right now, use 5.4.42. In the future more versions will be supported
 * **MySQL password**: Pick a good, secure password for MySQL root user
 * **Wiki database name**: Pick something without any spaces, like "wiki_main"
