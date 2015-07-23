@@ -4,10 +4,10 @@ Meza1 configures a CentOS/RedHat server with a complete enterprise MediaWiki ins
 
 ## Server setup 
 
-If you're installing on an existing server (or cloud hosting like [Digital Ocean](https://digitalocean.com), which we use) then you can skip this section. If you're installing on a virtual machine then do one of the following:
+If you're installing on an existing server (or cloud hosting like [Digital Ocean](https://digitalocean.com), which we use) then you can probably skip this section. If you're installing on a virtual machine then perform one of the following:
 
-* [Setup VirtualBox](manual/1.0-SettingUpVirtualBox.md): This will give you a virtual machine with very little installed and that is incapable of SSH. This is, of course, no fun.
-* VMWare steps to come
+* [Setup VirtualBox](manual/1.0-SettingUpVirtualBox.md)
+* "Setup VMWare" steps to come
 
 ## Running the setup script
 
