@@ -3,6 +3,8 @@
 # Setup everything that should be installed with yum. 
 #
 
+bash printTitle.sh "Begin $0"
+
 cd ~/sources
 
 # if the script was called in the form:

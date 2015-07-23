@@ -1,4 +1,6 @@
 
+bash printTitle.sh "Begin $0"
+
 echo "******* Downloading node.js *******"
 cd ~/sources
 

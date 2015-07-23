@@ -3,6 +3,8 @@
 # Install MediaWiki extensions. 
 #
 
+bash printTitle.sh "Begin $0"
+
 cd /var/www/meza1/htdocs/wiki
 
 # Install extensions installed via Composer

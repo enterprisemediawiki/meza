@@ -2,6 +2,7 @@
 #
 # Setup PHP
 
+bash printTitle.sh "Begin $0"
 
 # if the script was called in the form:
 # bash php.sh 5.4.42
@@ -94,12 +95,8 @@ cd "php-$phpversion/"
 make
 make install
 
-
-#
-# Add PHP to path...refresh bash external to this script.
-#
-echo "export PATH=/usr/local/php/bin:\$PATH" > /etc/profile.d/php.sh
-
+# add symlink to php binary in location already in path
+sudo ln -s /usr/local/php/bin/php /usr/bin/php
 
 #
 # Initiate php.ini

@@ -2,6 +2,16 @@
 #
 # Setup the entire Meza1 platform
 
+if [ "$(whoami)" != "root" ]; then
+	echo "Try running this script with sudo: \"sudo bash install.sh\""
+	exit 1
+fi
+
+# If /usr/local/bin is not in PATH then add it
+# Ref enterprisemediawiki/Meza1#68 "Run install.sh with non-root user"
+if [[ $PATH != *"/usr/local/bin"* ]]; then
+  PATH="/usr/local/bin:$PATH"
+fi
 
 # if the script was called in the form:
 # bash install <architecture> \
@@ -51,51 +61,51 @@ fi
 # Force user to pick an architecture: 32 or 64 bit
 while [ "$architecture" != "32" ] && [ "$architecture" != "64" ]
 do
-echo -e "\n\n\n\nWhich architecture are you using? Type 32 or 64 and press [ENTER]: "
+echo -e "\nWhich architecture are you using? Type 32 or 64 and press [ENTER]: "
 read architecture
 done
 
 # Prompt user for PHP version
 while [ -z "$phpversion" ]
 do
-echo -e "\n\n\n\nVisit http://php.net/downloads.php"
-echo -e "\nEnter the version of PHP you would like (such as 5.4.42) and press [ENTER]: "
+echo -e "\nVisit http://php.net/downloads.php for version numbers"
+echo -e "Enter version of PHP you would like (such as 5.4.42) and press [ENTER]: "
 read phpversion
 done
 
 while [ -z "$mysql_root_pass" ]
 do
-echo -e "\n\n\n\nEnter MySQL root password and press [ENTER]: "
+echo -e "\nEnter MySQL root password and press [ENTER]: "
 read -s mysql_root_pass
 done
 
 while [ -z "$wiki_db_name" ]
 do
-echo -e "\n\nEnter desired name of your wiki database and press [ENTER]: "
+echo -e "\nEnter desired name of your wiki database and press [ENTER]: "
 read wiki_db_name
 done
 
 while [ -z "$wiki_name" ]
 do
-echo -e "\n\nEnter desired name of your wiki and press [ENTER]: "
+echo -e "\nEnter desired name of your wiki and press [ENTER]: "
 read wiki_name
 done
 
 while [ -z "$wiki_admin_name" ]
 do
-echo -e "\n\nEnter desired administrator account username and press [ENTER]: "
+echo -e "\nEnter desired administrator account username and press [ENTER]: "
 read wiki_admin_name
 done
 
 while [ -z "$wiki_admin_pass" ]
 do
-echo -e "\n\nEnter the password you would like for your wiki administrator account and press [ENTER]: "
+echo -e "\nEnter password you would like for your wiki administrator account and press [ENTER]: "
 read -s wiki_admin_pass
 done
 
 while [ -z "$git_branch" ]
 do
-echo -e "\n\nEnter the git branch of Meza1 you want to use (generally this is \"master\") [ENTER]: "
+echo -e "\nEnter git branch of Meza1 you want to use (generally this is \"master\") [ENTER]: "
 read git_branch
 done
 
@@ -141,9 +151,7 @@ cd ~/sources/meza1/client_files
 bash yums.sh "$architecture" || exit 1
 bash apache.sh || exit 1
 
-# install PHP, then add php to PATH
 bash php.sh "$phpversion" || exit 1
-source /etc/profile.d/php.sh # allow usage of php command?
 
 bash mysql.sh "$mysql_root_pass" || exit 1
 
@@ -152,3 +160,8 @@ bash mediawiki-quick.sh "$mysql_root_pass" "$wiki_db_name" "$wiki_name" "$wiki_a
 
 bash extensions.sh || exit 1
 bash VE.sh || exit 1
+
+
+# Display Most Plusquamperfekt Wiki Pigeon of Victory
+cat ~/sources/meza1/client_files/pigeon.txt
+
