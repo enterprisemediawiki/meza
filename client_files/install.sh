@@ -61,8 +61,8 @@ if [ ! -z "$9" ]; then
     mw_api_protocol="$9"
 fi
 
-if [ ! -z "$10" ]; then
-    mw_api_domain="$10"
+if [ ! -z "${10}" ]; then
+    mw_api_domain="${10}"
 fi
 
 
