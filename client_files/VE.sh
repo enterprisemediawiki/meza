@@ -1,6 +1,44 @@
 
 bash printTitle.sh "Begin $0"
 
+# if the script was called in the form:
+# bash VE.sh https
+# then set mw_api_protocol to https (meaning no user interaction required)
+if [ ! -z "$1" ]; then
+    mw_api_protocol="$1"
+fi
+
+#
+# Prompt user for mw_api_protocol
+#
+while [ "$mw_api_protocol" != "http" ] && [ "$mw_api_protocol" != "https" ]
+do
+	echo -e "\nType \"http\" or \"https\" for MW API and press [ENTER]: "
+	read mw_api_protocol
+done
+
+
+# if the script was called in the form:
+# bash VE.sh https example.com
+# then set mw_api_domain to example.com (meaning no user interaction required)
+if [ ! -z "$2" ]; then
+    mw_api_domain="$2"
+fi
+
+#
+# Prompt user for MW API domain
+#
+while [ -z "$mw_api_domain" ]
+do
+	echo -e "\nType domain or IP address of your wiki and press [ENTER]: "
+	read mw_api_domain
+done
+
+
+# MediaWiki's API URI, for parsoid
+mw_api_uri="$mw_api_protocol://$mw_api_domain/wiki/api.php"
+
+
 echo "******* Downloading node.js *******"
 cd ~/sources
 
@@ -39,6 +77,14 @@ cd ~/sources/meza1/client_files
 
 # Copy Parsoid settings from Meza to Parsoid install
 cp ./localsettings.js /etc/parsoid/api/localsettings.js
+
+# Insert proper MediaWiki API URI
+# Insert contents of "$mw_api_uri" in place of "<<INSERTED_BY_VE.sh>>"
+# Note on escape syntax: result="${original_var//text_to_replace/text_to_replace_with}
+escaped_mw_api_uri=${mw_api_uri//\//\\\/} # need to replace / with \/ for regex
+sed -r -i "s/INSERTED_BY_VE_SCRIPT/$escaped_mw_api_uri/g;" /etc/parsoid/api/localsettings.js
+
+
 # Add VE and UniversalLanguageSelector to ExtensionSettings
 cat ./ExtensionSettingsVE.php >> /var/www/meza1/htdocs/wiki/ExtensionSettings.php
 # Add VE settings to LocalSettings.php
