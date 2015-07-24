@@ -63,7 +63,7 @@ done
 
 # setup configuration variables
 meza1_root="/var/www/meza1"
-wiki_root="$meza1_root/wiki"
+wiki_root="$meza1_root/htdocs/wiki"
 smw_root="$wiki_root/extensions/SemanticMediaWiki"
 wiki_sql_file="$meza1_root/wiki.sql"
 wiki_images="$meza1_root/images.tar.gz"
