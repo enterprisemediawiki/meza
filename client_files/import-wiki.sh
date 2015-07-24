@@ -79,8 +79,8 @@ mv ./images/* "$wiki_root/images/*"
 
 # Configure images folder
 # Ref: https://www.mediawiki.org/wiki/Manual:Configuring_file_uploads
-chmod 755 /images
-chown -R apache:apache /images
+chmod 755 ./images
+chown -R apache:apache ./images
 
 
 # Import database - Ref: https://www.mediawiki.org/wiki/Manual:Restoring_a_wiki_from_backup
