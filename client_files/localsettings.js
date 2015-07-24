@@ -6,7 +6,7 @@ exports.setup = function(parsoidConfig) {
 	//parsoidConfig.userAgent = "My-User-Agent-String";
 
 	// The URL of your MediaWiki API endpoint.
-	parsoidConfig.setMwApi( 'wiki', { uri: 'http://127.0.0.1/wiki/api.php' });
+	parsoidConfig.setMwApi( 'wiki', { uri: 'http://192.168.56.56/wiki/api.php' });
 	// To specify a proxy (or proxy headers) specific to this prefix (which
 	// overrides defaultAPIProxyURI) use:
 	/*
