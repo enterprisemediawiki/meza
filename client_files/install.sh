@@ -119,14 +119,14 @@ done
 
 while [ "$mw_api_protocol" != "http" ] && [ "$mw_api_protocol" != "https" ]
 do
-	echo -e "\nType \"http\" or \"https\" for MW API and press [ENTER]: "
-	read mw_api_protocol
+echo -e "\nType http or https for MW API and press [ENTER]: "
+read mw_api_protocol
 done
 
 while [ -z "$mw_api_domain" ]
 do
-	echo -e "\nType domain or IP address of your wiki and press [ENTER]: "
-	read mw_api_domain
+echo -e "\nType domain or IP address of your wiki and press [ENTER]: "
+read mw_api_domain
 done
 
 
