@@ -59,8 +59,6 @@ $wgLocaltimezone = "America/Chicago";
 $oldtz = getenv("TZ");
 putenv("TZ=$wgLocaltimezone");
 
-$wgMaxUploadSize = 1024*1024*40;
-//$wgUploadSizeWarning = 1024*1024*100;
 
 $wgFileExtensions[] = 'mp3';
 $wgFileExtensions[] = 'aac';
