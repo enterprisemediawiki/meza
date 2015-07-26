@@ -121,3 +121,15 @@ php maintenance/install.php \
 	--pass "$wiki_admin_pass" \
 	"$wiki_name" "$wiki_admin_name" \
 	--scriptpath /wiki
+
+
+#
+# Modify LocalSettings.php, set $wgEnableUploads = true;
+# if we need to go over 100MB, will need to add values for $wgMaxUploadSize and
+# $wgUploadSizeWarning (both default to 100MB).
+#
+sed -r -i 's/\$wgEnableUploads\s*=\s*false;/$wgEnableUploads = true;/g;' ./LocalSettings.php
+
+
+# end of script
+echo -e "\n\nMediaWiki has been installed"
