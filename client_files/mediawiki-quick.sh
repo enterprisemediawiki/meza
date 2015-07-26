@@ -125,10 +125,9 @@ php maintenance/install.php \
 
 #
 # Modify LocalSettings.php, set $wgEnableUploads = true;
-# if we need to go over 100MB, will need to add values for $wgMaxUploadSize and
-# $wgUploadSizeWarning (both default to 100MB).
+# Evidently must also set $wgMaxUploadSize = 1024*1024*100; to get over 40MB
 #
-sed -r -i 's/\$wgEnableUploads\s*=\s*false;/$wgEnableUploads = true;/g;' ./LocalSettings.php
+sed -r -i 's/\$wgEnableUploads\s*=\s*false;/$wgEnableUploads = true;\n$wgMaxUploadSize = 1024*1024*100; \/\/ 100 MB/g;' ./LocalSettings.php
 
 
 # end of script
