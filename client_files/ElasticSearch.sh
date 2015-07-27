@@ -139,27 +139,11 @@ sleep 20  # Waits 10 seconds
 #
 # Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
 #
-echo "******* Generating elasticsearch index *******"
+echo "******* Running elastic-build-index.sh *******"
+bash ~/sources/meza1/client_files/elastic-build-index.sh
 
-# Add "$wgDisableSearchUpdate = true;" to LocalSettings.php
-# Ref: http://stackoverflow.com/questions/525592/find-and-replace-inside-a-text-file-from-a-bash-command
-cd /var/www/meza1/htdocs/wiki
-sed -i -e 's/\/\/ES-CONFIG-ANCHOR/$wgDisableSearchUpdate = true;/g' LocalSettings.php
-
-# Run script to generate elasticsearch index
-php /var/www/meza1/htdocs/wiki/extensions/CirrusSearch/maintenance/updateSearchIndexConfig.php
- 
-# Remove $wgDisableSearchUpdate = true from LocalSettings.php (updates should start heading to elasticsearch)
-sed -i -e 's/$wgDisableSearchUpdate = true;/\/\/ES-CONFIG-ANCHOR/g' LocalSettings.php
-
-# Bootstrap the search index
-#
-# Note that this can take some time
-# For large wikis read "Bootstrapping large wikis" in https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
-php /var/www/meza1/htdocs/wiki/extensions/CirrusSearch/maintenance/forceSearchIndex.php --skipLinks --indexOnSkip
-php /var/www/meza1/htdocs/wiki/extensions/CirrusSearch/maintenance/forceSearchIndex.php --skipParse
- 
 # Add "$wgSearchType = 'CirrusSearch';" to LocalSettings.php to funnel queries to ElasticSearch
+cd /var/www/meza1/htdocs/wiki
 sed -i -e 's/\/\/ES-CONFIG-ANCHOR/$wgSearchType = "CirrusSearch";/g' LocalSettings.php
 
 echo "******* Complete! *******"
