@@ -114,4 +114,8 @@ cd "$wiki_root/maintenance"
 php runJobs.php --quick
 
 
+echo "Building Elastic Search index"
+bash ~/sources/meza1/client_files/elastic-build-index.sh
+
+
 echo -e "\nYour wiki has been imported!\n"
