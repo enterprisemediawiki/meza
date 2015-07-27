@@ -160,7 +160,7 @@ bash mediawiki-quick.sh "$mysql_root_pass" "$wiki_db_name" "$wiki_name" "$wiki_a
 
 bash extensions.sh || exit 1
 bash VE.sh || exit 1
-
+bash ElasticSearch.sh || exit 1
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
 cat ~/sources/meza1/client_files/pigeon.txt
