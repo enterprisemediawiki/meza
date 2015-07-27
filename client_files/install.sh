@@ -13,6 +13,8 @@ if [[ $PATH != *"/usr/local/bin"* ]]; then
   PATH="/usr/local/bin:$PATH"
 fi
 
+echo -e "\nWelcome to Meza1 v0.2.0\n"
+
 # if the script was called in the form:
 # bash install <architecture> \
 #              <phpversion> \

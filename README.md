@@ -1,4 +1,4 @@
-# Meza1
+# Meza1 v0.2.0
 
 Meza1 configures a CentOS/RedHat server with a complete enterprise MediaWiki installation.
 
