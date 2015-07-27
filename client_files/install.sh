@@ -57,6 +57,14 @@ if [ ! -z "$8" ]; then
     git_branch="$8"
 fi
 
+if [ ! -z "$9" ]; then
+    mw_api_protocol="$9"
+fi
+
+if [ ! -z "${10}" ]; then
+    mw_api_domain="${10}"
+fi
+
 
 # Force user to pick an architecture: 32 or 64 bit
 while [ "$architecture" != "32" ] && [ "$architecture" != "64" ]
@@ -109,6 +117,19 @@ echo -e "\nEnter git branch of Meza1 you want to use (generally this is \"master
 read git_branch
 done
 
+while [ "$mw_api_protocol" != "http" ] && [ "$mw_api_protocol" != "https" ]
+do
+echo -e "\nType http or https for MW API and press [ENTER]: "
+read mw_api_protocol
+done
+
+while [ -z "$mw_api_domain" ]
+do
+echo -e "\nType domain or IP address of your wiki and press [ENTER]: "
+read mw_api_domain
+done
+
+
 
 # Check if git installed, and install it if required
 if ! hash git 2>/dev/null; then
@@ -159,7 +180,9 @@ bash mysql.sh "$mysql_root_pass" || exit 1
 bash mediawiki-quick.sh "$mysql_root_pass" "$wiki_db_name" "$wiki_name" "$wiki_admin_name" "$wiki_admin_pass" || exit 1
 
 bash extensions.sh || exit 1
-bash VE.sh || exit 1
+
+bash VE.sh "$mw_api_protocol" "$mw_api_domain" || exit 1
+
 bash ElasticSearch.sh || exit 1
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
