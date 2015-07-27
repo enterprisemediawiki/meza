@@ -180,8 +180,10 @@ bash mysql.sh "$mysql_root_pass" || exit 1
 bash mediawiki-quick.sh "$mysql_root_pass" "$wiki_db_name" "$wiki_name" "$wiki_admin_name" "$wiki_admin_pass" || exit 1
 
 bash extensions.sh || exit 1
+
 bash VE.sh "$mw_api_protocol" "$mw_api_domain" || exit 1
 
+bash ElasticSearch.sh || exit 1
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
 cat ~/sources/meza1/client_files/pigeon.txt
