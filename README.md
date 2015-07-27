@@ -4,8 +4,9 @@ Meza1 configures a CentOS/RedHat server with a complete enterprise MediaWiki ins
 
 ## Server setup 
 
-If you're installing on an existing server (or cloud hosting like [Digital Ocean](https://digitalocean.com), which we use) then you can probably skip this section. If you're installing on a virtual machine then perform one of the following:
+Depending on where you're installing Meza1 you'll have different initial setup steps. The following environments have been tested.
 
+* [Setup Digital Ocean](manual/SetupDigitalOcean.md)
 * [Setup VirtualBox](manual/1.0-SettingUpVirtualBox.md)
 * "Setup VMWare" steps to come
 
