@@ -19,6 +19,10 @@ bash printTitle.sh "Begin $0"
 # https://wikitech.wikimedia.org/wiki/Search
 #
 
+if [[ $PATH != *"/usr/local/bin"* ]]; then
+  PATH="/usr/local/bin:$PATH"
+fi
+
 #
 # Install JAVA
 # 

@@ -7,21 +7,20 @@ bash printTitle.sh "Begin $0"
 
 cd ~/sources
 
-# if the script was called in the form:
-# bash yums.sh 32
-# then set architecture to 32 (meaning no user interaction required)
-if [ ! -z "$1" ]; then
-    architecture="$1"
+#
+# Set architecture to 32 or 64 (bit)
+#
+if [ ! -z "$architecture" ]; then
+    
+	# Set architecture to 32 or 64 (bit)
+	if [ $(uname -m | grep -c 64) -eq 1 ]; then
+	architecture=64
+	else
+	architecture=32
+	fi
+
 fi
 
-#
-# Force user to pick an architecture: 32 or 64 bit
-#
-while [ "$architecture" != "32" ] && [ "$architecture" != "64" ]
-do
-echo -e "\n\n\n\nWhich architecture are you using? Type 32 or 64 and press [ENTER]: "
-read architecture
-done
 
 if [ "$architecture" = "32" ]; then
     echo "Downloading RPM for 32-bit"
@@ -39,6 +38,23 @@ fi
 # Update everything managed by yum
 #
 yum -y update
+
+
+#
+# Do any RedHat or CentOS specific items
+#
+if [ -f /etc/centos-release ]; then
+	# do centos-specific stuff
+else {
+	# do redhat-specific stuff
+	# thanks to https://bluehatrecord.wordpress.com for teaching me this
+	# https://bluehatrecord.wordpress.com/2014/10/13/installing-r-on-red-hat-enterprise-linux-6-5/
+
+	# Enable "optional RPMs" repo to be able to get: libc-client-devel.i686,
+	# libc-client-devel, libicu-devel, t1lib-devel, aspell-devel, libvpx-devel
+	# and libtidy-devel 
+	subscription-manager repos --enable=rhel-6-server-optional-rpms
+}
 
 
 #
@@ -61,7 +77,7 @@ rpm -i rpmforge-release-0.5.3-1.el6.rf.*.rpm
 # safe than sorry--attempt to install them now anyway.
 #
 yum install -y \
-    zlib-dev \
+    zlib-devel \
     sqlite-devel \
     bzip2-devel \
     xz-libs \
@@ -88,7 +104,8 @@ yum install -y \
     freetype-devel \
     readline-devel \
     libtidy-devel \
-    libmcrypt-devel
+    libmcrypt-devel \
+    pam-devel
 
 
 #
