@@ -10,15 +10,10 @@ cd ~/sources
 #
 # Set architecture to 32 or 64 (bit)
 #
-if [ ! -z "$architecture" ]; then
-    
-	# Set architecture to 32 or 64 (bit)
-	if [ $(uname -m | grep -c 64) -eq 1 ]; then
-	architecture=64
-	else
-	architecture=32
-	fi
-
+if [ $(uname -m | grep -c 64) -eq 1 ]; then
+architecture=64
+else
+architecture=32
 fi
 
 
