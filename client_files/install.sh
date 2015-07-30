@@ -13,7 +13,7 @@ if [[ $PATH != *"/usr/local/bin"* ]]; then
   PATH="/usr/local/bin:$PATH"
 fi
 
-echo -e "\nWelcome to Meza1 v0.2.0\n"
+echo -e "\nWelcome to Meza1 v0.2.1\n"
 
 #
 # Set architecture to 32 or 64 (bit)
