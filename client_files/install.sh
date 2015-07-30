@@ -15,6 +15,16 @@ fi
 
 echo -e "\nWelcome to Meza1 v0.2.0\n"
 
+#
+# Set architecture to 32 or 64 (bit)
+#
+if [ $(uname -m | grep -c 64) -eq 1 ]; then
+architecture=64
+else
+architecture=32
+fi
+
+
 # if the script was called in the form:
 # bash install <architecture> \
 #              <phpversion> \
@@ -28,52 +38,41 @@ echo -e "\nWelcome to Meza1 v0.2.0\n"
 # These are out of hand. Change them to GNU-style long-options, see:
 # http://mywiki.wooledge.org/BashFAQ/035
 if [ ! -z "$1" ]; then
-    architecture="$1"
+    phpversion="$1"
 fi
 
 if [ ! -z "$2" ]; then
-    phpversion="$2"
+    mysql_root_pass="$2"
 fi
 
 if [ ! -z "$3" ]; then
-    mysql_root_pass="$3"
+    wiki_db_name="$3"
 fi
 
 if [ ! -z "$4" ]; then
-    wiki_db_name="$4"
+    wiki_name="$4"
 fi
 
 if [ ! -z "$5" ]; then
-    wiki_name="$5"
+    wiki_admin_name="$5"
 fi
 
 if [ ! -z "$6" ]; then
-    wiki_admin_name="$6"
+    wiki_admin_pass="$6"
 fi
 
 if [ ! -z "$7" ]; then
-    wiki_admin_pass="$7"
+    git_branch="$7"
 fi
 
 if [ ! -z "$8" ]; then
-    git_branch="$8"
+    mw_api_protocol="$8"
 fi
 
 if [ ! -z "$9" ]; then
-    mw_api_protocol="$9"
+    mw_api_domain="$9"
 fi
 
-if [ ! -z "${10}" ]; then
-    mw_api_domain="${10}"
-fi
-
-
-# Force user to pick an architecture: 32 or 64 bit
-while [ "$architecture" != "32" ] && [ "$architecture" != "64" ]
-do
-echo -e "\nWhich architecture are you using? Type 32 or 64 and press [ENTER]: "
-read architecture
-done
 
 # Prompt user for PHP version
 while [ -z "$phpversion" ]
