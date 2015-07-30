@@ -40,6 +40,7 @@ yum -y update
 #
 if [ -f /etc/centos-release ]; then
 	# do centos-specific stuff
+    echo "No special actions for CentOS" # need to have something in this block or error occurs
 else
 	# do redhat-specific stuff
 	# thanks to https://bluehatrecord.wordpress.com for teaching me this
@@ -48,6 +49,7 @@ else
 	# Enable "optional RPMs" repo to be able to get: libc-client-devel.i686,
 	# libc-client-devel, libicu-devel, t1lib-devel, aspell-devel, libvpx-devel
 	# and libtidy-devel 
+    echo "Enable \"Optional RPMs\" repo for RedHat"
 	subscription-manager repos --enable=rhel-6-server-optional-rpms
 fi
 
