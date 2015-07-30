@@ -40,7 +40,7 @@ yum -y update
 #
 if [ -f /etc/centos-release ]; then
 	# do centos-specific stuff
-else {
+else
 	# do redhat-specific stuff
 	# thanks to https://bluehatrecord.wordpress.com for teaching me this
 	# https://bluehatrecord.wordpress.com/2014/10/13/installing-r-on-red-hat-enterprise-linux-6-5/
@@ -49,7 +49,7 @@ else {
 	# libc-client-devel, libicu-devel, t1lib-devel, aspell-devel, libvpx-devel
 	# and libtidy-devel 
 	subscription-manager repos --enable=rhel-6-server-optional-rpms
-}
+fi
 
 
 #
