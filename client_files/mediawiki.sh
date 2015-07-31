@@ -42,38 +42,38 @@ fi
 #
 while [ -z "$mysql_root_pass" ]
 do
-echo -e "\n\n\n\nEnter MySQL root password and press [ENTER]: "
+echo -e "\n\nEnter MySQL root password and press [ENTER]: "
 read -s mysql_root_pass
 done
 
 while [ -z "$wiki_db_name" ]
 do
-echo -e "\n\nEnter desired name of your wiki database and press [ENTER]: "
+echo -e "\nEnter desired name of your wiki database and press [ENTER]: "
 read wiki_db_name
 done
 
 while [ -z "$wiki_name" ]
 do
-echo -e "\n\nEnter desired name of your wiki and press [ENTER]: "
+echo -e "\nEnter desired name of your wiki and press [ENTER]: "
 read wiki_name
 done
 
 while [ -z "$wiki_admin_name" ]
 do
-echo -e "\n\nEnter desired administrator account username and press [ENTER]: "
+echo -e "\nEnter desired administrator account username and press [ENTER]: "
 read wiki_admin_name
 done
 
 while [ -z "$wiki_admin_pass" ]
 do
-echo -e "\n\nEnter the password you would like for your wiki administrator account and press [ENTER]: "
+echo -e "\nEnter the password you would like for your wiki administrator account and press [ENTER]: "
 read -s wiki_admin_pass
 done
 
 while [ -z "$mediawiki_git_install" ]
 do
-echo -e "\n\nInstall MediaWiki with git? (y/n) [ENTER]: "
-read -s mediawiki_git_install
+echo -e "\nInstall MediaWiki with git? (y/n) [ENTER]: "
+read mediawiki_git_install
 done
 
 

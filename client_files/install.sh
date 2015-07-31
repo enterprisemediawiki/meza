@@ -132,8 +132,8 @@ done
 
 while [ -z "$mediawiki_git_install" ]
 do
-echo -e "\n\nInstall MediaWiki with git? (y/n) [ENTER]: "
-read -s mediawiki_git_install
+echo -e "\nInstall MediaWiki with git? (y/n) [ENTER]: "
+read mediawiki_git_install
 done
 
 
