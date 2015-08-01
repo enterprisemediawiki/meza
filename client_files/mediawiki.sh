@@ -86,7 +86,7 @@ mv composer.phar /usr/local/bin/composer
 
 
 #
-# Download MediaWiki from tarball
+# Download MediaWiki
 #
 cd /var/www/meza1/htdocs
 
