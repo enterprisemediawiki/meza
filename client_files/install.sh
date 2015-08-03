@@ -152,6 +152,15 @@ install_via_git()
 	git checkout "$git_branch"
 }
 
+#
+# Output command to screen and to log files
+#
+command_to_screen_and_logs()
+{
+	${1} > >(tee -a "$outlog") 2> >(tee -a "$errlog" >&2)
+	sleep 5
+}
+
 
 # no meza1 directory
 if [ ! -d ~/sources/meza1 ]; then
@@ -170,21 +179,23 @@ else
 fi
 
 cd ~/sources/meza1/client_files
-bash yums.sh "$architecture" || exit 1
-bash apache.sh || exit 1
 
-bash php.sh "$phpversion" || exit 1
+command_to_screen_and_logs "bash yums.sh $architecture || exit 1"
+command_to_screen_and_logs "bash apache.sh || exit 1"
 
-bash mysql.sh "$mysql_root_pass" || exit 1
+command_to_screen_and_logs "bash php.sh $phpversion || exit 1"
+
+command_to_screen_and_logs "bash mysql.sh $mysql_root_pass || exit 1"
 
 # bash mediawiki-quick.sh <mysql pass> <wiki db name> <wiki name> <wiki admin name> <wiki admin pass>
-bash mediawiki-quick.sh "$mysql_root_pass" "$wiki_db_name" "$wiki_name" "$wiki_admin_name" "$wiki_admin_pass" || exit 1
+command_to_screen_and_logs "bash mediawiki-quick.sh $mysql_root_pass $wiki_db_name $wiki_name $wiki_admin_name $wiki_admin_pass || exit 1"
 
-bash extensions.sh || exit 1
+command_to_screen_and_logs "bash extensions.sh || exit 1"
 
-bash VE.sh "$mw_api_protocol" "$mw_api_domain" || exit 1
+command_to_screen_and_logs "bash VE.sh $mw_api_protocol $mw_api_domain || exit 1"
 
-bash ElasticSearch.sh || exit 1
+command_to_screen_and_logs "bash ElasticSearch.sh || exit 1"
+
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
 cat ~/sources/meza1/client_files/pigeon.txt
