@@ -155,6 +155,9 @@ install_via_git()
 #
 # Output command to screen and to log files
 #
+timestamp=$(date "+%Y%m%d%H%M%S")
+outlog="/root/sources/meza1/logs/${timestamp}_out.log"
+errlog="/root/sources/meza1/logs/${timestamp}_err.log"
 command_to_screen_and_logs()
 {
 	${1} > >(tee -a "$outlog") 2> >(tee -a "$errlog" >&2)
