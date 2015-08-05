@@ -130,6 +130,11 @@ echo -e "\nType domain or IP address of your wiki and press [ENTER]: "
 read mw_api_domain
 done
 
+while [ -z "$mediawiki_git_install" ]
+do
+echo -e "\nInstall MediaWiki with git? (y/n) [ENTER]: "
+read mediawiki_git_install
+done
 
 
 # Check if git installed, and install it if required
@@ -191,7 +196,7 @@ command_to_screen_and_logs "bash php.sh $phpversion || exit 1"
 command_to_screen_and_logs "bash mysql.sh $mysql_root_pass || exit 1"
 
 # bash mediawiki-quick.sh <mysql pass> <wiki db name> <wiki name> <wiki admin name> <wiki admin pass>
-command_to_screen_and_logs "bash mediawiki-quick.sh $mysql_root_pass $wiki_db_name $wiki_name $wiki_admin_name $wiki_admin_pass || exit 1"
+command_to_screen_and_logs "bash mediawiki.sh $mysql_root_pass $wiki_db_name $wiki_name $wiki_admin_name $wiki_admin_pass || exit 1"
 
 command_to_screen_and_logs "bash extensions.sh || exit 1"
 

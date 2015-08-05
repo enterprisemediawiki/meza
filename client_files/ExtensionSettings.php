@@ -23,15 +23,6 @@
 // ),
 
 /**
- * In SVN, see https://www.mediawiki.org/wiki/Extension:Pipe_Escape
- * Do we use this? If so, should we migrate into EMW git?
- */
-// 'PipeEscape' => array(
-// 	'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/PipeEscape.git',
-// 	'branch' => 'master',
-// ),
-
-/**
  * Do we want to install this? Not used much with SMW...
  */
 // 'DynamicPageList' => array(
@@ -258,6 +249,15 @@ $egExtensionLoaderConfig += array(
 			    array(30,50),
 			    array(0,50));
 		}
+	),
+
+	/**
+	 * In SVN, see https://www.mediawiki.org/wiki/Extension:Pipe_Escape
+	 * Do we use this? If so, should we migrate into EMW git?
+	 */
+	'PipeEscape' => array(
+		'git' => 'https://github.com/jamesmontalvo3/MediaWiki-PipeEscape.git',
+		'branch' => 'master',
 	),
 
 );
