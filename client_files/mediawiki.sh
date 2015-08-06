@@ -92,17 +92,21 @@ cd /var/www/meza1/htdocs
 
 if [ "$mediawiki_git_install" = "y" ]; then
 	# git clone https://github.com/wikimedia/mediawiki.git wiki
+	cmd_profile "START mediawiki git clone"
 	git clone https://gerrit.wikimedia.org/r/p/mediawiki/core.git wiki
 	cd wiki
 
 	# Checkout latest released version
 	git checkout tags/1.25.1
+	cmd_profile "END mediawiki git clone"
 else
+	cmd_profile "START mediawiki get from tarball"
 	wget http://releases.wikimedia.org/mediawiki/1.25/mediawiki-core-1.25.1.tar.gz
 
 	mkdir wiki
 	tar xpvf mediawiki-core-1.25.1.tar.gz -C ./wiki --strip-components 1
 	cd wiki
+	cmd_profile "END mediawiki get from tarball"
 fi
 
 
@@ -115,7 +119,9 @@ chown -R apache:www ./images
 #
 # Update Composer dependencies
 #
+cmd_profile "START mediawiki core composer update"
 composer update
+cmd_profile "END mediawiki core composer update"
 
 
 #

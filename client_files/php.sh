@@ -52,6 +52,7 @@ cd "php-$phpversion/"
 #
 # Configure, make, make install
 #
+cmd_profile "START php build"
 ./configure \
     --with-apxs2=/usr/local/apache2/bin/apxs \
     --enable-bcmath \
@@ -94,6 +95,7 @@ cd "php-$phpversion/"
     --prefix=/usr/local/php
 make
 make install
+cmd_profile "END php build"
 
 # add symlink to php binary in location already in path
 sudo ln -s /usr/local/php/bin/php /usr/bin/php

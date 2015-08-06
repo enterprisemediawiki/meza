@@ -165,11 +165,16 @@ logpath="/root/sources/meza1/logs"
 outlog="$logpath/${timestamp}_out.log"
 errlog="$logpath/${timestamp}_err.log"
 cmdlog="$logpath/${timestamp}_cmd.log"
+cmd_profile()
+{
+	echo "`date`: $*" >> "$cmdlog"
+}
 command_to_screen_and_logs()
 {
-	echo "`date`: $*" > "$cmdlog"
+	cmd_profile "START $*"
 	$@ > >(tee -a "$outlog") 2> >(tee -a "$errlog" >&2)
 	sleep 1 #this doesn't need to be that long
+	cmd_profile "END $*"
 }
 
 

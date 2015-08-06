@@ -30,9 +30,11 @@ tar -zxvf apr-util-1.5.4.tar.gz
 cp -r apr-1.5.2 "httpd-$httpdversion/srclib/apr"
 cp -r apr-util-1.5.4 "httpd-$httpdversion/srclib/apr-util"
 cd "httpd-$httpdversion"
+cmd_profile "START apache build"
 ./configure --enable-ssl --enable-so --with-included-apr --with-mpm=event
 make
 make install
+cmd_profile "END apache build"
 
 
 #
