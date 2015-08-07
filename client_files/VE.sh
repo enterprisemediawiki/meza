@@ -1,12 +1,6 @@
 
 bash printTitle.sh "Begin $0"
 
-# if the script was called in the form:
-# bash VE.sh https
-# then set mw_api_protocol to https (meaning no user interaction required)
-if [ ! -z "$1" ]; then
-    mw_api_protocol="$1"
-fi
 
 #
 # Prompt user for mw_api_protocol
@@ -17,13 +11,6 @@ do
 	read mw_api_protocol
 done
 
-
-# if the script was called in the form:
-# bash VE.sh https example.com
-# then set mw_api_domain to example.com (meaning no user interaction required)
-if [ ! -z "$2" ]; then
-    mw_api_domain="$2"
-fi
 
 #
 # Prompt user for MW API domain

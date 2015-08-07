@@ -25,55 +25,6 @@ architecture=32
 fi
 
 
-# if the script was called in the form:
-# bash install <architecture> \
-#              <phpversion> \
-#              <mysql_root_pass> \
-#              <wiki_db_name> \
-#              <wiki_name> \
-#              <wiki_admin_name> \
-#              <wiki_admin_pass>
-# then set params accordingly (meaning no user interaction required)
-#
-# These are out of hand. Change them to GNU-style long-options, see:
-# http://mywiki.wooledge.org/BashFAQ/035
-if [ ! -z "$1" ]; then
-    phpversion="$1"
-fi
-
-if [ ! -z "$2" ]; then
-    mysql_root_pass="$2"
-fi
-
-if [ ! -z "$3" ]; then
-    wiki_db_name="$3"
-fi
-
-if [ ! -z "$4" ]; then
-    wiki_name="$4"
-fi
-
-if [ ! -z "$5" ]; then
-    wiki_admin_name="$5"
-fi
-
-if [ ! -z "$6" ]; then
-    wiki_admin_pass="$6"
-fi
-
-if [ ! -z "$7" ]; then
-    git_branch="$7"
-fi
-
-if [ ! -z "$8" ]; then
-    mw_api_protocol="$8"
-fi
-
-if [ ! -z "$9" ]; then
-    mw_api_domain="$9"
-fi
-
-
 # Prompt user for PHP version
 while [ -z "$phpversion" ]
 do
@@ -168,7 +119,7 @@ cmd_profile()
 
 # Use tee to send a command output to the terminal, but send stdout
 # to a log file and stderr to a different log file. Use like:
-# command_to_screen_and_logs "bash yums.sh $architecture || exit 1"
+# command_to_screen_and_logs "bash yums.sh"
 cmd_tee()
 {
 	cmd_profile "START $*"
@@ -202,29 +153,32 @@ else
 	git checkout "$git_branch"
 fi
 
+# @todo: Need to test for yums.sh functionality prior to proceeding
+#    with apache.sh, and Apache functionality prior to proceeding
+#    with php.sh, and so forth.
 cd ~/sources/meza1/client_files
-cmd_tee "source yums.sh || exit 1"
+cmd_tee "source yums.sh"
 
 cd ~/sources/meza1/client_files
-cmd_tee "source apache.sh || exit 1"
+cmd_tee "source apache.sh"
 
 cd ~/sources/meza1/client_files
-cmd_tee "source php.sh || exit 1"
+cmd_tee "source php.sh"
 
 cd ~/sources/meza1/client_files
-cmd_tee "source mysql.sh || exit 1"
+cmd_tee "source mysql.sh"
 
 cd ~/sources/meza1/client_files
-cmd_tee "source mediawiki.sh || exit 1"
+cmd_tee "source mediawiki.sh"
 
 cd ~/sources/meza1/client_files
-cmd_tee "source extensions.sh || exit 1"
+cmd_tee "source extensions.sh"
 
 cd ~/sources/meza1/client_files
-cmd_tee "source VE.sh || exit 1"
+cmd_tee "source VE.sh"
 
 cd ~/sources/meza1/client_files
-cmd_tee "source ElasticSearch.sh || exit 1"
+cmd_tee "source ElasticSearch.sh"
 
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
