@@ -203,21 +203,27 @@ else
 fi
 
 cd ~/sources/meza1/client_files
-
 cmd_tee "source yums.sh || exit 1"
 
+cd ~/sources/meza1/client_files
 cmd_tee "source apache.sh || exit 1"
 
+cd ~/sources/meza1/client_files
 cmd_tee "source php.sh || exit 1"
 
+cd ~/sources/meza1/client_files
 cmd_tee "source mysql.sh || exit 1"
 
+cd ~/sources/meza1/client_files
 cmd_tee "source mediawiki.sh || exit 1"
 
+cd ~/sources/meza1/client_files
 cmd_tee "source extensions.sh || exit 1"
 
+cd ~/sources/meza1/client_files
 cmd_tee "source VE.sh || exit 1"
 
+cd ~/sources/meza1/client_files
 cmd_tee "source ElasticSearch.sh || exit 1"
 
 

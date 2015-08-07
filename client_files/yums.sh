@@ -75,7 +75,7 @@ rpm -i rpmforge-release-0.5.3-1.el6.rf.*.rpm
 # Some may be included in groupinstall above, and will be ignored, but better
 # safe than sorry--attempt to install them now anyway.
 #
-profile "START yum install dependency list"
+cmd_profile "START yum install dependency list"
 yum install -y \
     zlib-devel \
     sqlite-devel \
@@ -106,7 +106,7 @@ yum install -y \
     libtidy-devel \
     libmcrypt-devel \
     pam-devel
-profile "END yum install dependency list"
+cmd_profile "END yum install dependency list"
 
 
 #
