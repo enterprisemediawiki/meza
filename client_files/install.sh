@@ -10,7 +10,7 @@ fi
 # If /usr/local/bin is not in PATH then add it
 # Ref enterprisemediawiki/Meza1#68 "Run install.sh with non-root user"
 if [[ $PATH != *"/usr/local/bin"* ]]; then
-  PATH="/usr/local/bin:$PATH"
+	PATH="/usr/local/bin:$PATH"
 fi
 
 echo -e "\nWelcome to Meza1 v0.2.1\n"
@@ -148,14 +148,6 @@ if [ ! -d ~/sources ]; then
 	mkdir ~/sources
 fi
 
-# function to install Meza1 via git
-install_via_git()
-{
-	cd ~/sources
-	git clone https://github.com/enterprisemediawiki/Meza1 meza1
-	cd meza1
-	git checkout "$git_branch"
-}
 
 #
 # Output command to screen and to log files
@@ -165,18 +157,34 @@ logpath="/root/sources/meza1/logs"
 outlog="$logpath/${timestamp}_out.log"
 errlog="$logpath/${timestamp}_err.log"
 cmdlog="$logpath/${timestamp}_cmd.log"
+
+# writes a timestamp with a message for profiling purposes
+# Generally use in the form:
+# Thu Aug  6 10:44:07 CDT 2015: START some description of action
 cmd_profile()
 {
 	echo "`date`: $*" >> "$cmdlog"
 }
-command_to_screen_and_logs()
+
+# Use tee to send a command output to the terminal, but send stdout
+# to a log file and stderr to a different log file. Use like:
+# command_to_screen_and_logs "bash yums.sh $architecture || exit 1"
+cmd_tee()
 {
 	cmd_profile "START $*"
 	$@ > >(tee -a "$outlog") 2> >(tee -a "$errlog" >&2)
-	sleep 1 #this doesn't need to be that long
+	sleep 1 # why is this needed? It is needed, but why?
 	cmd_profile "END $*"
 }
 
+# function to install Meza1 via git
+install_via_git()
+{
+	cd ~/sources
+	git clone https://github.com/enterprisemediawiki/Meza1 meza1
+	cd meza1
+	git checkout "$git_branch"
+}
 
 # no meza1 directory
 if [ ! -d ~/sources/meza1 ]; then
@@ -196,21 +204,21 @@ fi
 
 cd ~/sources/meza1/client_files
 
-command_to_screen_and_logs "bash yums.sh $architecture || exit 1"
-command_to_screen_and_logs "bash apache.sh || exit 1"
+cmd_tee "source yums.sh || exit 1"
 
-command_to_screen_and_logs "bash php.sh $phpversion || exit 1"
+cmd_tee "source apache.sh || exit 1"
 
-command_to_screen_and_logs "bash mysql.sh $mysql_root_pass || exit 1"
+cmd_tee "source php.sh || exit 1"
 
-# bash mediawiki-quick.sh <mysql pass> <wiki db name> <wiki name> <wiki admin name> <wiki admin pass>
-command_to_screen_and_logs "bash mediawiki.sh $mysql_root_pass $wiki_db_name $wiki_name $wiki_admin_name $wiki_admin_pass || exit 1"
+cmd_tee "source mysql.sh || exit 1"
 
-command_to_screen_and_logs "bash extensions.sh || exit 1"
+cmd_tee "source mediawiki.sh || exit 1"
 
-command_to_screen_and_logs "bash VE.sh $mw_api_protocol $mw_api_domain || exit 1"
+cmd_tee "source extensions.sh || exit 1"
 
-command_to_screen_and_logs "bash ElasticSearch.sh || exit 1"
+cmd_tee "source VE.sh || exit 1"
+
+cmd_tee "source ElasticSearch.sh || exit 1"
 
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory

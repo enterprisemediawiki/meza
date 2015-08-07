@@ -11,30 +11,26 @@
 bash printTitle.sh "Begin $0"
 
 # if the script was called in the form:
-# bash mediawiki-quick.sh <mysql pass> <wiki db name> <wiki name> <wiki admin name> <wiki admin pass>
+# bash mediawiki.sh <wiki db name> <wiki name> <wiki admin name> <wiki admin pass>
 # then set params accordingly (meaning no user interaction required)
 if [ ! -z "$1" ]; then
-    mysql_root_pass="$1"
+    wiki_db_name="$1"
 fi
 
 if [ ! -z "$2" ]; then
-    wiki_db_name="$2"
+    wiki_name="$2"
 fi
 
 if [ ! -z "$3" ]; then
-    wiki_name="$3"
+    wiki_admin_name="$3"
 fi
 
 if [ ! -z "$4" ]; then
-    wiki_admin_name="$4"
+    wiki_admin_pass="$4"
 fi
 
 if [ ! -z "$5" ]; then
-    wiki_admin_pass="$5"
-fi
-
-if [ ! -z "$6" ]; then
-    mediawiki_git_install="$6"
+    mediawiki_git_install="$5"
 fi
 
 #
