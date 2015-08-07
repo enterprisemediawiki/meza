@@ -2,7 +2,7 @@
 #
 # Setup Apache webserver
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script apache.sh"
 
 # change to sources directory
 cd ~/sources

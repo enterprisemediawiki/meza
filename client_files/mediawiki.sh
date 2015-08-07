@@ -1,14 +1,14 @@
 #!/bin/bash
 #
-# Setup MediaWiki (quick--not checking out whole core.git)
+# Setup MediaWiki
 #
 # Example:
-#   bash mediawiki-quick.sh
+#   bash mediawiki.sh
 #
 #   This script will prompt the user for several parameters
 #
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script mediawiki.sh"
 
 
 #

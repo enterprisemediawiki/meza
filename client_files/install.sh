@@ -137,6 +137,21 @@ install_via_git()
 	git checkout "$git_branch"
 }
 
+# Creates generic title for the beginning of scripts
+print_title()
+{
+cat << EOM
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                                                             *
+*  $*
+*                                                             *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+EOM
+}
+
+
 # no meza1 directory
 if [ ! -d ~/sources/meza1 ]; then
 	install_via_git

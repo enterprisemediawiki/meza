@@ -2,7 +2,7 @@
 #
 # Setup PHP
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script php.sh"
 
 #
 # Prompt user for PHP version

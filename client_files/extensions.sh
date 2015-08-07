@@ -3,7 +3,7 @@
 # Install MediaWiki extensions. 
 #
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script extensions.sh"
 
 cd /var/www/meza1/htdocs/wiki
 

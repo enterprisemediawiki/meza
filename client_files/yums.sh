@@ -3,7 +3,7 @@
 # Setup everything that should be installed with yum. 
 #
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script yums.sh"
 
 cd ~/sources
 

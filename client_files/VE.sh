@@ -1,5 +1,5 @@
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script VE.sh"
 
 
 #
