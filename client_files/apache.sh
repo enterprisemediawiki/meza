@@ -4,8 +4,6 @@
 
 bash printTitle.sh "Begin $0"
 
-# change to meza1 src directory
-cd ~/sources/meza1/src
 
 #
 # Use pre-downloaded Apache httpd, Apache Portable Runtime (APR) and APR-util
@@ -23,8 +21,9 @@ apr_util_version="1.5.4"
 # Unpack Apache Webserver sources into ~/sources
 # Unpack APR and APR Util into Apache Webserver /srclib directory
 #
-tar -zxvf "httpd-$httpd_version.tar.gz" -C ~/sources
-cd "~/sources/httpd-2.4.16/srclib"
+cd ~/sources/meza1/src
+tar -zxvf "httpd-$httpd_version.tar.gz" -C /root/sources
+cd "/root/sources/httpd-$httpd_version/srclib"
 mkdir apr
 mkdir apr-util
 tar -zxvf "/root/sources/meza1/src/apr-$apr_version.tar.gz" -C "/root/sources/httpd-$httpd_version/srclib/apr" --strip-components 1
