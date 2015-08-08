@@ -4,36 +4,41 @@
 
 bash printTitle.sh "Begin $0"
 
-# change to sources directory
-cd ~/sources
 
 #
-# Download Apache httpd, Apache Portable Runtime (APR) and APR-util
-# Note that these links may break when new versions are released
-# See httpd [1] and APR [2] list of files to confirm versions before running.
+# Use pre-downloaded Apache httpd, Apache Portable Runtime (APR) and APR-util
 #
+# Sources:
 # [1] http://www.us.apache.org/dist//httpd/
 # [2] http://www.us.apache.org/dist//apr
 #
-httpdversion="2.4.16"
-wget "http://www.us.apache.org/dist//httpd/httpd-$httpdversion.tar.gz"
-wget http://www.us.apache.org/dist//apr/apr-1.5.2.tar.gz
-wget http://www.us.apache.org/dist//apr/apr-util-1.5.4.tar.gz
+httpd_version="2.4.16"
+apr_version="1.5.2"
+apr_util_version="1.5.4"
 
 
 #
-# Unpack and build Apache from source
+# Unpack Apache Webserver sources into /root/sources
+# Unpack APR and APR Util into Apache Webserver /srclib directory
 #
-tar -zxvf "httpd-$httpdversion.tar.gz"
-tar -zxvf apr-1.5.2.tar.gz
-tar -zxvf apr-util-1.5.4.tar.gz
-cp -r apr-1.5.2 "httpd-$httpdversion/srclib/apr"
-cp -r apr-util-1.5.4 "httpd-$httpdversion/srclib/apr-util"
-cd "httpd-$httpdversion"
+cd /root/sources/meza1/src
+tar -zxvf "httpd-$httpd_version.tar.gz" -C /root/sources
+cd "/root/sources/httpd-$httpd_version/srclib"
+mkdir apr
+mkdir apr-util
+tar -zxvf "/root/sources/meza1/src/apr-$apr_version.tar.gz" -C "/root/sources/httpd-$httpd_version/srclib/apr" --strip-components 1
+tar -zxvf "/root/sources/meza1/src/apr-util-$apr_util_version.tar.gz" -C "/root/sources/httpd-$httpd_version/srclib/apr-util" --strip-components 1
+
+
+
+
+#
+# Build Apache Webserver from source
+#
+cd "/root/sources/httpd-$httpd_version"
 ./configure --enable-ssl --enable-so --with-included-apr --with-mpm=event
 make
 make install
-
 
 #
 # Apache user
@@ -54,6 +59,8 @@ chown -R apache:www /var/www
 chmod -R 775 /var/www
 
 
+#
+# @todo: Issue #138
 #
 # Skip section (not titled) on httpd.conf "Supplemental configuration" 
 # Skip section titled "httpd-mpm.conf" 
