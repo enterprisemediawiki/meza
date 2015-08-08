@@ -24,8 +24,13 @@ apr_util_version="1.5.4"
 # Unpack APR and APR Util into Apache Webserver /srclib directory
 #
 tar -zxvf "httpd-$httpd_version.tar.gz" -C ~/sources
-tar -zxvf "apr-$apr_version.tar.gz" -C "~/sources/httpd-$httpd_version/srclib/apr"
-tar -zxvf "apr-util-$apr_util_version.tar.gz" -C "~/sources/httpd-$httpd_version/srclib/apr-util"
+cd "~/sources/httpd-2.4.16/srclib"
+mkdir apr
+mkdir apr-util
+tar -zxvf "/root/sources/meza1/src/apr-$apr_version.tar.gz" -C "/root/sources/httpd-$httpd_version/srclib/apr" --strip-components 1
+tar -zxvf "/root/sources/meza1/src/apr-util-$apr_util_version.tar.gz" -C "/root/sources/httpd-$httpd_version/srclib/apr-util" --strip-components 1
+
+
 
 
 #
