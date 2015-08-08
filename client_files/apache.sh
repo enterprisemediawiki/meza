@@ -18,10 +18,10 @@ apr_util_version="1.5.4"
 
 
 #
-# Unpack Apache Webserver sources into ~/sources
+# Unpack Apache Webserver sources into /root/sources
 # Unpack APR and APR Util into Apache Webserver /srclib directory
 #
-cd ~/sources/meza1/src
+cd /root/sources/meza1/src
 tar -zxvf "httpd-$httpd_version.tar.gz" -C /root/sources
 cd "/root/sources/httpd-$httpd_version/srclib"
 mkdir apr
@@ -35,7 +35,7 @@ tar -zxvf "/root/sources/meza1/src/apr-util-$apr_util_version.tar.gz" -C "/root/
 #
 # Build Apache Webserver from source
 #
-cd "~/sources/httpd-$httpd_version"
+cd "/root/sources/httpd-$httpd_version"
 ./configure --enable-ssl --enable-so --with-included-apr --with-mpm=event
 make
 make install
