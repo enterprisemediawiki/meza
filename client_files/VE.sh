@@ -1,12 +1,6 @@
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script VE.sh"
 
-# if the script was called in the form:
-# bash VE.sh https
-# then set mw_api_protocol to https (meaning no user interaction required)
-if [ ! -z "$1" ]; then
-    mw_api_protocol="$1"
-fi
 
 #
 # Prompt user for mw_api_protocol
@@ -17,13 +11,6 @@ do
 	read mw_api_protocol
 done
 
-
-# if the script was called in the form:
-# bash VE.sh https example.com
-# then set mw_api_domain to example.com (meaning no user interaction required)
-if [ ! -z "$2" ]; then
-    mw_api_domain="$2"
-fi
 
 #
 # Prompt user for MW API domain
@@ -47,11 +34,13 @@ cd ~/sources
 wget https://nodejs.org/dist/v0.12.5/node-v0.12.5.tar.gz
 tar zxvf node-v0.12.5.tar.gz
 cd node-v0.12.5
+cmd_profile "START node.js build"
 ./configure
 echo "******* Compiling node.js *******"
 make
 echo "******* Installing node.js *******"
 make install
+cmd_profile "END node.js build"
 
 # Download and install parsoid
 echo "******* Downloading parsoid *******"
@@ -61,11 +50,15 @@ cd parsoid
 echo "******* Installing parsoid *******"
 #npm install -g # install globally
 #attempt to install globally was resulting in several errors
+cmd_profile "START npm install parsoid"
 npm install
+cmd_profile "END npm install parsoid"
 # npm install results in "npm WARN prefer global jshint@2.8.0 should be installed with -g"
 
 echo "******* Testing parsoid *******"
+cmd_profile "START npm test parsoid"
 npm test #optional?
+cmd_profile "END npm test parsoid"
 # several warnings come out of npm test
 
 # Configure parsoid for wiki use

@@ -1,41 +1,15 @@
 #!/bin/bash
 #
-# Setup MediaWiki (quick--not checking out whole core.git)
+# Setup MediaWiki
 #
 # Example:
-#   bash mediawiki-quick.sh
+#   bash mediawiki.sh
 #
 #   This script will prompt the user for several parameters
 #
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script mediawiki.sh"
 
-# if the script was called in the form:
-# bash mediawiki-quick.sh <mysql pass> <wiki db name> <wiki name> <wiki admin name> <wiki admin pass>
-# then set params accordingly (meaning no user interaction required)
-if [ ! -z "$1" ]; then
-    mysql_root_pass="$1"
-fi
-
-if [ ! -z "$2" ]; then
-    wiki_db_name="$2"
-fi
-
-if [ ! -z "$3" ]; then
-    wiki_name="$3"
-fi
-
-if [ ! -z "$4" ]; then
-    wiki_admin_name="$4"
-fi
-
-if [ ! -z "$5" ]; then
-    wiki_admin_pass="$5"
-fi
-
-if [ ! -z "$6" ]; then
-    mediawiki_git_install="$6"
-fi
 
 #
 # Prompt for parameters
@@ -92,17 +66,21 @@ cd /var/www/meza1/htdocs
 
 if [ "$mediawiki_git_install" = "y" ]; then
 	# git clone https://github.com/wikimedia/mediawiki.git wiki
+	cmd_profile "START mediawiki git clone"
 	git clone https://gerrit.wikimedia.org/r/p/mediawiki/core.git wiki
 	cd wiki
 
 	# Checkout latest released version
 	git checkout tags/1.25.1
+	cmd_profile "END mediawiki git clone"
 else
+	cmd_profile "START mediawiki get from tarball"
 	wget http://releases.wikimedia.org/mediawiki/1.25/mediawiki-core-1.25.1.tar.gz
 
 	mkdir wiki
 	tar xpvf mediawiki-core-1.25.1.tar.gz -C ./wiki --strip-components 1
 	cd wiki
+	cmd_profile "END mediawiki get from tarball"
 fi
 
 
@@ -115,7 +93,9 @@ chown -R apache:www ./images
 #
 # Update Composer dependencies
 #
+cmd_profile "START mediawiki core composer update"
 composer update
+cmd_profile "END mediawiki core composer update"
 
 
 #

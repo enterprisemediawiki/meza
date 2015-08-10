@@ -2,14 +2,7 @@
 #
 # Setup PHP
 
-bash printTitle.sh "Begin $0"
-
-# if the script was called in the form:
-# bash php.sh 5.4.42
-# then set phpversion to 5.4.42 (meaning no user interaction required)
-if [ ! -z "$1" ]; then
-    phpversion="$1"
-fi
+print_title "Starting script php.sh"
 
 #
 # Prompt user for PHP version
@@ -52,6 +45,7 @@ cd "php-$phpversion/"
 #
 # Configure, make, make install
 #
+cmd_profile "START php build"
 ./configure \
     --with-apxs2=/usr/local/apache2/bin/apxs \
     --enable-bcmath \
@@ -94,6 +88,7 @@ cd "php-$phpversion/"
     --prefix=/usr/local/php
 make
 make install
+cmd_profile "END php build"
 
 # add symlink to php binary in location already in path
 sudo ln -s /usr/local/php/bin/php /usr/bin/php

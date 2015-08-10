@@ -2,7 +2,7 @@
 #
 # Setup Apache webserver
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script apache.sh"
 
 # change to sources directory
 cd ~/sources
@@ -32,9 +32,11 @@ tar -zxvf "apr-util-$aprutil_version.tar.gz"
 cp -r "apr-$apr_version" "httpd-$httpd_version/srclib/apr"
 cp -r "apr-util-$aprutil_version" "httpd-$httpd_version/srclib/apr-util"
 cd "httpd-$httpd_version"
+cmd_profile "START apache build"
 ./configure --enable-ssl --enable-so --with-included-apr --with-mpm=event
 make
 make install
+cmd_profile "END apache build"
 
 
 #

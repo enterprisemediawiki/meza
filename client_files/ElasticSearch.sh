@@ -1,5 +1,5 @@
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script ElasticSearch.sh"
 
 #
 # This script installs everything required to use elasticsearch in MediaWiki
@@ -20,7 +20,7 @@ bash printTitle.sh "Begin $0"
 #
 
 if [[ $PATH != *"/usr/local/bin"* ]]; then
-  PATH="/usr/local/bin:$PATH"
+	PATH="/usr/local/bin:$PATH"
 fi
 
 #
