@@ -67,18 +67,26 @@ wiki_root="$meza1_root/htdocs/wiki"
 smw_root="$wiki_root/extensions/SemanticMediaWiki"
 wiki_sql_file="$meza1_root/wiki.sql"
 wiki_images="$meza1_root/images.tar.gz"
-cd "$meza1_root/htdocs/wiki"
+cd "$meza1_root"
 
 
-# un-zip images directory
+# untar to new ./images directory
 tar -zxvf "$wiki_images"
-rm ./images/README.md
+
+# remove files from new directory that will be managed by git 
+rm ./images/README
 rm ./images/.htaccess
+
+# move contents of new images directory into wiki images directory
 mv ./images/* "$wiki_root/images/*"
+
+# remove empty directory
+rm -rf ./images
 
 
 # Configure images folder
 # Ref: https://www.mediawiki.org/wiki/Manual:Configuring_file_uploads
+cd "$wiki_root"
 chmod 755 ./images
 chown -R apache:apache ./images
 
