@@ -70,19 +70,26 @@ wiki_images="$meza1_root/images.tar.gz"
 cd "$meza1_root"
 
 
-# untar to new ./images directory
+# untar to new ./images directory, delete tarball
 tar -zxvf "$wiki_images"
+rm -rf "./images.tar.gz"
 
 # remove files from new directory that will be managed by git 
 rm ./images/README
 rm ./images/.htaccess
 
-# move contents of new images directory into wiki images directory
-mv ./images/* "$wiki_root/images/*"
+# move "good" README and .htaccess to safe location in new images director
+mv "$wiki_root/images/README" ./images/README
+mv "$wiki_root/images/.htaccess" ./images/.htaccess
+
+# remove all contents of wiki images directory
+rm -rf "$wiki_root/images/"*
+
+# move contents of new images directory into wiki images directory (including README, .htaccess)
+mv ./images/* "$wiki_root/images/"
 
 # remove empty directory
 rm -rf ./images
-
 
 # Configure images folder
 # Ref: https://www.mediawiki.org/wiki/Manual:Configuring_file_uploads
@@ -97,7 +104,7 @@ echo " * dropping if exists"
 echo " * (re)creating"
 echo " * importing file at $wiki_sql_file"
 mysql -u root "--password=$mysql_root_pass" -e"DROP DATABASE IF EXISTS $wiki_db_name; CREATE DATABASE $wiki_db_name; use $wiki_db_name; SOURCE $wiki_sql_file;"
-
+rm -rf "$wiki_sql_file"
 
 # Run update.php. The database you imported may not be up to the same version
 # as Meza1, and thus you must update it.
