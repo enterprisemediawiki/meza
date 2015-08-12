@@ -66,13 +66,25 @@ meza1_root="/var/www/meza1"
 wiki_root="$meza1_root/htdocs/wiki"
 smw_root="$wiki_root/extensions/SemanticMediaWiki"
 wiki_sql_file="$meza1_root/wiki.sql"
-wiki_images="$meza1_root/images.tar.gz"
+wiki_images="$meza1_root/images"
 cd "$meza1_root"
 
 
-# untar to new ./images directory, delete tarball
-tar -zxvf "$wiki_images"
-rm -rf "./images.tar.gz"
+if [ -d "$wiki_images" ]; then
+	echo "image directory already exists"
+elif [ -f "$wiki_images.tar" ]; then
+	echo "images.tar found. Extracting..."
+	tar -xvf "$wiki_images.tar"
+	rm -rf "$wiki_images.tar"
+elif [ -f "$wiki_images.tar.gz" ]; then
+	echo "images.tar.gz found. Extracting..."
+	tar -zxvf "$wiki_images.tar.gz"
+	rm -rf "$wiki_images.tar.gz"
+else
+	echo "No images file or directory found. Exiting..."
+	exit 1
+fi
+
 
 # remove files from new directory that will be managed by git 
 rm ./images/README
