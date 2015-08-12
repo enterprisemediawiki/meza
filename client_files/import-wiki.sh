@@ -65,21 +65,21 @@ done
 meza1_root="/var/www/meza1"
 wiki_root="$meza1_root/htdocs/wiki"
 smw_root="$wiki_root/extensions/SemanticMediaWiki"
-wiki_sql_file="$meza1_root/wiki.sql"
-wiki_images="$meza1_root/images"
+imported_sql_file="$meza1_root/wiki.sql"
+imported_images="$meza1_root/images"
 cd "$meza1_root"
 
 
-if [ -d "$wiki_images" ]; then
+if [ -d "$imported_images" ]; then
 	echo "image directory already exists"
-elif [ -f "$wiki_images.tar" ]; then
+elif [ -f "$imported_images.tar" ]; then
 	echo "images.tar found. Extracting..."
-	tar -xvf "$wiki_images.tar"
-	rm -rf "$wiki_images.tar"
-elif [ -f "$wiki_images.tar.gz" ]; then
+	tar -xvf "$imported_images.tar"
+	rm -rf "$imported_images.tar"
+elif [ -f "$imported_images.tar.gz" ]; then
 	echo "images.tar.gz found. Extracting..."
-	tar -zxvf "$wiki_images.tar.gz"
-	rm -rf "$wiki_images.tar.gz"
+	tar -zxvf "$imported_images.tar.gz"
+	rm -rf "$imported_images.tar.gz"
 else
 	echo "No images file or directory found. Exiting..."
 	exit 1
@@ -114,9 +114,9 @@ chown -R apache:apache ./images
 echo "For $wiki_db_name: "
 echo " * dropping if exists"
 echo " * (re)creating"
-echo " * importing file at $wiki_sql_file"
-mysql -u root "--password=$mysql_root_pass" -e"DROP DATABASE IF EXISTS $wiki_db_name; CREATE DATABASE $wiki_db_name; use $wiki_db_name; SOURCE $wiki_sql_file;"
-rm -rf "$wiki_sql_file"
+echo " * importing file at $imported_sql_file"
+mysql -u root "--password=$mysql_root_pass" -e"DROP DATABASE IF EXISTS $wiki_db_name; CREATE DATABASE $wiki_db_name; use $wiki_db_name; SOURCE $imported_sql_file;"
+rm -rf "$imported_sql_file"
 
 # Run update.php. The database you imported may not be up to the same version
 # as Meza1, and thus you must update it.
