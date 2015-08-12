@@ -3,17 +3,19 @@
 # Install MediaWiki extensions. 
 #
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script extensions.sh"
 
 cd /var/www/meza1/htdocs/wiki
 
 # Install extensions installed via Composer
 echo -e "\n\n## Meza1: Install composer-supported extensions"
+cmd_profile "START extensions composer require"
 composer require \
 	mediawiki/semantic-media-wiki:~2.0 \
 	mediawiki/semantic-result-formats:~2.0 \
 	mediawiki/sub-page-list:~1.1 \
 	mediawiki/semantic-meeting-minutes:~0.3
+cmd_profile "END extensions composer require"
 
 # SMW, and perhaps others just installed, require DB update after install
 echo -e "\n\n## Meza1: update database"
@@ -36,7 +38,9 @@ cp ~/sources/meza1/client_files/ExtensionSettings.php ./ExtensionSettings.php
 
 # Install extensions and update database
 echo -e "\n\n## Meza1: update/install extensions"
+cmd_profile "START extension loader install"
 php extensions/ExtensionLoader/updateExtensions.php
+cmd_profile "END extension loader install"
 php maintenance/update.php --quick
 
 # Import pages required for SemanticMeetingMinutes and rebuild indices

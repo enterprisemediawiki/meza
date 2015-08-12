@@ -3,7 +3,7 @@
 # Setup everything that should be installed with yum. 
 #
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script yums.sh"
 
 cd ~/sources
 
@@ -32,8 +32,9 @@ fi
 #
 # Update everything managed by yum
 #
+cmd_profile "START yum update"
 yum -y update
-
+cmd_profile "END yum update"
 
 #
 # Do any RedHat or CentOS specific items
@@ -57,8 +58,9 @@ fi
 #
 # Get development tools
 #
+cmd_profile "START yum groupinstall development"
 yum groupinstall -y development
-
+cmd_profile "END yum groupinstall development"
 
 #
 # Import RPM repo so libmcrypt-devel can be installed (not in default repo)
@@ -73,6 +75,7 @@ rpm -i rpmforge-release-0.5.3-1.el6.rf.*.rpm
 # Some may be included in groupinstall above, and will be ignored, but better
 # safe than sorry--attempt to install them now anyway.
 #
+cmd_profile "START yum install dependency list"
 yum install -y \
     zlib-devel \
     sqlite-devel \
@@ -103,6 +106,7 @@ yum install -y \
     libtidy-devel \
     libmcrypt-devel \
     pam-devel
+cmd_profile "END yum install dependency list"
 
 
 #

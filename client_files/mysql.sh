@@ -2,14 +2,8 @@
 #
 # Setup MySQL
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script mysql.sh"
 
-# if the script was called in the form:
-# bash mysql.sh mypassword
-# then set mysql_root_pass to mypassword (meaning no user interaction required)
-if [ ! -z "$1" ]; then
-    mysql_root_pass="$1"
-fi
 
 #
 # Prompt for password

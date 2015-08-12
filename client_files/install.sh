@@ -10,7 +10,7 @@ fi
 # If /usr/local/bin is not in PATH then add it
 # Ref enterprisemediawiki/Meza1#68 "Run install.sh with non-root user"
 if [[ $PATH != *"/usr/local/bin"* ]]; then
-  PATH="/usr/local/bin:$PATH"
+	PATH="/usr/local/bin:$PATH"
 fi
 
 echo -e "\nWelcome to Meza1 v0.2.1\n"
@@ -22,55 +22,6 @@ if [ $(uname -m | grep -c 64) -eq 1 ]; then
 architecture=64
 else
 architecture=32
-fi
-
-
-# if the script was called in the form:
-# bash install <architecture> \
-#              <phpversion> \
-#              <mysql_root_pass> \
-#              <wiki_db_name> \
-#              <wiki_name> \
-#              <wiki_admin_name> \
-#              <wiki_admin_pass>
-# then set params accordingly (meaning no user interaction required)
-#
-# These are out of hand. Change them to GNU-style long-options, see:
-# http://mywiki.wooledge.org/BashFAQ/035
-if [ ! -z "$1" ]; then
-    phpversion="$1"
-fi
-
-if [ ! -z "$2" ]; then
-    mysql_root_pass="$2"
-fi
-
-if [ ! -z "$3" ]; then
-    wiki_db_name="$3"
-fi
-
-if [ ! -z "$4" ]; then
-    wiki_name="$4"
-fi
-
-if [ ! -z "$5" ]; then
-    wiki_admin_name="$5"
-fi
-
-if [ ! -z "$6" ]; then
-    wiki_admin_pass="$6"
-fi
-
-if [ ! -z "$7" ]; then
-    git_branch="$7"
-fi
-
-if [ ! -z "$8" ]; then
-    mw_api_protocol="$8"
-fi
-
-if [ ! -z "$9" ]; then
-    mw_api_domain="$9"
 fi
 
 
@@ -130,6 +81,11 @@ echo -e "\nType domain or IP address of your wiki and press [ENTER]: "
 read mw_api_domain
 done
 
+while [ -z "$mediawiki_git_install" ]
+do
+echo -e "\nInstall MediaWiki with git? (y/n) [ENTER]: "
+read mediawiki_git_install
+done
 
 
 # Check if git installed, and install it if required
@@ -143,6 +99,35 @@ if [ ! -d ~/sources ]; then
 	mkdir ~/sources
 fi
 
+
+#
+# Output command to screen and to log files
+#
+timestamp=$(date "+%Y%m%d%H%M%S")
+logpath="/root/sources/meza1/logs"
+outlog="$logpath/${timestamp}_out.log"
+errlog="$logpath/${timestamp}_err.log"
+cmdlog="$logpath/${timestamp}_cmd.log"
+
+# writes a timestamp with a message for profiling purposes
+# Generally use in the form:
+# Thu Aug  6 10:44:07 CDT 2015: START some description of action
+cmd_profile()
+{
+	echo "`date`: $*" >> "$cmdlog"
+}
+
+# Use tee to send a command output to the terminal, but send stdout
+# to a log file and stderr to a different log file. Use like:
+# command_to_screen_and_logs "bash yums.sh"
+cmd_tee()
+{
+	cmd_profile "START $*"
+	$@ > >(tee -a "$outlog") 2> >(tee -a "$errlog" >&2)
+	sleep 1 # why is this needed? It is needed, but why?
+	cmd_profile "END $*"
+}
+
 # function to install Meza1 via git
 install_via_git()
 {
@@ -150,6 +135,20 @@ install_via_git()
 	git clone https://github.com/enterprisemediawiki/Meza1 meza1
 	cd meza1
 	git checkout "$git_branch"
+}
+
+# Creates generic title for the beginning of scripts
+print_title()
+{
+cat << EOM
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                                                             *
+*  $*
+*                                                             *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+EOM
 }
 
 
@@ -169,22 +168,33 @@ else
 	git checkout "$git_branch"
 fi
 
+# @todo: Need to test for yums.sh functionality prior to proceeding
+#    with apache.sh, and Apache functionality prior to proceeding
+#    with php.sh, and so forth.
 cd ~/sources/meza1/client_files
-bash yums.sh "$architecture" || exit 1
-bash apache.sh || exit 1
+cmd_tee "source yums.sh"
 
-bash php.sh "$phpversion" || exit 1
+cd ~/sources/meza1/client_files
+cmd_tee "source apache.sh"
 
-bash mysql.sh "$mysql_root_pass" || exit 1
+cd ~/sources/meza1/client_files
+cmd_tee "source php.sh"
 
-# bash mediawiki-quick.sh <mysql pass> <wiki db name> <wiki name> <wiki admin name> <wiki admin pass>
-bash mediawiki-quick.sh "$mysql_root_pass" "$wiki_db_name" "$wiki_name" "$wiki_admin_name" "$wiki_admin_pass" || exit 1
+cd ~/sources/meza1/client_files
+cmd_tee "source mysql.sh"
 
-bash extensions.sh || exit 1
+cd ~/sources/meza1/client_files
+cmd_tee "source mediawiki.sh"
 
-bash VE.sh "$mw_api_protocol" "$mw_api_domain" || exit 1
+cd ~/sources/meza1/client_files
+cmd_tee "source extensions.sh"
 
-bash ElasticSearch.sh || exit 1
+cd ~/sources/meza1/client_files
+cmd_tee "source VE.sh"
+
+cd ~/sources/meza1/client_files
+cmd_tee "source ElasticSearch.sh"
+
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
 cat ~/sources/meza1/client_files/pigeon.txt

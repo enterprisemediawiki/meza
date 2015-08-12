@@ -116,7 +116,7 @@ $egExtensionLoaderConfig += array(
 		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/AdminLinks.git',
 		'branch' => 'REL1_25',
 		'afterFn' => function() {
-			$wgGroupPermissions['sysop']['adminlinks'] = true;
+			$GLOBALS['wgGroupPermissions']['sysop']['adminlinks'] = true;
 		}
 	),
 
@@ -144,12 +144,12 @@ $egExtensionLoaderConfig += array(
 		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/WikiEditor.git',
 		'branch' => 'REL1_25',
 		'afterFn' => function() {
-			$wgDefaultUserOptions['usebetatoolbar'] = 1;
-			$wgDefaultUserOptions['usebetatoolbar-cgd'] = 1;
+			$GLOBALS['wgDefaultUserOptions']['usebetatoolbar'] = 1;
+			$GLOBALS['wgDefaultUserOptions']['usebetatoolbar-cgd'] = 1;
 			# displays publish button
-			$wgDefaultUserOptions['wikieditor-publish'] = 1;
+			$GLOBALS['wgDefaultUserOptions']['wikieditor-publish'] = 1;
 			# Displays the Preview and Changes tabs
-			$wgDefaultUserOptions['wikieditor-preview'] = 1;
+			$GLOBALS['wgDefaultUserOptions']['wikieditor-preview'] = 1;
 		}
 	),
 
@@ -192,7 +192,7 @@ $egExtensionLoaderConfig += array(
 		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/Interwiki.git',
 		'branch' => 'REL1_25',
 		'afterFn' => function() {
-			$wgGroupPermissions['sysop']['interwiki'] = true;
+			$GLOBALS['wgGroupPermissions']['sysop']['interwiki'] = true;
 		}
 	),
 
@@ -239,12 +239,12 @@ $egExtensionLoaderConfig += array(
 		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/ContributionScores.git',
 		'branch' => 'REL1_25',
 		'afterFn' => function() {
-			$wgContribScoreIgnoreBots = true;          // Exclude Bots from the reporting - Can be omitted.
-			$wgContribScoreIgnoreBlockedUsers = true;  // Exclude Blocked Users from the reporting - Can be omitted.
-			$wgContribScoresUseRealName = true;        // Use real user names when available - Can be omitted. Only for MediaWiki 1.19 and later.
-			$wgContribScoreDisableCache = false;       // Set to true to disable cache for parser function and inclusion of table.
+			$GLOBALS['wgContribScoreIgnoreBots'] = true;          // Exclude Bots from the reporting - Can be omitted.
+			$GLOBALS['wgContribScoreIgnoreBlockedUsers'] = true;  // Exclude Blocked Users from the reporting - Can be omitted.
+			$GLOBALS['wgContribScoresUseRealName'] = true;        // Use real user names when available - Can be omitted. Only for MediaWiki 1.19 and later.
+			$GLOBALS['wgContribScoreDisableCache'] = false;       // Set to true to disable cache for parser function and inclusion of table.
 			//Each array defines a report - 7,50 is "past 7 days" and "LIMIT 50" - Can be omitted.
-			$wgContribScoreReports = array(
+			$GLOBALS['wgContribScoreReports'] = array(
 			    array(7,50),
 			    array(30,50),
 			    array(0,50));

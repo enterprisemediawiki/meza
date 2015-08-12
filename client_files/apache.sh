@@ -2,7 +2,7 @@
 #
 # Setup Apache webserver
 
-bash printTitle.sh "Begin $0"
+print_title "Starting script apache.sh"
 
 # change to sources directory
 cd ~/sources
@@ -15,24 +15,28 @@ cd ~/sources
 # [1] http://www.us.apache.org/dist//httpd/
 # [2] http://www.us.apache.org/dist//apr
 #
-httpdversion="2.4.16"
-wget "http://www.us.apache.org/dist//httpd/httpd-$httpdversion.tar.gz"
-wget http://www.us.apache.org/dist//apr/apr-1.5.2.tar.gz
-wget http://www.us.apache.org/dist//apr/apr-util-1.5.4.tar.gz
+httpd_version="2.4.16"
+apr_version="1.5.2"
+aprutil_version="1.5.4"
+wget "http://archive.apache.org/dist/httpd/httpd-$httpd_version.tar.gz"
+wget "http://archive.apache.org/dist/apr/apr-$apr_version.tar.gz"
+wget "http://archive.apache.org/dist/apr/apr-util-$aprutil_version.tar.gz"
 
 
 #
 # Unpack and build Apache from source
 #
-tar -zxvf "httpd-$httpdversion.tar.gz"
-tar -zxvf apr-1.5.2.tar.gz
-tar -zxvf apr-util-1.5.4.tar.gz
-cp -r apr-1.5.2 "httpd-$httpdversion/srclib/apr"
-cp -r apr-util-1.5.4 "httpd-$httpdversion/srclib/apr-util"
-cd "httpd-$httpdversion"
+tar -zxvf "httpd-$httpd_version.tar.gz"
+tar -zxvf "apr-$apr_version.tar.gz"
+tar -zxvf "apr-util-$aprutil_version.tar.gz"
+cp -r "apr-$apr_version" "httpd-$httpd_version/srclib/apr"
+cp -r "apr-util-$aprutil_version" "httpd-$httpd_version/srclib/apr-util"
+cd "httpd-$httpd_version"
+cmd_profile "START apache build"
 ./configure --enable-ssl --enable-so --with-included-apr --with-mpm=event
 make
 make install
+cmd_profile "END apache build"
 
 
 #
