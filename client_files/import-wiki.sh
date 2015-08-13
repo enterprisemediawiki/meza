@@ -7,6 +7,8 @@
 # 1) On your current wiki, create an images.tar.gz file from your wiki's
 #    images directory:
 #    tar -cvzf images.tar.gz ./images/*
+#    If disk space is an issue, you can alternatively just copy the files over
+#    using the instructions below.
 # 
 # 2) Run mysqldump on your wiki and create wiki.sql:
 #    mysqldump -h localhost -u root -p WIKI_DB_NAME > /path/to/save/wiki.sql
@@ -23,13 +25,28 @@
 #    (p)scp /path/to/wiki.sql user@example.com:/var/www/meza1
 #    (p)scp /path/to/images.tar.gz user@example.com:/var/www/meza1
 #    replace "/path/to", "user", and "example.com" accordingly
+# 
+#    To Secure Copy a directory (of images)
+#    scp -r images user@example.com:/var/www/meza1/images
+#
+#    Depending on permissions, you might copy these to a non-root user 
+#    directory first. Then you can move them into a new images
+#    directory /var/www/meza1/images
+#    scp wiki.sql user@example.com:/home/user
+#    scp -r images user@example.com:/home/user/images
+#    Then on the new server:
+#    cd ~
+#    sudo mv wiki.sql /var/www/meza1/wiki.sql
+#    sudo mkdir /var/www/meza1/images
+#    sudo mv ./images/* /var/www/meza1/images
+#    rm -rf ./images
 #
 # 4) Run this script
 
 
 # must be root or sudoer
 if [ "$(whoami)" != "root" ]; then
-	echo "Try running this script with sudo: \"sudo bash install.sh\""
+	echo "Try running this script with sudo: \"sudo bash import-wiki.sh\""
 	exit 1
 fi
 
@@ -65,20 +82,47 @@ done
 meza1_root="/var/www/meza1"
 wiki_root="$meza1_root/htdocs/wiki"
 smw_root="$wiki_root/extensions/SemanticMediaWiki"
-wiki_sql_file="$meza1_root/wiki.sql"
-wiki_images="$meza1_root/images.tar.gz"
-cd "$meza1_root/htdocs/wiki"
+imported_sql_file="$meza1_root/wiki.sql"
+imported_images="$meza1_root/images"
+cd "$meza1_root"
 
 
-# un-zip images directory
-tar -zxvf "$wiki_images"
-rm ./images/README.md
+if [ -d "$imported_images" ]; then
+	echo "image directory already exists"
+elif [ -f "$imported_images.tar" ]; then
+	echo "images.tar found. Extracting..."
+	tar -xvf "$imported_images.tar"
+	rm -rf "$imported_images.tar"
+elif [ -f "$imported_images.tar.gz" ]; then
+	echo "images.tar.gz found. Extracting..."
+	tar -zxvf "$imported_images.tar.gz"
+	rm -rf "$imported_images.tar.gz"
+else
+	echo "No images file or directory found. Exiting..."
+	exit 1
+fi
+
+
+# remove files from new directory that will be managed by git 
+rm ./images/README
 rm ./images/.htaccess
-mv ./images/* "$wiki_root/images/*"
 
+# move "good" README and .htaccess to safe location in new images director
+mv "$wiki_root/images/README" ./images/README
+mv "$wiki_root/images/.htaccess" ./images/.htaccess
+
+# remove all contents of wiki images directory
+rm -rf "$wiki_root/images/"*
+
+# move contents of new images directory into wiki images directory (including README, .htaccess)
+mv ./images/* "$wiki_root/images/"
+
+# remove empty directory
+rm -rf ./images
 
 # Configure images folder
 # Ref: https://www.mediawiki.org/wiki/Manual:Configuring_file_uploads
+cd "$wiki_root"
 chmod 755 ./images
 chown -R apache:apache ./images
 
@@ -87,9 +131,9 @@ chown -R apache:apache ./images
 echo "For $wiki_db_name: "
 echo " * dropping if exists"
 echo " * (re)creating"
-echo " * importing file at $wiki_sql_file"
-mysql -u root "--password=$mysql_root_pass" -e"DROP DATABASE IF EXISTS $wiki_db_name; CREATE DATABASE $wiki_db_name; use $wiki_db_name; SOURCE $wiki_sql_file;"
-
+echo " * importing file at $imported_sql_file"
+mysql -u root "--password=$mysql_root_pass" -e"DROP DATABASE IF EXISTS $wiki_db_name; CREATE DATABASE $wiki_db_name; use $wiki_db_name; SOURCE $imported_sql_file;"
+rm -rf "$imported_sql_file"
 
 # Run update.php. The database you imported may not be up to the same version
 # as Meza1, and thus you must update it.
