@@ -2,6 +2,8 @@
 #
 # Install ImageMagick, Ghostscript and Xpdf
 
+print_title "Starting script install-imagick.sh"
+
 
 if [ "$(whoami)" != "root" ]; then
 	echo "Try running this script with sudo: \"sudo bash install-imagick.sh\""
@@ -11,24 +13,29 @@ fi
 #
 # Install Ghostscript
 #
+echo "Installing ghostscript via yum"
 yum -y install ghostscript
 
 
 # Get ImageMagick
-http://www.imagemagick.org/download/ImageMagick.tar.gz
+echo "Downloading and ImageMagick"
+wget http://www.imagemagick.org/download/ImageMagick.tar.gz
 tar xvzf ImageMagick.tar.gz
 
 # Different versions may be downloaded, * to catch whatever version
 cd ImageMagick*
 
-
+echo "Configure ImageMagick"
 ./configure
+echo "Make ImageMagick"
 make
+echo "Make install ImageMagick"
 make install
 
 
 # According to http://www.imagemagick.org/script/install-source.php:
 # "You may need to configure the dynamic linker run-time bindings"
+echo "Configure dynamic linker"
 ldconfig /usr/local/lib
 
 # For testing should run: `make check`
@@ -37,6 +44,7 @@ ldconfig /usr/local/lib
 cd ~
 
 # Get xpdf-utils
+echo "Download xpdf-utils"
 wget ftp://ftp.foolabs.com/pub/xpdf/xpdfbin-linux-3.04.tar.gz
 tar xvzf xpdfbin-linux-3.04.tar.gz
 
@@ -44,10 +52,10 @@ cd xpdfbin-linux-3.04
 
 # Copy correct-architecture executables to /usr/local/bin
 if [ $(uname -m | grep -c 64) -eq 1 ]; then
-	# 64-bit
+	echo "Move 64-bit executables to /usr/local/bin"
 	cp -a ./bin64/. /usr/local/bin/
 else
-	# 32-bit
+	echo "Move 32-bit executables to /usr/local/bin"
 	cp -a ./bin32/. /usr/local/bin/
 fi
 
