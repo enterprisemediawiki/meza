@@ -19,6 +19,7 @@ yum -y install ghostscript
 
 # Get ImageMagick
 echo "Downloading and ImageMagick"
+cd ~/sources
 wget http://www.imagemagick.org/download/ImageMagick.tar.gz
 tar xvzf ImageMagick.tar.gz
 
@@ -41,10 +42,9 @@ ldconfig /usr/local/lib
 # For testing should run: `make check`
 
 
-cd ~
-
 # Get xpdf-utils
 echo "Download xpdf-utils"
+cd ~/sources
 wget ftp://ftp.foolabs.com/pub/xpdf/xpdfbin-linux-3.04.tar.gz
 tar xvzf xpdfbin-linux-3.04.tar.gz
 
