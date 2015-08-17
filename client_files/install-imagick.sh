@@ -10,12 +10,6 @@ if [ "$(whoami)" != "root" ]; then
 	exit 1
 fi
 
-#
-# Install Ghostscript
-#
-echo "Installing ghostscript via yum"
-yum -y install ghostscript
-
 
 # Get ImageMagick
 echo "Downloading and ImageMagick"
@@ -26,12 +20,14 @@ tar xvzf ImageMagick.tar.gz
 # Different versions may be downloaded, * to catch whatever version
 cd ImageMagick*
 
+cmd_profile "START build ImageMagick"
 echo "Configure ImageMagick"
 ./configure
 echo "Make ImageMagick"
 make
 echo "Make install ImageMagick"
 make install
+cmd_profile "END build ImageMagick"
 
 
 # According to http://www.imagemagick.org/script/install-source.php:

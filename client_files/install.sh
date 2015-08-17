@@ -175,6 +175,9 @@ cd ~/sources/meza1/client_files
 cmd_tee "source yums.sh"
 
 cd ~/sources/meza1/client_files
+cmd_tee "source install-imagick.sh"
+
+cd ~/sources/meza1/client_files
 cmd_tee "source apache.sh"
 
 cd ~/sources/meza1/client_files

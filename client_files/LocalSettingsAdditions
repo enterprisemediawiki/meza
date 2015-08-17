@@ -73,3 +73,9 @@ $wgMaxImageArea = 1.25e10; // Images on [[Snorkel]] fail without this
 // If set to 10million, errors are seen when using Edit with form on mission pages like 41S
 // ini_set( 'pcre.backtrack_limit', 10000000 ); //10million
 ini_set( 'pcre.backtrack_limit', 1000000000 ); //1 billion
+
+
+$wgFileExtensions[] = 'pdf';
+$wgFileExtensions[] = 'svg';
+$wgUseImageMagick = true;
+$wgImageMagickConvertCommand = '/usr/local/bin/convert';
