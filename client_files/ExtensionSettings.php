@@ -260,4 +260,15 @@ $egExtensionLoaderConfig += array(
 		'branch' => 'master',
 	),
 
+	'PdfHandler' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler',
+		'branch' => 'REL1_25',
+		'afterFn' => function(){
+			// Location of PdfHandler dependencies
+			$GLOBALS['wgPdfProcessor'] = '/usr/bin/gs'; // installed via yum
+			$GLOBALS['wgPdfPostProcessor'] = '/usr/local/bin/convert'; // built from source
+			$GLOBALS['wgPdfInfo'] = '/usr/local/bin/pdfinfo'; // pre-built binaries installed
+		}
+	),
+
 );

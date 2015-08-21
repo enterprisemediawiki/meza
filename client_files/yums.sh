@@ -105,7 +105,8 @@ yum install -y \
     readline-devel \
     libtidy-devel \
     libmcrypt-devel \
-    pam-devel
+    pam-devel \
+    ghostscript
 cmd_profile "END yum install dependency list"
 
 
