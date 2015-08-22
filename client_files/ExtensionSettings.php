@@ -267,7 +267,20 @@ $egExtensionLoaderConfig += array(
 			// Location of PdfHandler dependencies
 			$GLOBALS['wgPdfProcessor'] = '/usr/bin/gs'; // installed via yum
 			$GLOBALS['wgPdfPostProcessor'] = '/usr/local/bin/convert'; // built from source
-			$GLOBALS['wgPdfInfo'] = '/usr/local/bin/pdfinfo'; // pre-built binaries installed
+			 // pre-built binaries installed
+		}
+	),
+
+	'UploadWizard' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/UploadWizard',
+		'branch' => 'REL1_25',
+		'afterFn' => function(){
+			// Location of PdfHandler dependencies
+			$GLOBALS['wgEnableUploads'] = true;
+			$GLOBALS['wgUseImageMagick'] = true;
+			$GLOBALS['wgImageMagickConvertCommand'] = '/usr/local/bin/convert';  # Only needs to be set if different from /usr/bin/convert
+			// Needed to make UploadWizard work in IE, see bug 39877
+			$GLOBALS['wgApiFrameOptions'] = 'SAMEORIGIN';
 		}
 	),
 
