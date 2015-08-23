@@ -81,16 +81,16 @@ $wgUseImageMagick = true;
 $wgImageMagickConvertCommand = '/usr/local/bin/convert';
 
 // Use UploadWizard by default in navigation bar
-$wgUploadNavigationUrl = '$wgScriptPath/Special:UploadWizard';
+$wgUploadNavigationUrl = '/Special:UploadWizard';
 $wgUploadWizardConfig = array(
- 	'debug' => false,
- 	'autoCategory' => 'Uploaded with UploadWizard',
- 	'feedbackPage' => 'FeedbackTest2',
- 	'altUploadForm' => 'Special:Upload',
- 	'fallbackToAltUploadForm' => false,
- 	'enableFormData' => true,  # Should FileAPI uploads be used on supported browsers?
- 	'enableMultipleFiles' => true,
- 	'enableMultiFileSelect' => true,
- 	'tutorial' => array('skip' => false),
-    'fileExtensions' => $wgFileExtensions //omitting this can cause errors
- );
+	'debug' => false,
+	'autoCategory' => 'Uploaded with UploadWizard',
+	'feedbackPage' => 'FeedbackTest2',
+	'altUploadForm' => 'Special:Upload',
+	'fallbackToAltUploadForm' => false,
+	'enableFormData' => true,  # Should FileAPI uploads be used on supported browsers?
+	'enableMultipleFiles' => true,
+	'enableMultiFileSelect' => true,
+	'tutorial' => array('skip' => true),
+	'fileExtensions' => $wgFileExtensions //omitting this can cause errors
+);
