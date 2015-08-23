@@ -267,7 +267,7 @@ $egExtensionLoaderConfig += array(
 			// Location of PdfHandler dependencies
 			$GLOBALS['wgPdfProcessor'] = '/usr/bin/gs'; // installed via yum
 			$GLOBALS['wgPdfPostProcessor'] = '/usr/local/bin/convert'; // built from source
-			 // pre-built binaries installed
+			$GLOBALS['wgPdfInfo'] = '/usr/local/bin/pdfinfo'; // pre-built binaries installed
 		}
 	),
 
