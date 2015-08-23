@@ -81,7 +81,7 @@ $wgUseImageMagick = true;
 $wgImageMagickConvertCommand = '/usr/local/bin/convert';
 
 // Use UploadWizard by default in navigation bar
-$wgUploadNavigationUrl = '/Special:UploadWizard';
+$wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard"; //Update with #156
 $wgUploadWizardConfig = array(
 	'debug' => false,
 	'autoCategory' => 'Uploaded with UploadWizard',
@@ -93,4 +93,11 @@ $wgUploadWizardConfig = array(
 	'enableMultiFileSelect' => true,
 	'tutorial' => array('skip' => true),
 	'fileExtensions' => $wgFileExtensions //omitting this can cause errors
+);
+
+// Allowed file types
+$wgFileExtensions = array( 'bmp', 'doc', 'docx'
+	, 'gif', 'jpg', 'jpeg', 'mpp', 'odg', 'odp'
+	, 'ods', 'odt', 'pdf', 'png', 'ppt', 'pptx'
+	, 'ps', 'tiff', 'txt', 'xls', 'xlsx'
 );
