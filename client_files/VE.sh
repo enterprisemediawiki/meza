@@ -29,17 +29,18 @@ mw_api_uri="$mw_api_protocol://$mw_api_domain/wiki/api.php"
 echo "******* Downloading node.js *******"
 cd ~/sources
 
-# Download, compile, and install node
-# Ref: https://www.digitalocean.com/community/tutorials/how-to-install-and-run-a-node-js-app-on-centos-6-4-64bit
-wget https://nodejs.org/dist/v0.12.5/node-v0.12.5.tar.gz
-tar zxvf node-v0.12.5.tar.gz
-cd node-v0.12.5
+# Download and install node
+# Ref: https://gist.github.com/isaacs/579814
+mkdir ./node-latest-install
+cd node-latest-install
+wget http://nodejs.org/dist/node-latest.tar.gz
+tar zxvf node-latest.tar.gz --strip-components=1
+rm -f node-latest.tar.gz
 cmd_profile "START node.js build"
 ./configure
-echo "******* Compiling node.js *******"
-make
 echo "******* Installing node.js *******"
 make install
+# curl https://www.npmjs.org/install.sh | sh
 cmd_profile "END node.js build"
 
 # Download and install parsoid
