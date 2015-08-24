@@ -32,15 +32,17 @@ cd ~/sources
 
 # Download binaries
 # Ref: http://derpturkey.com/install-node-js-from-binaries/
+# This doesn't seem to install npm. Perhaps we need to install nvm.
 wget http://nodejs.org/dist/v0.10.40/node-v0.10.40-linux-x64.tar.gz
-tar -zxvf node-v0.10.40-linux-x64.tar.gz
+tar -zxvf node-v0.10.40-linux-x64.tar.gz -C /usr/local/bin
 rm -f node-v0.10.40-linux-x64.tar.gz
 
 # Create a symbolic link for node that points to the new directory
+cd /usr/local/bin
 ln -s node-v0.10.40-linux-x64 node
 
 if [[ $PATH != *"/usr/local/bin"* ]]; then
-	PATH="$HOME/sources/node/bin:$PATH"
+	PATH="/usr/local/bin:$PATH"
 fi
 
 cmd_profile "END node.js build"
@@ -66,7 +68,6 @@ cmd_profile "END npm test parsoid"
 
 # Configure parsoid for wiki use
 # TODO This part can be modified once localsettings.js is included in initial download of files
-# TODO change client_files to master once merged
 # localsettings for parsoid
 echo "******* Downloading configuration files *******"
 cd ~/sources/meza1/client_files
