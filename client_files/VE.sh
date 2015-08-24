@@ -27,20 +27,22 @@ mw_api_uri="$mw_api_protocol://$mw_api_domain/wiki/api.php"
 
 
 echo "******* Downloading node.js *******"
+cmd_profile "START node.js build"
 cd ~/sources
 
-# Download and install node
-# Ref: https://gist.github.com/isaacs/579814
-mkdir ./node-latest-install
-cd node-latest-install
-wget http://nodejs.org/dist/node-latest.tar.gz
-tar zxvf node-latest.tar.gz --strip-components=1
-rm -f node-latest.tar.gz
-cmd_profile "START node.js build"
-./configure
-echo "******* Installing node.js *******"
-make install
-# curl https://www.npmjs.org/install.sh | sh
+# Download binaries
+# Ref: http://derpturkey.com/install-node-js-from-binaries/
+wget http://nodejs.org/dist/v0.10.40/node-v0.10.40-linux-x64.tar.gz
+tar -zxvf node-v0.10.40-linux-x64.tar.gz
+rm -f node-v0.10.40-linux-x64.tar.gz
+
+# Create a symbolic link for node that points to the new directory
+ln -s node-v0.10.40-linux-x64 node
+
+if [[ $PATH != *"/usr/local/bin"* ]]; then
+	PATH="$HOME/sources/node/bin:$PATH"
+fi
+
 cmd_profile "END node.js build"
 
 # Download and install parsoid
