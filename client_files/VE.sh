@@ -39,8 +39,8 @@ rm -f node-v0.12.7-linux-x64.tar.gz
 
 # Create a symbolic link for node that points to the new directory
 cd /usr/local/bin
-ln -s node-v0.12.7-linux-x64.tar.gz/bin/node node
-ln -s node-v0.12.7-linux-x64.tar.gz/lib/node_modules/npm/bin/npm-cli.js npm
+ln -s node-v0.12.7-linux-x64/bin/node node
+ln -s node-v0.12.7-linux-x64/lib/node_modules/npm/bin/npm-cli.js npm
 
 if [[ $PATH != *"/usr/local/bin"* ]]; then
 	PATH="/usr/local/bin:$PATH"
