@@ -32,7 +32,6 @@ cd ~/sources
 
 # Download binaries
 # Ref: http://derpturkey.com/install-node-js-from-binaries/
-# This doesn't seem to install npm. Perhaps we need to install nvm.
 wget http://nodejs.org/dist/v0.12.7/node-v0.12.7-linux-x64.tar.gz
 tar -zxvf node-v0.12.7-linux-x64.tar.gz -C /usr/local/bin
 rm -f node-v0.12.7-linux-x64.tar.gz
