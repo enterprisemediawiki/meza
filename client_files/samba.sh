@@ -3,6 +3,18 @@
 # Sets up /var/www/meza1/htdocs as a shared drive via samba
 #
 
+if [ "$(whoami)" != "root" ]; then
+	echo "Try running this script with sudo: \"sudo bash install.sh\""
+	exit 1
+fi
+
+# If /usr/local/bin is not in PATH then add it
+# Ref enterprisemediawiki/Meza1#68 "Run install.sh with non-root user"
+if [[ $PATH != *"/usr/local/bin"* ]]; then
+	PATH="/usr/local/bin:$PATH"
+fi
+
+
 echo "Installing samba"
 yum -y install samba samba-client samba-common
 
