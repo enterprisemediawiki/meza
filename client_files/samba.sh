@@ -16,7 +16,7 @@ fi
 
 
 echo "Installing samba"
-yum -y install samba samba-client samba-common
+yum -y install samba4 samba4-client samba4-common
 
 chkconfig smb on
 chkconfig nmb on
