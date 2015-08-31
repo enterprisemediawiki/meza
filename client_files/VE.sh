@@ -27,19 +27,24 @@ mw_api_uri="$mw_api_protocol://$mw_api_domain/wiki/api.php"
 
 
 echo "******* Downloading node.js *******"
+cmd_profile "START node.js build"
 cd ~/sources
 
-# Download, compile, and install node
-# Ref: https://www.digitalocean.com/community/tutorials/how-to-install-and-run-a-node-js-app-on-centos-6-4-64bit
-wget https://nodejs.org/dist/v0.12.5/node-v0.12.5.tar.gz
-tar zxvf node-v0.12.5.tar.gz
-cd node-v0.12.5
-cmd_profile "START node.js build"
-./configure
-echo "******* Compiling node.js *******"
-make
-echo "******* Installing node.js *******"
-make install
+# Download binaries
+# Ref: http://derpturkey.com/install-node-js-from-binaries/
+wget http://nodejs.org/dist/v0.12.7/node-v0.12.7-linux-x64.tar.gz
+tar -zxvf node-v0.12.7-linux-x64.tar.gz -C /usr/local/bin
+rm -f node-v0.12.7-linux-x64.tar.gz
+
+# Create a symbolic link for node that points to the new directory
+cd /usr/local/bin
+ln -s node-v0.12.7-linux-x64/bin/node node
+ln -s node-v0.12.7-linux-x64/lib/node_modules/npm/bin/npm-cli.js npm
+
+if [[ $PATH != *"/usr/local/bin"* ]]; then
+	PATH="/usr/local/bin:$PATH"
+fi
+
 cmd_profile "END node.js build"
 
 # Download and install parsoid
@@ -63,7 +68,6 @@ cmd_profile "END npm test parsoid"
 
 # Configure parsoid for wiki use
 # TODO This part can be modified once localsettings.js is included in initial download of files
-# TODO change client_files to master once merged
 # localsettings for parsoid
 echo "******* Downloading configuration files *******"
 cd ~/sources/meza1/client_files
