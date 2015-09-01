@@ -1,6 +1,21 @@
 
 // ******* Begin info for VE *******
 
+// Allow read and edit permission for requests from the server (e.g. Parsoid)
+// Ref: https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
+// Ref: https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
+if ( $_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR'] ) {
+   $wgGroupPermissions['*']['read'] = true;
+   $wgGroupPermissions['*']['edit'] = true;
+}else{
+   # Disable reading by anonymous users
+   $wgGroupPermissions['*']['read'] = false;
+   $wgWhitelistRead = array ("Special:Userlogin", "MediaWiki:Common.css",
+   "MediaWiki:Common.js", "MediaWiki:Monobook.css", "MediaWiki:Monobook.js", "-");
+   # Disable anonymous editing
+   $wgGroupPermissions['*']['edit'] = false;
+}
+
 // Enable by default for everybody
 $wgDefaultUserOptions['visualeditor-enable'] = 1;
 
