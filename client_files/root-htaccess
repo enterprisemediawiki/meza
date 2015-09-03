@@ -1,0 +1,15 @@
+# mod_rewrite
+<IfModule mod_rewrite.c>
+
+    # Enable mod_rewrite engine
+    RewriteEngine on
+
+    RewriteBase /
+
+    # Taken from MediaWiki.org [[Extension:Simple Farm]]
+    #
+    # Redirect virtual wiki path to physical wiki path. There
+    # can be no wiki accessible using this path.
+    RewriteRule ^(?!wiki(?:/|$))[^/]+(?:/(.*))?$ wiki/$1
+
+</IfModule>
