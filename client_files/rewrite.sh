@@ -1,18 +1,28 @@
 #!/usr/bin/sh
 #
 # Enable mod_rewrite
-
+#
+# Try this mod_rewrite tester: http://htaccess.madewithlove.be/
 
 
 cd /usr/local/apache2/conf
-mv httpd.conf httpd.old.conf
+mv httpd.conf httpd.default.conf
 cp ~/sources/meza1/client_files/config/httpd.conf ./httpd.conf
 
 echo "restart apache httpd"
 service httpd restart
 
+cd /var/www/meza1/htdocs
+
 echo "add .htaccess file to htdocs root"
-cp ~/sources/meza1/client_files/root-htaccess /var/www/meza1/htdocs/.htaccess
+cp ~/sources/meza1/client_files/root-htaccess ./.htaccess
+
+echo "move wiki directory to mediawiki"
+mv ./wiki ./mediawiki
+
+mkdir ./wikis
+cd ./wikis
+
 
 #
 # Manual steps:
