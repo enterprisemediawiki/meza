@@ -16,11 +16,6 @@ fi
 echo -e "\nWelcome to Meza1 v0.2.1\n"
 
 
-# Load config constants. Unfortunately right now have to write out full path to
-# Meza1 since we can't be certain of consistent method of accessing install.sh.
-source /root/sources/meza1/config.sh
-
-
 #
 # Set architecture to 32 or 64 (bit)
 #
@@ -148,6 +143,11 @@ else
 	git fetch origin
 	git checkout "$git_branch"
 fi
+
+
+# Load config constants. Unfortunately right now have to write out full path to
+# Meza1 since we can't be certain of consistent method of accessing install.sh.
+source /root/sources/meza1/client_files/config.sh
 
 
 # @todo: Need to test for yums.sh functionality prior to proceeding
