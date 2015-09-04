@@ -2,7 +2,7 @@
 
 # Meza1 install location
 m_install=/root/sources
-m_meza="$m_meza/meza1"
+m_meza="$m_install/meza1"
 
 # webserver variables
 m_www=/var/www
