@@ -39,30 +39,6 @@ echo -e "\nEnter MySQL root password and press [ENTER]: "
 read -s mysql_root_pass
 done
 
-while [ -z "$wiki_db_name" ]
-do
-echo -e "\nEnter desired name of your wiki database and press [ENTER]: "
-read wiki_db_name
-done
-
-while [ -z "$wiki_name" ]
-do
-echo -e "\nEnter desired name of your wiki and press [ENTER]: "
-read wiki_name
-done
-
-while [ -z "$wiki_admin_name" ]
-do
-echo -e "\nEnter desired administrator account username and press [ENTER]: "
-read wiki_admin_name
-done
-
-while [ -z "$wiki_admin_pass" ]
-do
-echo -e "\nEnter password you would like for your wiki administrator account and press [ENTER]: "
-read -s wiki_admin_pass
-done
-
 while [ -z "$git_branch" ]
 do
 echo -e "\nEnter git branch of Meza1 you want to use (generally this is \"master\") [ENTER]: "
