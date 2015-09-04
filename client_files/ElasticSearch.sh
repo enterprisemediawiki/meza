@@ -30,7 +30,7 @@ fi
 # http://stackoverflow.com/questions/10268583/how-to-automate-download-and-installation-of-java-jdk-on-linux
 #
 echo "******* Downloading and installing JAVA Development Kit *******"
-cd "$m_install/client_files"
+cd "$m_meza/client_files"
 yum -y install java-1.7.0-openjdk
 # Reference this for if we want to try JDK 8: http://tecadmin.net/install-java-8-on-centos-rhel-and-fedora/
 ## wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.rpm
@@ -54,7 +54,7 @@ echo "JAVA_HOME = $JAVA_HOME"
 echo "******* Installing Elasticsearch *******"
 
 # Download and install the public signing key:
-cd "$m_install/client_files"
+cd "$m_meza/client_files"
 rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
 
 # Add yum repo file
@@ -87,7 +87,7 @@ echo "127.0.0.1 Meza1" >> /etc/hosts
 # Rename the standard config file and copy over our custom config file
 cd /etc/elasticsearch
 mv ./elasticsearch.yml ./elasticsearch-old.yml
-cd "$m_install/client_files"
+cd "$m_meza/client_files"
 cp ./elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 
 # Make directories called out in elasticsearch.yml
@@ -110,7 +110,7 @@ chown -R elasticsearch /var/work/elasticsearch
 # Add Elastica and CirrusSearch to ExtensionSettings
 #
 echo "******* Adding extensions to ExtensionLoader *******"
-cat "$m_install/client_files/ExtensionSettingsElasticSearch.php" >> "$m_mediawiki/ExtensionSettings.php"
+cat "$m_meza/client_files/ExtensionSettingsElasticSearch.php" >> "$m_mediawiki/ExtensionSettings.php"
 
 #
 # MW Configuration
@@ -118,7 +118,7 @@ cat "$m_install/client_files/ExtensionSettingsElasticSearch.php" >> "$m_mediawik
 
 # Add CirrusSearch settings to LocalSettings.php
 echo "******* Downloading configuration files *******"
-cat "$m_install/client_files/LocalSettingsElasticSearch.php" >> "$m_mediawiki/LocalSettings.php"
+cat "$m_meza/client_files/LocalSettingsElasticSearch.php" >> "$m_mediawiki/LocalSettings.php"
 
 # Run updateExtensions to install UniversalLanguageSelector and VisualEditor
 echo "******* Installing extensions *******"
@@ -144,7 +144,7 @@ sleep 20  # Waits 10 seconds
 # Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
 #
 echo "******* Running elastic-build-index.sh *******"
-bash "$m_install/client_files/elastic-build-index.sh"
+bash "$m_meza/client_files/elastic-build-index.sh"
 
 # Add "$wgSearchType = 'CirrusSearch';" to LocalSettings.php to funnel queries to ElasticSearch
 cd "$m_mediawiki"
