@@ -110,8 +110,11 @@ echo '<?php phpinfo();' > info.php
 #LoadModule php5_module modules/libphp5.so
 
 #
-# Restart Apache
+# Start webserver service
 #
+chkconfig httpd on
+service httpd status
 service httpd restart
+
 
 echo -e "\n\nPHP has been setup.\n\nPlease use the web browser on your host computer to navigate to http://192.168.56.56/info.php to verify php is being executed."

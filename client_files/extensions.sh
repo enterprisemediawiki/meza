@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Install MediaWiki extensions. 
+# Install MediaWiki extensions.
 #
 
 print_title "Starting script extensions.sh"
@@ -50,3 +50,15 @@ echo -e "\n\n## Meza1: rebuildrecentchanges.php"
 php maintenance/rebuildrecentchanges.php
 echo -e "\n\n## Meza1: Extension:TitleKey rebuildTitleKeys.php"
 php extensions/TitleKey/rebuildTitleKeys.php
+
+#
+# Create "Admin" user on Demo Wiki
+# This is sort of strange in this location, but it cannot be done much prior to
+# this due to the fact that everything defined in our pre-built LocalSettings.php
+# must be available prior to running any maintenance scripts. Thus, it must be
+# after SMW install due to the `enableSemantics()` function in LocalSettings.php.
+# Other extensions could cause similar issues, so it's best that this go after
+# loading extensions.
+#
+cp ~/sources/meza1/client_files/mezaCreateUser.php /var/www/meza1/mezaCreateUser.php
+WIKI=demo php /var/www/meza1/mezaCreateUser.php --username=Admin --password=1234 --groups=sysop,bureaucrat

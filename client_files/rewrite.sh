@@ -2,7 +2,7 @@
 #
 # Enable mod_rewrite
 #
-# Try this mod_rewrite tester: http://htaccess.madewithlove.be/
+# @todo: Try this mod_rewrite tester: http://htaccess.madewithlove.be/
 
 
 cd /usr/local/apache2/conf
@@ -20,8 +20,12 @@ cp ~/sources/meza1/client_files/root-htaccess ./.htaccess
 echo "move wiki directory to mediawiki"
 mv ./wiki ./mediawiki
 
+
+echo "create \"wikis\" and \"__common\" directories"
 mkdir ./wikis
-cd ./wikis
+mkdir ./__common
+
+
 
 
 #

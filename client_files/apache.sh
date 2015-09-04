@@ -59,8 +59,8 @@ chmod -R 775 /var/www
 
 
 #
-# Skip section (not titled) on httpd.conf "Supplemental configuration" 
-# Skip section titled "httpd-mpm.conf" 
+# Skip section (not titled) on httpd.conf "Supplemental configuration"
+# Skip section titled "httpd-mpm.conf"
 # Skip section titled "Vhosts for apache 2.4.12"
 #
 # @todo: figure out if this section is necessary For now skip section titled "httpd-security.conf"
@@ -77,18 +77,24 @@ chmod -R 775 /var/www
 
 cd /usr/local/apache2/conf
 
+#
+# Commenting out all modifications to httpd.conf. These should all be in
+# "Meza1/client_files/config/httpd.conf" now. Anything
+#
 # update document root
-sed -r -i 's/\/usr\/local\/apache2\/htdocs/\/var\/www\/meza1\/htdocs/g;' ./httpd.conf
-
+# sed -r -i 's/\/usr\/local\/apache2\/htdocs/\/var\/www\/meza1\/htdocs/g;' ./httpd.conf
 # direct apache to execute PHP
-cat ~/sources/meza1/client_files/httpd-conf-additions.conf >> ./httpd.conf
-
+# cat ~/sources/meza1/client_files/httpd-conf-additions.conf >> ./httpd.conf
 # serve index.php as default file
-sed -r -i 's/DirectoryIndex\s*index.html/DirectoryIndex index.php index.html/g;' ./httpd.conf
-
+# sed -r -i 's/DirectoryIndex\s*index.html/DirectoryIndex index.php index.html/g;' ./httpd.conf
 # modify user that will handle web requests
-sed -r -i 's/User\s*daemon/User apache/g;' ./httpd.conf
-sed -r -i 's/Group\s*daemon/Group www/g;' ./httpd.conf
+# sed -r -i 's/User\s*daemon/User apache/g;' ./httpd.conf
+# sed -r -i 's/Group\s*daemon/Group www/g;' ./httpd.conf
+
+
+# rename default configuration file, get Meza1 config file
+mv httpd.conf httpd.default.conf
+cp ~/sources/meza1/client_files/config/httpd.conf ./httpd.conf
 
 # create service script
 cd /etc/init.d
@@ -103,10 +109,20 @@ cd /var/www/meza1/htdocs
 touch index.html
 echo '<h1>It works!</h1><p>Congratulations, your Apache 2.4 webserver is running.</p>' > index.html
 
-# Start webserver service
-chkconfig httpd on
-service httpd status
-service httpd restart
+#
+# Defer starting httpd until PHP installed
+#
+# # Start webserver service
+# chkconfig httpd on
+# service httpd status
+# service httpd restart
+
+echo "add .htaccess file to htdocs root"
+cp ~/sources/meza1/client_files/root-htaccess ./.htaccess
+
+echo "create \"wikis\" and \"__common\" directories"
+mkdir ./wikis
+mkdir ./__common
 
 echo -e "\n\nYour Apache 2.4 webserver has been setup.\n\nPlease use the web browser on your host computer to navigate to http://192.168.56.56 to test it out"
 
