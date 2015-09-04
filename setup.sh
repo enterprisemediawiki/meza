@@ -14,7 +14,7 @@ mkdir meza1
 tar xpvf meza1.tar.gz -C ./meza1 --strip-components 1
 
 #
-# Modify network scripts in /etc/sysconfig/network-scripts, 
+# Modify network scripts in /etc/sysconfig/network-scripts,
 # ifcfg-eth0 (for NAT network adapter) and ifcfg-eth1 (for host-only)
 #
 cd /etc/sysconfig/network-scripts
@@ -26,7 +26,7 @@ sed -r -i 's/ONBOOT=no/ONBOOT=yes/g;' ./ifcfg-eth0
 sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' ./ifcfg-eth0
 
 # copy ifcfg-eth1  (host-only)
-cp ~/sources/meza1/client_files/ifcfg-eth1 ./ifcfg-eth1
+cp /root/sources/meza1/client_files/ifcfg-eth1 ./ifcfg-eth1
 
 # get eth1 HWADDR from ifconfig, insert int ifcfg-eth1
 eth1_hwaddr="$(ifconfig eth1 | grep '[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}' -o -P)"

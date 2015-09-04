@@ -7,7 +7,10 @@ if ( !defined( 'MEDIAWIKI' ) ) {
         exit;
 }
 
-require_once '/var/www/meza1/htdocs/__common/AllWikiSettings.php';
+// same value as bash variable in config.sh
+$m_htdocs = '/var/www/meza1/htdocs';
+
+require_once "$m_htdocs/__common/AllWikiSettings.php";
 
 if( $wgCommandLineMode ) {
 
@@ -52,7 +55,7 @@ $wgScriptPath = "/$wikiId";
 $wgUploadPath = "$mezaWikiIP/images";
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadDirectory
-$wgUploadDirectory = "/var/www/meza1/htdocs/wikis/$wikiId/images";
+$wgUploadDirectory = "$m_htdocs/wikis/$wikiId/images";
 
 // https://www.mediawiki.org/wiki/Manual:$wgLogo
 $wgLogo = "$mezaWikiIP/config/logo.png";
@@ -104,7 +107,7 @@ if ( isset( $mezaCustomDBuser ) && isset ( $mezaCustomDBpass ) ) {
 	$wgDBuser = $mezaCustomDBuser;
 	$wgDBpassword = $mezaCustomDBpass;
 } else {
-	require_once "/var/www/meza1/htdocs/__common/dbUserPass.php";
+	require_once "$m_htdocs/__common/dbUserPass.php";
 }
 
 # MySQL specific settings

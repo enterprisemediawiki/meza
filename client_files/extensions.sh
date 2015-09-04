@@ -5,7 +5,7 @@
 
 print_title "Starting script extensions.sh"
 
-cd /var/www/meza1/htdocs/wiki
+cd "$m_mediawiki"
 
 # Install extensions installed via Composer
 echo -e "\n\n## Meza1: Install composer-supported extensions"
@@ -28,13 +28,13 @@ git clone https://github.com/jamesmontalvo3/ExtensionLoader.git
 cd ..
 
 # Add settings to LocalSettings.php from Meza1 repo
-cat ~/sources/meza1/client_files/LocalSettingsAdditions >> ./LocalSettings.php
+cat "$m_meza/client_files/LocalSettingsAdditions" >> ./LocalSettings.php
 
 # Add ExtensionLoader setup to LocalSettings.php
 cat ./extensions/ExtensionLoader/LocalSettings-append >> ./LocalSettings.php
 
 # Add ExtensionSettings.php (used by ExtensionLoader) from Meza1 repo
-cp ~/sources/meza1/client_files/ExtensionSettings.php ./ExtensionSettings.php
+cp "$m_meza/client_files/ExtensionSettings.php" ./ExtensionSettings.php
 
 # Install extensions and update database
 echo -e "\n\n## Meza1: update/install extensions"
@@ -60,5 +60,5 @@ php extensions/TitleKey/rebuildTitleKeys.php
 # Other extensions could cause similar issues, so it's best that this go after
 # loading extensions.
 #
-cp ~/sources/meza1/client_files/mezaCreateUser.php /var/www/meza1/mezaCreateUser.php
+cp "$m_meza/client_files/mezaCreateUser.php" /var/www/meza1/mezaCreateUser.php
 WIKI=demo php /var/www/meza1/mezaCreateUser.php --username=Admin --password=1234 --groups=sysop,bureaucrat

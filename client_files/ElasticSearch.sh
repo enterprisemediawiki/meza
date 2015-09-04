@@ -3,14 +3,14 @@ print_title "Starting script ElasticSearch.sh"
 
 #
 # This script installs everything required to use elasticsearch in MediaWiki
-# 
+#
 # Dependencies
 # - PHP compiled with cURL
 # - Elasticsearch
 #   - JAVA 7+
 # - Extension:Elastica
 # - Extension:CirrusSearch
-# 
+#
 # Ref:
 # https://www.mediawiki.org/wiki/Extension:CirrusSearch
 # https://en.wikipedia.org/w/api.php?action=cirrus-config-dump&srbackend=CirrusSearch&format=json
@@ -25,12 +25,12 @@ fi
 
 #
 # Install JAVA
-# 
+#
 # http://docs.oracle.com/javase/8/docs/technotes/guides/install/linux_jdk.html#BJFJHFDD
 # http://stackoverflow.com/questions/10268583/how-to-automate-download-and-installation-of-java-jdk-on-linux
 #
 echo "******* Downloading and installing JAVA Development Kit *******"
-cd ~/sources/meza1/client_files
+cd "$m_install/client_files"
 yum -y install java-1.7.0-openjdk
 # Reference this for if we want to try JDK 8: http://tecadmin.net/install-java-8-on-centos-rhel-and-fedora/
 ## wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.rpm
@@ -50,11 +50,11 @@ echo "JAVA_HOME = $JAVA_HOME"
 # Install Elasticsearch via yum repository
 #
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-repositories.html
-# 
+#
 echo "******* Installing Elasticsearch *******"
 
 # Download and install the public signing key:
-cd ~/sources/meza1/client_files
+cd "$m_install/client_files"
 rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
 
 # Add yum repo file
@@ -78,7 +78,7 @@ chkconfig --add elasticsearch
 # Elasticsearch Configuration
 #
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html
-# 
+#
 
 echo "******* Adding Elasticsearch configuration *******"
 # Add host name per https://github.com/elastic/elasticsearch/issues/6611
@@ -87,7 +87,7 @@ echo "127.0.0.1 Meza1" >> /etc/hosts
 # Rename the standard config file and copy over our custom config file
 cd /etc/elasticsearch
 mv ./elasticsearch.yml ./elasticsearch-old.yml
-cd ~/sources/meza1/client_files
+cd "$m_install/client_files"
 cp ./elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 
 # Make directories called out in elasticsearch.yml
@@ -110,27 +110,27 @@ chown -R elasticsearch /var/work/elasticsearch
 # Add Elastica and CirrusSearch to ExtensionSettings
 #
 echo "******* Adding extensions to ExtensionLoader *******"
-cat ~/sources/meza1/client_files/ExtensionSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/ExtensionSettings.php
+cat "$m_install/client_files/ExtensionSettingsElasticSearch.php" >> "$m_mediawiki/ExtensionSettings.php"
 
 #
 # MW Configuration
-# 
+#
 
 # Add CirrusSearch settings to LocalSettings.php
 echo "******* Downloading configuration files *******"
-cat ~/sources/meza1/client_files/LocalSettingsElasticSearch.php >> /var/www/meza1/htdocs/wiki/LocalSettings.php
+cat "$m_install/client_files/LocalSettingsElasticSearch.php" >> "$m_mediawiki/LocalSettings.php"
 
 # Run updateExtensions to install UniversalLanguageSelector and VisualEditor
 echo "******* Installing extensions *******"
-php /var/www/meza1/htdocs/wiki/extensions/ExtensionLoader/updateExtensions.php
+php "$m_mediawiki/extensions/ExtensionLoader/updateExtensions.php"
 # Install Elastica library via composer
-cd /var/www/meza1/htdocs/wiki/extensions/Elastica
+cd "$m_mediawiki/extensions/Elastica"
 composer install
 
 # Any time you run updateExtensions.php it may be required to run
 # `php maintenance/update.php` since new extension versions may be installed
 echo "******* Running update.php to update database as required *******"
-cd /var/www/meza1/htdocs/wiki/maintenance
+cd "$m_mediawiki/maintenance"
 php update.php --quick
 
 # Start Elasticsearch
@@ -144,10 +144,10 @@ sleep 20  # Waits 10 seconds
 # Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
 #
 echo "******* Running elastic-build-index.sh *******"
-bash ~/sources/meza1/client_files/elastic-build-index.sh
+bash "$m_install/client_files/elastic-build-index.sh"
 
 # Add "$wgSearchType = 'CirrusSearch';" to LocalSettings.php to funnel queries to ElasticSearch
-cd /var/www/meza1/htdocs/wiki
+cd "$m_mediawiki"
 sed -i -e 's/\/\/ES-CONFIG-ANCHOR/$wgSearchType = "CirrusSearch";/g' LocalSettings.php
 
 echo "******* Complete! *******"

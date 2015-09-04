@@ -1,7 +1,15 @@
 #!/bin/bash
 #
-# Sets up /var/www/meza1/htdocs as a shared drive via samba
+# Sets up $m_htdocs as a shared drive via samba
 #
+
+#
+# For now this script is not called within the same shell as install.sh
+# and thus it needs to know how to get to the config.sh script on it's own
+#
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source "$DIR/config.sh"
+
 
 echo "Installing samba"
 yum -y install samba samba-client samba-common
@@ -29,7 +37,7 @@ security = share
 map to guest = bad user
 #============================ Share Definitions ==============================
 [MyShare]
-path = /var/www/meza1/htdocs
+path = $m_htdocs
 browsable =yes
 writable = yes
 guest ok = yes
@@ -41,4 +49,4 @@ service smb restart
 service nmb restart
 
 
-chmod -R 0777 /var/www/meza1/htdocs
+chmod -R 0777 $m_htdocs

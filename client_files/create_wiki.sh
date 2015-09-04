@@ -21,6 +21,13 @@ if [[ $PATH != *"/usr/local/bin"* ]]; then
 	PATH="/usr/local/bin:$PATH"
 fi
 
+#
+# For now this script is not called within the same shell as install.sh
+# and thus it needs to know how to get to the config.sh script on it's own
+#
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source "$DIR/config.sh"
+
 echo -e "\nCreating new wiki\n"
 
 
@@ -70,7 +77,7 @@ done
 
 
 
-cd /var/www/meza1/htdocs/wikis
+cd "$m_htdocs/wikis"
 
 
 # check if dir already exists
@@ -80,14 +87,15 @@ if [ -d "./$wiki_id" ]; then
 fi
 
 # Check that desired name is alpha-numeric
-if [ $wiki_id =~ ^[\w\d]+$ ]; then
+if grep '^[-0-9a-zA-Z]*$' <<<$wiki_id ; then
 	echo "Wiki name is acceptable"
-	cp ~/sources/meza1/wiki-init "./$wiki_id"
+	cp "$m_meza/wiki-init" "./$wiki_id"
 	chown -R apache:www "./$wiki_id/images"
 else
 	echo "Wiki name is not alphanumeric. Exiting."
 	exit 1;
 fi
+
 
 # insert wiki name into setup.php
 sed -r -i "s/\$wgSitename = 'placeholder';/\$wgSitename = '$wiki_name';/g;" "./wikis/$wiki_id/setup.php"
@@ -99,7 +107,7 @@ sed -r -i "s/\$mezaAuthType = 'placeholder';/\$mezaAuthType = 'local_dev';/g;" "
 wiki_db_name="wiki_$wiki_id"
 
 echo -e "\nCreating database and importing tables"
-mysql -u root "--password=$mysql_root_pass" -e"CREATE DATABASE IF NOT EXISTS $wiki_db_name; use $wiki_db_name; SOURCE /var/www/meza1/htdocs/mediawiki/maintenance/tables.sql;"
+mysql -u root "--password=$mysql_root_pass" -e"CREATE DATABASE IF NOT EXISTS $wiki_db_name; use $wiki_db_name; SOURCE $m_htdocs/mediawiki/maintenance/tables.sql;"
 
 # @todo: initialize site stats?
 
@@ -108,7 +116,7 @@ mysql -u root "--password=$mysql_root_pass" -e"CREATE DATABASE IF NOT EXISTS $wi
 # from zero to fully installed.
 #
 echo -e "\nRun update.php"
-WIKI="$wiki_id" php /var/www/meza1/htdocs/mediawiki/maintenance/update.php
+WIKI="$wiki_id" php "$m_htdocs/mediawiki/maintenance/update.php"
 
 # This should be done separately. When wikis use a common user table
 # then new wikis will not want to create a new user (necessarily)

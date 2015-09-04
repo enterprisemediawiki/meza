@@ -38,7 +38,7 @@ mv composer.phar /usr/local/bin/composer
 #
 # Download MediaWiki
 #
-cd /var/www/meza1/htdocs
+cd "$m_htdocs"
 
 if [ "$mediawiki_git_install" = "y" ]; then
 	# git clone https://github.com/wikimedia/mediawiki.git wiki
@@ -89,19 +89,19 @@ fi
 #
 # Copy in LocalSettings.php
 #
-cp ~/sources/meza1/client_files/config/LocalSettings.php /var/www/meza1/htdocs/mediawiki/LocalSettings.php
+cp "$m_meza/client_files/config/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
 
 
 #
 # Create common database credentials
 #
-echo -e "<?php\n\$wgDBuser = \"root\";\n\$wgDBpassword = \"$mysql_root_pass\";\n" > /var/www/meza1/htdocs/__common/dbUserPass.php
+echo -e "<?php\n\$wgDBuser = \"root\";\n\$wgDBpassword = \"$mysql_root_pass\";\n" > "$m_htdocs/__common/dbUserPass.php"
 
 
 #
 # Install Demo MW: create wiki directory, setup basic settings, create database
 #
-bash ~/sources/meza1/client_files/create_wiki.sh "demo" "Demo Wiki" "$mysql_root_pass"
+bash "$m_meza/client_files/create_wiki.sh" "demo" "Demo Wiki" "$mysql_root_pass"
 
 
 #

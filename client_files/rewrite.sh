@@ -7,7 +7,7 @@
 
 cd /usr/local/apache2/conf
 mv httpd.conf httpd.default.conf
-cp ~/sources/meza1/client_files/config/httpd.conf ./httpd.conf
+cp "$m_meza/client_files/config/httpd.conf" ./httpd.conf
 
 echo "restart apache httpd"
 service httpd restart
@@ -15,7 +15,7 @@ service httpd restart
 cd /var/www/meza1/htdocs
 
 echo "add .htaccess file to htdocs root"
-cp ~/sources/meza1/client_files/root-htaccess ./.htaccess
+cp "$m_meza/client_files/config/htaccess" ./.htaccess
 
 echo "move wiki directory to mediawiki"
 mv ./wiki ./mediawiki

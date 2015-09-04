@@ -3,13 +3,13 @@
 # Using a SQL file and a directory of images, import a wiki
 
 # Prior to running, first:
-# 
+#
 # 1) On your current wiki, create an images.tar.gz file from your wiki's
 #    images directory:
 #    tar -cvzf images.tar.gz ./images/*
 #    If disk space is an issue, you can alternatively just copy the files over
 #    using the instructions below.
-# 
+#
 # 2) Run mysqldump on your wiki and create wiki.sql:
 #    mysqldump -h localhost -u root -p WIKI_DB_NAME > /path/to/save/wiki.sql
 #    replace WIKI_DB_NAME with your wiki's database name
@@ -25,11 +25,11 @@
 #    (p)scp /path/to/wiki.sql user@example.com:/var/www/meza1
 #    (p)scp /path/to/images.tar.gz user@example.com:/var/www/meza1
 #    replace "/path/to", "user", and "example.com" accordingly
-# 
+#
 #    To Secure Copy a directory (of images)
 #    scp -r images user@example.com:/var/www/meza1/images
 #
-#    Depending on permissions, you might copy these to a non-root user 
+#    Depending on permissions, you might copy these to a non-root user
 #    directory first. Then you can move them into a new images
 #    directory /var/www/meza1/images
 #    scp wiki.sql user@example.com:/home/user
@@ -60,6 +60,14 @@ bash printTitle.sh "Begin $0"
 if [[ $PATH != *"/usr/local/bin"* ]]; then
   PATH="/usr/local/bin:$PATH"
 fi
+
+
+#
+# For now this script is not called within the same shell as install.sh
+# and thus it needs to know how to get to the config.sh script on it's own
+#
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source "$DIR/config.sh"
 
 
 # Prompt user for wiki database name
@@ -103,7 +111,7 @@ else
 fi
 
 
-# remove files from new directory that will be managed by git 
+# remove files from new directory that will be managed by git
 rm ./images/README
 rm ./images/.htaccess
 
@@ -137,7 +145,7 @@ rm -rf "$imported_sql_file"
 
 # Run update.php. The database you imported may not be up to the same version
 # as Meza1, and thus you must update it.
-echo "Running MediaWiki maintenance script \"update.php\"" 
+echo "Running MediaWiki maintenance script \"update.php\""
 php maintenance/update.php --quick
 
 
@@ -159,7 +167,7 @@ php runJobs.php --quick
 
 
 echo "Building Elastic Search index"
-bash ~/sources/meza1/client_files/elastic-build-index.sh
+source "$m_meza/client_files/elastic-build-index.sh"
 
 
 echo -e "\nYour wiki has been imported!\n"

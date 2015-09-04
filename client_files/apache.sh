@@ -50,12 +50,12 @@ chown -R apache:www /usr/local/apache2
 #
 # Setup document root
 #
-mkdir /var/www
-mkdir /var/www/meza1
-mkdir /var/www/meza1/htdocs
-mkdir /var/www/meza1/logs
-chown -R apache:www /var/www
-chmod -R 775 /var/www
+mkdir "$m_www"
+mkdir "$m_www_meza"
+mkdir "$m_htdocs"
+mkdir "$m_www_meza/logs"
+chown -R apache:www "$m_www"
+chmod -R 775 "$m_www"
 
 
 #
@@ -84,7 +84,7 @@ cd /usr/local/apache2/conf
 # update document root
 # sed -r -i 's/\/usr\/local\/apache2\/htdocs/\/var\/www\/meza1\/htdocs/g;' ./httpd.conf
 # direct apache to execute PHP
-# cat ~/sources/meza1/client_files/httpd-conf-additions.conf >> ./httpd.conf
+# cat $m_meza/client_files/httpd-conf-additions.conf >> ./httpd.conf
 # serve index.php as default file
 # sed -r -i 's/DirectoryIndex\s*index.html/DirectoryIndex index.php index.html/g;' ./httpd.conf
 # modify user that will handle web requests
@@ -94,18 +94,18 @@ cd /usr/local/apache2/conf
 
 # rename default configuration file, get Meza1 config file
 mv httpd.conf httpd.default.conf
-cp ~/sources/meza1/client_files/config/httpd.conf ./httpd.conf
+cp "$m_meza/client_files/config/httpd.conf" ./httpd.conf
 
 # create service script
 cd /etc/init.d
-cp ~/sources/meza1/client_files/initd_httpd.sh ./httpd
+cp "$m_meza/client_files/initd_httpd.sh" ./httpd
 chmod +x /etc/init.d/httpd
 
 # create logrotate file
 cd /etc/logrotate.d
-cp ~/sources/meza1/client_files/logrotated_httpd ./httpd
+cp "$m_meza/client_files/logrotated_httpd" ./httpd
 
-cd /var/www/meza1/htdocs
+cd "$m_htdocs"
 touch index.html
 echo '<h1>It works!</h1><p>Congratulations, your Apache 2.4 webserver is running.</p>' > index.html
 
@@ -118,7 +118,7 @@ echo '<h1>It works!</h1><p>Congratulations, your Apache 2.4 webserver is running
 # service httpd restart
 
 echo "add .htaccess file to htdocs root"
-cp ~/sources/meza1/client_files/root-htaccess ./.htaccess
+cp "$m_meza/client_files/config/htaccess" ./.htaccess
 
 echo "create \"wikis\" and \"__common\" directories"
 mkdir ./wikis
