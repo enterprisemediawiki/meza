@@ -80,7 +80,7 @@ fi
 # Output command to screen and to log files
 #
 timestamp=$(date "+%Y%m%d%H%M%S")
-logpath="$m_meza/logs"
+logpath="/root/sources/meza1/logs"
 outlog="$logpath/${timestamp}_out.log"
 errlog="$logpath/${timestamp}_err.log"
 cmdlog="$logpath/${timestamp}_cmd.log"
