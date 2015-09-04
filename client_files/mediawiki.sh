@@ -58,7 +58,7 @@ cd ~/sources
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 
-# Set the GitHub OAuth token to make use of the 6000 per hour rate limit
+# Set the GitHub OAuth token to make use of the 5000 per hour rate limit
 cd ~
 mkdir .composer
 cd sources/meza1/client_files
