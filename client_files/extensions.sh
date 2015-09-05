@@ -19,7 +19,7 @@ cmd_profile "END extensions composer require"
 
 # SMW, and perhaps others just installed, require DB update after install
 echo -e "\n\n## Meza1: update database"
-php maintenance/update.php --quick
+WIKI=demo php maintenance/update.php --quick
 
 # Clone ExtensionLoader
 echo -e "\n\n## Meza1: Install ExtensionLoader and apply changes to MW settings"
@@ -39,17 +39,17 @@ cp "$m_meza/client_files/ExtensionSettings.php" ./ExtensionSettings.php
 # Install extensions and update database
 echo -e "\n\n## Meza1: update/install extensions"
 cmd_profile "START extension loader install"
-php extensions/ExtensionLoader/updateExtensions.php
+WIKI=demo php extensions/ExtensionLoader/updateExtensions.php
 cmd_profile "END extension loader install"
-php maintenance/update.php --quick
+WIKI=demo php maintenance/update.php --quick
 
 # Import pages required for SemanticMeetingMinutes and rebuild indices
 echo -e "\n\n## Meza1: import pages for SemanticMeetingMinutes"
-php maintenance/importDump.php < ./extensions/SemanticMeetingMinutes/ImportFiles/import.xml
+WIKI=demo php maintenance/importDump.php < ./extensions/SemanticMeetingMinutes/ImportFiles/import.xml
 echo -e "\n\n## Meza1: rebuildrecentchanges.php"
-php maintenance/rebuildrecentchanges.php
+WIKI=demo php maintenance/rebuildrecentchanges.php
 echo -e "\n\n## Meza1: Extension:TitleKey rebuildTitleKeys.php"
-php extensions/TitleKey/rebuildTitleKeys.php
+WIKI=demo php extensions/TitleKey/rebuildTitleKeys.php
 
 #
 # Create "Admin" user on Demo Wiki

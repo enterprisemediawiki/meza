@@ -90,6 +90,7 @@ fi
 # Copy in LocalSettings.php
 #
 cp "$m_meza/client_files/config/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
+cp "$m_meza/client_files/config/AllWikiSettings.php" "$m_htdocs/__common/AllWikiSettings.php"
 
 
 #
