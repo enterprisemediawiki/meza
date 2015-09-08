@@ -10,7 +10,7 @@ echo '$wgDisableSearchUpdate = true;' >> ./LocalSettings.php
 # it appears to work without doing that
 
 # Run script to generate elasticsearch index
-php "$m_mediawiki/extensions/CirrusSearch/maintenance/updateSearchIndexConfig.php"
+WIKI=demo php "$m_mediawiki/extensions/CirrusSearch/maintenance/updateSearchIndexConfig.php"
 
 # Remove $wgDisableSearchUpdate = true from LocalSettings.php (updates should start heading to elasticsearch)
 sed -i -e 's/$wgDisableSearchUpdate = true;//g' LocalSettings.php
@@ -19,7 +19,7 @@ sed -i -e 's/$wgDisableSearchUpdate = true;//g' LocalSettings.php
 #
 # Note that this can take some time
 # For large wikis read "Bootstrapping large wikis" in https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
-php "$m_mediawiki/extensions/CirrusSearch/maintenance/forceSearchIndex.php" --skipLinks --indexOnSkip
-php "$m_mediawiki/extensions/CirrusSearch/maintenance/forceSearchIndex.php" --skipParse
+WIKI=demo php "$m_mediawiki/extensions/CirrusSearch/maintenance/forceSearchIndex.php" --skipLinks --indexOnSkip
+WIKI=demo php "$m_mediawiki/extensions/CirrusSearch/maintenance/forceSearchIndex.php" --skipParse
 
 echo "******* Elastic Search build index complete! *******"

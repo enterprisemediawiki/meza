@@ -94,8 +94,8 @@ git submodule update --init
 # Any time you run updateExtensions.php it may be required to run
 # `php maintenance/update.php` since new extension versions may be installed
 echo "******* Running update.php to update database as required *******"
-cd "$m_mediawiki/maintenance"
-php update.php --quick
+cd "$m_mediawiki"
+WIKI=demo php maintenance/update.php --quick
 
 # Create parsoid user to run parsoid node server
 cd /etc/parsoid # @issue#48: is this necessary?

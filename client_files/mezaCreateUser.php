@@ -97,7 +97,8 @@ class MezaCreateUser extends Maintenance {
 
 		$status = $this->createUser( User::newFromName( $newUsername ), false );
 
-		$this->output( "\n $success \n" );
+		// @fixme: check $status
+		$this->output( "\n User $newUsername created \n" );
 	}
 
 	/**

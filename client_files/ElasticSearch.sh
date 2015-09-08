@@ -122,7 +122,7 @@ cat "$m_meza/client_files/LocalSettingsElasticSearch.php" >> "$m_mediawiki/Local
 
 # Run updateExtensions to install UniversalLanguageSelector and VisualEditor
 echo "******* Installing extensions *******"
-php "$m_mediawiki/extensions/ExtensionLoader/updateExtensions.php"
+WIKI=demo php "$m_mediawiki/extensions/ExtensionLoader/updateExtensions.php"
 # Install Elastica library via composer
 cd "$m_mediawiki/extensions/Elastica"
 composer install
@@ -130,8 +130,8 @@ composer install
 # Any time you run updateExtensions.php it may be required to run
 # `php maintenance/update.php` since new extension versions may be installed
 echo "******* Running update.php to update database as required *******"
-cd "$m_mediawiki/maintenance"
-php update.php --quick
+cd "$m_mediawiki"
+WIKI=demo php maintenance/update.php --quick
 
 # Start Elasticsearch
 echo "******* Starting elasticsearch service *******"
