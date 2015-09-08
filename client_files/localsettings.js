@@ -9,7 +9,9 @@ exports.setup = function(parsoidConfig) {
 	// uri like:
 	//     http://192.168.56.56/wiki/api.php
 	//     http://enterprisemediawiki.org/wiki/api.php
-	// parsoidConfig.setMwApi( 'wiki', { uri: 'INSERTED_BY_VE_SCRIPT' });
+
+	// file system
+	var fs = require( 'fs' );
 
 	// get all the directories in the /wikis directory. These are the wiki
 	// identifiers for each wiki
