@@ -9,7 +9,23 @@ exports.setup = function(parsoidConfig) {
 	// uri like:
 	//     http://192.168.56.56/wiki/api.php
 	//     http://enterprisemediawiki.org/wiki/api.php
-	parsoidConfig.setMwApi( 'wiki', { uri: 'INSERTED_BY_VE_SCRIPT' });
+	// parsoidConfig.setMwApi( 'wiki', { uri: 'INSERTED_BY_VE_SCRIPT' });
+
+	// get all the directories in the /wikis directory. These are the wiki
+	// identifiers for each wiki
+	var wikis = fs.readdirSync( '/var/www/meza1/htdocs/wikis' );
+
+	// Domain, which will be setup by the Meza1 installer
+	var domain = 'INSERTED_BY_VE_SCRIPT';
+
+	// loop through all wiki IDs and do setMwApi
+	for ( var i = 0; i < wikis.length; i++ ) {
+		parsoidConfig.setMwApi( {
+			prefix: wikis[i],
+			uri: domain + wikis[i] + '/api.php'
+		} );
+	}
+
 	// To specify a proxy (or proxy headers) specific to this prefix (which
 	// overrides defaultAPIProxyURI) use:
 	/*

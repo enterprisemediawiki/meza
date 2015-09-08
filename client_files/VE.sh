@@ -23,7 +23,7 @@ done
 
 
 # MediaWiki's API URI, for parsoid
-mw_api_uri="$mw_api_protocol://$mw_api_domain/wiki/api.php"
+mw_api_uri="$mw_api_protocol://$mw_api_domain/"
 
 
 echo "******* Downloading node.js *******"
