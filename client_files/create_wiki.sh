@@ -90,7 +90,7 @@ fi
 if grep '^[-0-9a-zA-Z]*$' <<<$wiki_id ; then
 	echo "Wiki name is acceptable"
 	mkdir "./$wiki_id"
-	cp -avr "$m_meza/wiki-init/*" "./$wiki_id/*"
+	cp -avr "$m_meza/wiki-init/*" "./$wiki_id/"
 	chown -R apache:www "./$wiki_id/images"
 else
 	echo "Wiki name is not alphanumeric. Exiting."
@@ -99,10 +99,10 @@ fi
 
 
 # insert wiki name into setup.php
-sed -r -i "s/\$wgSitename = 'placeholder';/\$wgSitename = '$wiki_name';/g;" "./wikis/$wiki_id/setup.php"
+sed -r -i "s/\$wgSitename = 'placeholder';/\$wgSitename = '$wiki_name';/g;" "./$wiki_id/config/setup.php"
 
 # inserter auth type into setup.php
-sed -r -i "s/\$mezaAuthType = 'placeholder';/\$mezaAuthType = 'local_dev';/g;" "./wikis/$wiki_id/setup.php"
+sed -r -i "s/\$mezaAuthType = 'placeholder';/\$mezaAuthType = 'local_dev';/g;" "./$wiki_id/config/setup.php"
 
 
 wiki_db_name="wiki_$wiki_id"
@@ -117,7 +117,7 @@ mysql -u root "--password=$mysql_root_pass" -e"CREATE DATABASE IF NOT EXISTS $wi
 # from zero to fully installed.
 #
 echo -e "\nRun update.php"
-WIKI="$wiki_id" php "$m_htdocs/mediawiki/maintenance/update.php"
+WIKI="$wiki_id" php "$m_htdocs/mediawiki/maintenance/update.php --quick"
 
 # This should be done separately. When wikis use a common user table
 # then new wikis will not want to create a new user (necessarily)
