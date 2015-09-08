@@ -85,7 +85,7 @@ cat ./LocalSettingsVE.php >> "$m_mediawiki/LocalSettings.php"
 
 # Run updateExtensions to install UniversalLanguageSelector and VisualEditor
 echo "******* Installing extensions *******"
-php "$m_mediawiki/extensions/ExtensionLoader/updateExtensions.php"
+WIKI=demo php "$m_mediawiki/extensions/ExtensionLoader/updateExtensions.php" UniversalLanguageSelector VisualEditor
 
 echo "******* Installing VE *******"
 cd "$m_mediawiki/extensions/VisualEditor"

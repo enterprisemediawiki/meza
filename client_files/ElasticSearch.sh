@@ -122,7 +122,7 @@ cat "$m_meza/client_files/LocalSettingsElasticSearch.php" >> "$m_mediawiki/Local
 
 # Run updateExtensions to install UniversalLanguageSelector and VisualEditor
 echo "******* Installing extensions *******"
-WIKI=demo php "$m_mediawiki/extensions/ExtensionLoader/updateExtensions.php"
+WIKI=demo php "$m_mediawiki/extensions/ExtensionLoader/updateExtensions.php" Elastica CirrusSearch
 # Install Elastica library via composer
 cd "$m_mediawiki/extensions/Elastica"
 composer install
@@ -144,7 +144,7 @@ sleep 20  # Waits 10 seconds
 # Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
 #
 echo "******* Running elastic-build-index.sh *******"
-bash "$m_meza/client_files/elastic-build-index.sh"
+source "$m_meza/client_files/elastic-build-index.sh"
 
 # Add "$wgSearchType = 'CirrusSearch';" to LocalSettings.php to funnel queries to ElasticSearch
 cd "$m_mediawiki"
