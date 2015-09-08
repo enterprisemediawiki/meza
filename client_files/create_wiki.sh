@@ -28,8 +28,8 @@ fi
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source "$DIR/config.sh"
 
-echo -e "\nCreating new wiki\n"
 
+echo -e "\nCreating new wiki\n"
 
 
 #
@@ -42,10 +42,10 @@ fi
 while [ -z "$wiki_id" ]
 do
 echo -e "\nEnter the desired wiki identifier. This should be a short "
-echo -e "\nalphanumeric string (no spaces) which will be part of the "
-echo -e "\nURL for your wiki. Example: in the following URL the "
-echo -e "\n\"mywiki\" part is your wiki ID http://example.com/mywiki"
-echo -e "\n\nType the desired wiki ID and press [ENTER]:"
+echo -e "alphanumeric string (no spaces) which will be part of the "
+echo -e "URL for your wiki. Example: in the following URL the "
+echo -e "\"mywiki\" part is your wiki ID http://example.com/mywiki"
+echo -e "\nType the desired wiki ID and press [ENTER]:"
 read wiki_id
 done
 
@@ -71,8 +71,8 @@ fi
 
 while [ -z "$mysql_root_pass" ]
 do
-echo -s -e "\nType the MySQL root user's password and press [ENTER]: "
-read mysql_root_pass
+echo -e "\nType the MySQL root user's password and press [ENTER]: "
+read -s mysql_root_pass
 done
 
 
@@ -89,7 +89,8 @@ fi
 # Check that desired name is alpha-numeric
 if grep '^[-0-9a-zA-Z]*$' <<<$wiki_id ; then
 	echo "Wiki name is acceptable"
-	cp "$m_meza/wiki-init" "./$wiki_id"
+	mkdir "./$wiki_id"
+	cp -avr "$m_meza/wiki-init/*" "./$wiki_id/*"
 	chown -R apache:www "./$wiki_id/images"
 else
 	echo "Wiki name is not alphanumeric. Exiting."

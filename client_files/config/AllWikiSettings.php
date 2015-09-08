@@ -13,5 +13,5 @@
  * @todo enable this when
  **/
 // disabled by default for now, should be enabled later for
-$mezaEnableWikiEmail = false;
+$mezaEnableAllWikiEmail = false;
 

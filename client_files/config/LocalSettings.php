@@ -28,8 +28,8 @@ else {
 
 }
 
-// for now just a dummy list of wikis
-$wikis = array( 'eva', 'oso', 'robo' );
+// get all directory names in /wikis, minus the first two: . and ..
+$wikis = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
 
 
 if ( ! in_array( $wikiId, $wikis ) ) {
@@ -45,7 +45,7 @@ $mezaWikiIP = "/wikis/$wikiId";
 
 // Get's wiki-specific config variables like:
 // $wgSitename, $mezaAuthType, $mezaDebug, $mezaEnableWikiEmail
-require_once "$mezaWikiIP/config/setup.php";
+require_once "/var/www/meza1/htdocs/$mezaWikiIP/config/setup.php";
 
 
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
@@ -81,7 +81,7 @@ $wgScriptExtension = ".php";
 $wgStylePath = "$wgScriptPath/skins";
 $wgResourceBasePath = $wgScriptPath;
 
-if ( $mezaAllWikiEmail && isset( $mezaEnableWikiEmail ) && $mezaEnableWikiEmail ) {
+if ( $mezaEnableAllWikiEmail && isset( $mezaEnableWikiEmail ) && $mezaEnableWikiEmail ) {
 	$wgEnableEmail = true;
 }
 else {
