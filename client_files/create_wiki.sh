@@ -99,10 +99,10 @@ fi
 
 
 # insert wiki name into setup.php
-sed -r -i "s/\$wgSitename = 'placeholder';/\$wgSitename = '$wiki_name';/g;" "./$wiki_id/config/setup.php"
+sed -r -i "s/wgSitename = 'placeholder';/wgSitename = '$wiki_name';/g;" "./$wiki_id/config/setup.php"
 
 # inserter auth type into setup.php
-sed -r -i "s/\$mezaAuthType = 'placeholder';/\$mezaAuthType = 'local_dev';/g;" "./$wiki_id/config/setup.php"
+sed -r -i "s/mezaAuthType = 'placeholder';/mezaAuthType = 'local_dev';/g;" "./$wiki_id/config/setup.php"
 
 
 wiki_db_name="wiki_$wiki_id"
