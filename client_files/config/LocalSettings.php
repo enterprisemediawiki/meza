@@ -45,7 +45,7 @@ $mezaWikiIP = "/wikis/$wikiId";
 
 // Get's wiki-specific config variables like:
 // $wgSitename, $mezaAuthType, $mezaDebug, $mezaEnableWikiEmail
-require_once "/var/www/meza1/htdocs/$mezaWikiIP/config/setup.php";
+require_once "/var/www/meza1/htdocs/wikis/$wikiId/config/setup.php";
 
 
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath

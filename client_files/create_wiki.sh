@@ -90,7 +90,7 @@ fi
 if grep '^[-0-9a-zA-Z]*$' <<<$wiki_id ; then
 	echo "Wiki name is acceptable"
 	mkdir "./$wiki_id"
-	cp -avr "$m_meza/wiki-init/*" "./$wiki_id/"
+	cp -avr "$m_meza/wiki-init/." "./$wiki_id/"
 	chown -R apache:www "./$wiki_id/images"
 else
 	echo "Wiki name is not alphanumeric. Exiting."
