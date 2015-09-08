@@ -117,7 +117,7 @@ mysql -u root "--password=$mysql_root_pass" -e"CREATE DATABASE IF NOT EXISTS $wi
 # from zero to fully installed.
 #
 echo -e "\nRun update.php"
-WIKI="$wiki_id" php "$m_htdocs/mediawiki/maintenance/update.php --quick"
+WIKI="$wiki_id" php "$m_htdocs/mediawiki/maintenance/update.php" --quick
 
 # This should be done separately. When wikis use a common user table
 # then new wikis will not want to create a new user (necessarily)
