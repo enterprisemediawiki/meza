@@ -106,8 +106,6 @@ cd /etc/logrotate.d
 cp "$m_meza/client_files/logrotated_httpd" ./httpd
 
 cd "$m_htdocs"
-touch index.html
-echo '<h1>It works!</h1><p>Congratulations, your Apache 2.4 webserver is running.</p>' > index.html
 
 #
 # Defer starting httpd until PHP installed
@@ -124,5 +122,5 @@ echo "create \"wikis\" and \"__common\" directories"
 mkdir ./wikis
 mkdir ./__common
 
-echo -e "\n\nYour Apache 2.4 webserver has been setup.\n\nPlease use the web browser on your host computer to navigate to http://192.168.56.56 to test it out"
+echo -e "\n\nYour Apache 2.4 webserver has been setup, but it is not yet running. PHP must be installed first for Meza1 setup."
 

@@ -99,9 +99,14 @@ sudo ln -s /usr/local/php/bin/php /usr/bin/php
 cp "$m_meza/client_files/php.ini-development" /usr/local/php/lib/php.ini
 
 #
-# Create info.php
+# Add wiki landing page
 #
 cd "$m_htdocs"
+cp "$m_meza/client_files/index.php" ./index.php
+
+#
+# Create info.php
+#
 touch info.php
 echo '<?php phpinfo();' > info.php
 
