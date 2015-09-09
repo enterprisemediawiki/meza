@@ -59,10 +59,7 @@ curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 
 # Set the GitHub OAuth token to make use of the 5000 per hour rate limit
-cd ~
-mkdir .composer
-cd sources/meza1/client_files
-cp .composer.auth.json ~/.composer/auth.json
+composer config -g github-oauth.github.com e9191bc6d394d64011273d19f4c6be47eb10e25b
 
 #
 # Download MediaWiki
