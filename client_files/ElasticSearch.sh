@@ -144,6 +144,7 @@ sleep 20  # Waits 10 seconds
 # Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
 #
 echo "******* Running elastic-build-index.sh *******"
+wiki_id=demo
 source "$m_meza/client_files/elastic-build-index.sh"
 
 # Add "$wgSearchType = 'CirrusSearch';" to LocalSettings.php to funnel queries to ElasticSearch
