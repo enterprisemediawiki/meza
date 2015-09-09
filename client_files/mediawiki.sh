@@ -59,7 +59,7 @@ curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 
 # Set the GitHub OAuth token to make use of the 5000 per hour rate limit
-composer config -g github-oauth.github.com e9191bc6d394d64011273d19f4c6be47eb10e25b
+composer config -g github-oauth.github.com $githubtoken
 
 #
 # Download MediaWiki
@@ -112,7 +112,7 @@ if [ "$mediawiki_git_install" = "y" ]; then
 	git checkout REL1_25
 	cd ..
 else
-	wget https://github.com/wikimedia/mediawiki-skins-Vector/archive/REL1_25.tar.gz
+	wget https://$githubtoken:x-oauth-basic@github.com/wikimedia/mediawiki-skins-Vector/archive/REL1_25.tar.gz
 	mkdir Vector
 	tar xpvf REL1_25.tar.gz -C ./Vector --strip-components 1
 fi

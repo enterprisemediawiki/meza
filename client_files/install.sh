@@ -25,6 +25,16 @@ architecture=32
 fi
 
 
+# Prompt user for GitHub API personal access token
+default_githubtoken="e9191bc6d394d64011273d19f4c6be47eb10e25b" # From Oscar Rogers
+echo -e "\nIf you run this script multiple times from one IP address"
+echo -e "\n, you may exceed GitHub's API rate limit."
+echo -e "\nYou may just press [ENTER] to use our generic token (which may exceed limits if used too much) or,"
+echo -e "\n\nVisit https://github.com/settings/tokens to generate a new token (with no scopes)."
+echo -e "\nCopy/paste your 40-character token and press [ENTER]: "
+read githubtoken
+githubtoken=${githubtoken:-$default_githubtoken}
+
 # Prompt user for PHP version
 while [ -z "$phpversion" ]
 do
