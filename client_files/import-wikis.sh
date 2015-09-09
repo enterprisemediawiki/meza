@@ -89,14 +89,6 @@ done
 
 if [ "$imports_dir" = "new" ]; then
 
-	# Prompt user for wiki database name
-	while [ -z "$wiki_db_name" ]
-	do
-		echo -e "Enter name of your wiki database and press [ENTER]: "
-		read wiki_db_name
-	done
-
-
 	while [ -z "$wiki_id" ]; do
 		echo ""
 		echo "Enter the desired wiki identifier. This should be a short"
@@ -116,10 +108,11 @@ if [ "$imports_dir" = "new" ]; then
 	fi
 	mkdir wikis
 	imports_dir="/tmp/wikis"
-	cp "$m_meza/wiki-init" "$imports_dir/$wiki_id"
+	cp -avr "$m_meza/wiki-init" "$imports_dir/$wiki_id"
 
 	# get SQL file from MediaWiki
-	cp "$m_mediawiki/maintenance/tables.sql" "$imports_dir/$wiki_id/wiki.sql"
+	echo "Copying MediaWiki tables.sql"
+	cp -avr "$m_mediawiki/maintenance/tables.sql" "$imports_dir/$wiki_id/wiki.sql"
 
 fi
 
@@ -140,14 +133,14 @@ wikis_install_dir="$m_htdocs/wikis"
 #     ...
 #   wikiN
 #
-# Note: $wiki_source_dirname has trailing slash, like "wiki1/"
+# Note: $d has trailing slash, like "wiki1/"
 cd $imports_dir
-for wiki_source_dirname in */ ; do
+for d in */ ; do
 
 	# trim trailing slash from directory name
 	# ref: http://stackoverflow.com/questions/1848415/remove-slash-from-the-end-of-a-variable
 	# ref: http://www.network-theory.co.uk/docs/bashref/ShellParameterExpansion.html
-	wiki_id=${wiki_source_dirname%/}
+	wiki_id=${d%/}
 
 	wiki_install_path="$wikis_install_dir/$wiki_id"
 
@@ -157,6 +150,11 @@ for wiki_source_dirname in */ ; do
 	# Ref: https://www.mediawiki.org/wiki/Manual:Configuring_file_uploads
 	chmod 755 "$wiki_install_path/images"
 	chown -R apache:apache "$wiki_install_path/images"
+
+	# ideally imported wikis will have a config directory, but if not, create one
+	if [ ! -d "$wiki_install_path/config" ]; then
+		mkdir "$wiki_install_path/config"
+	fi
 
 	# check if logo.png, favicon.ico, setup.php and CustomSettings.php exist. Else use defaults
 	if [ ! -f "$wiki_install_path/config/logo.png" ]; then
@@ -178,7 +176,7 @@ for wiki_source_dirname in */ ; do
 
 	# import SQL file
 	# Import database - Ref: https://www.mediawiki.org/wiki/Manual:Restoring_a_wiki_from_backup
-	import_sql_file="$wiki_install_dir/$wiki_id/wiki.sql"
+	import_sql_file="$wiki_install_path/wiki.sql"
 	wiki_db_name="wiki_$wiki_id"
 	echo "For $wiki_db_name: "
 	echo " * dropping if exists"
