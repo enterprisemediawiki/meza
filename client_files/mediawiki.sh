@@ -59,6 +59,7 @@ curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 
 # Set the GitHub OAuth token to make use of the 5000 per hour rate limit
+# Ref: https://getcomposer.org/doc/articles/troubleshooting.md#api-rate-limit-and-oauth-tokens
 composer config -g github-oauth.github.com $githubtoken
 
 #

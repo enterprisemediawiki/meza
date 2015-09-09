@@ -27,11 +27,11 @@ fi
 
 # Prompt user for GitHub API personal access token
 default_githubtoken="e9191bc6d394d64011273d19f4c6be47eb10e25b" # From Oscar Rogers
-echo -e "\nIf you run this script multiple times from one IP address"
-echo -e "\n, you may exceed GitHub's API rate limit."
-echo -e "\nYou may just press [ENTER] to use our generic token (which may exceed limits if used too much) or,"
-echo -e "\n\nVisit https://github.com/settings/tokens to generate a new token (with no scopes)."
-echo -e "\nCopy/paste your 40-character token and press [ENTER]: "
+echo -e "\nIf you run this script multiple times from one IP address,"
+echo -e "you might exceed GitHub's API rate limit."
+echo -e "\nYou may just press [ENTER] to use our generic token (which may exceed limits if used too much) or"
+echo -e "Visit https://github.com/settings/tokens to generate a new token (with no scopes)."
+echo -e "and copy/paste your 40-character token and press [ENTER]: "
 read githubtoken
 githubtoken=${githubtoken:-$default_githubtoken}
 
@@ -142,7 +142,7 @@ cmd_tee()
 install_via_git()
 {
 	cd ~/sources
-	git clone https://github.com/enterprisemediawiki/Meza1 meza1
+	git clone https://$githubtoken:x-oauth-basic@github.com/enterprisemediawiki/Meza1 meza1
 	cd meza1
 	git checkout "$git_branch"
 }
@@ -207,6 +207,11 @@ cmd_tee "source VE.sh"
 
 cd ~/sources/meza1/client_files
 cmd_tee "source ElasticSearch.sh"
+
+# Remove GitHub API personal access token from .composer dir
+# @todo: change the following to instead just remove the token from the file
+#        in case there are other authentication entries
+rm -f ~/.composer/auth.json
 
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
