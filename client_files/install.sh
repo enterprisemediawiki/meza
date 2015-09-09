@@ -26,14 +26,15 @@ fi
 
 
 # Prompt user for GitHub API personal access token
-default_githubtoken="e9191bc6d394d64011273d19f4c6be47eb10e25b" # From Oscar Rogers
+default_usergithubtoken="e9191bc6d394d64011273d19f4c6be47eb10e25b" # From Oscar Rogers
 echo -e "\nIf you run this script multiple times from one IP address,"
 echo -e "you might exceed GitHub's API rate limit."
 echo -e "\nYou may just press [ENTER] to use our generic token (which may exceed limits if used too much) or"
 echo -e "Visit https://github.com/settings/tokens to generate a new token (with no scopes)."
 echo -e "and copy/paste your 40-character token and press [ENTER]: "
-read githubtoken
-githubtoken=${githubtoken:-$default_githubtoken}
+read usergithubtoken
+usergithubtoken=${usergithubtoken:-$default_usergithubtoken}
+githubtoken="$usergithubtoken:x-oauth-basic@"
 
 # Prompt user for PHP version
 while [ -z "$phpversion" ]
@@ -142,7 +143,7 @@ cmd_tee()
 install_via_git()
 {
 	cd ~/sources
-	git clone https://$githubtoken:x-oauth-basic@github.com/enterprisemediawiki/Meza1 meza1
+	git clone https://{$githubtoken}github.com/enterprisemediawiki/Meza1 meza1
 	cd meza1
 	git checkout "$git_branch"
 }
