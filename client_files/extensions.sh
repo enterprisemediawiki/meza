@@ -24,7 +24,7 @@ php maintenance/update.php --quick
 # Clone ExtensionLoader
 echo -e "\n\n## Meza1: Install ExtensionLoader and apply changes to MW settings"
 cd extensions
-git clone "https://{$githubtoken}github.com/jamesmontalvo3/ExtensionLoader.git"
+git clone "https://${githubtoken}github.com/jamesmontalvo3/ExtensionLoader.git"
 cd ..
 
 # Add settings to LocalSettings.php from Meza1 repo

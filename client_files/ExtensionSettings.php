@@ -108,7 +108,7 @@ $egExtensionLoaderConfig += array(
 	),
 
 	'TalkRight' => array(
-		'git' => 'https://{$githubtoken}github.com/enterprisemediawiki/TalkRight.git',
+		'git' => 'https://${githubtoken}github.com/enterprisemediawiki/TalkRight.git',
 		'branch' => 'master',
 	),
 
@@ -154,7 +154,7 @@ $egExtensionLoaderConfig += array(
 	),
 
 	'CopyWatchers' => array(
-		'git' => 'https://{$githubtoken}github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git',
+		'git' => 'https://${githubtoken}github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git',
 		'branch' => 'master',
 	),
 
@@ -166,12 +166,12 @@ $egExtensionLoaderConfig += array(
 	),
 
 	'Wiretap' => array(
-		'git' => 'https://{$githubtoken}github.com/enterprisemediawiki/Wiretap.git',
+		'git' => 'https://${githubtoken}github.com/enterprisemediawiki/Wiretap.git',
 		'branch' => 'master',
 	),
 
 	'ApprovedRevs' => array(
-		'git' => 'https://{$githubtoken}github.com/jamesmontalvo3/MediaWiki-ApprovedRevs.git',
+		'git' => 'https://${githubtoken}github.com/jamesmontalvo3/MediaWiki-ApprovedRevs.git',
 		'branch' => 'master',
 		'globals' => array(
 			'egApprovedRevsAutomaticApprovals' => false,
@@ -197,17 +197,17 @@ $egExtensionLoaderConfig += array(
 	),
 
 	'IMSQuery' => array(
-		'git' => 'https://{$githubtoken}github.com/jamesmontalvo3/IMSQuery.git',
+		'git' => 'https://${githubtoken}github.com/jamesmontalvo3/IMSQuery.git',
 		'branch' => 'master',
 	),
 
 	'MasonryMainPage' => array(
-		'git' => 'https://{$githubtoken}github.com/enterprisemediawiki/MasonryMainPage.git',
+		'git' => 'https://${githubtoken}github.com/enterprisemediawiki/MasonryMainPage.git',
 		'branch' => 'master',
 	),
 
 	'WatchAnalytics' => array(
-		'git' => 'https://{$githubtoken}github.com/enterprisemediawiki/WatchAnalytics.git',
+		'git' => 'https://${githubtoken}github.com/enterprisemediawiki/WatchAnalytics.git',
 		'branch' => 'master',
 		'globals' => array(
 			'egPendingReviewsEmphasizeDays' => 10, // makes Pending Reviews shake after X days
@@ -226,7 +226,7 @@ $egExtensionLoaderConfig += array(
 	),
 
 	'SummaryTimeline' => array(
-		'git' => 'https://{$githubtoken}github.com/darenwelsh/SummaryTimeline.git',
+		'git' => 'https://${githubtoken}github.com/darenwelsh/SummaryTimeline.git',
 		'branch' => 'master',
 	),
 
@@ -256,7 +256,7 @@ $egExtensionLoaderConfig += array(
 	 * Do we use this? If so, should we migrate into EMW git?
 	 */
 	'PipeEscape' => array(
-		'git' => 'https://{$githubtoken}github.com/jamesmontalvo3/MediaWiki-PipeEscape.git',
+		'git' => 'https://${githubtoken}github.com/jamesmontalvo3/MediaWiki-PipeEscape.git',
 		'branch' => 'master',
 	),
 

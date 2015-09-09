@@ -113,7 +113,7 @@ if [ "$mediawiki_git_install" = "y" ]; then
 	git checkout REL1_25
 	cd ..
 else
-	wget "https://{$githubtoken}github.com/wikimedia/mediawiki-skins-Vector/archive/REL1_25.tar.gz"
+	wget "https://${githubtoken}github.com/wikimedia/mediawiki-skins-Vector/archive/REL1_25.tar.gz"
 	mkdir Vector
 	tar xpvf REL1_25.tar.gz -C ./Vector --strip-components 1
 fi
