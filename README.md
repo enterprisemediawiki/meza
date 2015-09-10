@@ -2,7 +2,7 @@
 
 Meza1 configures a CentOS/RedHat server with a complete enterprise MediaWiki installation.
 
-## Server setup 
+## Server setup
 
 Depending on where you're installing Meza1 you'll have different initial setup steps. The following environments have been tested.
 
@@ -32,3 +32,7 @@ This script will retrieve a script from the Meza1 repository, which will subsequ
 
 ## Manual Install
 While the goal is to have an entirely scripted install of CentOS and the entire MediaWiki platform and dependencies, we started with just [manual instructions](manual/README.md). We haven't used these in a while, and they'll probably be removed at some point. Use at your own risk.
+
+## See Also
+
+* [Creating and importing wikis](manual/AddingWikis.md)

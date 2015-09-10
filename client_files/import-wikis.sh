@@ -95,10 +95,22 @@ if [ "$imports_dir" = "new" ]; then
 		echo "alphanumeric string (no spaces) which will be part of the"
 		echo "URL for your wiki. For example, in the following URL the"
 		echo '"mywiki" part is your wiki ID: https://example.com/mywiki'
-		echo
+		echo ""
 		echo "Type the desired wiki ID and press [ENTER]:"
 		read wiki_id
 	done
+
+	while [ -z "$wiki_name" ]; do
+		echo ""
+		echo "The wiki name should name should be short, but not as short"
+		echo "as the wiki ID. It can be a little more descriptive, and"
+		echo "should also use capitalization where appropriate."
+		echo "Example: Engineering Wiki"
+		echo ""
+		echo "Type the desired wiki name and press [ENTER]:"
+		read wiki_name
+	done
+
 
 	# this is sort of a hacky way to emulate the import process
 	#
@@ -171,7 +183,7 @@ for d in */ ; do
 	fi
 
 	# insert wiki name and auth type into setup.php if it's still "placeholder"
-	sed -r -i "s/wgSitename = 'placeholder';/wgSitename = '$wiki_id wiki';/g;" "$wiki_install_path/config/setup.php"
+	sed -r -i "s/wgSitename = 'placeholder';/wgSitename = '$wiki_name';/g;" "$wiki_install_path/config/setup.php"
 	sed -r -i "s/mezaAuthType = 'placeholder';/mezaAuthType = 'local_dev';/g;" "$wiki_install_path/config/setup.php"
 
 	# import SQL file

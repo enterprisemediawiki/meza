@@ -102,7 +102,10 @@ echo -e "<?php\n\$wgDBuser = \"root\";\n\$wgDBpassword = \"$mysql_root_pass\";\n
 #
 # Install Demo MW: create wiki directory, setup basic settings, create database
 #
-bash "$m_meza/client_files/create_wiki.sh" "demo" "Demo Wiki" "$mysql_root_pass"
+imports_dir="new"
+wiki_id="demo"
+wiki_name="Demo Wiki"
+source "$m_meza/client_files/create-wiki.sh"
 
 
 #
