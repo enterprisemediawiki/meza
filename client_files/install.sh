@@ -142,7 +142,7 @@ cmd_tee()
 install_via_git()
 {
 	cd ~/sources
-	git clone "https://github.com/enterprisemediawiki/Meza1" meza1
+	git clone https://github.com/enterprisemediawiki/Meza1 meza1
 	cd meza1
 	git checkout "$git_branch"
 }
