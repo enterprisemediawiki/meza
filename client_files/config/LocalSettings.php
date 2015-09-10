@@ -60,6 +60,9 @@ $wgUploadDirectory = "$m_htdocs/wikis/$wikiId/images";
 // https://www.mediawiki.org/wiki/Manual:$wgLogo
 $wgLogo = "$mezaWikiIP/config/logo.png";
 
+// https://www.mediawiki.org/wiki/Manual:$wgFavicon
+$wgFavicon = "$mezaWikiIP/config/favicon.ico";
+
 // https://www.mediawiki.org/wiki/Manual:$wgEmergencyContact
 $wgEmergencyContact = "enterprisemediawiki@gmail.com"; // @todo: this should be in setup, but this is easier for now.
 
@@ -182,6 +185,9 @@ $wgDefaultSkin = "vector";
 # The following skins were automatically enabled:
 wfLoadSkin( 'Vector' );
 
+// allows users to remove the page title.
+// https://www.mediawiki.org/wiki/Manual:$wgRestrictDisplayTitle
+$wgRestrictDisplayTitle = false;
 
 
 

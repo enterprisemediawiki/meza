@@ -131,7 +131,7 @@ fi
 
 # setup configuration variables
 wikis_install_dir="$m_htdocs/wikis"
-
+skipped_wikis=""
 
 # Intended location of $imports_dir (if not creating new wiki): /home/your-user-name/wikis
 #
@@ -149,12 +149,21 @@ wikis_install_dir="$m_htdocs/wikis"
 cd $imports_dir
 for d in */ ; do
 
+
 	# trim trailing slash from directory name
 	# ref: http://stackoverflow.com/questions/1848415/remove-slash-from-the-end-of-a-variable
 	# ref: http://www.network-theory.co.uk/docs/bashref/ShellParameterExpansion.html
 	wiki_id=${d%/}
 
+	echo "Starting $wiki_id"
+
 	wiki_install_path="$wikis_install_dir/$wiki_id"
+
+	if [ -f "$wiki_install_path" ]; then
+		echo "$wiki_id directory already exists. Skipping."
+		skipped_wikis="$skipped_wikis\n$wiki_id"
+		continue
+	fi
 
 	mv "$imports_dir/$wiki_id" "$wiki_install_path"
 
@@ -229,6 +238,13 @@ for d in */ ; do
 
 done
 
+# In order for the new wiki(s) to use Visual Editor, must restart Parsoid
+service parsoid restart
 
 echo -e "\nImport complete!"
+
+if [ "$skipped_wikis" != "" ]; then
+	echo "The following wikis were skipped:"
+	echo "$skipped_wikis"
+fi
 
