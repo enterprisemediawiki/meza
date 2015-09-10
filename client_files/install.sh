@@ -34,7 +34,6 @@ echo -e "Visit https://github.com/settings/tokens to generate a new token (with 
 echo -e "and copy/paste your 40-character token and press [ENTER]: "
 read usergithubtoken
 usergithubtoken=${usergithubtoken:-$default_usergithubtoken}
-githubtoken="$usergithubtoken:x-oauth-basic@"
 
 # Prompt user for PHP version
 while [ -z "$phpversion" ]
@@ -143,7 +142,7 @@ cmd_tee()
 install_via_git()
 {
 	cd ~/sources
-	git clone "https://${githubtoken}github.com/enterprisemediawiki/Meza1" meza1
+	git clone "https://github.com/enterprisemediawiki/Meza1" meza1
 	cd meza1
 	git checkout "$git_branch"
 }
