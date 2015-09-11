@@ -159,7 +159,7 @@ for d in */ ; do
 
 	wiki_install_path="$wikis_install_dir/$wiki_id"
 
-	if [ -f "$wiki_install_path" ]; then
+	if [ -d "$wiki_install_path" ]; then
 		echo "$wiki_id directory already exists. Skipping."
 		skipped_wikis="$skipped_wikis\n$wiki_id"
 		continue
