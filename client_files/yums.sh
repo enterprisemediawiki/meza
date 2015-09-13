@@ -89,8 +89,6 @@ yum install -y \
     pcre-devel \
     openssl-devel \
     curl-devel \
-    libc-client-devel.i686 \
-    libc-client-devel \
     libxml2-devel \
     libXpm-devel \
     gmp-devel \

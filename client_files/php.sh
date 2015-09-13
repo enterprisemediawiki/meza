@@ -59,8 +59,6 @@ cmd_profile "START php build"
     --with-png-dir \
     --with-freetype-dir \
     --enable-gd-native-ttf \
-    --with-imap \
-    --with-imap-ssl \
     --with-kerberos \
     --enable-mbstring \
     --with-mcrypt \
