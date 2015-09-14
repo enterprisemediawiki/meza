@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Setup everything that should be installed with yum. 
+# Setup everything that should be installed with yum.
 #
 
 print_title "Starting script yums.sh"
@@ -17,16 +17,37 @@ architecture=32
 fi
 
 
+# note: /etc/os-release does not exist in CentOS 6, but this works anyway
+if grep -Fxq "VERSION_ID=\"7\"" /etc/os-release
+then
+    echo "Setting Enterprise Linux version to \"7\""
+    enterprise_linux_version=7
+else
+    echo "Setting Enterprise Linux version to \"6\""
+    enterprise_linux_version=6
+fi
+
+
 if [ "$architecture" = "32" ]; then
     echo "Downloading RPM for 32-bit"
-    wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.i686.rpm
+    rpmforge_version=rpmforge-release-0.5.3-1.el6.rf.i686.rpm
 elif [ "$architecture" = "64" ]; then
-    echo "Downloading RPM for 64-bit"
-    wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+
+	if [ "$enterprise_linux_version" = "6" ]; then
+	    echo "Downloading RPM for 64-bit Enterprise Linux v6"
+	    rpmforge_version=rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+	else
+		echo "Downloading RPM for 64-bit Enterprise Linux v7"
+		rpmforge_version=rpmforge-release-0.5.3-1.el7.rf.x86_64.rpm
+	fi
+
 else
     echo -e "There was an error in choosing architecture."
     exit 1
 fi
+
+
+curl -LO "http://pkgs.repoforge.org/rpmforge-release/$rpmforge_version"
 
 
 #
@@ -49,7 +70,7 @@ else
 
 	# Enable "optional RPMs" repo to be able to get: libc-client-devel.i686,
 	# libc-client-devel, libicu-devel, t1lib-devel, aspell-devel, libvpx-devel
-	# and libtidy-devel 
+	# and libtidy-devel
     echo "Enable \"Optional RPMs\" repo for RedHat"
 	subscription-manager repos --enable=rhel-6-server-optional-rpms
 fi
@@ -63,11 +84,12 @@ yum groupinstall -y development
 cmd_profile "END yum groupinstall development"
 
 #
+# @todo: can we get libmcrypt-devel from anywhere else? What is apt.sw.be?
 # Import RPM repo so libmcrypt-devel can be installed (not in default repo)
 #
 rpm --import http://apt.sw.be/RPM-GPG-KEY.dag.txt
-rpm -K rpmforge-release-0.5.3-1.el6.rf.*.rpm # Verifies the package
-rpm -i rpmforge-release-0.5.3-1.el6.rf.*.rpm
+rpm -K rpmforge-release-0.5.3-1.el*.rpm # Verifies the package
+rpm -i rpmforge-release-0.5.3-1.el*.rpm
 
 
 #
