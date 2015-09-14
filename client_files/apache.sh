@@ -59,8 +59,8 @@ chmod -R 775 /var/www
 
 
 #
-# Skip section (not titled) on httpd.conf "Supplemental configuration" 
-# Skip section titled "httpd-mpm.conf" 
+# Skip section (not titled) on httpd.conf "Supplemental configuration"
+# Skip section titled "httpd-mpm.conf"
 # Skip section titled "Vhosts for apache 2.4.12"
 #
 # @todo: figure out if this section is necessary For now skip section titled "httpd-security.conf"
@@ -114,12 +114,12 @@ service httpd restart
 # CentOS 7 (and presumably later) use firewalld
 if grep -Fxq "VERSION_ID=\"7\"" /etc/os-release
 then
-    echo "Enterprise Linux version 7. Applying rule changes to firewalld"
+	echo "Enterprise Linux version 7. Applying rule changes to firewalld"
 
-    # Add access to http now
-    firewall-cmd --zone=public --add-port=http/tcp
+	# Add access to http now
+	firewall-cmd --zone=public --add-port=http/tcp
 
-    # Add it as "permanent" so it get's done on future reboots
+	# Add it as "permanent" so it get's done on future reboots
 	firewall-cmd --zone=public --add-port=http/tcp --permanent
 
 else

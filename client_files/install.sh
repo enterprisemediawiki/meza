@@ -25,6 +25,20 @@ architecture=32
 fi
 
 
+#
+# CentOS/RHEL version 7 or 6?
+#
+# note: /etc/os-release does not exist in CentOS 6, but this works anyway
+if grep -Fxq "VERSION_ID=\"7\"" /etc/os-release
+then
+    echo "Setting Enterprise Linux version to \"7\""
+    enterprise_linux_version=7
+else
+    echo "Setting Enterprise Linux version to \"6\""
+    enterprise_linux_version=6
+fi
+
+
 # Prompt user for GitHub API personal access token
 default_usergithubtoken="e9191bc6d394d64011273d19f4c6be47eb10e25b" # From Oscar Rogers
 echo -e "\nIf you run this script multiple times from one IP address,"

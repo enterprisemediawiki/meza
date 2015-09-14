@@ -17,17 +17,6 @@ architecture=32
 fi
 
 
-# note: /etc/os-release does not exist in CentOS 6, but this works anyway
-if grep -Fxq "VERSION_ID=\"7\"" /etc/os-release
-then
-    echo "Setting Enterprise Linux version to \"7\""
-    enterprise_linux_version=7
-else
-    echo "Setting Enterprise Linux version to \"6\""
-    enterprise_linux_version=6
-fi
-
-
 if [ "$architecture" = "32" ]; then
     echo "Downloading RPM for 32-bit"
     rpmforge_version=rpmforge-release-0.5.3-1.el6.rf.i686.rpm
