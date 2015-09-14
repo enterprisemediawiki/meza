@@ -63,14 +63,5 @@ chkconfig sshd on
 service sshd start
 
 
-#
-# Configure IPTABLES to open port 80 (for Apache HTTP)
-# @todo: consider method to define entire iptables config:
-# http://blog.astaz3l.com/2015/03/06/secure-firewall-for-centos/
-#
-iptables -I INPUT 5 -i eth1 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT
-service iptables save
-
-
 echo -e "Network and SSH setup complete\n\n\n\n\n\nPlease login via SSH from your host machine, by doing:\n    ssh root@$ipaddr\n\nEnter your root password when prompted"
 
