@@ -18,16 +18,16 @@ fi
 
 
 if [ "$architecture" = "32" ]; then
-    echo "Downloading RPM for 32-bit"
-    rpmforge_version=rpmforge-release-0.5.3-1.el6.rf.i686.rpm
+    echo "Downloading EPEL for 32-bit"
+    epel_version="6/i386/epel-release-6-8.noarch.rpm"
 elif [ "$architecture" = "64" ]; then
 
 	if [ "$enterprise_linux_version" = "6" ]; then
-	    echo "Downloading RPM for 64-bit Enterprise Linux v6"
-	    rpmforge_version=rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+	    echo "Downloading EPEL for 64-bit Enterprise Linux v6"
+	    epel_version="6/x86_64/epel-release-6-8.noarch.rpm"
 	else
-		echo "Downloading RPM for 64-bit Enterprise Linux v7"
-		rpmforge_version=rpmforge-release-0.5.3-1.el7.rf.x86_64.rpm
+		echo "Downloading EPEL for 64-bit Enterprise Linux v7"
+		epel_version="7/x86_64/e/epel-release-7-5.noarch.rpm"
 	fi
 
 else
@@ -36,7 +36,10 @@ else
 fi
 
 
-curl -LO "http://pkgs.repoforge.org/rpmforge-release/$rpmforge_version"
+# http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+# http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+# http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+curl -LO "http://dl.fedoraproject.org/pub/epel/$epel_version"
 
 
 #
@@ -72,13 +75,11 @@ cmd_profile "START yum groupinstall development"
 yum groupinstall -y development
 cmd_profile "END yum groupinstall development"
 
+
 #
-# @todo: can we get libmcrypt-devel from anywhere else? What is apt.sw.be?
-# Import RPM repo so libmcrypt-devel can be installed (not in default repo)
+# Import EPEL repo so libmcrypt-devel can be installed (not in default repo)
 #
-rpm --import http://apt.sw.be/RPM-GPG-KEY.dag.txt
-rpm -K rpmforge-release-0.5.3-1.el*.rpm # Verifies the package
-rpm -i rpmforge-release-0.5.3-1.el*.rpm
+rpm -ivh epel-release-*.noarch.rpm
 
 
 #
