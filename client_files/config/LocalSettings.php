@@ -52,7 +52,8 @@ require_once "$m_htdocs/wikis/$wikiId/config/setup.php";
 $wgScriptPath = "/$wikiId";
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath
-$wgUploadPath = "$mezaWikiIP/images";
+// $wgUploadPath = "$mezaWikiIP/images";
+$wgUploadPath = "$wgScriptPath/img_auth.php";
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadDirectory
 $wgUploadDirectory = "$m_htdocs/wikis/$wikiId/images";
