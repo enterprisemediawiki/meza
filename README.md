@@ -8,6 +8,7 @@ Depending on where you're installing Meza1 you'll have different initial setup s
 
 * [Setup Digital Ocean](manual/SetupDigitalOcean.md)
 * [Setup VirtualBox](manual/1.0-SettingUpVirtualBox.md)
+* [Setup VirtualBox on Windows](manual/1.0-SettingUpVirtualBoxWindows.md)
 * "Setup VMWare" steps to come
 
 ## Running the setup script

@@ -25,6 +25,17 @@ else
 architecture=32
 fi
 
+
+# Prompt user for GitHub API personal access token
+default_usergithubtoken="e9191bc6d394d64011273d19f4c6be47eb10e25b" # From Oscar Rogers
+echo -e "\nIf you run this script multiple times from one IP address,"
+echo -e "you might exceed GitHub's API rate limit."
+echo -e "\nYou may just press [ENTER] to use our generic token (which may exceed limits if used too much) or"
+echo -e "Visit https://github.com/settings/tokens to generate a new token (with no scopes)."
+echo -e "and copy/paste your 40-character token and press [ENTER]: "
+read usergithubtoken
+usergithubtoken=${usergithubtoken:-$default_usergithubtoken}
+
 # Prompt user for PHP version
 while [ -z "$phpversion" ]
 do
@@ -179,6 +190,11 @@ cmd_tee "source VE.sh"
 
 cd "$m_meza/client_files"
 cmd_tee "source ElasticSearch.sh"
+
+# Remove GitHub API personal access token from .composer dir
+# @todo: change the following to instead just remove the token from the file
+#        in case there are other authentication entries
+rm -f ~/.composer/auth.json
 
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
