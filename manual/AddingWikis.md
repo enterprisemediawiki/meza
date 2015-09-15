@@ -55,7 +55,7 @@ eng
 		favicon.ico
 		setup.php
 		CustomSettings.php
-	wikis.sql
+	wiki.sql
 ```
 
 The `images` directory should be directly copied from your current wiki.
