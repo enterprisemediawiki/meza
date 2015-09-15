@@ -40,9 +40,6 @@ if ( ! in_array( $wikiId, $wikis ) ) {
 }
 
 
-// Path of to images and config for this $wikiId
-$mezaWikiIP = "/wikis/$wikiId";
-
 // Get's wiki-specific config variables like:
 // $wgSitename, $mezaAuthType, $mezaDebug, $mezaEnableWikiEmail
 require_once "$m_htdocs/wikis/$wikiId/config/setup.php";
@@ -52,17 +49,16 @@ require_once "$m_htdocs/wikis/$wikiId/config/setup.php";
 $wgScriptPath = "/$wikiId";
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath
-// $wgUploadPath = "$mezaWikiIP/images";
 $wgUploadPath = "$wgScriptPath/img_auth.php";
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadDirectory
 $wgUploadDirectory = "$m_htdocs/wikis/$wikiId/images";
 
 // https://www.mediawiki.org/wiki/Manual:$wgLogo
-$wgLogo = "$mezaWikiIP/config/logo.png";
+$wgLogo = "/wikis/$wikiId/config/logo.png";
 
 // https://www.mediawiki.org/wiki/Manual:$wgFavicon
-$wgFavicon = "$mezaWikiIP/config/favicon.ico";
+$wgFavicon = "/wikis/$wikiId/config/favicon.ico";
 
 // https://www.mediawiki.org/wiki/Manual:$wgEmergencyContact
 $wgEmergencyContact = "enterprisemediawiki@gmail.com"; // @todo: this should be in setup, but this is easier for now.
