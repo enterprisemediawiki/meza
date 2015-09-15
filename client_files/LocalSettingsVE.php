@@ -17,6 +17,6 @@ $wgVisualEditorParsoidURL = 'http://127.0.0.1:8000';
 
 // Interwiki prefix to pass to the Parsoid instance
 // Parsoid will be called as $url/$prefix/$pagename
-$wgVisualEditorParsoidPrefix = 'wiki';
+$wgVisualEditorParsoidPrefix = $wikiId;
 
 // ******* End info for VE *******
