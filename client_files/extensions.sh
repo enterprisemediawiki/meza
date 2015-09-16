@@ -6,6 +6,15 @@
 print_title "Starting script extensions.sh"
 
 
+#
+# Install Demo MW: create wiki directory, setup basic settings, create database
+#
+imports_dir="new"
+wiki_id="demo"
+wiki_name="Demo Wiki"
+source "$m_meza/client_files/create-wiki.sh"
+
+
 # Clone ExtensionLoader
 echo -e "\n\n## Meza1: Install ExtensionLoader and apply changes to MW settings"
 cd "$m_mediawiki/extensions"
@@ -45,17 +54,9 @@ cd "$m_mediawiki/extensions/Elastica"
 composer install
 
 
-#
-# Install Demo MW: create wiki directory, setup basic settings, create database
-#
-imports_dir="new"
-wiki_id="demo"
-wiki_name="Demo Wiki"
-source "$m_meza/client_files/create-wiki.sh"
-# note: now update.php required since it's in create-wiki.sh (import-wiki.sh, more specifically)
-
 # update database
 cd "$m_mediawiki"
+WIKI=demo php maintenance/update.php --quick
 
 # Import pages required for SemanticMeetingMinutes and rebuild indices
 echo -e "\n\n## Meza1: import pages for SemanticMeetingMinutes"
