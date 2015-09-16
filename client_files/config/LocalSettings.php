@@ -191,3 +191,121 @@ $wgRestrictDisplayTitle = false;
 
 
 
+
+
+
+
+/**
+ *
+ * Take from LocalSettingsAdditions
+ *
+ **/
+
+
+enableSemantics('Meza1');
+
+// SMW Settings Overrides:
+$smwgQMaxSize = 5000;
+
+$srfgFormats = array(
+	'calendar',
+	'timeline',
+	'filtered',
+	//'exhibit', 
+	'eventline',
+	'tree',
+	'oltree',
+	'datatables',
+	'ultree',
+	'tagcloud',
+	'sum',
+	'pagewidget'
+);
+
+// allows adding semantic properties to Templates themselves
+// (not just on pages via templates). 
+// ENABLE THIS AFTER ALL TEMPLATES HAVE BEEN CHECKED FOR PROPER FORM
+// i.e. using <noinclude> and <includeonly> properly
+// $smwgNamespacesWithSemanticLinks[NS_TEMPLATE] = true;
+$smwgNamespacesWithSemanticLinks[NS_TALK] = true;
+
+
+// opens external links in new window
+$wgExternalLinkTarget = '_blank';
+
+// added this line to allow linking. specifically to Imagery Online.
+$wgAllowExternalImages = true;
+$wgAllowImageTag = true;
+
+$wgVectorUseSimpleSearch = true;
+
+//$wgDefaultUserOptions['useeditwarning'] = 1;
+
+// disable page edit warning (edit warning affect Semantic Forms)
+$wgVectorFeatures['editwarning']['global'] = false;
+
+$wgDefaultUserOptions['rememberpassword'] = 1;
+
+// users watch pages by default (they can override in settings)
+$wgDefaultUserOptions['watchdefault'] = 1;
+$wgDefaultUserOptions['watchmoves'] = 1;
+$wgDefaultUserOptions['watchdeletion'] = 1;
+$wgDefaultUserOptions['watchcreations'] = 1;
+
+$wgEnableMWSuggest = true;
+
+// fixes login issue for some users (login issue fixed in MW version 1.18.1 supposedly)
+$wgDisableCookieCheck = true;
+
+#Set Default Timezone
+$wgLocaltimezone = "America/Chicago";
+$oldtz = getenv("TZ");
+putenv("TZ=$wgLocaltimezone");
+
+
+$wgFileExtensions[] = 'mp3';
+$wgFileExtensions[] = 'aac';
+$wgFileExtensions[] = 'msg';
+
+$wgMaxImageArea = 1.25e10; // Images on [[Snorkel]] fail without this
+// $wgMemoryLimit = 500000000; //Default is 50M. This is 500M.
+
+
+// Increase from default setting for large form
+// See https://www.mediawiki.org/wiki/Extension_talk:Semantic_Forms/Archive_April_to_June_2012#Error:_Backtrace_limit_exceeded_during_parsing
+// If set to 10million, errors are seen when using Edit with form on mission pages like 41S
+// ini_set( 'pcre.backtrack_limit', 10000000 ); //10million
+ini_set( 'pcre.backtrack_limit', 1000000000 ); //1 billion
+
+
+$wgFileExtensions[] = 'pdf';
+$wgFileExtensions[] = 'svg';
+$wgUseImageMagick = true;
+$wgImageMagickConvertCommand = '/usr/local/bin/convert';
+
+
+
+/**
+ * END LocalSettingsAdditions
+ **/
+
+
+
+
+/**
+ *  Code to load the extension "ExtensionLoader", which then installs and loads
+ *  other extensions as defined in "ExtensionSettings.php". Note that the file
+ *  or files defining which extensions are loaded is configurable below, as is
+ *  the path to where extensions are installed.
+ */
+require_once "$IP/extensions/ExtensionLoader/ExtensionLoader.php";
+ExtensionLoader::init( "$IP/ExtensionSettings.php" );
+foreach( ExtensionLoader::$loader->oldExtensions as $extensionPath ) {
+	require_once $extensionPath;
+}
+ExtensionLoader::$loader->completeExtensionLoading();
+
+
+
+
+

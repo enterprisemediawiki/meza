@@ -180,16 +180,16 @@ cd "$m_meza/client_files"
 cmd_tee "source mysql.sh"
 
 cd "$m_meza/client_files"
-cmd_tee "source mediawiki.sh"
-
-cd "$m_meza/client_files"
-cmd_tee "source extensions.sh"
-
-cd "$m_meza/client_files"
 cmd_tee "source VE.sh"
 
 cd "$m_meza/client_files"
 cmd_tee "source ElasticSearch.sh"
+
+cd "$m_meza/client_files"
+cmd_tee "source mediawiki.sh"
+
+cd "$m_meza/client_files"
+cmd_tee "source extensions.sh"
 
 # Remove GitHub API personal access token from .composer dir
 # @todo: change the following to instead just remove the token from the file
