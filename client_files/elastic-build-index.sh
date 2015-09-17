@@ -3,14 +3,15 @@ bash printTitle.sh "Begin $0"
 echo "******* Generating elasticsearch index *******"
 
 # Add "$wgDisableSearchUpdate = true;"
-echo '<?php $GLOBALS["wgDisableSearchUpdate"] = true;\n' > "$m_htdocs/wikis/$wiki_id/config/disableSearchUpdate.php"
+sed -r -i 's/false/true/g;' "$m_htdocs/wikis/$wiki_id/config/disableSearchUpdate.php"
+
 
 # Run script to generate elasticsearch index
 cd "$m_mediawiki"
 WIKI="$wiki_id" php "$m_mediawiki/extensions/CirrusSearch/maintenance/updateSearchIndexConfig.php"
 
 # Remove $wgDisableSearchUpdate = true (updates should start heading to elasticsearch)
-echo '<?php $GLOBALS["wgDisableSearchUpdate"] = false;\n' > "$m_htdocs/wikis/$wiki_id/config/disableSearchUpdate.php"
+sed -r -i 's/true/false/g;' "$m_htdocs/wikis/$wiki_id/config/disableSearchUpdate.php"
 
 # Bootstrap the search index
 #

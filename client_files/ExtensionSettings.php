@@ -283,6 +283,7 @@ $egExtensionLoaderConfig += array(
 		'git' => 'https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git',
 		'branch' => 'REL1_25',
 		'afterFn' => function() {
+			global $wikiId;
 
 			// Enable by default for everybody
 			$GLOBALS['wgDefaultUserOptions']['visualeditor-enable'] = 1;

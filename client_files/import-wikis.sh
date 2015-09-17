@@ -190,6 +190,9 @@ for d in */ ; do
 	if [ ! -f "$wiki_install_path/config/setup.php" ]; then
 		cp "$m_meza/wiki-init/config/setup.php" "$wiki_install_path/config/setup.php"
 	fi
+	if [ ! -f "$wiki_install_path/config/disableSearchUpdate.php" ]; then
+		cp "$m_meza/wiki-init/config/disableSearchUpdate.php" "$wiki_install_path/config/disableSearchUpdate.php"
+	fi
 
 	# insert wiki name and auth type into setup.php if it's still "placeholder"
 	sed -r -i "s/wgSitename = 'placeholder';/wgSitename = '$wiki_name';/g;" "$wiki_install_path/config/setup.php"
