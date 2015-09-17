@@ -16,6 +16,7 @@ source "$m_meza/client_files/create-wiki.sh"
 
 # Install extensions installed via Composer
 echo -e "\n\n## Meza1: Install composer-supported extensions"
+cd "$m_mediawiki"
 cmd_profile "START extensions composer require"
 composer require \
 	mediawiki/semantic-media-wiki:~2.0 \
