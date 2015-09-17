@@ -5,6 +5,13 @@
 
 print_title "Starting script extensions.sh"
 
+#
+# Install Demo MW: create wiki directory, setup basic settings, create database
+#
+imports_dir="new"
+wiki_id="demo"
+wiki_name="Demo Wiki"
+source "$m_meza/client_files/create-wiki.sh"
 
 # Install extensions installed via Composer
 echo -e "\n\n## Meza1: Install composer-supported extensions"
@@ -15,15 +22,6 @@ composer require \
 	mediawiki/sub-page-list:~1.1 \
 	mediawiki/semantic-meeting-minutes:~0.3
 cmd_profile "END extensions composer require"
-
-#
-# Install Demo MW: create wiki directory, setup basic settings, create database
-#
-imports_dir="new"
-wiki_id="demo"
-wiki_name="Demo Wiki"
-source "$m_meza/client_files/create-wiki.sh"
-
 
 # Clone ExtensionLoader
 echo -e "\n\n## Meza1: Install ExtensionLoader and apply changes to MW settings"
@@ -54,6 +52,13 @@ composer install
 # update database
 cd "$m_mediawiki"
 WIKI=demo php maintenance/update.php --quick
+
+#
+# Enable Composer settings: remove dummy file, replace with the real deal
+#
+rm -rf "$m_htdocs/__common/ComposerSettings.php"
+cp "$m_meza/client_files/config/ComposerSettings.php" "$m_htdocs/__common/ComposerSettings.php"
+
 
 # Import pages required for SemanticMeetingMinutes and rebuild indices
 echo -e "\n\n## Meza1: import pages for SemanticMeetingMinutes"
