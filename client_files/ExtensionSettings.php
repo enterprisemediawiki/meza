@@ -320,8 +320,8 @@ $egExtensionLoaderConfig += array(
 			$GLOBALS['wgSearchType'] = 'CirrusSearch';
 
 			global $wikiId, $m_htdocs;
-			include "$m_htdocs/wikis/$wikiId/config/disableSearchUpdate.php"
-			
+			include "$m_htdocs/wikis/$wikiId/config/disableSearchUpdate.php";
+
 			//$wgCirrusSearchServers = array( 'search01', 'search02' );
 		},
 	),
