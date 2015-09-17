@@ -263,20 +263,6 @@ $wgImageMagickConvertCommand = '/usr/local/bin/convert';
 include "$m_htdocs/__common/ComposerSettings.php";
 
 
-/**
- *  Code to load the extension "ExtensionLoader", which then installs and loads
- *  other extensions as defined in "ExtensionSettings.php". Note that the file
- *  or files defining which extensions are loaded is configurable below, as is
- *  the path to where extensions are installed.
- */
-require_once "$IP/extensions/ExtensionLoader/ExtensionLoader.php";
-ExtensionLoader::init( "$IP/ExtensionSettings.php" );
-foreach( ExtensionLoader::$loader->oldExtensions as $extensionPath ) {
-	require_once $extensionPath;
-}
-ExtensionLoader::$loader->completeExtensionLoading();
-
-
 
 
 

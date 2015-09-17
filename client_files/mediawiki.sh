@@ -98,7 +98,7 @@ cp "$m_meza/client_files/config/AllWikiSettings.php" "$m_htdocs/__common/AllWiki
 #
 # Make dummy ComposerSettings.php to start. Will be replaced by correct file later.
 #
-echo "<?php\n\n// Temporary ComposerSettings.php for initial setup" > "$m_htdocs/__common/ComposerSettings.php";
+echo "<?php // Temporary ComposerSettings.php for initial setup" > "$m_htdocs/__common/ComposerSettings.php"
 
 #
 # Create common database credentials
