@@ -6,6 +6,16 @@
 print_title "Starting script extensions.sh"
 
 
+# Install extensions installed via Composer
+echo -e "\n\n## Meza1: Install composer-supported extensions"
+cmd_profile "START extensions composer require"
+composer require \
+	mediawiki/semantic-media-wiki:~2.0 \
+	mediawiki/semantic-result-formats:~2.0 \
+	mediawiki/sub-page-list:~1.1 \
+	mediawiki/semantic-meeting-minutes:~0.3
+cmd_profile "END extensions composer require"
+
 #
 # Install Demo MW: create wiki directory, setup basic settings, create database
 #
@@ -21,27 +31,14 @@ cd "$m_mediawiki/extensions"
 git clone https://github.com/jamesmontalvo3/ExtensionLoader.git
 cd ..
 
-
 # Add ExtensionSettings.php (used by ExtensionLoader) from Meza1 repo
 cp "$m_meza/client_files/ExtensionSettings.php" ./ExtensionSettings.php
-
 
 # Install extensions and update database
 echo -e "\n\n## Meza1: update/install extensions"
 cmd_profile "START extension loader install"
 WIKI=demo php extensions/ExtensionLoader/updateExtensions.php
 cmd_profile "END extension loader install"
-
-
-# Install extensions installed via Composer
-echo -e "\n\n## Meza1: Install composer-supported extensions"
-cmd_profile "START extensions composer require"
-composer require \
-	mediawiki/semantic-media-wiki:~2.0 \
-	mediawiki/semantic-result-formats:~2.0 \
-	mediawiki/sub-page-list:~1.1 \
-	mediawiki/semantic-meeting-minutes:~0.3
-cmd_profile "END extensions composer require"
 
 
 echo "******* Installing VE *******"
