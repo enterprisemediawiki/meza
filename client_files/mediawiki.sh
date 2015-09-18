@@ -95,27 +95,15 @@ fi
 cp "$m_meza/client_files/config/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
 cp "$m_meza/client_files/config/AllWikiSettings.php" "$m_htdocs/__common/AllWikiSettings.php"
 
+#
+# Make dummy ComposerSettings.php to start. Will be replaced by correct file later.
+#
+echo "<?php // Temporary ComposerSettings.php for initial setup" > "$m_htdocs/__common/ComposerSettings.php"
 
 #
 # Create common database credentials
 #
 echo -e "<?php\n\$wgDBuser = \"root\";\n\$wgDBpassword = \"$mysql_root_pass\";\n" > "$m_htdocs/__common/dbUserPass.php"
-
-
-#
-# Install Demo MW: create wiki directory, setup basic settings, create database
-#
-imports_dir="new"
-wiki_id="demo"
-wiki_name="Demo Wiki"
-source "$m_meza/client_files/create-wiki.sh"
-
-
-#
-# Modify LocalSettings.php, set $wgEnableUploads = true;
-# Evidently must also set $wgMaxUploadSize = 1024*1024*100; to get over 40MB
-#
-# sed -r -i 's/\$wgEnableUploads\s*=\s*false;/$wgEnableUploads = true;\n$wgMaxUploadSize = 1024*1024*100; \/\/ 100 MB/g;' ./LocalSettings.php
 
 
 # end of script

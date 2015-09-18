@@ -190,6 +190,9 @@ for d in */ ; do
 	if [ ! -f "$wiki_install_path/config/setup.php" ]; then
 		cp "$m_meza/wiki-init/config/setup.php" "$wiki_install_path/config/setup.php"
 	fi
+	if [ ! -f "$wiki_install_path/config/disableSearchUpdate.php" ]; then
+		cp "$m_meza/wiki-init/config/disableSearchUpdate.php" "$wiki_install_path/config/disableSearchUpdate.php"
+	fi
 
 	# insert wiki name and auth type into setup.php if it's still "placeholder"
 	sed -r -i "s/wgSitename = 'placeholder';/wgSitename = '$wiki_name';/g;" "$wiki_install_path/config/setup.php"
@@ -213,24 +216,32 @@ for d in */ ; do
 	WIKI="$wiki_id" php "$m_mediawiki/maintenance/update.php" --quick
 
 
-	# Run SMW rebuildData.php
-	# Some documenation says to run this in increments of ~3000 pages, but the most
-	# recent version of http://semantic-mediawiki.org/wiki/Help:RebuildData.php
-	# does not mention that. Attempting without that. If that is required, then
-	# will have to determine a method to test for completion of rebuild, and run it
-	# in a while loop
-	echo "Running Semantic MediaWiki maintenance script \"rebuildData.php\""
-	WIKI="$wiki_id" php "$m_mediawiki/extensions/SemanticMediaWiki/maintenance/rebuildData.php" -d 5 -v
+	# if SMW set up yet. On the very first install it will not be.
+	if [ -d "$m_mediawiki/extensions/SemanticMediaWiki" ]; then
+		# Run SMW rebuildData.php
+		# Some documenation says to run this in increments of ~3000 pages, but the most
+		# recent version of http://semantic-mediawiki.org/wiki/Help:RebuildData.php
+		# does not mention that. Attempting without that. If that is required, then
+		# will have to determine a method to test for completion of rebuild, and run it
+		# in a while loop
+		echo "Running Semantic MediaWiki maintenance script \"rebuildData.php\""
+		WIKI="$wiki_id" php "$m_mediawiki/extensions/SemanticMediaWiki/maintenance/rebuildData.php" -d 5 -v
 
-	# Run runJobs.php
-	# Note that should prob be removed: Daren saw 12k+ jobs in the queue after performing the above steps
-	echo "Running MediaWiki maintenance script \"runJobs.php\""
-	WIKI="$wiki_id" php "$m_mediawiki/maintenance/runJobs.php" --quick
+		# Run runJobs.php
+		# Note that should prob be removed: Daren saw 12k+ jobs in the queue after performing the above steps
+		echo "Running MediaWiki maintenance script \"runJobs.php\""
+		WIKI="$wiki_id" php "$m_mediawiki/maintenance/runJobs.php" --quick
+	else
+		echo -e "\nSKIPPING SemanticMediaWiki rebuildData.php and runjobs.php (no SMW)"
+	fi
 
-
-	echo "Building Elastic Search index"
-	source "$m_meza/client_files/elastic-build-index.sh"
-
+	# if CirrusSearch extension exists. On first install it will not yet.
+	if [ -d "$m_mediawiki/extensions/CirrusSearch" ]; then
+		echo "Building Elastic Search index"
+		source "$m_meza/client_files/elastic-build-index.sh"
+	else
+		echo -e "\nSKIPPING elastic-build-index.sh (no CirrusSearch)"
+	fi
 
 	echo -e "\nWiki \"$wiki_id\" has been imported\n"
 

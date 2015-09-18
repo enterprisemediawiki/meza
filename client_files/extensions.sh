@@ -5,10 +5,18 @@
 
 print_title "Starting script extensions.sh"
 
-cd "$m_mediawiki"
+#
+# Install Demo MW: create wiki directory, setup basic settings, create database
+#
+echo -e "\n\nCreating new wiki called \"Demo Wiki\""
+imports_dir="new"
+wiki_id="demo"
+wiki_name="Demo Wiki"
+source "$m_meza/client_files/create-wiki.sh"
 
 # Install extensions installed via Composer
 echo -e "\n\n## Meza1: Install composer-supported extensions"
+cd "$m_mediawiki"
 cmd_profile "START extensions composer require"
 composer require \
 	mediawiki/semantic-media-wiki:~2.0 \
@@ -17,21 +25,22 @@ composer require \
 	mediawiki/semantic-meeting-minutes:~0.3
 cmd_profile "END extensions composer require"
 
-# SMW, and perhaps others just installed, require DB update after install
-echo -e "\n\n## Meza1: update database"
+# update database
+cd "$m_mediawiki"
 WIKI=demo php maintenance/update.php --quick
+
+#
+# Enable Composer settings: remove dummy file, replace with the real deal
+# Note: This also enables ExtensionLoader...which seems hacky.
+#
+rm -rf "$m_htdocs/__common/ComposerSettings.php"
+cp "$m_meza/client_files/config/ComposerSettings.php" "$m_htdocs/__common/ComposerSettings.php"
 
 # Clone ExtensionLoader
 echo -e "\n\n## Meza1: Install ExtensionLoader and apply changes to MW settings"
-cd extensions
+cd "$m_mediawiki/extensions"
 git clone https://github.com/jamesmontalvo3/ExtensionLoader.git
 cd ..
-
-# Add settings to LocalSettings.php from Meza1 repo
-cat "$m_meza/client_files/LocalSettingsAdditions" >> ./LocalSettings.php
-
-# Add ExtensionLoader setup to LocalSettings.php
-cat ./extensions/ExtensionLoader/LocalSettings-append >> ./LocalSettings.php
 
 # Add ExtensionSettings.php (used by ExtensionLoader) from Meza1 repo
 cp "$m_meza/client_files/ExtensionSettings.php" ./ExtensionSettings.php
@@ -41,7 +50,22 @@ echo -e "\n\n## Meza1: update/install extensions"
 cmd_profile "START extension loader install"
 WIKI=demo php extensions/ExtensionLoader/updateExtensions.php
 cmd_profile "END extension loader install"
+
+
+echo "******* Installing VE *******"
+cd "$m_mediawiki/extensions/VisualEditor"
+git submodule update --init
+
+
+# Install Elastica library via composer
+cd "$m_mediawiki/extensions/Elastica"
+composer install
+
+
+# update database
+cd "$m_mediawiki"
 WIKI=demo php maintenance/update.php --quick
+
 
 # Import pages required for SemanticMeetingMinutes and rebuild indices
 echo -e "\n\n## Meza1: import pages for SemanticMeetingMinutes"
@@ -62,3 +86,18 @@ WIKI=demo php extensions/TitleKey/rebuildTitleKeys.php
 #
 cp "$m_meza/client_files/mezaCreateUser.php" /var/www/meza1/mezaCreateUser.php
 WIKI=demo php /var/www/meza1/mezaCreateUser.php --username=Admin --password=1234 --groups=sysop,bureaucrat
+
+#
+# Generate ES index
+#
+# Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
+#
+echo "******* Running elastic-build-index.sh *******"
+wiki_id=demo
+# @todo @fixme Does this need to run here, or is it sufficient during create-wiki.sh?
+source "$m_meza/client_files/elastic-build-index.sh"
+
+
+# NOTE: I think this can be in LocalSettings.php to start. Don't think it needs to be added later.
+# Add "$wgSearchType = 'CirrusSearch';" to LocalSettings.php to funnel queries to ElasticSearch
+

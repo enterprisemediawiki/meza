@@ -105,50 +105,8 @@ cd /var
 chown -R elasticsearch /var/data/elasticsearch
 chown -R elasticsearch /var/work/elasticsearch
 
-#
-# Install Extension:Elastica and Extension:CirrusSearch
-# Add Elastica and CirrusSearch to ExtensionSettings
-#
-echo "******* Adding extensions to ExtensionLoader *******"
-cat "$m_meza/client_files/ExtensionSettingsElasticSearch.php" >> "$m_mediawiki/ExtensionSettings.php"
-
-#
-# MW Configuration
-#
-
-# Add CirrusSearch settings to LocalSettings.php
-echo "******* Downloading configuration files *******"
-cat "$m_meza/client_files/LocalSettingsElasticSearch.php" >> "$m_mediawiki/LocalSettings.php"
-
-# Run updateExtensions to install UniversalLanguageSelector and VisualEditor
-echo "******* Installing extensions *******"
-WIKI=demo php "$m_mediawiki/extensions/ExtensionLoader/updateExtensions.php" Elastica CirrusSearch
-# Install Elastica library via composer
-cd "$m_mediawiki/extensions/Elastica"
-composer install
-
-# Any time you run updateExtensions.php it may be required to run
-# `php maintenance/update.php` since new extension versions may be installed
-echo "******* Running update.php to update database as required *******"
-cd "$m_mediawiki"
-WIKI=demo php maintenance/update.php --quick
 
 # Start Elasticsearch
 echo "******* Starting elasticsearch service *******"
 service elasticsearch start
 sleep 20  # Waits 10 seconds
-
-#
-# Generate ES index
-#
-# Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
-#
-echo "******* Running elastic-build-index.sh *******"
-wiki_id=demo
-source "$m_meza/client_files/elastic-build-index.sh"
-
-# Add "$wgSearchType = 'CirrusSearch';" to LocalSettings.php to funnel queries to ElasticSearch
-cd "$m_mediawiki"
-sed -i -e 's/\/\/ES-CONFIG-ANCHOR/$wgSearchType = "CirrusSearch";/g' LocalSettings.php
-
-echo "******* Complete! *******"

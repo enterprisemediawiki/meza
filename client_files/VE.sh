@@ -82,24 +82,10 @@ escaped_mw_api_uri=${mw_api_uri//\//\\\/} # need to replace / with \/ for regex
 sed -r -i "s/INSERTED_BY_VE_SCRIPT/$escaped_mw_api_uri/g;" /etc/parsoid/api/localsettings.js
 
 
-# Add VE and UniversalLanguageSelector to ExtensionSettings
-cat ./ExtensionSettingsVE.php >> "$m_mediawiki/ExtensionSettings.php"
-# Add VE settings to LocalSettings.php
-cat ./LocalSettingsVE.php >> "$m_mediawiki/LocalSettings.php"
+#
+# Installing Extension:VisualEditor was here
+#
 
-# Run updateExtensions to install UniversalLanguageSelector and VisualEditor
-echo "******* Installing extensions *******"
-WIKI=demo php "$m_mediawiki/extensions/ExtensionLoader/updateExtensions.php" UniversalLanguageSelector VisualEditor
-
-echo "******* Installing VE *******"
-cd "$m_mediawiki/extensions/VisualEditor"
-git submodule update --init
-
-# Any time you run updateExtensions.php it may be required to run
-# `php maintenance/update.php` since new extension versions may be installed
-echo "******* Running update.php to update database as required *******"
-cd "$m_mediawiki"
-WIKI=demo php maintenance/update.php --quick
 
 # Create parsoid user to run parsoid node server
 cd /etc/parsoid # @issue#48: is this necessary?
