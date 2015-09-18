@@ -94,12 +94,17 @@ sudo ln -s /usr/local/php/bin/php /usr/bin/php
 #
 # Initiate php.ini
 #
-cp ~/sources/meza1/client_files/php.ini-development /usr/local/php/lib/php.ini
+cp "$m_meza/client_files/php.ini-development" /usr/local/php/lib/php.ini
+
+#
+# Add wiki landing page
+#
+cd "$m_htdocs"
+cp "$m_meza/client_files/index.php" ./index.php
 
 #
 # Create info.php
 #
-cd /var/www/meza1/htdocs
 touch info.php
 echo '<?php phpinfo();' > info.php
 
@@ -108,8 +113,11 @@ echo '<?php phpinfo();' > info.php
 #LoadModule php5_module modules/libphp5.so
 
 #
-# Restart Apache
+# Start webserver service
 #
+chkconfig httpd on
+service httpd status
 service httpd restart
+
 
 echo -e "\n\nPHP has been setup.\n\nPlease use the web browser on your host computer to navigate to http://192.168.56.56/info.php to verify php is being executed."

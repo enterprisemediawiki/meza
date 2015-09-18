@@ -271,4 +271,60 @@ $egExtensionLoaderConfig += array(
 		}
 	),
 
+
+	/**
+	 * Extensions for Visual Editor
+	 **/
+	'UniversalLanguageSelector' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UniversalLanguageSelector.git',
+		'branch' => 'REL1_25',
+	),
+	'VisualEditor' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git',
+		'branch' => 'REL1_25',
+		'afterFn' => function() {
+			global $wikiId;
+
+			// Enable by default for everybody
+			$GLOBALS['wgDefaultUserOptions']['visualeditor-enable'] = 1;
+
+			// Don't allow users to disable it
+			$GLOBALS['wgHiddenPrefs'][] = 'visualeditor-enable';
+
+			// OPTIONAL: Enable VisualEditor's experimental code features
+			#$wgDefaultUserOptions['visualeditor-enable-experimental'] = 1;
+
+			// URL to the Parsoid instance
+			// MUST NOT end in a slash due to Parsoid bug
+			// Use port 8142 if you use the Debian package
+			$GLOBALS['wgVisualEditorParsoidURL'] = 'http://127.0.0.1:8000';
+
+			// Interwiki prefix to pass to the Parsoid instance
+			// Parsoid will be called as $url/$prefix/$pagename
+			$GLOBALS['wgVisualEditorParsoidPrefix'] = $wikiId;
+
+		}
+	),
+
+
+	/**
+	 * Extensions for Elastic Search
+	 **/
+	'Elastica' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/Elastica.git',
+		'branch' => 'REL1_25',
+	),
+	'CirrusSearch' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/CirrusSearch.git',
+		'branch' => 'REL1_25',
+		'afterFn' => function(){
+			$GLOBALS['wgSearchType'] = 'CirrusSearch';
+
+			global $wikiId, $m_htdocs;
+			include "$m_htdocs/wikis/$wikiId/config/disableSearchUpdate.php";
+
+			//$wgCirrusSearchServers = array( 'search01', 'search02' );
+		},
+	),
+
 );

@@ -54,7 +54,6 @@ sed -r -i 's/ONBOOT=no/ONBOOT=yes/g;' "./$network_adapter1"
 sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' "./$network_adapter1"
 
 
-# copy ifcfg-eth1  (host-only)
 # note: prefix with \ removes root's alias in .bashrc to "cp -i" which forces cp
 # to ask the user if they want to overwrite existing. We do want to overwrite.
 \cp "/root/sources/meza1/client_files/$network_adapter2" "./$network_adapter2"

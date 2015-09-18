@@ -15,6 +15,7 @@ fi
 
 echo -e "\nWelcome to Meza1 v0.2.1\n"
 
+
 #
 # Set architecture to 32 or 64 (bit)
 #
@@ -61,30 +62,6 @@ while [ -z "$mysql_root_pass" ]
 do
 echo -e "\nEnter MySQL root password and press [ENTER]: "
 read -s mysql_root_pass
-done
-
-while [ -z "$wiki_db_name" ]
-do
-echo -e "\nEnter desired name of your wiki database and press [ENTER]: "
-read wiki_db_name
-done
-
-while [ -z "$wiki_name" ]
-do
-echo -e "\nEnter desired name of your wiki and press [ENTER]: "
-read wiki_name
-done
-
-while [ -z "$wiki_admin_name" ]
-do
-echo -e "\nEnter desired administrator account username and press [ENTER]: "
-read wiki_admin_name
-done
-
-while [ -z "$wiki_admin_pass" ]
-do
-echo -e "\nEnter password you would like for your wiki administrator account and press [ENTER]: "
-read -s wiki_admin_pass
 done
 
 while [ -z "$git_branch" ]
@@ -192,35 +169,41 @@ else
 	git checkout "$git_branch"
 fi
 
+
+# Load config constants. Unfortunately right now have to write out full path to
+# Meza1 since we can't be certain of consistent method of accessing install.sh.
+source /root/sources/meza1/client_files/config.sh
+
+
 # @todo: Need to test for yums.sh functionality prior to proceeding
 #    with apache.sh, and Apache functionality prior to proceeding
 #    with php.sh, and so forth.
-cd ~/sources/meza1/client_files
+cd "$m_meza/client_files"
 cmd_tee "source yums.sh"
 
-cd ~/sources/meza1/client_files
+cd "$m_meza/client_files"
 cmd_tee "source install-imagick.sh"
 
-cd ~/sources/meza1/client_files
+cd "$m_meza/client_files"
 cmd_tee "source apache.sh"
 
-cd ~/sources/meza1/client_files
+cd "$m_meza/client_files"
 cmd_tee "source php.sh"
 
-cd ~/sources/meza1/client_files
+cd "$m_meza/client_files"
 cmd_tee "source mysql.sh"
 
-cd ~/sources/meza1/client_files
-cmd_tee "source mediawiki.sh"
-
-cd ~/sources/meza1/client_files
-cmd_tee "source extensions.sh"
-
-cd ~/sources/meza1/client_files
+cd "$m_meza/client_files"
 cmd_tee "source VE.sh"
 
-cd ~/sources/meza1/client_files
+cd "$m_meza/client_files"
 cmd_tee "source ElasticSearch.sh"
+
+cd "$m_meza/client_files"
+cmd_tee "source mediawiki.sh"
+
+cd "$m_meza/client_files"
+cmd_tee "source extensions.sh"
 
 # Remove GitHub API personal access token from .composer dir
 # @todo: change the following to instead just remove the token from the file
@@ -229,5 +212,5 @@ rm -f ~/.composer/auth.json
 
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
-cat ~/sources/meza1/client_files/pigeon.txt
+cat "$m_meza/client_files/pigeon.txt"
 
