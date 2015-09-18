@@ -271,4 +271,77 @@ $egExtensionLoaderConfig += array(
 		}
 	),
 
+
+	/**
+	 * Extensions for Visual Editor
+	 **/
+	'UniversalLanguageSelector' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UniversalLanguageSelector.git',
+		'branch' => 'REL1_25',
+	),
+	'VisualEditor' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git',
+		'branch' => 'REL1_25',
+		'afterFn' => function() {
+			global $wikiId;
+
+			// Allow read and edit permission for requests from the server (e.g. Parsoid)
+			// Ref: https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
+			// Ref: https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
+			if ( isset( $_SERVER['REMOTE_ADDR'] ) && isset( $_SERVER['SERVER_ADDR'] )
+				&& $_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR'] )
+			{
+				$GLOBALS['wgGroupPermissions']['*']['read'] = true;
+				$GLOBALS['wgGroupPermissions']['*']['edit'] = true;
+			} else {
+				# Disable reading by anonymous users
+				$GLOBALS['wgGroupPermissions']['*']['read'] = false;
+				$GLOBALS['wgWhitelistRead'] = array ("Special:Userlogin", "MediaWiki:Common.css",
+				"MediaWiki:Common.js", "MediaWiki:Monobook.css", "MediaWiki:Monobook.js", "-" );
+				# Disable anonymous editing
+				$GLOBALS['wgGroupPermissions']['*']['edit'] = false;
+			}
+
+			// Enable by default for everybody
+			$GLOBALS['wgDefaultUserOptions']['visualeditor-enable'] = 1;
+
+			// Don't allow users to disable it
+			$GLOBALS['wgHiddenPrefs'][] = 'visualeditor-enable';
+
+			// OPTIONAL: Enable VisualEditor's experimental code features
+			#$wgDefaultUserOptions['visualeditor-enable-experimental'] = 1;
+
+			// URL to the Parsoid instance
+			// MUST NOT end in a slash due to Parsoid bug
+			// Use port 8142 if you use the Debian package
+			$GLOBALS['wgVisualEditorParsoidURL'] = 'http://127.0.0.1:8000';
+
+			// Interwiki prefix to pass to the Parsoid instance
+			// Parsoid will be called as $url/$prefix/$pagename
+			$GLOBALS['wgVisualEditorParsoidPrefix'] = $wikiId;
+
+		}
+	),
+
+
+	/**
+	 * Extensions for Elastic Search
+	 **/
+	'Elastica' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/Elastica.git',
+		'branch' => 'REL1_25',
+	),
+	'CirrusSearch' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/CirrusSearch.git',
+		'branch' => 'REL1_25',
+		'afterFn' => function(){
+			$GLOBALS['wgSearchType'] = 'CirrusSearch';
+
+			global $wikiId, $m_htdocs;
+			include "$m_htdocs/wikis/$wikiId/config/disableSearchUpdate.php";
+
+			//$wgCirrusSearchServers = array( 'search01', 'search02' );
+		},
+	),
+
 );

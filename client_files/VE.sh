@@ -23,7 +23,7 @@ done
 
 
 # MediaWiki's API URI, for parsoid
-mw_api_uri="$mw_api_protocol://$mw_api_domain/wiki/api.php"
+mw_api_uri="$mw_api_protocol://$mw_api_domain/"
 
 
 echo "******* Downloading node.js *******"
@@ -70,7 +70,7 @@ cmd_profile "END npm test parsoid"
 # TODO This part can be modified once localsettings.js is included in initial download of files
 # localsettings for parsoid
 echo "******* Downloading configuration files *******"
-cd ~/sources/meza1/client_files
+cd "$m_meza/client_files"
 
 # Copy Parsoid settings from Meza to Parsoid install
 cp ./localsettings.js /etc/parsoid/api/localsettings.js
@@ -82,24 +82,10 @@ escaped_mw_api_uri=${mw_api_uri//\//\\\/} # need to replace / with \/ for regex
 sed -r -i "s/INSERTED_BY_VE_SCRIPT/$escaped_mw_api_uri/g;" /etc/parsoid/api/localsettings.js
 
 
-# Add VE and UniversalLanguageSelector to ExtensionSettings
-cat ./ExtensionSettingsVE.php >> /var/www/meza1/htdocs/wiki/ExtensionSettings.php
-# Add VE settings to LocalSettings.php
-cat ./LocalSettingsVE.php >> /var/www/meza1/htdocs/wiki/LocalSettings.php
+#
+# Installing Extension:VisualEditor was here
+#
 
-# Run updateExtensions to install UniversalLanguageSelector and VisualEditor
-echo "******* Installing extensions *******"
-php /var/www/meza1/htdocs/wiki/extensions/ExtensionLoader/updateExtensions.php
-
-echo "******* Installing VE *******"
-cd /var/www/meza1/htdocs/wiki/extensions/VisualEditor
-git submodule update --init
-
-# Any time you run updateExtensions.php it may be required to run
-# `php maintenance/update.php` since new extension versions may be installed
-echo "******* Running update.php to update database as required *******"
-cd /var/www/meza1/htdocs/wiki/maintenance
-php update.php --quick
 
 # Create parsoid user to run parsoid node server
 cd /etc/parsoid # @issue#48: is this necessary?
@@ -114,7 +100,7 @@ chown parsoid:parsoid /etc/parsoid -R
 # https://github.com/narath/brigopedia#setup-visualeditor-extension
 # Create service script
 echo "******* Creating parsoid service *******"
-cd ~/sources/meza1/client_files
+cd "$m_meza/client_files"
 cp ./initd_parsoid.sh /etc/init.d/parsoid
 chmod 755 /etc/init.d/parsoid
 chkconfig --add /etc/init.d/parsoid
