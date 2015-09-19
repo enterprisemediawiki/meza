@@ -30,16 +30,23 @@ echo "******* Downloading node.js *******"
 cmd_profile "START node.js build"
 cd ~/sources
 
+if [ $architecture = 64 ]; then
+	node_version="node-v0.12.7-linux-x64"
+else
+	node_version="node-v0.12.7-linux-x86"
+fi
+
+
 # Download binaries
 # Ref: http://derpturkey.com/install-node-js-from-binaries/
-wget http://nodejs.org/dist/v0.12.7/node-v0.12.7-linux-x64.tar.gz
-tar -zxvf node-v0.12.7-linux-x64.tar.gz -C /usr/local/bin
-rm -f node-v0.12.7-linux-x64.tar.gz
+wget "http://nodejs.org/dist/v0.12.7/$node_version.tar.gz"
+tar -zxvf "$node_version.tar.gz" -C /usr/local/bin
+rm -f "$node_version.tar.gz"
 
 # Create a symbolic link for node that points to the new directory
 cd /usr/local/bin
-ln -s node-v0.12.7-linux-x64/bin/node node
-ln -s node-v0.12.7-linux-x64/lib/node_modules/npm/bin/npm-cli.js npm
+ln -s "$node_version/bin/node" node
+ln -s "$node_version/lib/node_modules/npm/bin/npm-cli.js" npm
 
 if [[ $PATH != *"/usr/local/bin"* ]]; then
 	PATH="/usr/local/bin:$PATH"
