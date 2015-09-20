@@ -52,7 +52,7 @@ fi
 
 
 # print title of script
-bash printTitle.sh "Begin $0"
+bash printTitle.sh "Begin import-wikis.sh"
 
 
 # If /usr/local/bin is not in PATH then add it
