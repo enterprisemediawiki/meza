@@ -293,13 +293,6 @@ $egExtensionLoaderConfig += array(
 			{
 				$GLOBALS['wgGroupPermissions']['*']['read'] = true;
 				$GLOBALS['wgGroupPermissions']['*']['edit'] = true;
-			} else {
-				# Disable reading by anonymous users
-				$GLOBALS['wgGroupPermissions']['*']['read'] = false;
-				$GLOBALS['wgWhitelistRead'] = array ("Special:Userlogin", "MediaWiki:Common.css",
-				"MediaWiki:Common.js", "MediaWiki:Monobook.css", "MediaWiki:Monobook.js", "-" );
-				# Disable anonymous editing
-				$GLOBALS['wgGroupPermissions']['*']['edit'] = false;
 			}
 
 			// Enable by default for everybody
