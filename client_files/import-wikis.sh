@@ -1,48 +1,6 @@
 #!/bin/bash
 #
-# Using a SQL file and a directory of images, import a wiki
-
-# Prior to running, first:
-#
-# 1) On your current wiki, create an images.tar.gz file from your wiki's
-#    images directory:
-#    tar -cvzf images.tar.gz ./images/*
-#    If disk space is an issue, you can alternatively just copy the files over
-#    using the instructions below.
-#
-# 2) Run mysqldump on your wiki and create wiki.sql:
-#    mysqldump -h localhost -u root -p WIKI_DB_NAME > /path/to/save/wiki.sql
-#    replace WIKI_DB_NAME with your wiki's database name
-#
-# 3) Copy both files into your new server's /var/www/meza1 directory. How to do
-#    this is up to you. You can use scp, pscp (on Windows, with Putty), you can
-#    setup a shared directory with your VM. If your current wiki is on the open
-#    Internet you can make the files available via HTTP and use wget or cURL to
-#    pull them onto your new server. Your choice!
-#
-#    To use Secure Copy use the `scp` command
-#    On Windows use `pscp` after downloading from TBD
-#    (p)scp /path/to/wiki.sql user@example.com:/var/www/meza1
-#    (p)scp /path/to/images.tar.gz user@example.com:/var/www/meza1
-#    replace "/path/to", "user", and "example.com" accordingly
-#
-#    To Secure Copy a directory (of images)
-#    scp -r images user@example.com:/var/www/meza1/images
-#
-#    Depending on permissions, you might copy these to a non-root user
-#    directory first. Then you can move them into a new images
-#    directory /var/www/meza1/images
-#    scp wiki.sql user@example.com:/home/user
-#    scp -r images user@example.com:/home/user/images
-#    Then on the new server:
-#    cd ~
-#    sudo mv wiki.sql /var/www/meza1/wiki.sql
-#    sudo mkdir /var/www/meza1/images
-#    sudo mv ./images/* /var/www/meza1/images
-#    rm -rf ./images
-#
-# 4) Run this script
-
+# import one or more wikis
 
 # must be root or sudoer
 if [ "$(whoami)" != "root" ]; then

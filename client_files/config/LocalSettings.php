@@ -8,7 +8,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 }
 
 // same value as bash variable in config.sh
-$m_htdocs = '/var/www/meza1/htdocs';
+$m_htdocs = '/opt/meza/htdocs';
 
 require_once "$m_htdocs/__common/AllWikiSettings.php";
 

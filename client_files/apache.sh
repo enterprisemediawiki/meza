@@ -50,12 +50,8 @@ chown -R apache:www /usr/local/apache2
 #
 # Setup document root
 #
-mkdir "$m_www"
-mkdir "$m_www_meza"
-mkdir "$m_htdocs"
-mkdir "$m_www_meza/logs"
-chown -R apache:www "$m_www"
-chmod -R 775 "$m_www"
+chown -R apache:www "$m_htdocs"
+chmod -R 775 "$m_htdocs"
 
 
 #
@@ -114,13 +110,6 @@ cd "$m_htdocs"
 # chkconfig httpd on
 # service httpd status
 # service httpd restart
-
-echo "add .htaccess file to htdocs root"
-cp "$m_meza/client_files/config/htaccess" ./.htaccess
-
-echo "create \"wikis\" and \"__common\" directories"
-mkdir ./wikis
-mkdir ./__common
 
 
 # modify firewall rules

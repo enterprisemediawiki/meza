@@ -84,8 +84,7 @@ WIKI=demo php extensions/TitleKey/rebuildTitleKeys.php
 # Other extensions could cause similar issues, so it's best that this go after
 # loading extensions.
 #
-cp "$m_meza/client_files/mezaCreateUser.php" /var/www/meza1/mezaCreateUser.php
-WIKI=demo php /var/www/meza1/mezaCreateUser.php --username=Admin --password=1234 --groups=sysop,bureaucrat
+WIKI=demo php "$m_meza/client_files/mezaCreateUser.php" --username=Admin --password=1234 --groups=sysop,bureaucrat
 
 #
 # Generate ES index

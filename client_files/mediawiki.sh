@@ -93,7 +93,6 @@ fi
 # Copy in LocalSettings.php
 #
 cp "$m_meza/client_files/config/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
-cp "$m_meza/client_files/config/AllWikiSettings.php" "$m_htdocs/__common/AllWikiSettings.php"
 
 #
 # Make dummy ComposerSettings.php to start. Will be replaced by correct file later.
