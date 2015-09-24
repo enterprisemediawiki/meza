@@ -26,6 +26,12 @@ architecture=32
 fi
 
 
+# Prompt user for git branch
+default_git_branch="master"
+echo -e "\nType the git branch of Meza1 you want to use and press [ENTER]:"
+read -e -i $default_git_branch git_branch
+git_branch=${git_branch:-$default_git_branch}
+
 # Prompt user for GitHub API personal access token
 default_usergithubtoken="e9191bc6d394d64011273d19f4c6be47eb10e25b" # From Oscar Rogers
 echo -e "\nIf you run this script multiple times from one IP address,"
@@ -49,12 +55,6 @@ echo -e "\nType your desired MySQL root password"
 echo -e "or leave blank for a randomly generated password and press [ENTER]:"
 read -s mysql_root_pass
 mysql_root_pass=${mysql_root_pass:-$default_mysql_root_pass}
-
-# Prompt user for git branch
-default_git_branch="master"
-echo -e "\nType the git branch of Meza1 you want to use and press [ENTER]:"
-read -e -i $default_git_branch git_branch
-git_branch=${git_branch:-$default_git_branch}
 
 # Prompt user for MW API protocol
 default_mw_api_protocol="http"
