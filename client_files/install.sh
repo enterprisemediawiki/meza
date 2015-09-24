@@ -47,7 +47,7 @@ phpversion=${phpversion:-$default_phpversion}
 default_mysql_root_pass=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
 echo -e "\nType your desired MySQL root password"
 echo -e "or leave blank for a randomly generated password and press [ENTER]:"
-read mysql_root_pass
+read -s mysql_root_pass
 mysql_root_pass=${mysql_root_pass:-$default_mysql_root_pass}
 
 # Prompt user for git branch
