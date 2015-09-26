@@ -76,11 +76,20 @@ read -e -i $default_mw_api_protocol mw_api_protocol
 mw_api_protocol=${mw_api_protocol:-$default_mw_api_protocol}
 
 # Prompt user for MW API Domain or IP address
-FOUNDETH1=`grep "eth1" /proc/net/dev`
-if [ -n "$FOUNDETH1" ]; then
-  default_mw_api_domain=`ifconfig eth1 | grep "inet " | awk -F'[: ]+' '{ print $4 }'`
+# @fixme: This seems like a lot of fragile logic to set something up for very
+#         specific cases. Perhaps that's fine, but it seems prone to breaking.
+if [ "$enterprise_linux_version" = 7 ]; then
+	ADAPTER_0_NAME=enp0s3
+	ADAPTER_1_NAME=enp0s8
 else
-  default_mw_api_domain=`ifconfig eth0 | grep "inet " | awk -F'[: ]+' '{ print $4 }'`
+	ADAPTER_0_NAME=eth0
+	ADAPTER_1_NAME=eth1
+fi
+FOUND_ADAPTER_1=`grep "$ADAPTER_1_NAME" /proc/net/dev`
+if [ -n "$FOUND_ADAPTER_1" ]; then
+	default_mw_api_domain="`ifconfig $ADAPTER_1_NAME | grep "inet " | awk -F'[: ]+' '{ print $4 }'`"
+else
+	default_mw_api_domain="`ifconfig $ADAPTER_0_NAME | grep "inet " | awk -F'[: ]+' '{ print $4 }'`"
 fi
 echo -e "\nType domain or IP address of your wiki and press [ENTER]:"
 read -e -i $default_mw_api_domain mw_api_domain
