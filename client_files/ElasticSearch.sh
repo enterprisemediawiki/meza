@@ -65,7 +65,7 @@ yum -y install elasticsearch
 
 # Configure Elasticsearch to automatically start during bootup
 echo "******* Adding Elasticsearch service *******"
-chkconfig --add elasticsearch
+chkconfig elasticsearch on
 
 # *** MANUAL INSTALLATION OPTION (delete) ***
 # cd ~/sources
