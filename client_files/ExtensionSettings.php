@@ -337,4 +337,14 @@ $egExtensionLoaderConfig += array(
 		},
 	),
 
+	'Echo' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/Echo.git',
+		'branch' => 'REL1_25',
+	),
+
+	'Thanks' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/Thanks.git',
+		'branch' => 'REL1_25',
+	),
+
 );
