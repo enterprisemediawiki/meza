@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Setup everything that should be installed with yum. 
+# Setup everything that should be installed with yum.
 #
 
 print_title "Starting script yums.sh"
@@ -18,15 +18,28 @@ fi
 
 
 if [ "$architecture" = "32" ]; then
-    echo "Downloading RPM for 32-bit"
-    wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.i686.rpm
+    echo "Downloading EPEL for 32-bit"
+    epel_version="6/i386/epel-release-6-8.noarch.rpm"
 elif [ "$architecture" = "64" ]; then
-    echo "Downloading RPM for 64-bit"
-    wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+
+	if [ "$enterprise_linux_version" = "6" ]; then
+	    echo "Downloading EPEL for 64-bit Enterprise Linux v6"
+	    epel_version="6/x86_64/epel-release-6-8.noarch.rpm"
+	else
+		echo "Downloading EPEL for 64-bit Enterprise Linux v7"
+		epel_version="7/x86_64/e/epel-release-7-5.noarch.rpm"
+	fi
+
 else
     echo -e "There was an error in choosing architecture."
     exit 1
 fi
+
+
+# http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+# http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+# http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+curl -LO "http://dl.fedoraproject.org/pub/epel/$epel_version"
 
 
 #
@@ -49,7 +62,7 @@ else
 
 	# Enable "optional RPMs" repo to be able to get: libc-client-devel.i686,
 	# libc-client-devel, libicu-devel, t1lib-devel, aspell-devel, libvpx-devel
-	# and libtidy-devel 
+	# and libtidy-devel
     echo "Enable \"Optional RPMs\" repo for RedHat"
 	subscription-manager repos --enable=rhel-6-server-optional-rpms
 fi
@@ -62,12 +75,11 @@ cmd_profile "START yum groupinstall development"
 yum groupinstall -y development
 cmd_profile "END yum groupinstall development"
 
+
 #
-# Import RPM repo so libmcrypt-devel can be installed (not in default repo)
+# Import EPEL repo so libmcrypt-devel can be installed (not in default repo)
 #
-rpm --import http://apt.sw.be/RPM-GPG-KEY.dag.txt
-rpm -K rpmforge-release-0.5.3-1.el6.rf.*.rpm # Verifies the package
-rpm -i rpmforge-release-0.5.3-1.el6.rf.*.rpm
+rpm -ivh epel-release-*.noarch.rpm
 
 
 #
@@ -89,8 +101,6 @@ yum install -y \
     pcre-devel \
     openssl-devel \
     curl-devel \
-    libc-client-devel.i686 \
-    libc-client-devel \
     libxml2-devel \
     libXpm-devel \
     gmp-devel \

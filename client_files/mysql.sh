@@ -18,7 +18,13 @@ done
 #
 # Install MySQL repo
 #
-yum -y install http://dev.mysql.com/get/mysql-community-release-el6-5.noarch.rpm
+if [ "$enterprise_linux_version" = "6" ]; then
+	echo "Install MySQL for Enterprise Linux 6"
+    yum -y install https://dev.mysql.com/get/mysql-community-release-el6-5.noarch.rpm
+else
+	echo "Install MySQL for Enterprise Linux 7"
+	yum -y install https://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
+fi
 
 
 #

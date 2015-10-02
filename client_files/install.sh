@@ -26,6 +26,19 @@ architecture=32
 fi
 
 
+#
+# CentOS/RHEL version 7 or 6?
+#
+# note: /etc/os-release does not exist in CentOS 6, but this works anyway
+if grep -Fxq "VERSION_ID=\"7\"" /etc/os-release
+then
+    echo "Setting Enterprise Linux version to \"7\""
+    enterprise_linux_version=7
+else
+    echo "Setting Enterprise Linux version to \"6\""
+    enterprise_linux_version=6
+fi
+
 # Prompt user for git branch
 default_git_branch="master"
 echo -e "\nType the git branch of Meza1 you want to use and press [ENTER]:"
@@ -63,12 +76,35 @@ read -e -i $default_mw_api_protocol mw_api_protocol
 mw_api_protocol=${mw_api_protocol:-$default_mw_api_protocol}
 
 # Prompt user for MW API Domain or IP address
-FOUNDETH1=`grep "eth1" /proc/net/dev`
-if [ -n "$FOUNDETH1" ]; then
-  default_mw_api_domain=`ifconfig eth1 | grep "inet " | awk -F'[: ]+' '{ print $4 }'`
+# @fixme: This seems like a lot of fragile logic to set something up for very
+#         specific cases. Perhaps that's fine, but it seems prone to breaking.
+if [ "$enterprise_linux_version" = 7 ]; then
+
+	FOUND_ADAPTER_1=`grep "enp0s8" /proc/net/dev`
+
+	if [ -n "$FOUND_ADAPTER_1" ]; then
+		ADAPTER_NAME="enp0s8"
+	else
+		ADAPTER_NAME="enp0s3"
+	fi
+
+	default_mw_api_domain="`ip addr | grep $ADAPTER_NAME | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'`"
+
 else
-  default_mw_api_domain=`ifconfig eth0 | grep "inet " | awk -F'[: ]+' '{ print $4 }'`
+
+	FOUND_ADAPTER_1=`grep "eth1" /proc/net/dev`
+
+	if [ -n "$FOUND_ADAPTER_1" ]; then
+		ADAPTER_NAME="eth1"
+	else
+		ADAPTER_NAME="eth0"
+	fi
+
+	default_mw_api_domain="`ifconfig $ADAPTER_NAME | grep "inet " | awk -F'[: ]+' '{ print $4 }'`"
+
 fi
+
+
 echo -e "\nType domain or IP address of your wiki and press [ENTER]:"
 read -e -i $default_mw_api_domain mw_api_domain
 mw_api_domain=${mw_api_domain:-$default_mw_api_domain}
