@@ -258,11 +258,3 @@ $wgImageMagickConvertCommand = '/usr/local/bin/convert';
  **/
 
 include "$m_htdocs/__common/ComposerSettings.php";
-
-/**
- * Echo Settings
- **/
-
-// Use password sender email for Echo emails (or change here to customize)
-// https://www.mediawiki.org/wiki/Extension:Echo#Configuration
-$wgEchoEmailFooterAddress = $wgPasswordSender;

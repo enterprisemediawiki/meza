@@ -340,6 +340,8 @@ $egExtensionLoaderConfig += array(
 	'Echo' => array(
 		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/Echo.git',
 		'branch' => 'REL1_25',
+        'globals' => array(
+            'wgEchoEmailFooterAddress' => $GLOBALS['wgPasswordSender'],
 	),
 
 	'Thanks' => array(
