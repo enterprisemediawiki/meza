@@ -285,6 +285,16 @@ $egExtensionLoaderConfig += array(
 		'afterFn' => function() {
 			global $wikiId;
 
+			// Allow read and edit permission for requests from the server (e.g. Parsoid)
+			// Ref: https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
+			// Ref: https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
+			if ( isset( $_SERVER['REMOTE_ADDR'] ) && isset( $_SERVER['SERVER_ADDR'] )
+				&& $_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR'] )
+			{
+				$GLOBALS['wgGroupPermissions']['*']['read'] = true;
+				$GLOBALS['wgGroupPermissions']['*']['edit'] = true;
+			}
+
 			// Enable by default for everybody
 			$GLOBALS['wgDefaultUserOptions']['visualeditor-enable'] = 1;
 

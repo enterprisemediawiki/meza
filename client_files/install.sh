@@ -39,6 +39,11 @@ else
     enterprise_linux_version=6
 fi
 
+# Prompt user for git branch
+default_git_branch="master"
+echo -e "\nType the git branch of Meza1 you want to use and press [ENTER]:"
+read -e -i $default_git_branch git_branch
+git_branch=${git_branch:-$default_git_branch}
 
 # Prompt user for GitHub API personal access token
 default_usergithubtoken="e9191bc6d394d64011273d19f4c6be47eb10e25b" # From Oscar Rogers
@@ -51,42 +56,64 @@ read usergithubtoken
 usergithubtoken=${usergithubtoken:-$default_usergithubtoken}
 
 # Prompt user for PHP version
-while [ -z "$phpversion" ]
-do
+default_phpversion="5.4.42"
 echo -e "\nVisit http://php.net/downloads.php for version numbers"
-echo -e "Enter version of PHP you would like (such as 5.4.42) and press [ENTER]: "
-read phpversion
-done
+echo -e "Type the version of PHP you would like (such as 5.4.42) and press [ENTER]:"
+read -e -i $default_phpversion phpversion
+phpversion=${phpversion:-$default_phpversion}
 
-while [ -z "$mysql_root_pass" ]
-do
-echo -e "\nEnter MySQL root password and press [ENTER]: "
+# Prompt user for MySQL password
+default_mysql_root_pass=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
+echo -e "\nType your desired MySQL root password"
+echo -e "or leave blank for a randomly generated password and press [ENTER]:"
 read -s mysql_root_pass
-done
+mysql_root_pass=${mysql_root_pass:-$default_mysql_root_pass}
 
-while [ -z "$git_branch" ]
-do
-echo -e "\nEnter git branch of Meza1 you want to use (generally this is \"master\") [ENTER]: "
-read git_branch
-done
+# Prompt user for MW API protocol
+default_mw_api_protocol="http"
+echo -e "\nType http or https for MW API and press [ENTER]:"
+read -e -i $default_mw_api_protocol mw_api_protocol
+mw_api_protocol=${mw_api_protocol:-$default_mw_api_protocol}
 
-while [ "$mw_api_protocol" != "http" ] && [ "$mw_api_protocol" != "https" ]
-do
-echo -e "\nType http or https for MW API and press [ENTER]: "
-read mw_api_protocol
-done
+# Prompt user for MW API Domain or IP address
+# @fixme: This seems like a lot of fragile logic to set something up for very
+#         specific cases. Perhaps that's fine, but it seems prone to breaking.
+if [ "$enterprise_linux_version" = 7 ]; then
 
-while [ -z "$mw_api_domain" ]
-do
-echo -e "\nType domain or IP address of your wiki and press [ENTER]: "
-read mw_api_domain
-done
+	FOUND_ADAPTER_1=`grep "enp0s8" /proc/net/dev`
 
-while [ -z "$mediawiki_git_install" ]
-do
-echo -e "\nInstall MediaWiki with git? (y/n) [ENTER]: "
-read mediawiki_git_install
-done
+	if [ -n "$FOUND_ADAPTER_1" ]; then
+		ADAPTER_NAME="enp0s8"
+	else
+		ADAPTER_NAME="enp0s3"
+	fi
+
+	default_mw_api_domain="`ip addr | grep $ADAPTER_NAME | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'`"
+
+else
+
+	FOUND_ADAPTER_1=`grep "eth1" /proc/net/dev`
+
+	if [ -n "$FOUND_ADAPTER_1" ]; then
+		ADAPTER_NAME="eth1"
+	else
+		ADAPTER_NAME="eth0"
+	fi
+
+	default_mw_api_domain="`ifconfig $ADAPTER_NAME | grep "inet " | awk -F'[: ]+' '{ print $4 }'`"
+
+fi
+
+
+echo -e "\nType domain or IP address of your wiki and press [ENTER]:"
+read -e -i $default_mw_api_domain mw_api_domain
+mw_api_domain=${mw_api_domain:-$default_mw_api_domain}
+
+# Prompt user for MW install method
+default_mediawiki_git_install="y"
+echo -e "\nInstall MediaWiki with git? (y/n) [ENTER]:"
+read -e -i $default_mediawiki_git_install mediawiki_git_install
+mediawiki_git_install=${mediawiki_git_install:-$default_mediawiki_git_install}
 
 
 # Check if git installed, and install it if required
