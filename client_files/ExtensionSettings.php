@@ -342,6 +342,7 @@ $egExtensionLoaderConfig += array(
 		'branch' => 'REL1_25',
         'globals' => array(
             'wgEchoEmailFooterAddress' => $GLOBALS['wgPasswordSender'],
+            )
 	),
 
 	'Thanks' => array(
