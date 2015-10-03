@@ -196,7 +196,7 @@ for d in */ ; do
 	# if CirrusSearch extension exists. On first install it will not yet.
 	if [ -d "$m_mediawiki/extensions/CirrusSearch" ]; then
 		echo "Building Elastic Search index"
-		source "$m_meza/client_files/elastic-build-index.sh"
+		source "$m_meza/scripts/elastic-build-index.sh"
 	else
 		echo -e "\nSKIPPING elastic-build-index.sh (no CirrusSearch)"
 	fi

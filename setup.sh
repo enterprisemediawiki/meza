@@ -15,8 +15,8 @@ done
 # Load Meza1 repository
 #
 cd ~
-mkdir sources
-cd sources
+mkdir mezadownloads
+cd mezadownloads
 curl -L https://github.com/enterprisemediawiki/Meza1/tarball/centos7 > meza1.tar.gz # @FIXME: change to master!!!
 mkdir meza1
 tar xpvf meza1.tar.gz -C ./meza1 --strip-components 1
@@ -56,7 +56,7 @@ sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' "./$network_adapter1"
 
 # note: prefix with \ removes root's alias in .bashrc to "cp -i" which forces cp
 # to ask the user if they want to overwrite existing. We do want to overwrite.
-\cp "/root/sources/meza1/client_files/$network_adapter2" "./$network_adapter2"
+\cp "/root/mezadownloads/meza1/scripts/$network_adapter2" "./$network_adapter2"
 
 # modify IP address as required:
 sed -r -i "s/IPADDR=192.168.56.56/IPADDR=$ipaddr/g;" "./$network_adapter2"

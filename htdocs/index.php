@@ -33,7 +33,9 @@
 	$wikis = array_slice( scandir( '/opt/meza/htdocs/wikis' ), 2 );
 
 	foreach( $wikis as $wiki ) {
-		echo "<li><a href='$wiki'>$wiki</a></li>";
+		if ( is_dir( __DIR__ . "/$wiki" ) ) {
+			echo "<li><a href='$wiki'>$wiki</a></li>";
+		}
 	}
 
 ?>

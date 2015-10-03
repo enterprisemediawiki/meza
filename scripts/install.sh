@@ -122,10 +122,10 @@ if ! hash git 2>/dev/null; then
     yum install git -y
 fi
 
-# if no sources directory, create it
+# if no mezadownloads directory, create it
 # source files will be downloaded here and deleted later
-if [ ! -d ~/sources ]; then
-	mkdir ~/sources
+if [ ! -d ~/mezadownloads ]; then
+	mkdir ~/mezadownloads
 fi
 
 
@@ -200,37 +200,37 @@ fi
 
 # Load config constants. Unfortunately right now have to write out full path to
 # Meza1 since we can't be certain of consistent method of accessing install.sh.
-source /opt/meza/client_files/config.sh
+source /opt/meza/scripts/config.sh
 
 
 # @todo: Need to test for yums.sh functionality prior to proceeding
 #    with apache.sh, and Apache functionality prior to proceeding
 #    with php.sh, and so forth.
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source yums.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source install-imagick.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source apache.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source php.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source mysql.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source VE.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source ElasticSearch.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source mediawiki.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source extensions.sh"
 
 # Remove GitHub API personal access token from .composer dir
@@ -240,5 +240,5 @@ rm -f ~/.composer/auth.json
 
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
-cat "$m_meza/client_files/pigeon.txt"
+cat "$m_meza/scripts/pigeon.txt"
 

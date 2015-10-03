@@ -4,8 +4,8 @@
 
 print_title "Starting script apache.sh"
 
-# change to sources directory
-cd ~/sources
+# change to mezadownloads directory
+cd ~/mezadownloads
 
 #
 # Download Apache httpd, Apache Portable Runtime (APR) and APR-util
@@ -31,7 +31,8 @@ tar -zxvf "apr-$apr_version.tar.gz"
 tar -zxvf "apr-util-$aprutil_version.tar.gz"
 cp -r "apr-$apr_version" "httpd-$httpd_version/srclib/apr"
 cp -r "apr-util-$aprutil_version" "httpd-$httpd_version/srclib/apr-util"
-cd "httpd-$httpd_version"
+mv "httpd-$httpd_version" "$m_meza/sources/httpd-$httpd_version"
+cd "$m_meza/sources/httpd-$httpd_version"
 cmd_profile "START apache build"
 ./configure --enable-ssl --enable-so --with-included-apr --with-mpm=event
 make
@@ -75,12 +76,12 @@ cd /usr/local/apache2/conf
 
 #
 # Commenting out all modifications to httpd.conf. These should all be in
-# "Meza1/client_files/config/httpd.conf" now. Anything
+# "Meza1/scripts/config/httpd.conf" now. Anything
 #
 # update document root
 # sed -r -i 's/\/usr\/local\/apache2\/htdocs/\/var\/www\/meza1\/htdocs/g;' ./httpd.conf
 # direct apache to execute PHP
-# cat $m_meza/client_files/httpd-conf-additions.conf >> ./httpd.conf
+# cat $m_meza/scripts/httpd-conf-additions.conf >> ./httpd.conf
 # serve index.php as default file
 # sed -r -i 's/DirectoryIndex\s*index.html/DirectoryIndex index.php index.html/g;' ./httpd.conf
 # modify user that will handle web requests
@@ -90,16 +91,16 @@ cd /usr/local/apache2/conf
 
 # rename default configuration file, get Meza1 config file
 mv httpd.conf httpd.default.conf
-cp "$m_meza/client_files/config/httpd.conf" ./httpd.conf
+cp "$m_meza/scripts/config/httpd.conf" ./httpd.conf
 
 # create service script
 cd /etc/init.d
-cp "$m_meza/client_files/initd_httpd.sh" ./httpd
+cp "$m_meza/scripts/initd_httpd.sh" ./httpd
 chmod +x /etc/init.d/httpd
 
 # create logrotate file
 cd /etc/logrotate.d
-cp "$m_meza/client_files/logrotated_httpd" ./httpd
+cp "$m_meza/scripts/logrotated_httpd" ./httpd
 
 cd "$m_htdocs"
 
