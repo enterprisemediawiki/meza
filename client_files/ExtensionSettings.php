@@ -348,6 +348,9 @@ $egExtensionLoaderConfig += array(
 	'Thanks' => array(
 		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/Thanks.git',
 		'branch' => 'REL1_25',
+        'globals' => array(
+            'wgThanksConfirmationRequired' = false;
+            )
 	),
 
 );
