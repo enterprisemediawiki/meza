@@ -2,11 +2,11 @@
 #
 # Install ImageMagick, Ghostscript and Xpdf
 
-print_title "Starting script install-imagick.sh"
+print_title "Starting script imagemagick.sh"
 
 
 if [ "$(whoami)" != "root" ]; then
-	echo "Try running this script with sudo: \"sudo bash install-imagick.sh\""
+	echo "Try running this script with sudo: \"sudo bash imagemagick.sh\""
 	exit 1
 fi
 
@@ -18,7 +18,7 @@ wget http://www.imagemagick.org/download/ImageMagick.tar.gz
 tar xvzf ImageMagick.tar.gz
 
 # Different versions may be downloaded, * to catch whatever version
-mv ImageMagick* "$m_meza/sources/ImageMagick"
+mv ImageMagick-* "$m_meza/sources/ImageMagick"
 cd "$m_meza/sources/ImageMagick"
 
 cmd_profile "START build ImageMagick"

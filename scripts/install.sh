@@ -210,7 +210,7 @@ cd "$m_meza/scripts"
 cmd_tee "source yums.sh"
 
 cd "$m_meza/scripts"
-cmd_tee "source install-imagick.sh"
+cmd_tee "source imagemagick.sh"
 
 cd "$m_meza/scripts"
 cmd_tee "source apache.sh"
@@ -238,6 +238,8 @@ cmd_tee "source extensions.sh"
 #        in case there are other authentication entries
 rm -f ~/.composer/auth.json
 
+# remove downloads directory (miscellaneous downloaded files)
+rm -rf /root/mezadownloads
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
 cat "$m_meza/scripts/pigeon.txt"
