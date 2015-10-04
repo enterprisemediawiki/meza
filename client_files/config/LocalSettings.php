@@ -258,8 +258,3 @@ $wgImageMagickConvertCommand = '/usr/local/bin/convert';
  **/
 
 include "$m_htdocs/__common/ComposerSettings.php";
-
-
-
-
-
