@@ -95,7 +95,6 @@ sed -r -i "s/INSERTED_BY_VE_SCRIPT/$escaped_mw_api_uri/g;" /etc/parsoid/api/loca
 
 
 # Create parsoid user to run parsoid node server
-cd /etc/parsoid # @issue#48: is this necessary?
 useradd parsoid
 
 # Grant parsoid user ownership of /opt/services/parsoid
