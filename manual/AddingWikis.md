@@ -71,3 +71,10 @@ The contents of `config` are as follows:
 
 The `wiki.sql` file is what will build your database. You can generate this file by running the `mysqldump` command on your current wiki. The command may look something like: `mysqldump -u my_username -p my_database > /path/to/your/output/file.sql`
 
+### Transferring your files to your wiki
+
+To transfer files to your server you can use SCP (or PSCP on Windows):
+
+```
+(p)scp -r /path/to/your/wiki/imports user@example.com:/home/user/wikis
+```
