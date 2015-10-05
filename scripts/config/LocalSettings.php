@@ -4,7 +4,7 @@
 
 # Protect against web entry
 if ( !defined( 'MEDIAWIKI' ) ) {
-        exit;
+	exit;
 }
 
 // same value as bash variable in config.sh
@@ -109,6 +109,39 @@ if ( isset( $mezaCustomDBuser ) && isset ( $mezaCustomDBpass ) ) {
 } else {
 	require_once "$m_htdocs/__common/dbUserPass.php";
 }
+
+## Shared database settings
+if ( file_exists( "$m_htdocs/__common/primewiki" ) ) {
+
+	// grab prime wiki data using closure to encapsulate the data
+	// and not overwrite existing config ($wgSitename, etc)
+	$primewiki = call_user_func( function() use ( $m_htdocs ) {
+
+		$primeWikiId = trim( file_get_contents( "$m_htdocs/__common/primewiki" ) );
+
+		require_once "$m_htdocs/wikis/$primeWikiId/config/setup.php";
+
+		if ( isset( $mezaCustomDBname ) ) {
+			$primeWikiDBname = $mezaCustomDBname;
+		} else {
+			$primeWikiDBname = "wiki_$primeWikiId";
+		}
+
+		return array(
+			'id' => $primeWikiId,
+			'database' => $primeWikiDBname,
+		);
+	} );
+
+	$wgSharedDB = $primewiki[ 'database' ];
+	$wgSharedTables = array(
+		'user',            // default
+		'user_properties', // default
+		'interwiki',       // additional
+	);
+
+}
+
 
 # MySQL specific settings
 $wgDBprefix = "";

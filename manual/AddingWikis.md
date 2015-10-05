@@ -71,3 +71,13 @@ The contents of `config` are as follows:
 
 The `wiki.sql` file is what will build your database. You can generate this file by running the `mysqldump` command on your current wiki. The command may look something like: `mysqldump -u my_username -p my_database > /path/to/your/output/file.sql`
 
+## Making a wiki the "primary" wiki
+
+A wiki can be setup as the "primary" wiki. This means that all other wikis will use its user and interwiki tables. If all wikis are related, and are going to have similar users, you should do this. To make one wiki the primary wiki simply add a file called "primewiki" to the `__common` directory:
+
+```bash
+cd /opt/meza/htdocs/__common
+echo "wiki-id" > primewiki
+```
+
+In this example "wiki-id" is the ID of the wiki you want to be primary.
