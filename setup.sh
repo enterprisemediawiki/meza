@@ -17,7 +17,7 @@ done
 cd ~
 mkdir sources
 cd sources
-curl -L https://github.com/enterprisemediawiki/Meza1/tarball/centos7 > meza1.tar.gz # @FIXME: change to master!!!
+curl -L https://github.com/enterprisemediawiki/Meza1/tarball/master > meza1.tar.gz # @FIXME: change to master!!!
 mkdir meza1
 tar xpvf meza1.tar.gz -C ./meza1 --strip-components 1
 
