@@ -81,3 +81,11 @@ echo "wiki-id" > primewiki
 ```
 
 In this example "wiki-id" is the ID of the wiki you want to be primary.
+
+### Transferring your files to your wiki
+
+To transfer files to your server you can use SCP (or PSCP on Windows):
+
+```
+(p)scp -r /path/to/your/wiki/imports user@example.com:/home/user/wikis
+```
