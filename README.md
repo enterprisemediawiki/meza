@@ -38,3 +38,6 @@ While the goal is to have an entirely scripted install of CentOS and the entire 
 ## See Also
 
 * [Creating and importing wikis](manual/AddingWikis.md)
+
+## Contributing
+If you'd like to contribute to this project, please see [this guide on how to help](CONTRIBUTING.md).
