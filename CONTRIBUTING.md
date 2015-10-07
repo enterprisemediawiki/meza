@@ -40,7 +40,17 @@ The following tests should be performed if time allows, or if a change is likely
 
 * Verify PDFHandler functioning (PDF images shown on PDF file pages)
 * Verify image security: users unable to view images when not logged in
-
+  * Test access to images when not logged into the wiki (use another browser)
+    * Go to a file page with a logged in user and click the image and open in a new tab; verify you can view the image
+    * Open that same image in another browser without being logged in; verify you can view the image
+  * Add to `LocalSettings.php` to remove anonymous viewing:
+    * `$wgGroupPermissions['*']['read'] = false;`
+  * Test access to images from both browsers:
+    * Verify logged in user can view image
+    * Verify anonymous user CANNOT view image
+  * Attempt to directly access image via URI like `http://example.com/wikis/<wiki-id>/images/a/a1/Image.png`
+    * Verify logged in user can view image
+    * Verify anonymous user CANNOT view image
 
 #### Pre-release testing requirements
 
