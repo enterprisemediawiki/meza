@@ -1,10 +1,10 @@
-# Meza1 v0.4
+# meza v0.4
 
-Meza1 configures a CentOS/RedHat server with a complete enterprise MediaWiki installation.
+meza configures a CentOS/RedHat server with a complete enterprise MediaWiki installation.
 
 ## Server setup
 
-Depending on where you're installing Meza1 you'll have different initial setup steps. The following environments have been tested.
+Depending on where you're installing meza you'll have different initial setup steps. The following environments have been tested.
 
 * [Setup Digital Ocean](manual/SetupDigitalOcean.md)
 * [Setup VirtualBox](manual/1.0-SettingUpVirtualBox.md)
@@ -17,13 +17,13 @@ Login to your server and run the following:
 
 ```
 cd ~
-curl -LO https://raw.githubusercontent.com/enterprisemediawiki/Meza1/master/scripts/install.sh
+curl -LO https://raw.githubusercontent.com/enterprisemediawiki/meza/master/scripts/install.sh
 sudo bash install.sh
 ```
 
-This script will retrieve a script from the Meza1 repository, which will subsequently retrieve the entire Meza1 repository. The script will ask you several questions regarding how to setup your MediaWiki environment. The parameters requested are:
+This script will retrieve a script from the meza repository, which will subsequently retrieve the entire meza repository. The script will ask you several questions regarding how to setup your MediaWiki environment. The parameters requested are:
 
-* **Git branch**: The branch of Meza1 to use. This is mostly for testing. Type "master" in most cases.
+* **Git branch**: The branch of meza to use. This is mostly for testing. Type "master" in most cases.
 * **GitHub Token**: This allows you to download more things from GitHub than you would normally. Using the default is fine.
 * **PHP version**: Right now, use 5.4.42. In the future more versions will be supported
 * **MySQL password**: Pick a good, secure password for MySQL root user

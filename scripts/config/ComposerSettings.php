@@ -2,7 +2,7 @@
 
 global $wikiId;
 
-enableSemantics( "Meza1.$wikiId" );
+enableSemantics( "meza.$wikiId" );
 
 // SMW Settings Overrides:
 $smwgQMaxSize = 5000;

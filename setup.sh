@@ -1,25 +1,25 @@
 #!/bin/bash
 #
 # Setup network configuration for a CentOS 6.6 virtual machine on VirtualBox
-# Please see directions at https://github.com/enterprisemediawiki/meza1
+# Please see directions at https://github.com/enterprisemediawiki/meza
 
 # Get host-only IP address
 while [ -z "$ipaddr" ]
 do
-echo -e "Enter your desired IP address (follow Meza1 VirtualBox Networking steps)"
+echo -e "Enter your desired IP address (follow meza VirtualBox Networking steps)"
 read -e -i "192.168.56.56" ipaddr
 done
 
 
 #
-# Load Meza1 repository
+# Load meza repository
 #
 cd ~
 mkdir mezadownloads
 cd mezadownloads
-curl -L https://github.com/enterprisemediawiki/Meza1/tarball/master > meza1.tar.gz
-mkdir meza1
-tar xpvf meza1.tar.gz -C ./meza1 --strip-components 1
+curl -L https://github.com/enterprisemediawiki/meza/tarball/master > meza.tar.gz
+mkdir meza
+tar xpvf meza.tar.gz -C ./meza --strip-components 1
 
 #
 # Modify network scripts in /etc/sysconfig/network-scripts,
@@ -56,7 +56,7 @@ sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' "./$network_adapter1"
 
 # note: prefix with \ removes root's alias in .bashrc to "cp -i" which forces cp
 # to ask the user if they want to overwrite existing. We do want to overwrite.
-\cp "/root/mezadownloads/meza1/scripts/$network_adapter2" "./$network_adapter2"
+\cp "/root/mezadownloads/meza/scripts/$network_adapter2" "./$network_adapter2"
 
 # modify IP address as required:
 sed -r -i "s/IPADDR=192.168.56.56/IPADDR=$ipaddr/g;" "./$network_adapter2"

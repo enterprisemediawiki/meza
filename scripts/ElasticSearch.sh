@@ -82,7 +82,7 @@ chkconfig elasticsearch on
 
 echo "******* Adding Elasticsearch configuration *******"
 # Add host name per https://github.com/elastic/elasticsearch/issues/6611
-echo "127.0.0.1 Meza1" >> /etc/hosts
+echo "127.0.0.1 meza" >> /etc/hosts
 
 # Rename the standard config file and copy over our custom config file
 cd /etc/elasticsearch

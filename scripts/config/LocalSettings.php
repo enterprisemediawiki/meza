@@ -1,5 +1,5 @@
 <?php
-# This is the main configuration settings for all Meza1 wikis. This file
+# This is the main configuration settings for all meza wikis. This file
 # should not be edited. Instead edit TBD. @todo @fixme
 
 # Protect against web entry

@@ -14,7 +14,7 @@ bash printTitle.sh "Begin import-wikis.sh"
 
 
 # If /usr/local/bin is not in PATH then add it
-# Ref enterprisemediawiki/Meza1#68 "Run install.sh with non-root user"
+# Ref enterprisemediawiki/meza#68 "Run install.sh with non-root user"
 if [[ $PATH != *"/usr/local/bin"* ]]; then
 	PATH="/usr/local/bin:$PATH"
 fi
@@ -169,7 +169,7 @@ for d in */ ; do
 
 
 	# Run update.php. The database you imported may not be up to the same version
-	# as Meza1, and thus you must update it.
+	# as meza, and thus you must update it.
 	echo "Running MediaWiki maintenance script \"update.php\""
 	WIKI="$wiki_id" php "$m_mediawiki/maintenance/update.php" --quick
 

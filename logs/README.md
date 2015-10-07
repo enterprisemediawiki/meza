@@ -1,3 +1,3 @@
-# Meza1 Logs
+# meza Logs
 
-This directory will contain log files for Meza1 operations (installation, upgrade, etc).
+This directory will contain log files for meza operations (installation, upgrade, etc).

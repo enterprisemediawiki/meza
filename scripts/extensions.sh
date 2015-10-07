@@ -15,7 +15,7 @@ wiki_name="Demo Wiki"
 source "$m_meza/scripts/create-wiki.sh"
 
 # Install extensions installed via Composer
-echo -e "\n\n## Meza1: Install composer-supported extensions"
+echo -e "\n\n## meza: Install composer-supported extensions"
 cd "$m_mediawiki"
 cmd_profile "START extensions composer require"
 composer require \
@@ -37,16 +37,16 @@ rm -rf "$m_htdocs/__common/ComposerSettings.php"
 cp "$m_meza/scripts/config/ComposerSettings.php" "$m_htdocs/__common/ComposerSettings.php"
 
 # Clone ExtensionLoader
-echo -e "\n\n## Meza1: Install ExtensionLoader and apply changes to MW settings"
+echo -e "\n\n## meza: Install ExtensionLoader and apply changes to MW settings"
 cd "$m_mediawiki/extensions"
 git clone https://github.com/jamesmontalvo3/ExtensionLoader.git
 cd ..
 
-# Add ExtensionSettings.php (used by ExtensionLoader) from Meza1 repo
+# Add ExtensionSettings.php (used by ExtensionLoader) from meza repo
 cp "$m_meza/scripts/ExtensionSettings.php" ./ExtensionSettings.php
 
 # Install extensions and update database
-echo -e "\n\n## Meza1: update/install extensions"
+echo -e "\n\n## meza: update/install extensions"
 cmd_profile "START extension loader install"
 WIKI=demo php extensions/ExtensionLoader/updateExtensions.php
 cmd_profile "END extension loader install"
@@ -68,11 +68,11 @@ WIKI=demo php maintenance/update.php --quick
 
 
 # Import pages required for SemanticMeetingMinutes and rebuild indices
-echo -e "\n\n## Meza1: import pages for SemanticMeetingMinutes"
+echo -e "\n\n## meza: import pages for SemanticMeetingMinutes"
 WIKI=demo php maintenance/importDump.php < ./extensions/SemanticMeetingMinutes/ImportFiles/import.xml
-echo -e "\n\n## Meza1: rebuildrecentchanges.php"
+echo -e "\n\n## meza: rebuildrecentchanges.php"
 WIKI=demo php maintenance/rebuildrecentchanges.php
-echo -e "\n\n## Meza1: Extension:TitleKey rebuildTitleKeys.php"
+echo -e "\n\n## meza: Extension:TitleKey rebuildTitleKeys.php"
 WIKI=demo php extensions/TitleKey/rebuildTitleKeys.php
 
 #

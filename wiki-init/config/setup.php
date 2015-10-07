@@ -19,7 +19,7 @@
 $wgSitename = 'placeholder';
 
 /**
- * Meza1 uses an authentication system with a few default types. They are:
+ * meza uses an authentication system with a few default types. They are:
  * ndc_closed, ndc_open, local_dev. FIXME: need better docs
  **/
 $mezaAuthType = 'placeholder';
@@ -38,7 +38,7 @@ $mezaDebug = false;
 $mezaEnableWikiEmail = true;
 
 /**
- * It is possible to override the standard database naming used by the Meza1
+ * It is possible to override the standard database naming used by the meza
  * system. Simply uncomment this line and enter your custom name.
  **/
 // $mezaCustomDBname = '';

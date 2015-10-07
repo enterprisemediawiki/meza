@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Setup the entire Meza1 platform
+# Setup the entire meza platform
 
 if [ "$(whoami)" != "root" ]; then
 	echo "Try running this script with sudo: \"sudo bash install.sh\""
@@ -8,12 +8,12 @@ if [ "$(whoami)" != "root" ]; then
 fi
 
 # If /usr/local/bin is not in PATH then add it
-# Ref enterprisemediawiki/Meza1#68 "Run install.sh with non-root user"
+# Ref enterprisemediawiki/meza#68 "Run install.sh with non-root user"
 if [[ $PATH != *"/usr/local/bin"* ]]; then
 	PATH="/usr/local/bin:$PATH"
 fi
 
-echo -e "\nWelcome to Meza1 v0.2.1\n"
+echo -e "\nWelcome to meza v0.4\n"
 
 
 #
@@ -41,7 +41,7 @@ fi
 
 # Prompt user for git branch
 default_git_branch="master"
-echo -e "\nType the git branch of Meza1 you want to use and press [ENTER]:"
+echo -e "\nType the git branch of meza you want to use and press [ENTER]:"
 read -e -i $default_git_branch git_branch
 git_branch=${git_branch:-$default_git_branch}
 
@@ -157,11 +157,11 @@ cmd_tee()
 	cmd_profile "END $*"
 }
 
-# function to install Meza1 via git
+# function to install meza via git
 install_via_git()
 {
 	cd /opt
-	git clone https://github.com/enterprisemediawiki/Meza1 meza
+	git clone https://github.com/enterprisemediawiki/meza meza
 	cd meza
 	git checkout "$git_branch"
 }
@@ -181,16 +181,16 @@ EOM
 }
 
 
-# no meza1 directory
+# no meza directory
 if [ ! -d /opt/meza ]; then
 	install_via_git
 
-# meza1 exists, but is not a git repo (hold over from older versions of meza1)
+# meza exists, but is not a git repo (hold over from older versions of meza)
 elif [ ! -d /opt/meza/.git ]; then
 	rm -rf /opt/meza
 	install_via_git
 
-# meza1 exists and is a git repo: checkout latest branch
+# meza exists and is a git repo: checkout latest branch
 else
 	cd /opt/meza
 	git fetch origin
@@ -199,7 +199,7 @@ fi
 
 
 # Load config constants. Unfortunately right now have to write out full path to
-# Meza1 since we can't be certain of consistent method of accessing install.sh.
+# meza since we can't be certain of consistent method of accessing install.sh.
 source /opt/meza/scripts/config.sh
 
 

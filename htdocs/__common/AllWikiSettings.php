@@ -2,7 +2,7 @@
 
 /**
  * AllWikiSettings.php is used to modify all wiki settings. This is where any
- * any changes to the standard Meza1 configuration should be kept.
+ * any changes to the standard meza configuration should be kept.
  **/
 
 

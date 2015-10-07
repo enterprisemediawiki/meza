@@ -1,6 +1,6 @@
 <?php
 /**
- * This script adds a user to mediawiki. It is meant to initialize Meza1.
+ * This script adds a user to mediawiki. It is meant to initialize meza.
  *
  * Usage:
  *  no parameters
