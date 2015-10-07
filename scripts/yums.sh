@@ -5,7 +5,7 @@
 
 print_title "Starting script yums.sh"
 
-cd ~/sources
+cd ~/mezadownloads
 
 #
 # Set architecture to 32 or 64 (bit)

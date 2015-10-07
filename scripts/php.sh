@@ -18,7 +18,7 @@ done
 #
 # Download (for example) PHP 5.6.10, 5.5.26, or 5.4.42 source
 #
-cd ~/sources
+cd ~/mezadownloads
 tarfile="php-$phpversion.tar.bz2"
 wget "http://php.net/get/php-$phpversion.tar.bz2/from/this/mirror" -O "$tarfile"
 
@@ -39,7 +39,8 @@ fi
 # Unpack tar.bz2
 #
 tar jxf "php-$phpversion.tar.bz2"
-cd "php-$phpversion/"
+mv "php-$phpversion/" "$m_meza/sources/php-$phpversion/"
+cd "$m_meza/sources/php-$phpversion/"
 
 
 #
@@ -94,23 +95,8 @@ sudo ln -s /usr/local/php/bin/php /usr/bin/php
 #
 # Initiate php.ini
 #
-cp "$m_meza/client_files/php.ini-development" /usr/local/php/lib/php.ini
+cp "$m_meza/scripts/php.ini-development" /usr/local/php/lib/php.ini
 
-#
-# Add wiki landing page
-#
-cd "$m_htdocs"
-cp "$m_meza/client_files/index.php" ./index.php
-
-#
-# Create info.php
-#
-touch info.php
-echo '<?php phpinfo();' > info.php
-
-# Check and make sure php5_module is enabled?
-# @todo: do we need this?
-#LoadModule php5_module modules/libphp5.so
 
 #
 # Start webserver service

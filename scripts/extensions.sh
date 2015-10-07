@@ -12,7 +12,7 @@ echo -e "\n\nCreating new wiki called \"Demo Wiki\""
 imports_dir="new"
 wiki_id="demo"
 wiki_name="Demo Wiki"
-source "$m_meza/client_files/create-wiki.sh"
+source "$m_meza/scripts/create-wiki.sh"
 
 # Install extensions installed via Composer
 echo -e "\n\n## Meza1: Install composer-supported extensions"
@@ -34,7 +34,7 @@ WIKI=demo php maintenance/update.php --quick
 # Note: This also enables ExtensionLoader...which seems hacky.
 #
 rm -rf "$m_htdocs/__common/ComposerSettings.php"
-cp "$m_meza/client_files/config/ComposerSettings.php" "$m_htdocs/__common/ComposerSettings.php"
+cp "$m_meza/scripts/config/ComposerSettings.php" "$m_htdocs/__common/ComposerSettings.php"
 
 # Clone ExtensionLoader
 echo -e "\n\n## Meza1: Install ExtensionLoader and apply changes to MW settings"
@@ -43,7 +43,7 @@ git clone https://github.com/jamesmontalvo3/ExtensionLoader.git
 cd ..
 
 # Add ExtensionSettings.php (used by ExtensionLoader) from Meza1 repo
-cp "$m_meza/client_files/ExtensionSettings.php" ./ExtensionSettings.php
+cp "$m_meza/scripts/ExtensionSettings.php" ./ExtensionSettings.php
 
 # Install extensions and update database
 echo -e "\n\n## Meza1: update/install extensions"
@@ -84,8 +84,7 @@ WIKI=demo php extensions/TitleKey/rebuildTitleKeys.php
 # Other extensions could cause similar issues, so it's best that this go after
 # loading extensions.
 #
-cp "$m_meza/client_files/mezaCreateUser.php" /var/www/meza1/mezaCreateUser.php
-WIKI=demo php /var/www/meza1/mezaCreateUser.php --username=Admin --password=1234 --groups=sysop,bureaucrat
+WIKI=demo php "$m_meza/scripts/mezaCreateUser.php" --username=Admin --password=1234 --groups=sysop,bureaucrat
 
 #
 # Generate ES index
@@ -95,7 +94,7 @@ WIKI=demo php /var/www/meza1/mezaCreateUser.php --username=Admin --password=1234
 echo "******* Running elastic-build-index.sh *******"
 wiki_id=demo
 # @todo @fixme Does this need to run here, or is it sufficient during create-wiki.sh?
-source "$m_meza/client_files/elastic-build-index.sh"
+source "$m_meza/scripts/elastic-build-index.sh"
 
 
 # NOTE: I think this can be in LocalSettings.php to start. Don't think it needs to be added later.

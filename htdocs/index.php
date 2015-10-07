@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Meza1 Wikis</title>
+    <title>Meza Wikis</title>
 
     <!-- Bootstrap -->
     <!-- <link rel="stylesheet" href="bootstrap-3.3.5/css/bootstrap.min.css"> -->
@@ -25,15 +25,17 @@
 
   </head>
   <body>
-  	<h1>Meza1 Wikis</h1>
+  	<h1>Meza Wikis</h1>
   	<p>Below are all the wikis currently installed on this server.</p>
   	<ul>
 <?php
 
-	$wikis = array_slice( scandir( '/var/www/meza1/htdocs/wikis' ), 2 );
+	$wikis = array_slice( scandir( '/opt/meza/htdocs/wikis' ), 2 );
 
 	foreach( $wikis as $wiki ) {
-		echo "<li><a href='$wiki'>$wiki</a></li>";
+		if ( is_dir( __DIR__ . "/wikis/$wiki" ) ) {
+			echo "<li><a href='$wiki'>$wiki</a></li>";
+		}
 	}
 
 ?>

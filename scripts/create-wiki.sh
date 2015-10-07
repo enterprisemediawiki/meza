@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # This script is a wrapper on `import-wikis.sh`. By setting the $imports_dir
-# variable it overrides the import script's mechanism for finding sources for
+# variable it overrides the import script's mechanism for finding the source for
 # new wikis and instead installs a new wiki.
 
 

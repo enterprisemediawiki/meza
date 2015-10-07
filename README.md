@@ -17,7 +17,7 @@ Login to your server and run the following:
 
 ```
 cd ~
-curl -LO https://raw.githubusercontent.com/enterprisemediawiki/Meza1/master/client_files/install.sh
+curl -LO https://raw.githubusercontent.com/enterprisemediawiki/Meza1/master/scripts/install.sh
 sudo bash install.sh
 ```
 

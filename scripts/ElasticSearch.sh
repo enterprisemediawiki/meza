@@ -30,7 +30,7 @@ fi
 # http://stackoverflow.com/questions/10268583/how-to-automate-download-and-installation-of-java-jdk-on-linux
 #
 echo "******* Downloading and installing JAVA Development Kit *******"
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 yum -y install java-1.7.0-openjdk
 # Reference this for if we want to try JDK 8: http://tecadmin.net/install-java-8-on-centos-rhel-and-fedora/
 ## wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.rpm
@@ -54,7 +54,7 @@ echo "JAVA_HOME = $JAVA_HOME"
 echo "******* Installing Elasticsearch *******"
 
 # Download and install the public signing key:
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
 
 # Add yum repo file
@@ -68,7 +68,7 @@ echo "******* Adding Elasticsearch service *******"
 chkconfig elasticsearch on
 
 # *** MANUAL INSTALLATION OPTION (delete) ***
-# cd ~/sources
+# cd ~/mezadownloads
 # curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.6.0.tar.gz
 # tar -xvf elasticsearch-1.6.0.tar.gz
 # cp -r elasticsearch-1.6.0 /etc/elasticsearch-1.6.0
@@ -87,7 +87,7 @@ echo "127.0.0.1 Meza1" >> /etc/hosts
 # Rename the standard config file and copy over our custom config file
 cd /etc/elasticsearch
 mv ./elasticsearch.yml ./elasticsearch-old.yml
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cp ./elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 
 # Make directories called out in elasticsearch.yml

@@ -28,7 +28,7 @@ mw_api_uri="$mw_api_protocol://$mw_api_domain/"
 
 echo "******* Downloading node.js *******"
 cmd_profile "START node.js build"
-cd ~/sources
+cd ~/mezadownloads
 
 if [ $architecture = 64 ]; then
 	node_version="node-v0.12.7-linux-x64"
@@ -77,7 +77,7 @@ cmd_profile "END npm test parsoid"
 # TODO This part can be modified once localsettings.js is included in initial download of files
 # localsettings for parsoid
 echo "******* Downloading configuration files *******"
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 
 # Copy Parsoid settings from Meza to Parsoid install
 cp ./localsettings.js /etc/parsoid/api/localsettings.js
@@ -106,7 +106,7 @@ chown parsoid:parsoid /etc/parsoid -R
 # https://github.com/narath/brigopedia#setup-visualeditor-extension
 # Create service script
 echo "******* Creating parsoid service *******"
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cp ./initd_parsoid.sh /etc/init.d/parsoid
 chmod 755 /etc/init.d/parsoid
 chkconfig --add /etc/init.d/parsoid

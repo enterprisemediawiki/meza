@@ -5,7 +5,7 @@
  * settings. This file is used by the main LocalSettings.php file which is
  * common to all wikis. It is located at:
  *
- *     /var/www/meza1/htdocs/mediawiki/LocalSettings.php
+ *     /opt/meza/htdocs/mediawiki/LocalSettings.php
  *
  * This file is included near the beginning of that file, and thus can only be
  * used for initial setup and cannot override any settings therein.

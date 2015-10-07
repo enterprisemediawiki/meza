@@ -30,7 +30,7 @@ done
 #
 # Install Composer
 #
-cd ~/sources
+cd ~/mezadownloads
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 
@@ -92,8 +92,7 @@ fi
 #
 # Copy in LocalSettings.php
 #
-cp "$m_meza/client_files/config/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
-cp "$m_meza/client_files/config/AllWikiSettings.php" "$m_htdocs/__common/AllWikiSettings.php"
+cp "$m_meza/scripts/config/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
 
 #
 # Make dummy ComposerSettings.php to start. Will be replaced by correct file later.

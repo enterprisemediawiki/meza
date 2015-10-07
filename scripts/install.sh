@@ -122,9 +122,10 @@ if ! hash git 2>/dev/null; then
     yum install git -y
 fi
 
-# if no sources directory, create it
-if [ ! -d ~/sources ]; then
-	mkdir ~/sources
+# if no mezadownloads directory, create it
+# source files will be downloaded here and deleted later
+if [ ! -d ~/mezadownloads ]; then
+	mkdir ~/mezadownloads
 fi
 
 
@@ -132,7 +133,7 @@ fi
 # Output command to screen and to log files
 #
 timestamp=$(date "+%Y%m%d%H%M%S")
-logpath="/root/sources/meza1/logs"
+logpath="/opt/meza/logs" # @fixme: not DRY
 outlog="$logpath/${timestamp}_out.log"
 errlog="$logpath/${timestamp}_err.log"
 cmdlog="$logpath/${timestamp}_cmd.log"
@@ -159,9 +160,9 @@ cmd_tee()
 # function to install Meza1 via git
 install_via_git()
 {
-	cd ~/sources
-	git clone https://github.com/enterprisemediawiki/Meza1 meza1
-	cd meza1
+	cd /opt
+	git clone https://github.com/enterprisemediawiki/Meza1 meza
+	cd meza
 	git checkout "$git_branch"
 }
 
@@ -181,17 +182,17 @@ EOM
 
 
 # no meza1 directory
-if [ ! -d ~/sources/meza1 ]; then
+if [ ! -d /opt/meza ]; then
 	install_via_git
 
 # meza1 exists, but is not a git repo (hold over from older versions of meza1)
-elif [ ! -d ~/sources/meza1/.git ]; then
-	rm -rf ~/sources/meza1
+elif [ ! -d /opt/meza/.git ]; then
+	rm -rf /opt/meza
 	install_via_git
 
 # meza1 exists and is a git repo: checkout latest branch
 else
-	cd ~/sources/meza1
+	cd /opt/meza
 	git fetch origin
 	git checkout "$git_branch"
 fi
@@ -199,37 +200,37 @@ fi
 
 # Load config constants. Unfortunately right now have to write out full path to
 # Meza1 since we can't be certain of consistent method of accessing install.sh.
-source /root/sources/meza1/client_files/config.sh
+source /opt/meza/scripts/config.sh
 
 
 # @todo: Need to test for yums.sh functionality prior to proceeding
 #    with apache.sh, and Apache functionality prior to proceeding
 #    with php.sh, and so forth.
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source yums.sh"
 
-cd "$m_meza/client_files"
-cmd_tee "source install-imagick.sh"
+cd "$m_meza/scripts"
+cmd_tee "source imagemagick.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source apache.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source php.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source mysql.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source VE.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source ElasticSearch.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source mediawiki.sh"
 
-cd "$m_meza/client_files"
+cd "$m_meza/scripts"
 cmd_tee "source extensions.sh"
 
 # Remove GitHub API personal access token from .composer dir
@@ -237,7 +238,9 @@ cmd_tee "source extensions.sh"
 #        in case there are other authentication entries
 rm -f ~/.composer/auth.json
 
+# remove downloads directory (miscellaneous downloaded files)
+rm -rf /root/mezadownloads
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
-cat "$m_meza/client_files/pigeon.txt"
+cat "$m_meza/scripts/pigeon.txt"
 
