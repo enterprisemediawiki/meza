@@ -17,7 +17,7 @@ exports.setup = function(parsoidConfig) {
 	// identifiers for each wiki
 	var wikis = fs.readdirSync( '/opt/meza/htdocs/wikis' );
 
-	// Domain, which will be setup by the Meza1 installer
+	// Domain, which will be setup by the meza installer
 	var domain = 'INSERTED_BY_VE_SCRIPT';
 
 	// loop through all wiki IDs and do setMwApi

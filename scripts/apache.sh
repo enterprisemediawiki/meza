@@ -76,10 +76,10 @@ cd /usr/local/apache2/conf
 
 #
 # Commenting out all modifications to httpd.conf. These should all be in
-# "Meza1/scripts/config/httpd.conf" now. Anything
+# "meza/scripts/config/httpd.conf" now. Anything
 #
 # update document root
-# sed -r -i 's/\/usr\/local\/apache2\/htdocs/\/var\/www\/meza1\/htdocs/g;' ./httpd.conf
+# sed -r -i 's/\/usr\/local\/apache2\/htdocs/\/var\/www\/meza\/htdocs/g;' ./httpd.conf
 # direct apache to execute PHP
 # cat $m_meza/scripts/httpd-conf-additions.conf >> ./httpd.conf
 # serve index.php as default file
@@ -89,7 +89,7 @@ cd /usr/local/apache2/conf
 # sed -r -i 's/Group\s*daemon/Group www/g;' ./httpd.conf
 
 
-# rename default configuration file, get Meza1 config file
+# rename default configuration file, get meza config file
 mv httpd.conf httpd.default.conf
 cp "$m_meza/scripts/config/httpd.conf" ./httpd.conf
 
