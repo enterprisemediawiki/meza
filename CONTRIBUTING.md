@@ -33,11 +33,13 @@ These tests should be performed on all changes
 * Verify ElasticSearch works by searching with a typo (e.g. search for "Test Paeg" when looking for "Test Page")
 * Verify file uploads work
 * Verify thumbnailing works (upload a larger image and verify small images are generated)
+* Verify `create-wiki.sh` successfully creates a wiki
 
 #### Desired testing
 
 The following tests should be performed if time allows, or if a change is likely to affect any test.
 
+* Verify `import-wikis.sh` imports multiple wikis
 * Verify PDFHandler functioning (PDF images shown on PDF file pages)
 * Verify image security: users unable to view images when not logged in
   * Test access to images when not logged into the wiki (use another browser)
