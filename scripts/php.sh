@@ -7,12 +7,12 @@ print_title "Starting script php.sh"
 #
 # Prompt user for PHP version
 #
-while [ -z "$phpversion" ]
-do
-echo -e "\n\n\n\nVisit http://php.net/downloads.php"
-echo -e "\nEnter the version of PHP you would like (such as 5.4.42) and press [ENTER]: "
-read phpversion
-done
+# while [ -z "$phpversion" ]
+# do
+# echo -e "\n\n\n\nVisit http://php.net/downloads.php"
+# echo -e "\nEnter the version of PHP you would like (such as 5.4.42) and press [ENTER]: "
+# read phpversion
+# done
 
 
 #
