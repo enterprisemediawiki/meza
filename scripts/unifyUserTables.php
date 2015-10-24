@@ -27,15 +27,13 @@ PREP WORK:
 
 OPEN QUESTIONS:
 
-* How to merge user.user_editcount across multiple DBs? (sum all?)
-* How to handle user.user_registration across multiple DBs? (take lowest?)
 *
 
 
 */
 
 
-$wikiDBs = array(
+$wikiDBnames = array(
 	'wiki_eva',
 	'wiki_robo',
 	'wiki_mod',
@@ -82,6 +80,15 @@ $idOnlyTables = array(
 
 
 
+$wikiDBs = array();
+foreach( $wikiDBnames as $wiki ) {
+	// connect to databases
+	$wikiDbs[$wiki] = fakegetdatabase( $wiki );
+}
+
+
+
+
 
 
 // For each database, add $initialOffset to all user IDs in all tables
@@ -103,31 +110,52 @@ foreach( $wikiDBs as $wiki => $db ) {
 
 
 $userArray = array();
+$userColumnsIssetChecks = array(
+	'user_email',
+	// FIXME: what else
+);
 
 // Read user table for all wikis, add to $userArray giving each username a new unique ID
-foreach( $wikiDBs as $wiki ) {
-
-	// connect to database
+foreach( $wikiDBs as $wiki => $db ) {
 
 	// SELECT entire user table
 	$result = fakequeryfunction( "SELECT * ..." );
 
-	foreach( $result as $user ) {
+	foreach( $result as $row ) {
 
-		if ( ! isset( $userArray[$user] ) ) {
-			$newId = count( $userArray ) + 1;
+		$userName = $row['user_name'];
+
+		if ( ! isset( $userArray[$userName] ) ) {
+
+			$userArray[$userName] = $row;
+
 			// give new ID
-			$userArray[$user] = array(
-				"newId" => $newId,
+			$newId = count( $userArray );
+			$userArray[$userName]["newId"] = $newId;
 
-			);
+		} else {
+
+			// sum edit counts?
+			$userArray[$userName]["user_editcount"] += $row['user_editcount'];
+
+			// How to handle user.user_registration across multiple DBs? (take lowest?)
+			if ( $userArray[$userName]["user_registration"] > $row['user_registration'] ) {
+				$userArray[$userName]["user_registration"] = $row['user_registration'];
+			}
+
+			foreach ( $userColumnsIssetChecks as $col ) {
+				if ( ! $userArray[$userName][$col] ) {
+					$userArray[$userName][$col] = $row[$col];
+				}
+			}
+
 		}
 	}
 
 }
 
 
-foreach ( $wikiDBs as $wiki ) {
+foreach ( $wikiDBs as $wiki => $db ) {
 
 	// Loop through the ~17 tables with usernames and user IDs (except the user table) and:
 
