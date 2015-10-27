@@ -94,10 +94,6 @@ fi
 #
 cp "$m_meza/scripts/config/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
 
-#
-# Make dummy ComposerSettings.php to start. Will be replaced by correct file later.
-#
-echo "<?php // Temporary ComposerSettings.php for initial setup" > "$m_htdocs/__common/ComposerSettings.php"
 
 #
 # Create common database credentials

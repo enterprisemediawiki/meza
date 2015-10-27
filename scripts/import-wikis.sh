@@ -195,6 +195,7 @@ for d in */ ; do
 		echo -e "\nSKIPPING SemanticMediaWiki rebuildData.php and runjobs.php (no SMW)"
 	fi
 
+	# @FIXME: This has changed. CirrusSearch exists from the beginning now
 	# if CirrusSearch extension exists. On first install it will not yet.
 	if [ -d "$m_mediawiki/extensions/CirrusSearch" ]; then
 		echo "Building Elastic Search index"
