@@ -1,11 +1,23 @@
 <?php
+$host = 'hostname';
+$user = 'your-username';
+$pass = 'your-password';
 
 $primeWiki = 'wiki_meta';
 $wikiDBnames = array(
 	'wiki_eva',
-	'wiki_robo',
-	'wiki_mod',
-	'wiki_dd_ms',
+	"wiki_mod",
+	"wiki_bme",
+	"wiki_flight",
+	"wiki_rio",
+	"wiki_dd_ms",
+	"wiki_odb",
+	"wiki_oso",
+	"wiki_robo",
+	"wiki_spartan",
+	"wiki_topo",
+	"wiki_vido",
+	"wiki_meta"
 );
 
 $initialOffset = 10000; // make sure this is larger than your largest user ID
@@ -35,21 +47,29 @@ class DB {
 
 	public function query ( $sql ) {
 
-		$result = $this->mysqli->query( $sql )
+		$result = $this->mysqli->query( $sql );
 
 		if( ! $result ) {
 		    die( 'There was an error running the query [' . $this->mysqli->error . ']' );
 		}
 
-		$return = array();
-		while( $row = $result->fetch_assoc() ){
-		    $return[] = $row;
+		echo "\n$sql";
+
+		if ( $result instanceof mysqli_result ) {
+
+			$return = array();
+			while( $row = $result->fetch_assoc() ){
+				//print_r($row);
+			    $return[] = $row;
+			}
+
+			$result->free();
+			return $return;
 		}
-
-		$result->free();
-
-		return $return;
-
+		else {
+			echo "\nQuery complete, no rows returned.\n";
+			return $result;
+		}
 	}
 
 }
@@ -108,9 +128,23 @@ $tablesToModify = array(
 
 
 $wikiDBs = array();
+$originalUserIDs = array();
 foreach( $wikiDBnames as $wiki ) {
-	// connect to databases
-	$wikiDbs[$wiki] = new DB( $wiki );
+	echo "\nConnecting to database $wiki";
+	$wikiDBs[$wiki] = new DB( $wiki );
+
+	$db = $wikiDBs[$wiki];
+
+	$thisWikiUserTable = $db->query( "SELECT user_id, user_name FROM user" );
+
+	$originalUserIDs[$wiki] = array();
+	foreach( $thisWikiUserTable as $row ) {
+		$userName  = $row['user_name'];
+		$oldUserId = $row['user_id'];
+
+		$originalUserIDs[$wiki][$userName] = $oldUserId;
+	}
+
 }
 
 
@@ -128,12 +162,14 @@ foreach( $wikiDBnames as $wiki ) {
  **/
 foreach( $wikiDBs as $wiki => $db ) {
 
+	echo "\nAdding initial offset to user IDs in $wiki";
+
 	foreach ( $tablesToModify + array( "user" => $userTable ) as $tableName => $tableInfo ) {
 		$idField = $tableInfo['idField'];
 		$db->query( "UPDATE $tableName SET $idField = $idField + $initialOffset" );
 	}
 
-	$db->query( "UPDATE ipblocks SET ipb_user = ipb_user + $initialOffset, ipb_by = ipb_by + $initialOffset")
+	$db->query( "UPDATE ipblocks SET ipb_user = ipb_user + $initialOffset, ipb_by = ipb_by + $initialOffset");
 
 	// DROP external_user table. See https://www.mediawiki.org/wiki/Manual:External_user_table
 	$db->query( "DROP TABLE IF EXISTS external_user" );
@@ -157,8 +193,12 @@ $userColumnsIssetChecks = array(
 	'user_real_name',
 );
 
+echo "\nCreating userArray from all user tables";
+
 // Read user table for all wikis, add to $userArray giving each username a new unique ID
 foreach( $wikiDBs as $wiki => $db ) {
+
+	echo "\nAdding $wiki to userArray";
 
 	// SELECT entire user table
 	$userColumns = implode( ',', array_keys( $userColumnInfo ) );
@@ -219,8 +259,10 @@ foreach( $wikiDBs as $wiki => $db ) {
  *  wikis.
  *
  **/
+echo "\nStarting major table modifications";
 foreach ( $wikiDBs as $wiki => $db ) {
 
+	echo "\nStarting major modifications to $wiki";
 
 	// // For tables with username and id columns: replace the id with the id from $userArray
 	// foreach( $userArray as $userName => $newUserId ) {
@@ -235,21 +277,26 @@ foreach ( $wikiDBs as $wiki => $db ) {
 	// }
 
 	// Lookup the ID in the user table, use username to get new ID from $UserArray, update ID
-	$thisWikiUserTable = $db->query( "SELECT user_id, user_name FROM user" );
+	// $originalUserIDs[$wiki][$userName] = old user id
+	// $thisWikiUserTable = $db->query( "SELECT user_id, user_name FROM user" );
+	// print_r( $thisWikiUserTable );
+
 	$usernameToOldId = array();
 	$newIdToOld = array(); // array like $newIdToOld[ newId ] = oldId
 	$oldIdToNew = array(); // opposite of above...
-	foreach( $thisWikiUserTable as $row ) {
-		$username = $row['user_name'];
-		$newId = $userArray[$username]['user_id'];
-		$oldId = $row['user_id'];
 
-		$usernameToOldId[$username] = $row['user_id'];
-		// $newIdToOld[$newId] = $oldId;
-		$oldIdToNew[$oldId] = $newId;
-	}
-	foreach( $userArray as $userName => $newUserId ) {
-		$oldUserId = $usernameToOldId[ $userName ];
+	// foreach( $thisWikiUserTable as $row ) {
+	foreach( $originalUserIDs[$wiki] as $userName => $oldUserId ) {
+
+		$info = $userArray[$userName];
+		$newUserId = $info['user_id'];
+
+		// quick convert-from-this-to-that arrays
+		$usernameToOldId[$userName] = $oldUserId;
+		// $newIdToOld[$newUserId] = $oldUserId;
+		$oldIdToNew[$oldUserId] = $newUserId;
+
+
 		foreach( $tablesToModify as $tableName => $tableInfo ) {
 			$idField = $tableInfo['idField'];
 			$stmt = $db->mysqli->prepare( "UPDATE $tableName SET $idField=? WHERE $idField=?" );
@@ -258,10 +305,10 @@ foreach ( $wikiDBs as $wiki => $db ) {
 		}
 
 		// fix ipblocks table
-		$stmt = $db->mysqli->prepare( "UPDATE ipblocks SET ipb_user=$newUserId WHERE ipb_user=$oldUserId");
+		$stmt = $db->mysqli->prepare( "UPDATE ipblocks SET ipb_user=? WHERE ipb_user=?");
 		$stmt->bind_param( 'ii', $newUserId, $oldUserId );
 		$stmt->execute();
-		$stmt = $db->mysqli->prepare( "UPDATE ipblocks SET ipb_by=$newUserId WHERE ipb_by=$oldUserId");
+		$stmt = $db->mysqli->prepare( "UPDATE ipblocks SET ipb_by=? WHERE ipb_by=?");
 		$stmt->bind_param( 'ii', $newUserId, $oldUserId );
 		$stmt->execute();
 
@@ -271,15 +318,27 @@ foreach ( $wikiDBs as $wiki => $db ) {
 	// Get contents of user_properties, prep for insert into common
 	// user_properties table
 	$oldUserProps = $db->query( "SELECT * FROM user_properties" );
+	// echo "\n\nOLDUSERPROPS:\n";
+	// print_r( $oldUserProps );
+	// echo "\n\oldIdToNew:\n";
+	// print_r( $oldIdToNew );
+
 	foreach( $oldUserProps as $row ) {
-		$row['up_user'] = $oldIdToNew[ $row['up_user'] ]; // could be dupes across wikis...need to upsert at end
-		$newUserProps[] = $row;
+		if ( isset( $oldIdToNew[ $row['up_user'] ] ) ) {
+			$newPropUserId = $oldIdToNew[ $row['up_user'] ];
+
+			$row['up_user'] = $newPropUserId; // could be dupes across wikis...need to upsert at end
+			$newUserProps[] = $row;
+		} else {
+			$oldId = $row['up_user'];
+			echo "\nUser ID #$oldId not found in oldIdToNew array for $wiki.";
+		}
 	}
 
 	// Empty the user table for this wiki, since it will just use the common
 	// one created at the end. Same for user_properties
-	$db->query( "DELETE FROM user" );
-	$db->query( "DELETE FROM user_properties" );
+	//$db->query( "DELETE FROM user" );
+	//$db->query( "DELETE FROM user_properties" );
 
 }
 
@@ -314,7 +373,7 @@ foreach( $userArray as $username => $info ) {
 		$info['user_touched'],
 		$info['user_registration'],
 		$info['user_email'],
-		$info['user_real_name'],
+		$info['user_real_name']
 	);
 	$stmt->execute();
 
@@ -340,3 +399,4 @@ foreach( $newUserProps as $row ) {
 	$stmt->execute();
 }
 
+echo "\n"; //end of script
