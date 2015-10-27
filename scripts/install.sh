@@ -56,11 +56,12 @@ read usergithubtoken
 usergithubtoken=${usergithubtoken:-$default_usergithubtoken}
 
 # Prompt user for PHP version
-default_phpversion="5.4.42"
-echo -e "\nVisit http://php.net/downloads.php for version numbers"
-echo -e "Type the version of PHP you would like (such as 5.4.42) and press [ENTER]:"
-read -e -i $default_phpversion phpversion
-phpversion=${phpversion:-$default_phpversion}
+default_phpversion="5.6.14"
+phpversion=$default_phpversion #hard code version for now based on #24
+# echo -e "\nVisit http://php.net/downloads.php for version numbers"
+# echo -e "Type the version of PHP you would like (such as 5.4.42) and press [ENTER]:"
+# read -e -i $default_phpversion phpversion
+# phpversion=${phpversion:-$default_phpversion}
 
 # Prompt user for MySQL password
 default_mysql_root_pass=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
