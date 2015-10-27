@@ -40,8 +40,9 @@ cp "$m_meza/scripts/config/ComposerSettings.php" "$m_htdocs/__common/ComposerSet
 echo -e "\n\n## meza: Install ExtensionLoader and apply changes to MW settings"
 cd "$m_mediawiki/extensions"
 git clone https://github.com/jamesmontalvo3/ExtensionLoader.git
+cd ./ExtensionLoader
 git checkout v0.1.0
-cd ..
+cd "$m_mediawiki"
 
 # Add ExtensionSettings.php (used by ExtensionLoader) from meza repo
 cp "$m_meza/scripts/ExtensionSettings.php" ./ExtensionSettings.php
