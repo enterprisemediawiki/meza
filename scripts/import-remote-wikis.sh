@@ -4,6 +4,10 @@
 # application and database servers).
 #
 
+if [ -f "/opt/meza/remote-wiki-config.sh" ]; then
+	source "/opt/meza/remote-wiki-config.sh"
+fi
+
 
 # Ask for mount name
 while [ -z "$mount_name" ]
@@ -66,13 +70,19 @@ for d in */ ; do
 	default_which_wikis="$default_which_wikis $d"
 done
 
-
-# Prompt user for which wikis to import
-echo -e "\nType which wikis you would like to import, separated by spaces"
-echo -e "or leave blank to import all wikis and press [ENTER]:"
-read which_wikis
+# check if already set (via remote-wiki-config.sh file)
+if [ -z "$which_wikis" ]; then
+	# Prompt user for which wikis to import
+	echo -e "\nType which wikis you would like to import, separated by spaces"
+	echo -e "or leave blank to import all wikis and press [ENTER]:"
+	read which_wikis
+fi
 which_wikis=${which_wikis:-$default_which_wikis}
 
+# remote-wiki-config.sh method for getting all wikis is to set which_wikis to IMPORT_ALL
+if [ "$which_wikis" = "IMPORT_ALL" ]; then
+	which_wikis="$default_which_wikis"
+fi
 
 # Ask for mysql root password
 while [ -z "$mysql_root_pass" ]
@@ -121,6 +131,7 @@ do
 
 	echo "  Getting database..."
 	mysqldump -h $remote_db_server -u $remote_db_username -p$remote_db_password $wiki_db > "/root/wikis/$wiki/wiki.sql"
+
 done
 
 imports_dir=/root/wikis
