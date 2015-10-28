@@ -115,6 +115,8 @@ done
 
 cd "$full_remote_wikis_path"
 
+echo -e "\n\n\nIMPORTING WIKIS: $which_wikis\n"
+
 # copy each selected wiki directory, then get database
 for wiki in $which_wikis
 do

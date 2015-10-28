@@ -163,7 +163,7 @@ for d in */ ; do
 	# "wiki_$wiki_id", so if $wiki_id is "eva" then the database is "wiki_eva"
 	#
 	# This command just comments out the old database name
-	sed -i "s/\$mezaCustomDBname/\/\/ \$mezaCustomDBname/g;" "./setup.php"
+	sed -i "s/\$mezaCustomDBname/\/\/ \$mezaCustomDBname/g;" "$wiki_install_path/config/setup.php"
 
 	# import SQL file
 	# Import database - Ref: https://www.mediawiki.org/wiki/Manual:Restoring_a_wiki_from_backup
