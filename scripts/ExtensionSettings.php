@@ -365,5 +365,4 @@ $egExtensionLoaderConfig += array(
 		),
 	),
 
->>>>>>> master:scripts/ExtensionSettings.php
 );
