@@ -1,11 +1,11 @@
 # Setup Digital Ocean
 
-This manual describes how to prepare [Digital Ocean](https://digitalocean.com) for Meza1 install. It assumes you already have a Digital Ocean account.
+This manual describes how to prepare [Digital Ocean](https://digitalocean.com) for meza install. It assumes you already have a Digital Ocean account.
 
 ## Create droplet
 
 1. Click "create droplet"
-1. Choose a "droplet hostname", which can really be anything that identifies this droplet from the others. For example, if you're just testing out Meza1 you may choose "Meza1_test_2015-07-26".
+1. Choose a "droplet hostname", which can really be anything that identifies this droplet from the others. For example, if you're just testing out meza you may choose "meza_test_2015-07-26".
 1. Choose any droplet size with at least 1 GB RAM
 1. Select a region close the people who will be using your service
 1. Under "select image" select the CentOS operatings system, then under "version" select "6.5 x64"
@@ -17,7 +17,7 @@ This manual describes how to prepare [Digital Ocean](https://digitalocean.com) f
 
 ## Install wget
 
-Your server lacks one really important thing for Meza1: `wget`. The `wget` command allows you to retrieve (get) files over HTTP, HTTPS, and FTP. To install `wget` perform the following:
+Your server lacks one really important thing for meza: `wget`. The `wget` command allows you to retrieve (get) files over HTTP, HTTPS, and FTP. To install `wget` perform the following:
 
 1. `yum install -y wget`
 
@@ -38,6 +38,6 @@ If you'd like to setup a user other than root, perform the following:
 	1. Type ":wq" to write (save) the changes to the file and quit the editor
 	1. You can now exit your SSH session (type "exit") and start a new one with your new user
 
-## Run Meza1 install
+## Run meza install
 
 You're done setting up your Digital Ocean server. You can now do the steps in the main [README](../README.md).

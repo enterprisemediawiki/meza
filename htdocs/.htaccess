@@ -1,0 +1,22 @@
+# mod_rewrite
+<IfModule mod_rewrite.c>
+
+    # Enable mod_rewrite engine
+    RewriteEngine on
+
+    RewriteBase /
+
+    # Allow access to root index.php
+    RewriteRule ^index.php(.*) - [L]
+
+    # Allow access to /wikis directory (where all wiki content and
+    # and settings are located)
+    RewriteRule ^wikis(?:/|$)(.*)$ - [L]
+
+    # Taken from MediaWiki.org [[Extension:Simple Farm]]
+    #
+    # Redirect virtual wiki path to physical wiki path. There
+    # can be no wiki accessible using this path.
+    RewriteRule ^(?!mediawiki(?:/|$))[^/]+(?:/(.*))?$ mediawiki/$1
+
+</IfModule>
