@@ -261,7 +261,7 @@ include "$m_htdocs/__common/ComposerSettings.php";
 
 // memcached settings
 $wgMainCacheType = CACHE_MEMCACHED;
-$wgParserCacheType = CACHE_MEMCACHED; // optional
+$wgParserCacheType = CACHE_NONE; // optional; if set to CACHE_MEMCACHED, templates used to format query results in generic footer don't work
 $wgMessageCacheType = CACHE_MEMCACHED; // optional
 $wgMemCachedServers = array( "127.0.0.1:11211" );
 $wgSessionsInObjectCache = true; // optional
