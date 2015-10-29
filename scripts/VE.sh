@@ -59,6 +59,8 @@ echo "******* Downloading parsoid *******"
 cd /etc
 git clone https://gerrit.wikimedia.org/r/p/mediawiki/services/parsoid
 cd parsoid
+git checkout "$parsoid_version"
+
 echo "******* Installing parsoid *******"
 #npm install -g # install globally
 #attempt to install globally was resulting in several errors

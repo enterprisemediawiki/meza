@@ -55,6 +55,13 @@ echo -e "and copy/paste your 40-character token and press [ENTER]: "
 read usergithubtoken
 usergithubtoken=${usergithubtoken:-$default_usergithubtoken}
 
+# Set Parsoid version.
+# This should be able to be set in any of these forms:
+#   9260e5d       (a sha1 hash)
+#   tags/v0.4.1   (a tag name)
+#   master        (a branch name)
+parsoid_version="ba26a55"
+
 # Prompt user for PHP version
 default_phpversion="5.6.14"
 phpversion=$default_phpversion #hard code version for now based on #24
