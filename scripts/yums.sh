@@ -43,6 +43,17 @@ curl -LO "http://dl.fedoraproject.org/pub/epel/$epel_version"
 
 
 #
+# Make sure deltarpm is installed
+# CentOS 7 minimal install removed the deltarpm package, which handles the
+# difference between versions of an RPM package. This means the whole new RPM
+# does not have to be downloaded saving bandwidth. Do this before `yum update`
+# so bandwidth savings are achieved immediately.
+# Ref: http://danielgibbs.co.uk/2015/05/delta-rpms-disabled/
+#
+yum install -y deltarpm
+
+
+#
 # Update everything managed by yum
 #
 cmd_profile "START yum update"
