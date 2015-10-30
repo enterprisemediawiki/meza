@@ -231,10 +231,6 @@ $oldtz = getenv("TZ");
 putenv("TZ=$wgLocaltimezone");
 
 
-$wgFileExtensions[] = 'mp3';
-$wgFileExtensions[] = 'aac';
-$wgFileExtensions[] = 'msg';
-
 $wgMaxImageArea = 1.25e10; // Images on [[Snorkel]] fail without this
 // $wgMemoryLimit = 500000000; //Default is 50M. This is 500M.
 
@@ -246,11 +242,53 @@ $wgMaxImageArea = 1.25e10; // Images on [[Snorkel]] fail without this
 ini_set( 'pcre.backtrack_limit', 1000000000 ); //1 billion
 
 
-$wgFileExtensions[] = 'pdf';
-$wgFileExtensions[] = 'svg';
 $wgUseImageMagick = true;
 $wgImageMagickConvertCommand = '/usr/local/bin/convert';
 
+/**
+ *
+ * Upload Wizard
+ *
+ **/
+// Use UploadWizard by default in navigation bar
+$wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard"; //Update with #156
+$wgUploadWizardConfig = array(
+	'debug' => false,
+	'autoCategory' => 'Uploaded with UploadWizard',
+	'feedbackPage' => 'FeedbackTest2',
+	'altUploadForm' => 'Special:Upload',
+	'fallbackToAltUploadForm' => false,
+	'enableFormData' => true,  # Should FileAPI uploads be used on supported browsers?
+	'enableMultipleFiles' => true,
+	'enableMultiFileSelect' => true,
+	'tutorial' => array('skip' => true),
+	'fileExtensions' => $wgFileExtensions //omitting this can cause errors
+);
+
+// Allowed file types
+$wgFileExtensions = array(
+	'aac',
+	'bmp',
+	'docx',
+	'gif',
+	'jpg',
+	'jpeg',
+	'mpp',
+	'mp3',
+	'msg',
+	'odg',
+	'odp',
+	'ods',
+	'odt',
+	'pdf',
+	'png',
+	'pptx',
+	'ps',
+	'svg',
+	'tiff',
+	'txt',
+	'xlsx'
+);
 
 
 /**
