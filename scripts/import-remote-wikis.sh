@@ -12,7 +12,10 @@ fi
 # Ask for mount name
 while [ -z "$mount_name" ]
 do
-	echo -e "\nEnter name of mount and press [ENTER]: "
+	echo "The mount name is just a convenient identifier for the remote"
+	echo "server. It can be whatever you want, but should only include"
+	echo "alphanumeric characters (no spaces). "
+	echo "Enter name of mount and press [ENTER]: "
 	read mount_name
 done
 
