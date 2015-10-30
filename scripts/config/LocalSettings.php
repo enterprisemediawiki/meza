@@ -279,15 +279,23 @@ $wgDBmysql5 = false;
 
 
 
+
+
+
 /**
  *  6) GENERAL CONFIGURATION
  *
  *
  *
  **/
-## Shared memory settings
-$wgMainCacheType = CACHE_NONE;
-$wgMemCachedServers = array();
+// memcached settings
+$wgMainCacheType = CACHE_MEMCACHED;
+$wgParserCacheType = CACHE_NONE; // optional; if set to CACHE_MEMCACHED, templates used to format query results in generic footer don't work
+$wgMessageCacheType = CACHE_MEMCACHED; // optional
+$wgMemCachedServers = array( "127.0.0.1:11211" );
+$wgSessionsInObjectCache = true; // optional
+$wgSessionCacheType = CACHE_MEMCACHED; // optional
+
 
 ## To enable image uploads, make sure the 'images' directory
 ## is writable, then set this to true:
