@@ -2,7 +2,10 @@
 #
 # This is the example config file for the import-remote-wikis.sh script
 
-
+# The mount name is just a convenient identifier for the remote
+# server. It can be whatever you want, but should only include
+# alphanumeric characters (no spaces). The remote_share is the server
+# name and share/directory you have access to on the server.
 mount_name="remote-meza"
 remote_share="//example.com/some-directory"
 
