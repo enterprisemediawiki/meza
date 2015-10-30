@@ -227,6 +227,9 @@ cd "$m_meza/scripts"
 cmd_tee "source php.sh"
 
 cd "$m_meza/scripts"
+cmd_tee "source memcached.sh"
+
+cd "$m_meza/scripts"
 cmd_tee "source mysql.sh"
 
 cd "$m_meza/scripts"
