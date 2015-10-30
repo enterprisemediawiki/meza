@@ -269,7 +269,6 @@ $wgUploadWizardConfig = array(
 $wgFileExtensions = array(
 	'aac',
 	'bmp',
-	'doc',
 	'docx',
 	'gif',
 	'jpg',
@@ -283,13 +282,11 @@ $wgFileExtensions = array(
 	'odt',
 	'pdf',
 	'png',
-	'ppt',
 	'pptx',
 	'ps',
 	'svg',
 	'tiff',
 	'txt',
-	'xls',
 	'xlsx'
 );
 
