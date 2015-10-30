@@ -1034,7 +1034,8 @@ require_once $egExtensionLoader->registerLegacyExtension(
 	'UploadWizard',
 	'https://gerrit.wikimedia.org/r/mediawiki/extensions/UploadWizard',
 	'REL1_25'
-),
+);
+
 // Needed to make UploadWizard work in IE, see bug 39877
 // See also: https://www.mediawiki.org/wiki/Manual:$wgApiFrameOptions
 $wgApiFrameOptions = 'SAMEORIGIN';
