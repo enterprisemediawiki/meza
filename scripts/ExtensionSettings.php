@@ -263,7 +263,7 @@ $egExtensionLoaderConfig += array(
 	'PdfHandler' => array(
 		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler',
 		'branch' => 'REL1_25',
-		'afterFn' => function(){
+		'afterFn' => function() {
 			// Location of PdfHandler dependencies
 			$GLOBALS['wgPdfProcessor'] = '/usr/bin/gs'; // installed via yum
 			$GLOBALS['wgPdfPostProcessor'] = '/usr/local/bin/convert'; // built from source
@@ -271,6 +271,15 @@ $egExtensionLoaderConfig += array(
 		}
 	),
 
+	'UploadWizard' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/UploadWizard',
+		'branch' => 'REL1_25',
+		'afterFn' => function() {
+			// Needed to make UploadWizard work in IE, see bug 39877
+			// See also: https://www.mediawiki.org/wiki/Manual:$wgApiFrameOptions
+			$GLOBALS['wgApiFrameOptions'] = 'SAMEORIGIN';
+		}
+	),
 
 	/**
 	 * Extensions for Visual Editor
@@ -351,6 +360,19 @@ $egExtensionLoaderConfig += array(
 		'globals' => array(
 			'wgThanksConfirmationRequired' => false,
 		),
+	),
+
+	'Flow' => array(
+		'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/Flow.git',
+		'branch' => 'REL1_25',
+		'afterFn' => function() {
+			$GLOBALS['wgGroupPermissions']['sysop']['flow-create-board'] = true;
+			$GLOBALS['wgFlowContentFormat'] = 'html'; // store posts as html using Parsoid
+			$GLOBALS['wgFlowEditorList'] = array( 'visualeditor', 'none' ); // use VE
+			$GLOBALS['wgNamespaceContentModels'][NS_PROJECT_TALK] = CONTENT_MODEL_FLOW_BOARD;
+			$GLOBALS['wgNamespaceContentModels'][NS_USER_TALK] = CONTENT_MODEL_FLOW_BOARD;
+			$GLOBALS['wgNamespaceContentModels'][NS_TALK] = CONTENT_MODEL_FLOW_BOARD;
+		}
 	),
 
 );
