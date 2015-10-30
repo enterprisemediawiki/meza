@@ -423,7 +423,6 @@ $wgImageMagickConvertCommand = '/usr/local/bin/convert';
 $wgFileExtensions = array(
 	'aac',
 	'bmp',
-	'doc',
 	'docx',
 	'gif',
 	'jpg',
@@ -437,13 +436,11 @@ $wgFileExtensions = array(
 	'odt',
 	'pdf',
 	'png',
-	'ppt',
 	'pptx',
 	'ps',
 	'svg',
 	'tiff',
 	'txt',
-	'xls',
 	'xlsx'
 );
 
