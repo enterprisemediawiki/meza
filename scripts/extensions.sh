@@ -6,13 +6,24 @@
 print_title "Starting script extensions.sh"
 
 
+#
+# Install Demo MW: create wiki directory, setup basic settings, create database
+#
+echo -e "\n\nCreating new wiki called \"Demo Wiki\""
+imports_dir="new"
+wiki_id="demo"
+wiki_name="Demo Wiki"
+source "$m_meza/scripts/create-wiki.sh"
+
+
 # Clone ExtensionLoader
 echo -e "\n\n## meza: Install ExtensionLoader and apply changes to MW settings"
 cd "$m_mediawiki/extensions"
 git clone https://github.com/jamesmontalvo3/ExtensionLoader.git
 cd ./ExtensionLoader
-git checkout v0.2.0
+git checkout tags/v0.2.0
 cd "$m_mediawiki"
+
 
 # Install extensions
 echo -e "\n\n## meza: update/install extensions"
@@ -33,14 +44,6 @@ composer install
 
 
 
-#
-# Install Demo MW: create wiki directory, setup basic settings, create database
-#
-echo -e "\n\nCreating new wiki called \"Demo Wiki\""
-imports_dir="new"
-wiki_id="demo"
-wiki_name="Demo Wiki"
-source "$m_meza/scripts/create-wiki.sh"
 
 # Install extensions installed via Composer
 echo -e "\n\n## meza: Install composer-supported extensions"
