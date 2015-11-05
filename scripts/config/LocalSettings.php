@@ -1056,7 +1056,28 @@ $wgUploadWizardConfig = array(
 );
 
 
+#
+# Extension:Flow
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	'Flow',
+	'https://gerrit.wikimedia.org/r/mediawiki/extensions/Flow.git',
+	'REL1_25'
+);
 
+// only allow sysops to create new flow boards
+$wgGroupPermissions['sysop']['flow-create-board'] = true;
+
+// store posts as html using Parsoid
+$wgFlowContentFormat = 'html';
+
+// use VE
+$wgFlowEditorList = array( 'visualeditor', 'none' );
+
+// enable in Project Talk, User Talk, and Talk (content namespace talk)
+$wgNamespaceContentModels[NS_PROJECT_TALK] = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_USER_TALK]    = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_TALK]         = CONTENT_MODEL_FLOW_BOARD;
 
 
 
