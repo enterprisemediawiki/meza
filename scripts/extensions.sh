@@ -21,7 +21,7 @@ echo -e "\n\n## meza: Install ExtensionLoader and apply changes to MW settings"
 cd "$m_mediawiki/extensions"
 git clone https://github.com/jamesmontalvo3/ExtensionLoader.git
 cd ./ExtensionLoader
-git checkout tags/v0.2.0
+git checkout tags/v0.2.1
 cd "$m_mediawiki"
 
 
@@ -81,16 +81,14 @@ WIKI=demo php extensions/TitleKey/rebuildTitleKeys.php
 WIKI=demo php "$m_meza/scripts/mezaCreateUser.php" --username=Admin --password=1234 --groups=sysop,bureaucrat
 
 #
-# Generate ES index
+# Generate ES index, since it is skipped in the initial create-wiki.sh
 #
 # Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
 #
-## >> This is run during the first create-wiki.sh now.
 #
-# echo "******* Running elastic-build-index.sh *******"
-# wiki_id=demo
-# @todo @fixme Does this need to run here, or is it sufficient during create-wiki.sh?
-# source "$m_meza/scripts/elastic-build-index.sh"
+echo "******* Running elastic-build-index.sh *******"
+wiki_id=demo
+source "$m_meza/scripts/elastic-build-index.sh"
 
 
 # NOTE: I think this can be in LocalSettings.php to start. Don't think it needs to be added later.
