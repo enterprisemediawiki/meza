@@ -53,7 +53,8 @@ composer require \
 	mediawiki/semantic-media-wiki:~2.0 \
 	mediawiki/semantic-result-formats:~2.0 \
 	mediawiki/sub-page-list:~1.1 \
-	mediawiki/semantic-meeting-minutes:~0.3
+	mediawiki/semantic-meeting-minutes:~0.3 \
+	mediawiki/semantic-maps:~3.2
 cmd_profile "END extensions composer require"
 
 # update database
