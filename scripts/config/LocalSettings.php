@@ -472,20 +472,25 @@ $wgFileExtensions = array(
 #
 $smwgQMaxSize = 5000;
 
-$srfgFormats = array(
-	'calendar',
-	'timeline',
-	'filtered',
-	//'exhibit',
-	'eventline',
-	'tree',
-	'oltree',
-	'datatables',
-	'ultree',
-	'tagcloud',
-	'sum',
-	'pagewidget'
-);
+#
+# SemanticResultFormats formats enabled (beyond defaults)
+#
+
+// These are disabled by default because they send data to external
+// web services for rendering, which may be considered a data leak
+// $srfgFormats[] = 'googlebar';
+// $srfgFormats[] = 'googlepie';
+
+// Disabled until the proper dependencies are added (PHPExcel I think)
+// $srfgFormats[] = 'excel';
+
+// Enables the "filtered" format. Where do we use this?
+$srfgFormats[] = 'filtered';
+
+// Disabled due to some issue on FOD wikis. Confirm, reenable if possible
+// $srfgFormats[] = 'exhibit';
+
+
 
 // allows adding semantic properties to Templates themselves
 // (not just on pages via templates).
