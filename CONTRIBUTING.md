@@ -51,7 +51,7 @@ The following tests should be performed if time allows, or if a change is likely
     * Verify logged in user can view image
     * Verify anonymous user CANNOT view image
   * Attempt to directly access image via URI like `http://example.com/wikis/<wiki-id>/images/a/a1/Image.png`
-    * Verify logged in user can view image
+    * Verify logged in user CANNOT view image
     * Verify anonymous user CANNOT view image
 
 #### Pre-release testing requirements
