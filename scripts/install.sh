@@ -84,37 +84,23 @@ read -e -i $default_mw_api_protocol mw_api_protocol
 mw_api_protocol=${mw_api_protocol:-$default_mw_api_protocol}
 
 # Prompt user for MW API Domain or IP address
-# @fixme: This seems like a lot of fragile logic to set something up for very
-#         specific cases. Perhaps that's fine, but it seems prone to breaking.
-if [ "$enterprise_linux_version" = 7 ]; then
-
-	FOUND_ADAPTER_1=`grep "enp0s8" /proc/net/dev`
-
-	if [ -n "$FOUND_ADAPTER_1" ]; then
-		ADAPTER_NAME="enp0s8"
-	else
-		ADAPTER_NAME="enp0s3"
+# This for loop attempts to find the correct network adapter from which to pull the domain or IP address
+# If multiple adapters are configured (as in our VirtualBox configs), put the most-likely correct one last
+for networkadapter in eth0 eth1 enp0s3 enp0s8
+do
+	if [ -n "ip addr | grep $networkadapter | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'" ]; then
+		default_mw_api_domain="`ip addr | grep $networkadapter | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'`"
 	fi
-
-	default_mw_api_domain="`ip addr | grep $ADAPTER_NAME | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'`"
-
-else
-
-	FOUND_ADAPTER_1=`grep "eth1" /proc/net/dev`
-
-	if [ -n "$FOUND_ADAPTER_1" ]; then
-		ADAPTER_NAME="eth1"
-	else
-		ADAPTER_NAME="eth0"
-	fi
-
-	default_mw_api_domain="`ifconfig $ADAPTER_NAME | grep "inet " | awk -F'[: ]+' '{ print $4 }'`"
-
-fi
-
+done
 
 echo -e "\nType domain or IP address of your wiki and press [ENTER]:"
-read -e -i $default_mw_api_domain mw_api_domain
+# If the above logic found a value to use as a default suggestion, display it and still prompt user for value
+if [ -n "$default_mw_api_domain" ]; then
+        read -e -i $default_mw_api_domain mw_api_domain
+# If the above logic did not find a value to suggest, only read the value in (this fixes #238)
+else
+        read -e mw_api_domain
+fi
 mw_api_domain=${mw_api_domain:-$default_mw_api_domain}
 
 # Prompt user for MW install method
