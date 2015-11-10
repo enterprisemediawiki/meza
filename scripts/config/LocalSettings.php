@@ -992,6 +992,14 @@ $wgVisualEditorParsoidURL = 'http://127.0.0.1:8000';
 // Parsoid will be called as $url/$prefix/$pagename
 $wgVisualEditorParsoidPrefix = $wikiId;
 
+// Define which namespaces will use VE
+$wgVisualEditorNamespaces = array_merge(
+	$wgContentNamespaces,
+        array( NS_USER, 
+          NS_HELP,
+          NS_PROJECT
+	)
+);
 
 #
 # Extension:Elastica
@@ -1085,12 +1093,22 @@ $wgFlowContentFormat = 'html';
 // use VE
 $wgFlowEditorList = array( 'visualeditor', 'none' );
 
-// enable in Project Talk, User Talk, and Talk (content namespace talk)
-$wgNamespaceContentModels[NS_PROJECT_TALK] = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_USER_TALK]    = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_TALK]         = CONTENT_MODEL_FLOW_BOARD;
+// Define which namespaces will use Flow
+$wgNamespaceContentModels[NS_PROJECT_TALK]        = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_USER_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_TALK]                = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_HELP_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_FILE_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_CATEGORY_TALK]       = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_MEDIAWIKI_TALK]      = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_TEMPLATE_TALK]       = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[SMW_NS_FORM_TALK]       = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[SMW_NS_PROPERTY_TALK]   = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[SMW_NS_CONCEPT_TALK]    = CONTENT_MODEL_FLOW_BOARD;
 
-
+// Connect Flow to Parsoid
+$wgFlowParsoidURL = 'http://127.0.0.1:8000';
+$wgFlowParsoidPrefix = $wikiId;
 
 
 
