@@ -468,6 +468,12 @@ $wgFileExtensions = array(
  */
 
 #
+# Enable Semantic MediaWiki semantics
+#
+enableSemantics( $wikiId . '.' . $_SERVER[ 'SERVER_NAME' ] );
+
+
+#
 # Semantic MediaWiki Settings (extension loaded via Composer)
 #
 $smwgQMaxSize = 5000;

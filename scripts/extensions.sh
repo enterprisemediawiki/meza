@@ -7,6 +7,13 @@ print_title "Starting script extensions.sh"
 
 
 #
+# Since SMW is not installed yet, we need to temporarily remove
+# the enableSemantics() function in LocalSettings.php
+#
+sed -r -i 's/^enableSemantics/\/\/enableSemantics/;' "$m_mediawiki/LocalSettings.php"
+
+
+#
 # Install Demo MW: create wiki directory, setup basic settings, create database
 #
 echo -e "\n\nCreating new wiki called \"Demo Wiki\""
@@ -56,6 +63,11 @@ composer require \
 	mediawiki/semantic-meeting-minutes:~0.3 \
 	mediawiki/semantic-maps:~3.2
 cmd_profile "END extensions composer require"
+
+
+# Now do enableSemantics()...uncomment function
+sed -r -i 's/^\/\/enableSemantics/enableSemantics/;' "$m_mediawiki/LocalSettings.php"
+
 
 # update database
 cd "$m_mediawiki"
