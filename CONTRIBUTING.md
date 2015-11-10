@@ -62,3 +62,4 @@ These tests should be performed prior to each release of meza, or any time  chan
 * Repeat all tests for CentOS 6 64-bit
 * Repeat all tests for CentOS 7 (64-bit only)
 * Create semantic properties in several pages, perform #ask query and verify results
+* Perform tests on VirtualBox, Digital Ocean, AWS and Meza1-dev
