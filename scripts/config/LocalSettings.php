@@ -875,7 +875,7 @@ require_once $egExtensionLoader->registerLegacyExtension(
 require_once $egExtensionLoader->registerLegacyExtension(
 	"SummaryTimeline",
 	"https://github.com/darenwelsh/SummaryTimeline.git",
-	"master"
+	"tags/0.1.3"
 );
 
 
