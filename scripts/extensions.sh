@@ -28,7 +28,7 @@ echo -e "\n\n## meza: Install ExtensionLoader and apply changes to MW settings"
 cd "$m_mediawiki/extensions"
 git clone https://github.com/jamesmontalvo3/ExtensionLoader.git
 cd ./ExtensionLoader
-git checkout tags/v0.2.1
+git checkout tags/v0.2.2
 cd "$m_mediawiki"
 
 
