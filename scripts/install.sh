@@ -196,6 +196,13 @@ fi
 # meza since we can't be certain of consistent method of accessing install.sh.
 source /opt/meza/scripts/config.sh
 
+# Enable time sync
+# Ref: http://www.cyberciti.biz/faq/howto-install-ntp-to-synchronize-server-clock/
+yum -y install ntp ntpdate ntp-doc # Install packages for time sync
+chkconfig ntpd on # Activate service
+ntpdate pool.ntp.org # Synchronize the system clock with 0.pool.ntp.org server
+service ntpd start # Start service
+# Optionally configure ntpd via /etc/ntp.conf
 
 # @todo: Need to test for yums.sh functionality prior to proceeding
 #    with apache.sh, and Apache functionality prior to proceeding
