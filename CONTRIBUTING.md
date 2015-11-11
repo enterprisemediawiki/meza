@@ -51,7 +51,7 @@ The following tests should be performed if time allows, or if a change is likely
     * Verify logged in user can view image
     * Verify anonymous user CANNOT view image
   * Attempt to directly access image via URI like `http://example.com/wikis/<wiki-id>/images/a/a1/Image.png`
-    * Verify logged in user can view image
+    * Verify logged in user CANNOT view image
     * Verify anonymous user CANNOT view image
 
 #### Pre-release testing requirements
@@ -62,3 +62,4 @@ These tests should be performed prior to each release of meza, or any time  chan
 * Repeat all tests for CentOS 6 64-bit
 * Repeat all tests for CentOS 7 (64-bit only)
 * Create semantic properties in several pages, perform #ask query and verify results
+* Perform tests on VirtualBox, Digital Ocean, AWS and Meza1-dev

@@ -140,7 +140,7 @@ class MezaCreateUser extends Maintenance {
 
 		// added by jamesmontalvo3
 		foreach( $this->mGroups as $group ) {
-			$u->addGroup( 'sysop' );
+			$u->addGroup( $group );
 		}
 
 		return Status::newGood( $u );
