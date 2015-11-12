@@ -78,3 +78,14 @@ To transfer files to your server you can use SCP (or PSCP on Windows):
 ```
 (p)scp -r /path/to/your/wiki/imports user@example.com:/home/user/wikis
 ```
+
+## Importing wikis directly from another server
+
+This process can be used to import wikis from some types of servers. The authors of this script have only tested it where the remote server is running Windows.
+
+1. `cd /opt/meza`
+2. Create `remote-wiki-config.sh` by doing one of the following:
+  1. `sudo cp ./scripts/config/remote-wiki-config.example.sh ./remote-wiki-config.sh` and editing the file
+  2. `sudo vi remote-wiki-config.sh` and pasting in your pre-built config
+3. `cd scripts`
+4. `sudo bash import-remote-wikis.sh`. You should only need to enter your username and password for the remote server if you filled `remote-wiki-config.sh`
