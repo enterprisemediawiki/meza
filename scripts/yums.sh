@@ -128,6 +128,7 @@ yum install -y \
     libmcrypt-devel \
     pam-devel \
     cifs-utils \
+    httpd \
     ghostscript
 cmd_profile "END yum install dependency list"
 

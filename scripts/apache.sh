@@ -4,54 +4,11 @@
 
 print_title "Starting script apache.sh"
 
-# change to mezadownloads directory
-cd ~/mezadownloads
-
-#
-# Download Apache httpd, Apache Portable Runtime (APR) and APR-util
-# Note that these links may break when new versions are released
-# See httpd [1] and APR [2] list of files to confirm versions before running.
-#
-# [1] http://www.us.apache.org/dist//httpd/
-# [2] http://www.us.apache.org/dist//apr
-#
-httpd_version="2.4.16"
-apr_version="1.5.2"
-aprutil_version="1.5.4"
-wget "http://archive.apache.org/dist/httpd/httpd-$httpd_version.tar.gz"
-wget "http://archive.apache.org/dist/apr/apr-$apr_version.tar.gz"
-wget "http://archive.apache.org/dist/apr/apr-util-$aprutil_version.tar.gz"
-
-
-#
-# Unpack and build Apache from source
-#
-tar -zxvf "httpd-$httpd_version.tar.gz"
-tar -zxvf "apr-$apr_version.tar.gz"
-tar -zxvf "apr-util-$aprutil_version.tar.gz"
-cp -r "apr-$apr_version" "httpd-$httpd_version/srclib/apr"
-cp -r "apr-util-$aprutil_version" "httpd-$httpd_version/srclib/apr-util"
-mv "httpd-$httpd_version" "$m_meza/sources/httpd-$httpd_version"
-cd "$m_meza/sources/httpd-$httpd_version"
-cmd_profile "START apache build"
-./configure --enable-ssl --enable-so --with-included-apr --with-mpm=event
-make
-make install
-cmd_profile "END apache build"
-
-
-#
-# Apache user
-#
-groupadd www
-useradd -G www -r apache
-chown -R apache:www /usr/local/apache2
-
 
 #
 # Setup document root
 #
-chown -R apache:www "$m_htdocs"
+chown -R apache:apache "$m_htdocs"
 chmod -R 775 "$m_htdocs"
 
 
@@ -63,8 +20,6 @@ chmod -R 775 "$m_htdocs"
 # @todo: figure out if this section is necessary For now skip section titled "httpd-security.conf"
 #
 
-
-
 # @todo: pick up from section "Modify config file"
 
 #### NOT YET COMPLETE ####
@@ -72,7 +27,7 @@ chmod -R 775 "$m_htdocs"
 
 
 
-cd /usr/local/apache2/conf
+cd /etc/httpd/conf
 
 #
 # Commenting out all modifications to httpd.conf. These should all be in
@@ -93,12 +48,15 @@ cd /usr/local/apache2/conf
 mv httpd.conf httpd.default.conf
 cp "$m_meza/scripts/config/httpd.conf" ./httpd.conf
 
-# create service script
-cd /etc/init.d
-cp "$m_meza/scripts/initd_httpd.sh" ./httpd
-chmod +x /etc/init.d/httpd
+# create service script - THIS SHOULD BE DONE BY YUM NOW
+# cd /etc/init.d
+# cp "$m_meza/scripts/initd_httpd.sh" ./httpd
+# chmod +x /etc/init.d/httpd
 
 # create logrotate file
+# THIS MAY BE DONE BY YUM, BUT SINCE THESE FILES ARE REFERENCED IN OUR
+# CUSTOM httpd.conf WE SHOULD STICK WITH THIS FOR NOW. OUR CUSTOM httpd.conf
+# MAY REQUIRE REVISION.
 cd /etc/logrotate.d
 cp "$m_meza/scripts/logrotated_httpd" ./httpd
 
@@ -140,5 +98,5 @@ else
 fi
 
 
-echo -e "\n\nYour Apache 2.4 webserver has been setup.\n\nPlease use the web browser on your host computer to navigate to http://192.168.56.56 to test it out"
+echo -e "\n\napache.sh complete."
 
