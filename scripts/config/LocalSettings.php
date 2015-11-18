@@ -253,7 +253,32 @@ if ( isset( $mezaCustomDBuser ) && isset ( $mezaCustomDBpass ) ) {
 	require_once "$m_htdocs/__common/dbUserPass.php";
 }
 
-## Shared database settings
+# MySQL specific settings
+$wgDBprefix = "";
+
+# MySQL table options to use during installation or update
+$wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
+
+# Experimental charset support for MySQL 5.0.
+$wgDBmysql5 = false;
+
+/**
+ *  If a primewiki is defined then every wiki will use that wiki db for certain
+ *  tables. The shared `interwiki` table allows users to use the same interwiki
+ *  prefixes across all wikis. The `user` and `user_properties` tables make all
+ *  wikis have the same set of users and user properties/preferences. This does
+ *  not affect the user groups, so a user can be a sysop on one wiki and just a
+ *  user on another.
+ *
+ *  To enable a primewiki create the file $m_htdocs/__common/primewiki and make
+ *  the file contents be the id of the desired wiki.
+ *
+ *  In order for this to work properly the wikis need to have been created with
+ *  a single user table in mind. If you're starting a new wiki farm then you're
+ *  all set. If you're importing wikis which didn't previously have shared user
+ *  tables, then you'll need to use TBD user-merge script.
+ *
+ **/
 if ( file_exists( "$m_htdocs/__common/primewiki" ) ) {
 
 	// grab prime wiki data using closure to encapsulate the data
@@ -284,30 +309,6 @@ if ( file_exists( "$m_htdocs/__common/primewiki" ) ) {
 	);
 
 }
-
-
-# MySQL specific settings
-$wgDBprefix = "";
-
-# MySQL table options to use during installation or update
-$wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
-
-# Experimental charset support for MySQL 5.0.
-$wgDBmysql5 = false;
-
-/**
- *  All wikis will use the Meta Wiki for certain tables. For now only the
- *  interwiki table is being shared. At some point the user and user_properties
- *  table will be shared so people can keep preferences and other data across
- *  wikis.
- **/
-// $wgSharedDB     = 'wiki_meta';
-// $wgSharedTables = array(
-// 	'interwiki',
-// 	'user',
-// 	'user_properties',
-// );
-
 
 
 
@@ -1028,7 +1029,7 @@ $wgVisualEditorParsoidPrefix = $wikiId;
 // Define which namespaces will use VE
 $wgVisualEditorNamespaces = array_merge(
 	$wgContentNamespaces,
-        array( NS_USER, 
+        array( NS_USER,
           NS_HELP,
           NS_PROJECT
 	)
