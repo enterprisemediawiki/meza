@@ -48,7 +48,7 @@ cd "$m_meza/sources/php-$phpversion/"
 #
 cmd_profile "START php build"
 ./configure \
-    --with-apxs2=/usr/local/apache2/bin/apxs \
+    --with-apxs2=/usr/bin/apxs \
     --enable-bcmath \
     --with-bz2 \
     --enable-calendar \
