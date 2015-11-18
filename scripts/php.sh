@@ -82,7 +82,6 @@ cmd_profile "START php build"
     --enable-inline-optimization \
     --enable-mbregex \
     --enable-opcache \
-    --enable-fpm \
     --enable-intl \
     --prefix=/usr/local/php
 make
