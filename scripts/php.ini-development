@@ -700,6 +700,7 @@ default_mimetype = "text/html"
 ;
 ; PHP's default setting for include_path is ".;/path/to/php/pear"
 ; http://php.net/include-path
+include_path=".:/usr/local/php/lib/php:/etc/httpd/modules"
 
 ; The root of the PHP pages, used only if nonempty.
 ; if PHP was not compiled with FORCE_REDIRECT, you SHOULD set doc_root
