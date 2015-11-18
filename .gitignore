@@ -3,3 +3,4 @@ sources/*
 !sources/README.md
 logs/*
 !logs/README.md
+remote-wiki-config.sh

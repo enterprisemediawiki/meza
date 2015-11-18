@@ -1,11 +1,34 @@
 <?php
-# This is the main configuration settings for all Meza1 wikis. This file
-# should not be edited. Instead edit TBD. @todo @fixme
 
 # Protect against web entry
 if ( !defined( 'MEDIAWIKI' ) ) {
 	exit;
 }
+
+
+/**
+ *  TABLE OF CONTENTS
+ *
+ *    1) WIKI-SPECIFIC SETUP
+ *    2) DEBUG
+ *    3) PATH SETUP
+ *    4) EMAIL
+ *    5) DATABASE SETUP
+ *    6) GENERAL CONFIGURATION
+ *    7) EXTENSION SETTINGS
+ *    8) LOAD OVERRIDES
+ *    9) HOMELESS ITEMS
+ *
+ **/
+
+
+
+/**
+ *  1) WIKI-SPECIFIC SETUP
+ *
+ *  Acquire the intended wiki either from the REQUEST_URI (for web requests) or
+ *  from the WIKI environment variable (for command line scripts)
+ **/
 
 // same value as bash variable in config.sh
 $m_htdocs = '/opt/meza/htdocs';
@@ -45,6 +68,98 @@ if ( ! in_array( $wikiId, $wikis ) ) {
 require_once "$m_htdocs/wikis/$wikiId/config/setup.php";
 
 
+
+
+
+
+/**
+ *  2) DEBUG
+ *
+ *  Options to enable debug are below. The lowest-impact solution should be
+ *  chosen. Options are listed from least impact to most impact.
+ *    1) Add to the URI you're requesting `requestDebug=true` to enable debug
+ *       for just that request.
+ *    2) Set `$mezaCommandLineDebug = true;` for debug on the command line
+ *    3) Set `$mezaDebug = array( "NDC\Your-ndc", ... );` in a wiki's setup.sh
+ *       to enable debug for just specific users on a single wiki.
+ *    4) Set `$mezaDebug = true;` in a wiki's setup.sh to enable debug for all
+ *       users of a single wiki.
+ *    5) Set `$mezaForceDebug = true;` to turn on debug for all users and wikis
+ **/
+$mezaCommandLineDebug = false;
+$mezaForceDebug = false;
+
+
+if ( $mezaForceDebug ) {
+	$debug = true;
+}
+
+elseif ( $wgCommandLineMode && $mezaCommandLineDebug ) {
+	$debug = true;
+}
+
+elseif ( $GLOBALS['mezaDebug'] === true ) {
+	$debug = true;
+}
+
+// Check if $mezaDebug is an array, and if so check if the requesting user is
+// in the array.
+elseif ( ! $wgCommandLineMode
+	&& is_array( $GLOBALS['mezaDebug'] )
+	&& in_array( $_SERVER["REMOTE_USER"], $GLOBALS['mezaDebug'] )
+) {
+	$debug = true;
+}
+
+elseif ( isset( $_GET['requestDebug'] ) ) {
+	$debug = true;
+}
+
+else {
+	$debug = false;
+}
+
+
+if ( $debug ) {
+
+	// turn error logging on
+	error_reporting( -1 );
+	ini_set( 'display_errors', 1 );
+	ini_set( 'log_errors', 1 );
+
+	// Output errors to log file
+	ini_set( 'error_log', __DIR__ . '/php.log' );
+
+	// MediaWiki Debug Tools
+	$wgShowExceptionDetails = true;
+	$wgDebugToolbar = true;
+	$wgShowDebug = true;
+
+}
+
+// production: no error reporting
+else {
+
+	error_reporting(0);
+	ini_set("display_errors", 0);
+
+}
+
+
+
+
+
+
+
+
+
+
+/**
+ *  3) PATH SETUP
+ *
+ *
+ **/
+
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
 $wgScriptPath = "/$wikiId";
 
@@ -60,11 +175,6 @@ $wgLogo = "/wikis/$wikiId/config/logo.png";
 // https://www.mediawiki.org/wiki/Manual:$wgFavicon
 $wgFavicon = "/wikis/$wikiId/config/favicon.ico";
 
-// https://www.mediawiki.org/wiki/Manual:$wgEmergencyContact
-$wgEmergencyContact = "enterprisemediawiki@gmail.com"; // @todo: this should be in setup, but this is easier for now.
-
-// https://www.mediawiki.org/wiki/Manual:$wgPasswordSender
-$wgPasswordSender = "enterprisemediawiki@gmail.com"; // @todo: this should be in setup, but this is easier for now.
 
 // https://www.mediawiki.org/wiki/Manual:$wgMetaNamespace
 $wgMetaNamespace = str_replace( ' ', '_', $wgSitename );
@@ -81,6 +191,19 @@ $wgScriptExtension = ".php";
 $wgStylePath = "$wgScriptPath/skins";
 $wgResourceBasePath = $wgScriptPath;
 
+
+
+
+
+
+
+
+
+/**
+ *  4) EMAIL
+ *
+ *  Email configuration
+ **/
 if ( $mezaEnableAllWikiEmail && isset( $mezaEnableWikiEmail ) && $mezaEnableWikiEmail ) {
 	$wgEnableEmail = true;
 }
@@ -94,8 +217,26 @@ $wgEnotifUserTalk = false; # UPO
 $wgEnotifWatchlist = false; # UPO
 $wgEmailAuthentication = true;
 
+// https://www.mediawiki.org/wiki/Manual:$wgEmergencyContact
+$wgEmergencyContact = "enterprisemediawiki@gmail.com"; // @todo: this should be in setup, but this is easier for now.
 
-## Database settings
+// https://www.mediawiki.org/wiki/Manual:$wgPasswordSender
+$wgPasswordSender = "enterprisemediawiki@gmail.com"; // @todo: this should be in setup, but this is easier for now.
+
+
+
+
+
+
+
+
+
+
+/**
+ *  5) DATABASE SETUP
+ *
+ *
+ **/
 $wgDBtype = "mysql";
 $wgDBserver = "";
 if ( isset( $mezaCustomDBname ) ) {
@@ -103,6 +244,8 @@ if ( isset( $mezaCustomDBname ) ) {
 } else {
 	$wgDBname = "wiki_$wikiId";
 }
+
+// Custom database user and password, if any wikis have that (none do now)
 if ( isset( $mezaCustomDBuser ) && isset ( $mezaCustomDBpass ) ) {
 	$wgDBuser = $mezaCustomDBuser;
 	$wgDBpassword = $mezaCustomDBpass;
@@ -152,9 +295,40 @@ $wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
 # Experimental charset support for MySQL 5.0.
 $wgDBmysql5 = false;
 
-## Shared memory settings
-$wgMainCacheType = CACHE_NONE;
-$wgMemCachedServers = array();
+/**
+ *  All wikis will use the Meta Wiki for certain tables. For now only the
+ *  interwiki table is being shared. At some point the user and user_properties
+ *  table will be shared so people can keep preferences and other data across
+ *  wikis.
+ **/
+// $wgSharedDB     = 'wiki_meta';
+// $wgSharedTables = array(
+// 	'interwiki',
+// 	'user',
+// 	'user_properties',
+// );
+
+
+
+
+
+
+
+
+/**
+ *  6) GENERAL CONFIGURATION
+ *
+ *
+ *
+ **/
+// memcached settings
+$wgMainCacheType = CACHE_MEMCACHED;
+$wgParserCacheType = CACHE_NONE; // optional; if set to CACHE_MEMCACHED, templates used to format query results in generic footer don't work
+$wgMessageCacheType = CACHE_MEMCACHED; // optional
+$wgMemCachedServers = array( "127.0.0.1:11211" );
+$wgSessionsInObjectCache = true; // optional
+$wgSessionCacheType = CACHE_MEMCACHED; // optional
+
 
 ## To enable image uploads, make sure the 'images' directory
 ## is writable, then set this to true:
@@ -264,10 +438,6 @@ $oldtz = getenv("TZ");
 putenv("TZ=$wgLocaltimezone");
 
 
-$wgFileExtensions[] = 'mp3';
-$wgFileExtensions[] = 'aac';
-$wgFileExtensions[] = 'msg';
-
 $wgMaxImageArea = 1.25e10; // Images on [[Snorkel]] fail without this
 // $wgMemoryLimit = 500000000; //Default is 50M. This is 500M.
 
@@ -279,15 +449,731 @@ $wgMaxImageArea = 1.25e10; // Images on [[Snorkel]] fail without this
 ini_set( 'pcre.backtrack_limit', 1000000000 ); //1 billion
 
 
-$wgFileExtensions[] = 'pdf';
-$wgFileExtensions[] = 'svg';
 $wgUseImageMagick = true;
 $wgImageMagickConvertCommand = '/usr/local/bin/convert';
+
+// Allowed file types
+$wgFileExtensions = array(
+	'aac',
+	'bmp',
+	'docx',
+	'gif',
+	'jpg',
+	'jpeg',
+	'mpp',
+	'mp3',
+	'msg',
+	'odg',
+	'odp',
+	'ods',
+	'odt',
+	'pdf',
+	'png',
+	'pptx',
+	'ps',
+	'svg',
+	'tiff',
+	'txt',
+	'xlsx'
+);
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 /**
- * END LocalSettingsAdditions
+ *  7) EXTENSION SETTINGS
+ *
+ *  Code to load the extension "ExtensionLoader", which then installs and loads
+ *  other extensions as defined in "ExtensionSettings.php". Note that the file
+ *  or files defining which extensions are loaded is configurable below, as is
+ *  the path to where extensions are installed.
+ */
+
+#
+# Enable Semantic MediaWiki semantics
+#
+enableSemantics( $wikiId . '.' . $_SERVER[ 'SERVER_NAME' ] );
+
+
+#
+# Semantic MediaWiki Settings (extension loaded via Composer)
+#
+$smwgQMaxSize = 5000;
+
+#
+# SemanticResultFormats formats enabled (beyond defaults)
+#
+
+// These are disabled by default because they send data to external
+// web services for rendering, which may be considered a data leak
+// $srfgFormats[] = 'googlebar';
+// $srfgFormats[] = 'googlepie';
+
+// Disabled until the proper dependencies are added (PHPExcel I think)
+// $srfgFormats[] = 'excel';
+
+// Enables the "filtered" format. Where do we use this?
+$srfgFormats[] = 'filtered';
+
+// Disabled due to some issue on FOD wikis. Confirm, reenable if possible
+// $srfgFormats[] = 'exhibit';
+
+
+
+// allows adding semantic properties to Templates themselves
+// (not just on pages via templates).
+// ENABLE THIS AFTER ALL TEMPLATES HAVE BEEN CHECKED FOR PROPER FORM
+// i.e. using <noinclude> and <includeonly> properly
+// $smwgNamespacesWithSemanticLinks[NS_TEMPLATE] = true;
+$smwgNamespacesWithSemanticLinks[NS_TALK] = true;
+
+
+/**
+ *  Code to load the extension "ExtensionLoader", which then installs and loads
+ *  other extensions
+ */
+require_once "$IP/extensions/ExtensionLoader/ExtensionLoader.php";
+$egExtensionLoader = new ExtensionLoader();
+
+/**
+ * May want to include ParserFunctionHelper in order to extension-ify templates
+ */
+// 'ParserFunctionHelper' => array(
+// 	'git' => 'https://github.com/enterprisemediawiki/ParserFunctionHelper.git',
+// 	'branch' => 'master',
+// ),
+
+/**
+ * ImportUsers is not in wikimedia git, now in github/kghbln. Also, it seems it
+ * may not work well with newer versions of MW
+ * @url: https://github.com/kghbln/ImportUsers
+ * Consider updating and taking into EMW.org
+ */
+// 'ImportUsers' => array(
+// 	'git' => 'https://gerrit.wikimedia.org/r/mediawiki/extensions/ImportUsers.git',
+// 	'branch' => 'master',
+// 	'globals' => array(
+// 		'wgShowExceptionDetails' => true,
+// 	)
+// ),
+
+
+
+#
+# Extension:ParserFunctions
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"ParserFunctions",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/ParserFunctions.git",
+	"REL1_25"
+);
+$wgPFEnableStringFunctions = true;
+
+
+#
+# Extension:StringFunctionsEscaped
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"StringFunctionsEscaped",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/StringFunctionsEscaped.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:ExternalData
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"ExternalData",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/ExternalData.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:LabeledSectionTransclusion
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"LabeledSectionTransclusion",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/LabeledSectionTransclusion.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:Cite
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"Cite",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Cite.git",
+	"REL1_25"
+);
+$wgCiteEnablePopups = true;
+
+
+#
+# Extension:HeaderFooter
+#
+// managed by composer due to use of SemanticMeetingMinutes
+// 'HeaderFooter' => array(
+// 	'git' => 'https://github.com/enterprisemediawiki/HeaderFooter.git',
+// 	'branch' => 'master',
+// ),
+
+
+#
+# Extension:WhoIsWatching
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"WhoIsWatching",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/WhoIsWatching.git",
+	"REL1_25"
+);
+$wgPageShowWatchingUsers = true;
+
+
+#
+# Extension:CharInsert
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"CharInsert",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/CharInsert.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:SemanticForms
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"SemanticForms",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticForms.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:SemanticInternalObjects
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"SemanticInternalObjects",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticInternalObjects.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:SemanticCompoundQueries
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"SemanticCompoundQueries",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticCompoundQueries.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:Arrays
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"Arrays",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Arrays.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:TitleKey
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"TitleKey",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/TitleKey.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:TalkRight
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"TalkRight",
+	"https://github.com/enterprisemediawiki/TalkRight.git",
+	"master"
+);
+
+
+#
+# Extension:AdminLinks
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"AdminLinks",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/AdminLinks.git",
+	"REL1_25"
+);
+$wgGroupPermissions['sysop']['adminlinks'] = true;
+
+
+#
+# Extension:DismissableSiteNotice
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"DismissableSiteNotice",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/DismissableSiteNotice.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:BatchUserRights
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"BatchUserRights",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/BatchUserRights.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:HeaderTabs
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"HeaderTabs",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/HeaderTabs.git",
+	"REL1_25"
+);
+$htEditTabLink = false;
+$htRenderSingleTab = true;
+
+
+#
+# Extension:WikiEditor
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"WikiEditor",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/WikiEditor.git",
+	"REL1_25"
+);
+$wgDefaultUserOptions['usebetatoolbar'] = 1;
+$wgDefaultUserOptions['usebetatoolbar-cgd'] = 1;
+
+# displays publish button
+$wgDefaultUserOptions['wikieditor-publish'] = 1;
+
+# Displays the Preview and Changes tabs
+$wgDefaultUserOptions['wikieditor-preview'] = 1;
+
+
+#
+# Extension:CopyWatchers
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"CopyWatchers",
+	"https://github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git",
+	"master"
+);
+
+
+#
+# Extension:SyntaxHighlight_GeSHi
+#
+# consider replacing with SyntaxHighlight_Pygments
+# https://gerrit.wikimedia.org/r/mediawiki/extensions/SyntaxHighlight_Pygments.git
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"SyntaxHighlight_GeSHi",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/SyntaxHighlight_GeSHi.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:Wiretap
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"Wiretap",
+	"https://github.com/enterprisemediawiki/Wiretap.git",
+	"master"
+);
+
+
+#
+# Extension:ApprovedRevs
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"ApprovedRevs",
+	"https://github.com/jamesmontalvo3/MediaWiki-ApprovedRevs.git",
+	"master"
+);
+$egApprovedRevsAutomaticApprovals = false;
+
+
+#
+# Extension:InputBox
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"InputBox",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/InputBox.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:ReplaceText
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"ReplaceText",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/ReplaceText.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:Interwiki
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"Interwiki",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Interwiki.git",
+	"REL1_25"
+);
+$wgGroupPermissions['sysop']['interwiki'] = true;
+
+
+#
+# Extension:IMSQuery
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"IMSQuery",
+	"https://github.com/jamesmontalvo3/IMSQuery.git",
+	"master"
+);
+
+
+#
+# Extension:MasonryMainPage
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"MasonryMainPage",
+	"https://github.com/enterprisemediawiki/MasonryMainPage.git",
+	"master"
+);
+
+
+#
+# Extension:WatchAnalytics
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"WatchAnalytics",
+	"https://github.com/enterprisemediawiki/WatchAnalytics.git",
+	"master"
+);
+
+// makes Pending Reviews shake after X days
+$egPendingReviewsEmphasizeDays = 10;
+
+
+#
+# Extension:NumerAlpha
+#
+// managed by composer due to use of SemanticMeetingMinutes
+// 'NumerAlpha' => array(
+// 	'git' => 'https://github.com/jamesmontalvo3/NumerAlpha.git',
+// 	'branch' => 'master',
+// ),
+
+
+#
+# Extension:Variables
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"Variables",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Variables.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:SummaryTimeline
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"SummaryTimeline",
+	"https://github.com/darenwelsh/SummaryTimeline.git",
+	"tags/0.1.3"
+);
+
+
+#
+# Extension:YouTube
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"YouTube",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/YouTube.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:ContributionScores
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"ContributionScores",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/ContributionScores.git",
+	"REL1_25"
+);
+// Exclude Bots from the reporting - Can be omitted.
+$wgContribScoreIgnoreBots = true;
+
+// Exclude Blocked Users from the reporting - Can be omitted.
+$wgContribScoreIgnoreBlockedUsers = true;
+
+// Use real user names when available - Can be omitted. Only for MediaWiki 1.19 and later.
+$wgContribScoresUseRealName = true;
+
+// Set to true to disable cache for parser function and inclusion of table.
+$wgContribScoreDisableCache = false;
+
+//Each array defines a report - 7,50 is "past 7 days" and "LIMIT 50" - Can be omitted.
+$wgContribScoreReports = array(
+	array(7,50),
+	array(30,50),
+	array(0,50)
+);
+
+
+#
+# Extension:PipeEscape
+#
+# @todo: The "official" version of this is in an SVN repository. If we need
+#        this it should be migrated to Gerrit or an EMW managed git repo.
+#        See https://www.mediawiki.org/wiki/Extension:Pipe_Escape
+#
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"PipeEscape",
+	"https://github.com/jamesmontalvo3/MediaWiki-PipeEscape.git",
+	"master"
+);
+
+
+#
+# Extension:PdfHandler
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"PdfHandler",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler",
+	"REL1_25"
+);
+// Location of PdfHandler dependencies
+$wgPdfProcessor = '/usr/bin/gs'; // installed via yum
+$wgPdfPostProcessor = '/usr/local/bin/convert'; // built from source
+$wgPdfInfo = '/usr/local/bin/pdfinfo'; // pre-built binaries installed
+
+
+#
+# Extension:UniversalLanguageSelector
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"UniversalLanguageSelector",
+	"https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UniversalLanguageSelector.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:VisualEditor
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"VisualEditor",
+	"https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git",
+	"REL1_25"
+);
+// Allow read and edit permission for requests from the server (e.g. Parsoid)
+// Ref: https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
+// Ref: https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
+if ( isset( $_SERVER['REMOTE_ADDR'] ) && isset( $_SERVER['SERVER_ADDR'] )
+	&& $_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR'] )
+{
+	$wgGroupPermissions['*']['read'] = true;
+	$wgGroupPermissions['*']['edit'] = true;
+}
+
+// Enable by default for everybody
+$wgDefaultUserOptions['visualeditor-enable'] = 1;
+
+// Don't allow users to disable it
+$wgHiddenPrefs[] = 'visualeditor-enable';
+
+// OPTIONAL: Enable VisualEditor's experimental code features
+#$wgDefaultUserOptions['visualeditor-enable-experimental'] = 1;
+
+// URL to the Parsoid instance
+// MUST NOT end in a slash due to Parsoid bug
+// Use port 8142 if you use the Debian package
+$wgVisualEditorParsoidURL = 'http://127.0.0.1:8000';
+
+// Interwiki prefix to pass to the Parsoid instance
+// Parsoid will be called as $url/$prefix/$pagename
+$wgVisualEditorParsoidPrefix = $wikiId;
+
+// Define which namespaces will use VE
+$wgVisualEditorNamespaces = array_merge(
+	$wgContentNamespaces,
+        array( NS_USER, 
+          NS_HELP,
+          NS_PROJECT
+	)
+);
+
+#
+# Extension:Elastica
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"Elastica",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Elastica.git",
+	"REL1_25"
+);
+
+
+#
+# Extension:CirrusSearch
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"CirrusSearch",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/CirrusSearch.git",
+	"REL1_25"
+);
+$wgSearchType = 'CirrusSearch';
+include "$m_htdocs/wikis/$wikiId/config/disableSearchUpdate.php";
+//$wgCirrusSearchServers = array( 'search01', 'search02' );
+
+
+#
+# Extension:Echo
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"Echo",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Echo.git",
+	"REL1_25"
+);
+$wgEchoEmailFooterAddress = $wgPasswordSender;
+
+
+#
+# Extension:Thanks
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	"Thanks",
+	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Thanks.git",
+	"REL1_25"
+);
+$wgThanksConfirmationRequired = false;
+
+
+#
+# Extension:Upload Wizard
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	'UploadWizard',
+	'https://gerrit.wikimedia.org/r/mediawiki/extensions/UploadWizard',
+	'REL1_25'
+);
+
+// Needed to make UploadWizard work in IE, see bug 39877
+// See also: https://www.mediawiki.org/wiki/Manual:$wgApiFrameOptions
+$wgApiFrameOptions = 'SAMEORIGIN';
+
+// Use UploadWizard by default in navigation bar
+$wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard"; //Update with #156
+$wgUploadWizardConfig = array(
+	'debug' => false,
+	'autoCategory' => 'Uploaded with UploadWizard',
+	'feedbackPage' => 'FeedbackTest2',
+	'altUploadForm' => 'Special:Upload',
+	'fallbackToAltUploadForm' => false,
+	'enableFormData' => true,  # Should FileAPI uploads be used on supported browsers?
+	'enableMultipleFiles' => true,
+	'enableMultiFileSelect' => true,
+	'tutorial' => array('skip' => true),
+	'fileExtensions' => $wgFileExtensions //omitting this can cause errors
+);
+
+
+#
+# Extension:Flow
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	'Flow',
+	'https://gerrit.wikimedia.org/r/mediawiki/extensions/Flow.git',
+	'REL1_25'
+);
+
+// only allow sysops to create new flow boards
+$wgGroupPermissions['sysop']['flow-create-board'] = true;
+
+// store posts as html using Parsoid
+$wgFlowContentFormat = 'html';
+
+// use VE
+$wgFlowEditorList = array( 'visualeditor', 'none' );
+
+// Define which namespaces will use Flow
+$wgNamespaceContentModels[NS_PROJECT_TALK]        = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_USER_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_TALK]                = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_HELP_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_FILE_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_CATEGORY_TALK]       = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_MEDIAWIKI_TALK]      = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[NS_TEMPLATE_TALK]       = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[SMW_NS_FORM_TALK]       = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[SMW_NS_PROPERTY_TALK]   = CONTENT_MODEL_FLOW_BOARD;
+$wgNamespaceContentModels[SMW_NS_CONCEPT_TALK]    = CONTENT_MODEL_FLOW_BOARD;
+
+// Connect Flow to Parsoid
+$wgFlowParsoidURL = 'http://127.0.0.1:8000';
+$wgFlowParsoidPrefix = $wikiId;
+
+
+
+
+
+
+
+
+
+/**
+ *  8) LOAD OVERRIDES
+ *
+ *
+ *
+ *
+ **/
+if ( file_exists( "$m_htdocs/wikis/$wikiId/config/overrides.php" ) ) {
+	require_once "$m_htdocs/wikis/$wikiId/config/overrides.php";
+}
+
+
+
+
+
+
+
+
+
+/**
+ *  9) HOMELESS ITEMS
+ *
+ *  EVERYTHING BELOW HERE SHOULD BE MOVED INTO THE APPROPRIATE PLACE IN THIS
+ *  DOCUMENT OR SUPPORTING SETTINGS DOCUMENTS.
  **/
 
-include "$m_htdocs/__common/ComposerSettings.php";

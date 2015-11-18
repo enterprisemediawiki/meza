@@ -33,14 +33,26 @@ These tests should be performed on all changes
 * Verify ElasticSearch works by searching with a typo (e.g. search for "Test Paeg" when looking for "Test Page")
 * Verify file uploads work
 * Verify thumbnailing works (upload a larger image and verify small images are generated)
+* Verify `create-wiki.sh` successfully creates a wiki
 
 #### Desired testing
 
 The following tests should be performed if time allows, or if a change is likely to affect any test.
 
+* Verify `import-wikis.sh` imports multiple wikis
 * Verify PDFHandler functioning (PDF images shown on PDF file pages)
 * Verify image security: users unable to view images when not logged in
-
+  * Test access to images when not logged into the wiki (use another browser)
+    * Go to a file page with a logged in user and click the image and open in a new tab; verify you can view the image
+    * Open that same image in another browser without being logged in; verify you can view the image
+  * Add to `LocalSettings.php` to remove anonymous viewing:
+    * `$wgGroupPermissions['*']['read'] = false;`
+  * Test access to images from both browsers:
+    * Verify logged in user can view image
+    * Verify anonymous user CANNOT view image
+  * Attempt to directly access image via URI like `http://example.com/wikis/<wiki-id>/images/a/a1/Image.png`
+    * Verify logged in user CANNOT view image
+    * Verify anonymous user CANNOT view image
 
 #### Pre-release testing requirements
 
@@ -50,3 +62,4 @@ These tests should be performed prior to each release of meza, or any time  chan
 * Repeat all tests for CentOS 6 64-bit
 * Repeat all tests for CentOS 7 (64-bit only)
 * Create semantic properties in several pages, perform #ask query and verify results
+* Perform tests on VirtualBox, Digital Ocean, AWS and Meza1-dev

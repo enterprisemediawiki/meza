@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Setup the entire Meza1 platform
+# Setup the entire meza platform
 
 if [ "$(whoami)" != "root" ]; then
 	echo "Try running this script with sudo: \"sudo bash install.sh\""
@@ -8,12 +8,12 @@ if [ "$(whoami)" != "root" ]; then
 fi
 
 # If /usr/local/bin is not in PATH then add it
-# Ref enterprisemediawiki/Meza1#68 "Run install.sh with non-root user"
+# Ref enterprisemediawiki/meza#68 "Run install.sh with non-root user"
 if [[ $PATH != *"/usr/local/bin"* ]]; then
 	PATH="/usr/local/bin:$PATH"
 fi
 
-echo -e "\nWelcome to Meza1 v0.2.1\n"
+echo -e "\nWelcome to meza v0.4\n"
 
 
 #
@@ -41,7 +41,7 @@ fi
 
 # Prompt user for git branch
 default_git_branch="master"
-echo -e "\nType the git branch of Meza1 you want to use and press [ENTER]:"
+echo -e "\nType the git branch of meza you want to use and press [ENTER]:"
 read -e -i $default_git_branch git_branch
 git_branch=${git_branch:-$default_git_branch}
 
@@ -55,12 +55,20 @@ echo -e "and copy/paste your 40-character token and press [ENTER]: "
 read usergithubtoken
 usergithubtoken=${usergithubtoken:-$default_usergithubtoken}
 
+# Set Parsoid version.
+# This should be able to be set in any of these forms:
+#   9260e5d       (a sha1 hash)
+#   tags/v0.4.1   (a tag name)
+#   master        (a branch name)
+parsoid_version="ba26a55"
+
 # Prompt user for PHP version
-default_phpversion="5.4.42"
-echo -e "\nVisit http://php.net/downloads.php for version numbers"
-echo -e "Type the version of PHP you would like (such as 5.4.42) and press [ENTER]:"
-read -e -i $default_phpversion phpversion
-phpversion=${phpversion:-$default_phpversion}
+default_phpversion="5.6.14"
+phpversion=$default_phpversion #hard code version for now based on #24
+# echo -e "\nVisit http://php.net/downloads.php for version numbers"
+# echo -e "Type the version of PHP you would like (such as 5.4.42) and press [ENTER]:"
+# read -e -i $default_phpversion phpversion
+# phpversion=${phpversion:-$default_phpversion}
 
 # Prompt user for MySQL password
 default_mysql_root_pass=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
@@ -76,37 +84,23 @@ read -e -i $default_mw_api_protocol mw_api_protocol
 mw_api_protocol=${mw_api_protocol:-$default_mw_api_protocol}
 
 # Prompt user for MW API Domain or IP address
-# @fixme: This seems like a lot of fragile logic to set something up for very
-#         specific cases. Perhaps that's fine, but it seems prone to breaking.
-if [ "$enterprise_linux_version" = 7 ]; then
-
-	FOUND_ADAPTER_1=`grep "enp0s8" /proc/net/dev`
-
-	if [ -n "$FOUND_ADAPTER_1" ]; then
-		ADAPTER_NAME="enp0s8"
-	else
-		ADAPTER_NAME="enp0s3"
+# This for loop attempts to find the correct network adapter from which to pull the domain or IP address
+# If multiple adapters are configured (as in our VirtualBox configs), put the most-likely correct one last
+for networkadapter in eth0 eth1 enp0s3 enp0s8
+do
+	if [ -n "ip addr | grep $networkadapter | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'" ]; then
+		default_mw_api_domain="`ip addr | grep $networkadapter | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'`"
 	fi
-
-	default_mw_api_domain="`ip addr | grep $ADAPTER_NAME | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'`"
-
-else
-
-	FOUND_ADAPTER_1=`grep "eth1" /proc/net/dev`
-
-	if [ -n "$FOUND_ADAPTER_1" ]; then
-		ADAPTER_NAME="eth1"
-	else
-		ADAPTER_NAME="eth0"
-	fi
-
-	default_mw_api_domain="`ifconfig $ADAPTER_NAME | grep "inet " | awk -F'[: ]+' '{ print $4 }'`"
-
-fi
-
+done
 
 echo -e "\nType domain or IP address of your wiki and press [ENTER]:"
-read -e -i $default_mw_api_domain mw_api_domain
+# If the above logic found a value to use as a default suggestion, display it and still prompt user for value
+if [ -n "$default_mw_api_domain" ]; then
+        read -e -i $default_mw_api_domain mw_api_domain
+# If the above logic did not find a value to suggest, only read the value in (this fixes #238)
+else
+        read -e mw_api_domain
+fi
 mw_api_domain=${mw_api_domain:-$default_mw_api_domain}
 
 # Prompt user for MW install method
@@ -157,11 +151,11 @@ cmd_tee()
 	cmd_profile "END $*"
 }
 
-# function to install Meza1 via git
+# function to install meza via git
 install_via_git()
 {
 	cd /opt
-	git clone https://github.com/enterprisemediawiki/Meza1 meza
+	git clone https://github.com/enterprisemediawiki/meza meza
 	cd meza
 	git checkout "$git_branch"
 }
@@ -181,16 +175,16 @@ EOM
 }
 
 
-# no meza1 directory
+# no meza directory
 if [ ! -d /opt/meza ]; then
 	install_via_git
 
-# meza1 exists, but is not a git repo (hold over from older versions of meza1)
+# meza exists, but is not a git repo (hold over from older versions of meza)
 elif [ ! -d /opt/meza/.git ]; then
 	rm -rf /opt/meza
 	install_via_git
 
-# meza1 exists and is a git repo: checkout latest branch
+# meza exists and is a git repo: checkout latest branch
 else
 	cd /opt/meza
 	git fetch origin
@@ -199,9 +193,16 @@ fi
 
 
 # Load config constants. Unfortunately right now have to write out full path to
-# Meza1 since we can't be certain of consistent method of accessing install.sh.
+# meza since we can't be certain of consistent method of accessing install.sh.
 source /opt/meza/scripts/config.sh
 
+# Enable time sync
+# Ref: http://www.cyberciti.biz/faq/howto-install-ntp-to-synchronize-server-clock/
+yum -y install ntp ntpdate ntp-doc # Install packages for time sync
+chkconfig ntpd on # Activate service
+ntpdate pool.ntp.org # Synchronize the system clock with 0.pool.ntp.org server
+service ntpd start # Start service
+# Optionally configure ntpd via /etc/ntp.conf
 
 # @todo: Need to test for yums.sh functionality prior to proceeding
 #    with apache.sh, and Apache functionality prior to proceeding
@@ -217,6 +218,9 @@ cmd_tee "source apache.sh"
 
 cd "$m_meza/scripts"
 cmd_tee "source php.sh"
+
+cd "$m_meza/scripts"
+cmd_tee "source memcached.sh"
 
 cd "$m_meza/scripts"
 cmd_tee "source mysql.sh"

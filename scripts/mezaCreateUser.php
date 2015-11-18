@@ -1,6 +1,6 @@
 <?php
 /**
- * This script adds a user to mediawiki. It is meant to initialize Meza1.
+ * This script adds a user to mediawiki. It is meant to initialize meza.
  *
  * Usage:
  *  no parameters
@@ -140,7 +140,7 @@ class MezaCreateUser extends Maintenance {
 
 		// added by jamesmontalvo3
 		foreach( $this->mGroups as $group ) {
-			$u->addGroup( 'sysop' );
+			$u->addGroup( $group );
 		}
 
 		return Status::newGood( $u );

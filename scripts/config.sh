@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Meza1 install location
+# meza install location
 m_install=/opt # was :m_install=/root/mezadownloads
 m_meza="$m_install/meza" # was: m_meza="$m_install/meza1"
 

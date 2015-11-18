@@ -14,7 +14,7 @@ bash printTitle.sh "Begin import-wikis.sh"
 
 
 # If /usr/local/bin is not in PATH then add it
-# Ref enterprisemediawiki/Meza1#68 "Run install.sh with non-root user"
+# Ref enterprisemediawiki/meza#68 "Run install.sh with non-root user"
 if [[ $PATH != *"/usr/local/bin"* ]]; then
 	PATH="/usr/local/bin:$PATH"
 fi
@@ -124,6 +124,7 @@ for d in */ ; do
 	fi
 
 	mv "$imports_dir/$wiki_id" "$wiki_install_path"
+	chmod 755 "$wiki_install_path"
 
 	# Configure images folder
 	# Ref: https://www.mediawiki.org/wiki/Manual:Configuring_file_uploads
@@ -151,10 +152,18 @@ for d in */ ; do
 	if [ ! -f "$wiki_install_path/config/disableSearchUpdate.php" ]; then
 		cp "$m_meza/wiki-init/config/disableSearchUpdate.php" "$wiki_install_path/config/disableSearchUpdate.php"
 	fi
+	chmod -R 755 "$wiki_install_path/config"
 
 	# insert wiki name and auth type into setup.php if it's still "placeholder"
 	sed -r -i "s/wgSitename = 'placeholder';/wgSitename = '$wiki_name';/g;" "$wiki_install_path/config/setup.php"
 	sed -r -i "s/mezaAuthType = 'placeholder';/mezaAuthType = 'local_dev';/g;" "$wiki_install_path/config/setup.php"
+
+	# If setup.php already existed, it may have a $mezaCustomDBname set.`This
+	# import script normalizes all database names to be in the form
+	# "wiki_$wiki_id", so if $wiki_id is "eva" then the database is "wiki_eva"
+	#
+	# This command just comments out the old database name
+	sed -i "s/\$mezaCustomDBname/\/\/ \$mezaCustomDBname/g;" "$wiki_install_path/config/setup.php"
 
 	# import SQL file
 	# Import database - Ref: https://www.mediawiki.org/wiki/Manual:Restoring_a_wiki_from_backup
@@ -169,7 +178,7 @@ for d in */ ; do
 
 
 	# Run update.php. The database you imported may not be up to the same version
-	# as Meza1, and thus you must update it.
+	# as meza, and thus you must update it.
 	echo "Running MediaWiki maintenance script \"update.php\""
 	WIKI="$wiki_id" php "$m_mediawiki/maintenance/update.php" --quick
 
@@ -188,11 +197,14 @@ for d in */ ; do
 		# Run runJobs.php
 		# Note that should prob be removed: Daren saw 12k+ jobs in the queue after performing the above steps
 		echo "Running MediaWiki maintenance script \"runJobs.php\""
+		sed -r -i 's/false/true/g;' "$m_htdocs/wikis/$wiki_id/config/disableSearchUpdate.php"
 		WIKI="$wiki_id" php "$m_mediawiki/maintenance/runJobs.php" --quick
+		sed -r -i 's/true/false/g;' "$m_htdocs/wikis/$wiki_id/config/disableSearchUpdate.php"
 	else
 		echo -e "\nSKIPPING SemanticMediaWiki rebuildData.php and runjobs.php (no SMW)"
 	fi
 
+	# @FIXME: This has changed. CirrusSearch exists from the beginning now
 	# if CirrusSearch extension exists. On first install it will not yet.
 	if [ -d "$m_mediawiki/extensions/CirrusSearch" ]; then
 		echo "Building Elastic Search index"
