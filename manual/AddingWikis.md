@@ -19,6 +19,14 @@ This script will then ask for three inputs:
 2. *Wiki ID*: This is an alphanumeric identifier for your wiki. It will be used in the URL (like `http://example.com/yourID`), and throughout the server configuration. It should be something short and simple. For example, if you're creating a wiki for your Human Resources department, a good wiki ID would be "hr". All lowercase is preferred.
 3. *Wiki Name*: This should be a more descriptive title for your wiki. It still should not be too long, though. For the same example you may choose "Human Resources Wiki" or "HR Wiki"
 
+### Creating a wiki user
+
+With a new wiki, you'll probably want to create a new user. In the following example, you would be creating the user "Jdoe" on the wiki with the ID "mywiki" and the password "mypassword". Once your user account is set up, this user's password can be modified using Mediawiki's user profile page in the user settings.
+
+```bash
+WIKI=mywiki php mezaCreateUser.php --username=Jdoe --password=mypassword
+```
+
 ## Importing existing wikis
 
 To import one more more existing wikis you use the `import-wikis.sh` script.
