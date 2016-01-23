@@ -120,6 +120,10 @@ if grep -Fxq "VERSION_ID=\"7\"" /etc/os-release
 then
 	echo "Enterprise Linux version 7. Applying rule changes to firewalld"
 
+	# Make sure firewalld is enabled and started (it's not on Digital Ocean)
+	systemctl enable firewalld
+	systemctl start firewalld
+
 	# Add access to http now
 	firewall-cmd --zone=public --add-port=http/tcp
 
