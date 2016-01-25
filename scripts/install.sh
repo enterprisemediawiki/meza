@@ -83,11 +83,12 @@ echo -e "or leave blank for a randomly generated password and press [ENTER]:"
 read -s mysql_root_pass
 mysql_root_pass=${mysql_root_pass:-$default_mysql_root_pass}
 
-# Prompt user for MW API protocol
-default_mw_api_protocol="http"
-echo -e "\nType http or https for MW API and press [ENTER]:"
-read -e -i $default_mw_api_protocol mw_api_protocol
-mw_api_protocol=${mw_api_protocol:-$default_mw_api_protocol}
+# Prompt user for MW API protocol -- ASSUME HTTPS. Perhaps we'll remove this assumption later
+# default_mw_api_protocol="http"
+# echo -e "\nType http or https for MW API and press [ENTER]:"
+# read -e -i $default_mw_api_protocol mw_api_protocol
+# mw_api_protocol=${mw_api_protocol:-$default_mw_api_protocol}
+mw_api_protocol=https
 
 # Prompt user for MW API Domain or IP address
 # This for loop attempts to find the correct network adapter from which to pull the domain or IP address
@@ -114,6 +115,16 @@ default_mediawiki_git_install="y"
 echo -e "\nInstall MediaWiki with git? (y/n) [ENTER]:"
 read -e -i $default_mediawiki_git_install mediawiki_git_install
 mediawiki_git_install=${mediawiki_git_install:-$default_mediawiki_git_install}
+
+
+echo "Next you're going to setup your self-signed certificate for https."
+echo "Enter values for each of the following fields. Hit any key to continue."
+read -s dummy # is there another way to do this?
+
+
+# generate a self-signed SSL signature (for swap-out of a good signature later, of course!)
+sudo openssl req -newkey rsa:2048 -nodes -keyout /etc/pki/tls/private/meza.key -x509 -days 365 -out /etc/pki/tls/certs/meza.crt
+
 
 
 # Check if git installed, and install it if required

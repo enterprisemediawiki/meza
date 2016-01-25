@@ -93,6 +93,12 @@ cd /usr/local/apache2/conf
 mv httpd.conf httpd.default.conf
 cp "$m_meza/scripts/config/httpd.conf" ./httpd.conf
 
+# insert proper domain name
+sed -r -i "s/ServerName IPADDRESS:443/ServerName $mw_api_domain:443/g;" ./httpd.conf
+
+
+
+
 # create service script
 cd /etc/init.d
 cp "$m_meza/scripts/initd_httpd.sh" ./httpd
@@ -121,20 +127,23 @@ then
 	echo "Enterprise Linux version 7. Applying rule changes to firewalld"
 
 	# Add access to http now
-	firewall-cmd --zone=public --add-port=http/tcp
-
 	# Add it as "permanent" so it get's done on future reboots
-	firewall-cmd --zone=public --add-port=http/tcp --permanent
+	firewall-cmd --zone=public --add-service=https
+	firewall-cmd --zone=public --permanent --add-service=https
+
+	# firewall-cmd --zone=public --add-port=http/tcp
+	# firewall-cmd --zone=public --add-port=http/tcp --permanent
 
 else
     echo "Enterprise Linux version 6. Applying rule changes to iptables"
 
 	#
-	# Configure IPTABLES to open port 80 (for Apache HTTP)
+	# Configure IPTABLES to open port 80 (for Apache HTTP), or 443 for https
 	# @todo: consider method to define entire iptables config:
 	# http://blog.astaz3l.com/2015/03/06/secure-firewall-for-centos/
 	#
-	iptables -I INPUT 5 -i eth1 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT
+	# iptables -I INPUT 5 -i eth1 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT
+	iptables -I INPUT 5 -i eth1 -p tcp --dport 443 -m state --state NEW,ESTABLISHED -j ACCEPT
 	service iptables save
 
 fi
