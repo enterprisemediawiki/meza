@@ -117,6 +117,7 @@ read -e -i $default_mediawiki_git_install mediawiki_git_install
 mediawiki_git_install=${mediawiki_git_install:-$default_mediawiki_git_install}
 
 
+echo ""
 echo "Next you're going to setup your self-signed certificate for https."
 echo "Enter values for each of the following fields. Hit any key to continue."
 read -s dummy # is there another way to do this?

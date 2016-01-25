@@ -22,8 +22,9 @@ do
 done
 
 
-# MediaWiki's API URI, for parsoid
-mw_api_uri="$mw_api_protocol://$mw_api_domain/"
+# MediaWiki's API URI, for parsoid. Parsoid communicates with MediaWiki PHP API
+# via Apache httpd over port 8142
+mw_api_uri="$mw_api_protocol://$mw_api_domain:8142/"
 
 
 echo "******* Downloading node.js *******"

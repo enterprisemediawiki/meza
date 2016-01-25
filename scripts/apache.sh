@@ -93,10 +93,6 @@ cd /usr/local/apache2/conf
 mv httpd.conf httpd.default.conf
 cp "$m_meza/scripts/config/httpd.conf" ./httpd.conf
 
-# insert proper domain name
-sed -r -i "s/ServerName IPADDRESS:443/ServerName $mw_api_domain:443/g;" ./httpd.conf
-
-
 
 
 # create service script
@@ -109,14 +105,6 @@ cd /etc/logrotate.d
 cp "$m_meza/scripts/logrotated_httpd" ./httpd
 
 cd "$m_htdocs"
-
-#
-# Defer starting httpd until PHP installed
-#
-# # Start webserver service
-# chkconfig httpd on
-# service httpd status
-# service httpd restart
 
 
 # modify firewall rules
@@ -149,5 +137,4 @@ else
 fi
 
 
-echo -e "\n\nYour Apache 2.4 webserver has been setup.\n\nPlease use the web browser on your host computer to navigate to http://192.168.56.56 to test it out"
-
+# Apache httpd service not started yet. Started in php.sh
