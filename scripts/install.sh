@@ -34,6 +34,12 @@ if grep -Fxq "VERSION_ID=\"7\"" /etc/os-release
 then
     echo "Setting Enterprise Linux version to \"7\""
     enterprise_linux_version=7
+
+	# Make sure firewalld is enabled and started (it's not on Digital Ocean)
+	# This should be done as soon as possible to make sure we're protected early
+	systemctl enable firewalld
+	systemctl start firewalld
+
 else
     echo "Setting Enterprise Linux version to \"6\""
     enterprise_linux_version=6
