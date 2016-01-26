@@ -93,6 +93,8 @@ cd /usr/local/apache2/conf
 mv httpd.conf httpd.default.conf
 cp "$m_meza/scripts/config/httpd.conf" ./httpd.conf
 
+# replace INSERT-DOMAIN-OR-IP with domain...or IP address
+sed -r -i "s/INSERT-DOMAIN-OR-IP/$mw_api_domain/g;" ./httpd.conf
 
 
 # create service script
@@ -114,13 +116,14 @@ if grep -Fxq "VERSION_ID=\"7\"" /etc/os-release
 then
 	echo "Enterprise Linux version 7. Applying rule changes to firewalld"
 
-	# Add access to http now
+	# Add access to https now
 	# Add it as "permanent" so it get's done on future reboots
 	firewall-cmd --zone=public --add-service=https
 	firewall-cmd --zone=public --permanent --add-service=https
 
-	# firewall-cmd --zone=public --add-port=http/tcp
-	# firewall-cmd --zone=public --add-port=http/tcp --permanent
+	# access via http allowed, but forwarded to https (see httpd.conf)
+	firewall-cmd --zone=public --add-port=http/tcp
+	firewall-cmd --zone=public --add-port=http/tcp --permanent
 
 else
     echo "Enterprise Linux version 6. Applying rule changes to iptables"
