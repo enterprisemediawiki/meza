@@ -25,6 +25,7 @@ At any given time there are several new builds being considered for approval in 
 
 These tests should be performed on all changes
 
+* Set `$mezaForceDebug = true;` in `LocalSettings.php`
 * Create page with wikitext editor
 * Create page with VisualEditor
 * Verify adding images to pages with VisualEditor
