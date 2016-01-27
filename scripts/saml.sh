@@ -63,7 +63,7 @@ echo -e "\n"
 
 # install simplesamlphp from github
 # See https://simplesamlphp.org/docs/development/simplesamlphp-install-repo
-cd /opt/meza/htdocs
+cd /opt/meza
 git clone https://github.com/simplesamlphp/simplesamlphp.git simplesamlphp
 cd simplesamlphp
 cp -r config-templates/* config/
