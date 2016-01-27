@@ -96,6 +96,8 @@ sed -r -i "s/'technicalcontact_email'.*$/'technicalcontact_email' => '$saml_admi
 # http://unix.stackexchange.com/questions/32908/how-to-insert-the-content-of-a-file-into-another-file-before-a-pattern-marker
 sed -i -e '/ADD SPECIAL CONFIG BELOW/r /opt/meza/scripts/config/saml_httpd.conf' /usr/local/apache2/conf/httpd.conf
 
+# restart apache
+service httpd restart
 
 # Setup identity provider (IdP) for SimpleSamlPHP
 cd /opt/meza/simplesamlphp/metadata
