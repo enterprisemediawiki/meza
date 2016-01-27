@@ -102,7 +102,7 @@ sed -r -i "s/'technicalcontact_email'.*$/'technicalcontact_email' => '$saml_admi
 # This inserts the contents of one file (saml_httpd.conf) below a marker
 # in httpd.conf. See link below for more info:
 # http://unix.stackexchange.com/questions/32908/how-to-insert-the-content-of-a-file-into-another-file-before-a-pattern-marker
-sed -i -e '/ADD SPECIAL CONFIG BELOW/r $m_meza/scripts/config/saml_httpd.conf' "$m_apache/conf/httpd.conf"
+sed -i -e "/ADD SPECIAL CONFIG BELOW/r $m_meza/scripts/config/saml_httpd.conf" "$m_apache/conf/httpd.conf"
 
 # restart apache
 service httpd restart
