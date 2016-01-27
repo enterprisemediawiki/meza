@@ -51,7 +51,7 @@ wikis
 	eng
 ```
 
-If you have this directory in root's user directory, you would enter `/root/wikis/` for step 1 above. Note that using `~/wikis/` doesn't seem to work.
+If you have this directory in root's user directory, you would enter `/root/wikis/` for step 1 above. Note that using `~/wikis/` doesn't seem to work, but if you're using a user other than root with sudo rights you could use `/home/username/wikis/`.
 
 Each of these identifiers will be used throughout meza, but the place you'll notice it most is in your URLs. For example, your Engineering Department's wiki may be at `https://example.com/eng`.
 
