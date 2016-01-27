@@ -54,6 +54,14 @@ read logout_url
 echo -e "\nType a SAML IdP certificate fingerprint and press [ENTER]:"
 read cert_fingerprint
 
+# Escape values of inputs which could have disallowed characters: / \ &
+saml_admin=$(sed -e 's/[\/&]/\\&/g' <<< $saml_admin)
+saml_password=$(sed -e 's/[\/&]/\\&/g' <<< $saml_password)
+saml_admin_email=$(sed -e 's/[\/&]/\\&/g' <<< $saml_admin_email)
+idp_entity_id=$(sed -e 's/[\/&]/\\&/g' <<< $idp_entity_id)
+sign_on_url=$(sed -e 's/[\/&]/\\&/g' <<< $sign_on_url)
+logout_url=$(sed -e 's/[\/&]/\\&/g' <<< $logout_url)
+cert_fingerprint=$(sed -e 's/[\/&]/\\&/g' <<< $cert_fingerprint)
 
 
 
@@ -104,6 +112,8 @@ sed -r -i "s/cert_fingerprint/$cert_fingerprint/g;" ./saml20-idp-remote.php
 # This would be better handled by ExtensionLoader, but for now
 # I'm not going to automatically add the SimpleSamlAuth lines to
 # LocalSettings.php.
+
+echo -e "\n"
 
 cd /opt/meza/htdocs/mediawiki/extensions
 git clone https://github.com/jornane/mwSimpleSamlAuth.git SimpleSamlAuth -b v0.6
