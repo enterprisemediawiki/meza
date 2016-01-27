@@ -16,6 +16,14 @@ fi
 
 
 #
+# For now this script is not called within the same shell as install.sh
+# and thus it needs to know how to get to the config.sh script on it's own
+#
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source "$DIR/config.sh"
+
+
+#
 # Get admin name
 #
 echo -e "\nType a SAML admin full name and press [ENTER]:"
@@ -71,7 +79,7 @@ echo -e "\n"
 
 # install simplesamlphp from github
 # See https://simplesamlphp.org/docs/development/simplesamlphp-install-repo
-cd /opt/meza
+cd "$m_meza"
 git clone https://github.com/simplesamlphp/simplesamlphp.git simplesamlphp
 cd simplesamlphp
 cp -r config-templates/* config/
@@ -94,15 +102,15 @@ sed -r -i "s/'technicalcontact_email'.*$/'technicalcontact_email' => '$saml_admi
 # This inserts the contents of one file (saml_httpd.conf) below a marker
 # in httpd.conf. See link below for more info:
 # http://unix.stackexchange.com/questions/32908/how-to-insert-the-content-of-a-file-into-another-file-before-a-pattern-marker
-sed -i -e '/ADD SPECIAL CONFIG BELOW/r /opt/meza/scripts/config/saml_httpd.conf' /usr/local/apache2/conf/httpd.conf
+sed -i -e '/ADD SPECIAL CONFIG BELOW/r $m_meza/scripts/config/saml_httpd.conf' "$m_apache/httpd.conf"
 
 # restart apache
 service httpd restart
 
 # Setup identity provider (IdP) for SimpleSamlPHP
-cd /opt/meza/simplesamlphp/metadata
+cd "$m_meza/simplesamlphp/metadata"
 rm ./saml20-idp-remote.php
-cp /opt/meza/scripts/config/saml20-idp-remote.php ./saml20-idp-remote.php
+cp "$m_meza/scripts/config/saml20-idp-remote.php" ./saml20-idp-remote.php
 
 # input correct values for your IdP
 sed -r -i "s/idp_entity_id/$idp_entity_id/g;" ./saml20-idp-remote.php
@@ -117,6 +125,6 @@ sed -r -i "s/cert_fingerprint/$cert_fingerprint/g;" ./saml20-idp-remote.php
 
 echo -e "\n"
 
-cd /opt/meza/htdocs/mediawiki/extensions
+cd "$m_mediawiki/extensions"
 git clone https://github.com/jornane/mwSimpleSamlAuth.git SimpleSamlAuth -b v0.6
 cd SimpleSamlAuth
