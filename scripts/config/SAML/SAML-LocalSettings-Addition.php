@@ -17,9 +17,9 @@ $wgSamlRequirement = SAML_REQUIRED;
 $wgSamlCreateUser = true;
 
 // SAML attributes
-$wgSamlUsernameAttr = 'uid';
-$wgSamlRealnameAttr = 'cn';
-$wgSamlMailAttr = 'mail';
+$wgSamlUsernameAttr = 'username_attr';
+$wgSamlRealnameAttr = 'realname_attr';
+$wgSamlMailAttr = 'email_attr';
 
 // SimpleSamlPhp settings
 $wgSamlSspRoot = '/opt/meza/simplesamlphp';
@@ -29,7 +29,7 @@ $wgSamlPostLogoutRedirect = NULL;
 // Array: [MediaWiki group][SAML attribute name][SAML expected value]
 // If the SAML assertion matches, the user is added to the MediaWiki group
 $wgSamlGroupMap = array(
-	'sysop' => array(
-		'groups' => array('admin'),
-	),
+	//'sysop' => array(
+	//	'groups' => array('admin'),
+	//),
 );
