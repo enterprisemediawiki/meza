@@ -161,7 +161,7 @@ cd SimpleSamlAuth
 # added to some non-LocalSettings.php file? Something like deltas.php)
 #
 # First: make temporary file
-cp "$m_meza/scripts/SAML/SAML-LocalSettings-Additions.php" ~/SAML-LocalSettings-Additions.php
+cp "$m_meza/scripts/config/SAML/SAML-LocalSettings-Additions.php" ~/SAML-LocalSettings-Additions.php
 
 # Replace attributes with user input
 sed -r -i "s/username_attr/$username_attr/g;" ~/SAML-LocalSettings-Additions.php
