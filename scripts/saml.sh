@@ -144,7 +144,7 @@ sed -r -i "s/cert_fingerprint/$cert_fingerprint/g;" ./saml20-idp-remote.php
 # Setup authsources.php
 cd ../config
 sed -r -i "s/'entityID' => null,/'entityID' => '$sp_entity_id',\n\t'NameIDPolicy' => '$name_id_policy',\n/g;" ./authsources.php
-sed -r -i "s/'idp' => null,/$idp_entity_id/g;" ./authsources.php
+sed -r -i "s/'idp' => null,/'idp' => '$idp_entity_id',/g;" ./authsources.php
 
 
 echo -e "\n"
