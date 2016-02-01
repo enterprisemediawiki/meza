@@ -263,18 +263,52 @@ $wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
 $wgDBmysql5 = false;
 
 /**
- *  All wikis will use the Meta Wiki for certain tables. For now only the
- *  interwiki table is being shared. At some point the user and user_properties
- *  table will be shared so people can keep preferences and other data across
- *  wikis.
+ *  If a primewiki is defined then every wiki will use that wiki db for certain
+ *  tables. The shared `interwiki` table allows users to use the same interwiki
+ *  prefixes across all wikis. The `user` and `user_properties` tables make all
+ *  wikis have the same set of users and user properties/preferences. This does
+ *  not affect the user groups, so a user can be a sysop on one wiki and just a
+ *  user on another.
+ *
+ *  To enable a primewiki create the file $m_htdocs/__common/primewiki and make
+ *  the file contents be the id of the desired wiki.
+ *
+ *  In order for this to work properly the wikis need to have been created with
+ *  a single user table in mind. If you're starting a new wiki farm then you're
+ *  all set. If you're importing wikis which didn't previously have shared user
+ *  tables, then you'll need to use TBD user-merge script.
+ *
  **/
-// $wgSharedDB     = 'wiki_meta';
-// $wgSharedTables = array(
-// 	'interwiki',
-// 	'user',
-// 	'user_properties',
-// );
+if ( file_exists( "$m_htdocs/__common/primewiki" ) ) {
 
+	// grab prime wiki data using closure to encapsulate the data
+	// and not overwrite existing config ($wgSitename, etc)
+	$primewiki = call_user_func( function() use ( $m_htdocs ) {
+
+		$primeWikiId = trim( file_get_contents( "$m_htdocs/__common/primewiki" ) );
+
+		require_once "$m_htdocs/wikis/$primeWikiId/config/setup.php";
+
+		if ( isset( $mezaCustomDBname ) ) {
+			$primeWikiDBname = $mezaCustomDBname;
+		} else {
+			$primeWikiDBname = "wiki_$primeWikiId";
+		}
+
+		return array(
+			'id' => $primeWikiId,
+			'database' => $primeWikiDBname,
+		);
+	} );
+
+	$wgSharedDB = $primewiki[ 'database' ];
+	$wgSharedTables = array(
+		'user',            // default
+		'user_properties', // default
+		'interwiki',       // additional
+	);
+
+}
 
 
 
