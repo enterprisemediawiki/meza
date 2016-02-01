@@ -470,7 +470,7 @@ $wgFileExtensions = array(
 #
 # Enable Semantic MediaWiki semantics
 #
-enableSemantics( $wikiId . '.' . $_SERVER[ 'SERVER_NAME' ] );
+enableSemantics( $wikiId );
 
 
 #
@@ -875,7 +875,7 @@ require_once $egExtensionLoader->registerLegacyExtension(
 require_once $egExtensionLoader->registerLegacyExtension(
 	"SummaryTimeline",
 	"https://github.com/darenwelsh/SummaryTimeline.git",
-	"tags/0.1.3"
+	"tags/0.2.0"
 );
 
 
@@ -995,7 +995,7 @@ $wgVisualEditorParsoidPrefix = $wikiId;
 // Define which namespaces will use VE
 $wgVisualEditorNamespaces = array_merge(
 	$wgContentNamespaces,
-        array( NS_USER, 
+        array( NS_USER,
           NS_HELP,
           NS_PROJECT
 	)
