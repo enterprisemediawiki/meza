@@ -1078,37 +1078,41 @@ $wgUploadWizardConfig = array(
 #
 # Extension:Flow
 #
-require_once $egExtensionLoader->registerLegacyExtension(
-	'Flow',
-	'https://gerrit.wikimedia.org/r/mediawiki/extensions/Flow.git',
-	'REL1_25'
-);
+# Note: Flow removed due to being unable to search discussions. While the
+# improved interface is great, it's useless if we can't search our old content.
+# See issues #272.
+#
+// require_once $egExtensionLoader->registerLegacyExtension(
+// 	'Flow',
+// 	'https://gerrit.wikimedia.org/r/mediawiki/extensions/Flow.git',
+// 	'REL1_25'
+// );
 
-// only allow sysops to create new flow boards
-$wgGroupPermissions['sysop']['flow-create-board'] = true;
+// // only allow sysops to create new flow boards
+// $wgGroupPermissions['sysop']['flow-create-board'] = true;
 
-// store posts as html using Parsoid
-$wgFlowContentFormat = 'html';
+// // store posts as html using Parsoid
+// $wgFlowContentFormat = 'html';
 
-// use VE
-$wgFlowEditorList = array( 'visualeditor', 'none' );
+// // use VE
+// $wgFlowEditorList = array( 'visualeditor', 'none' );
 
-// Define which namespaces will use Flow
-$wgNamespaceContentModels[NS_PROJECT_TALK]        = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_USER_TALK]           = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_TALK]                = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_HELP_TALK]           = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_FILE_TALK]           = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_CATEGORY_TALK]       = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_MEDIAWIKI_TALK]      = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_TEMPLATE_TALK]       = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[SMW_NS_FORM_TALK]       = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[SMW_NS_PROPERTY_TALK]   = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[SMW_NS_CONCEPT_TALK]    = CONTENT_MODEL_FLOW_BOARD;
+// // Define which namespaces will use Flow
+// $wgNamespaceContentModels[NS_PROJECT_TALK]        = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_USER_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_TALK]                = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_HELP_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_FILE_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_CATEGORY_TALK]       = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_MEDIAWIKI_TALK]      = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_TEMPLATE_TALK]       = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[SMW_NS_FORM_TALK]       = CONTENT_MODEL_FLOW_BOARD; // MW throws error: SMW_NS_FORM_TALK not a constant
+// $wgNamespaceContentModels[SMW_NS_PROPERTY_TALK]   = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[SMW_NS_CONCEPT_TALK]    = CONTENT_MODEL_FLOW_BOARD;
 
-// Connect Flow to Parsoid
-$wgFlowParsoidURL = 'http://127.0.0.1:8000';
-$wgFlowParsoidPrefix = $wikiId;
+// // Connect Flow to Parsoid
+// $wgFlowParsoidURL = 'http://127.0.0.1:8000';
+// $wgFlowParsoidPrefix = $wikiId;
 
 
 
