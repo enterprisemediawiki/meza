@@ -51,7 +51,15 @@ class MezaUnifyUserTables extends Maintenance {
 		$primeWiki = trim( $this->getOption( "prime-wiki" ) );
 
 		// all other wiki IDs
-		$wikiIDs = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
+		$wikisDirectory = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
+		$wikiIDs = array();
+		foreach( $wikisDirectory as $fileOrDir ) {
+			if ( is_dir( "$m_htdocs/wikis/$fileOrDir" ) ) {
+				$wikiIDs[] = $fileOrDir;
+			}
+		}
+		unset( $wikisDirectory );
+
 
 		// make array of all wiki database names, including prime wiki
 
