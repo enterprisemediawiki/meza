@@ -109,3 +109,11 @@ echo "wiki-id" > primewiki
 ```
 
 In this example "wiki-id" is the ID of the wiki you want to be primary.
+
+Note that if you run `unifyUserTables.php` on a set of wikis that do not share user and interwiki tables, the script will automatically setup the `primewiki` file for you. To run `unifyUserTables.php` perform the following:
+
+```bash
+WIKI=anywiki php /opt/meza/scripts/unifyUserTables.php --prime-wiki=anotherwiki
+```
+
+In this case above you need to specify any existing wiki at the beginning. This is simply so LocalSettings.php will load properly. Any of your existing wikis will do. After the `--prime-wiki=` add the wiki ID of the wiki you want to be prime.
