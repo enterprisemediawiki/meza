@@ -355,8 +355,8 @@ class MezaUnifyUserTables extends Maintenance {
 
 			// Empty the user table for this wiki, since it will just use the common
 			// one created at the end. Same for user_properties
-			//$db->query( "DELETE FROM user" );
-			//$db->query( "DELETE FROM user_properties" );
+			$db->query( "DELETE FROM user" );
+			$db->query( "DELETE FROM user_properties" );
 
 		}
 
