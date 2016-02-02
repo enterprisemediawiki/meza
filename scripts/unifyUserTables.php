@@ -37,20 +37,21 @@ class MezaUnifyUserTables extends Maintenance {
 			'Wiki ID of prime wiki',
 			true, true );
 
-		$this->addOption(
-			'wikis',
-			'Comma-separated list of other wiki IDs',
-			true, true );
-
 	}
 
 	public function execute() {
+
+		global $m_htdocs;
+
+		if ( is_file( "$m_htdocs/__common/primewiki" ) ) {
+			die( "A prime wiki is already set in $m_htdocs/__common/primewiki. You cannot run this script." );
+		}
 
 		// prime wiki ID and database name
 		$primeWiki = trim( $this->getOption( "prime-wiki" ) );
 
 		// all other wiki IDs
-		$wikiIDs = array_map( 'trim', explode( ',', $this->getOption( "wikis" ) ) );
+		$wikiIDs = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
 
 		// make array of all wiki database names, including prime wiki
 
@@ -408,6 +409,11 @@ class MezaUnifyUserTables extends Maintenance {
 			__METHOD__,
 			array( 'IGNORE' ) // IGNORE or ON DUPLICATE KEY UPDATE ???
 		);
+
+
+		# Declare the prime-wiki as prime! Write prime wiki's wiki ID to file
+		file_put_contents( "$m_htdocs/__common/primewiki", $primewiki );
+
 		$this->output( "\n#\n# SCRIPT COMPLETE\n#" ); //end of script
 
 	}
