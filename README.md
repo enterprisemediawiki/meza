@@ -25,7 +25,6 @@ This script will retrieve a script from the meza repository, which will subseque
 
 * **Git branch**: The branch of meza to use. This is mostly for testing. Type "master" in most cases.
 * **GitHub Token**: This allows you to download more things from GitHub than you would normally. Using the default is fine.
-* **PHP version**: Right now, use 5.4.42. In the future more versions will be supported
 * **MySQL password**: Pick a good, secure password for MySQL root user
 * **domain or IP address**: If you'll access your wiki at http://example.com, your type `example.com`. If you'll access it at http://192.168.56.56, type `192.168.56.56`.
 * **Install with git**: Type `y`. You want to install with git.
