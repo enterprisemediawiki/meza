@@ -27,9 +27,9 @@ This script will retrieve a script from the meza repository, which will subseque
 * **GitHub Token**: This allows you to download more things from GitHub than you would normally. Using the default is fine.
 * **PHP version**: Right now, use 5.4.42. In the future more versions will be supported
 * **MySQL password**: Pick a good, secure password for MySQL root user
-* **http or https**: Will you access your website via http or https? If you don't know, do http.
 * **domain or IP address**: If you'll access your wiki at http://example.com, your type `example.com`. If you'll access it at http://192.168.56.56, type `192.168.56.56`.
 * **Install with git**: Type `y`. You want to install with git.
+* Setup of self-signed SSL certificate (for access over https): Enter location, organization and administrator info. For the sake of development enter any value for these fields, as your choices don't really matter. For the sake of a production server you should not be relying upon a self-signed certificate anyway. Generate the certificate with any choices, and replace with a trusted certificate after installation is complete.
 
 ## Manual Install
 
