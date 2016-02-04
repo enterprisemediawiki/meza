@@ -85,16 +85,6 @@ class MezaUnifyUserTables extends Maintenance {
 
 		$userTable = array( "idField" => "user_id", "userNameField" => "user_name" );
 
-		$userColumnInfo = array(
-			'user_name'         => 'b',
-			'user_editcount'    => 'i',
-			'user_touched'      => 'b',
-			'user_registration' => 'b',
-			'user_email'        => 'b',
-			'user_real_name'    => 'b',
-		);
-
-
 		$tablesToModify = array(
 			"page_restrictions"  => array( "idField" => "pr_user" ),
 			"protected_titles"   => array( "idField" => "pt_user" ),
@@ -208,9 +198,8 @@ class MezaUnifyUserTables extends Maintenance {
 			$this->output( "\nAdding $wikiID to userArray" );
 
 			// SELECT entire user table
-			$userColumns = implode( ',', array_keys( $userColumnInfo ) );
 			$result = $db->query(
-				"SELECT $userColumns FROM user"
+				"SELECT * FROM user"
 			);
 
 			while( $row = $result->fetchRow() ) {
