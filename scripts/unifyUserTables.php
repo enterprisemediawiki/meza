@@ -43,6 +43,8 @@ class MezaUnifyUserTables extends Maintenance {
 
 		global $m_htdocs;
 
+		$userTableRows = false;
+
 		if ( is_file( "$m_htdocs/__common/primewiki" ) ) {
 			die( "A prime wiki is already set in $m_htdocs/__common/primewiki. You cannot run this script." );
 		}
@@ -205,6 +207,13 @@ class MezaUnifyUserTables extends Maintenance {
 
 			while( $row = $result->fetchRow() ) {
 
+				if ( ! $userTableRows ) {
+					$userTableRows = array();
+					foreach( $row as $key => $value ) {
+						$userTableRows[] = $key;
+					}
+				}
+
 				$userName = $row['user_name'];
 
 				if ( ! isset( $userArray[$userName] ) ) {
@@ -366,16 +375,12 @@ class MezaUnifyUserTables extends Maintenance {
 		 **/
 		$userArrayForInsert = array();
 		while( $row = array_pop( $userArray ) ) {
-			$userArrayForInsert[] = array(
-				'user_name'         => $row['user_name'],
-				'user_editcount'    => $row['user_editcount'],
-				'user_touched'      => $row['user_touched'],
-				'user_registration' => $row['user_registration'],
-				'user_email'        => $row['user_email'],
-				'user_real_name'    => $row['user_real_name'],
-				'user_id'           => $row['user_id'],
-				'user_password'     => $row['user_password'],
-			);
+
+			$i = count( $userArrayForInsert );
+			foreach( $userTableRows as $key ) {
+				$userArrayForInsert[$i][$key] = $row[$key];
+			}
+
 		}
 
 		$db = $wikiDBs[$primeWiki];
@@ -416,7 +421,7 @@ class MezaUnifyUserTables extends Maintenance {
 
 
 		# Declare the prime-wiki as prime! Write prime wiki's wiki ID to file
-		file_put_contents( "$m_htdocs/__common/primewiki", $primewiki );
+		file_put_contents( "$m_htdocs/__common/primewiki", $primeWiki );
 
 		$this->output( "\n#\n# SCRIPT COMPLETE\n#" ); //end of script
 
