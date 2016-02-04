@@ -188,6 +188,7 @@ class MezaUnifyUserTables extends Maintenance {
 		$userColumnsIssetChecks = array(
 			'user_email',
 			'user_real_name',
+			'user_password'
 		);
 
 		$this->output( "\nCreating userArray from all user tables" );
@@ -228,10 +229,15 @@ class MezaUnifyUserTables extends Maintenance {
 					// If this wiki ($row) has been touched more recently, use this wiki's value
 					if ( $userArray[$userName]["user_touched"] < $row['user_touched'] ) {
 						$userArray[$userName]["user_touched"] = $row['user_touched'];
+
+						// also use this wikis password since they've accessed it more recently
+						if ( $row['user_password'] ) {
+							$userArray[$userName]["user_password"] = $row['user_password'];
+						}
 					}
 
 					foreach ( $userColumnsIssetChecks as $col ) {
-						if ( ! $userArray[$userName][$col] ) {
+						if ( ! $userArray[$userName][$col] && $row[$col] ) {
 							$userArray[$userName][$col] = $row[$col];
 						}
 					}
