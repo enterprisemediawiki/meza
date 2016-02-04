@@ -374,6 +374,7 @@ class MezaUnifyUserTables extends Maintenance {
 				'user_email'        => $row['user_email'],
 				'user_real_name'    => $row['user_real_name'],
 				'user_id'           => $row['user_id'],
+				'user_password'     => $row['user_password'],
 			);
 		}
 
