@@ -378,6 +378,12 @@ class MezaUnifyUserTables extends Maintenance {
 
 			$i = count( $userArrayForInsert );
 			foreach( $userTableRows as $key ) {
+
+				// if $key doesn't start with "user_" then skip it (it's not a valid field name)
+				if ( strpos( $key, "user_" ) !== 0 ) {
+					continue;
+				}
+
 				$userArrayForInsert[$i][$key] = $row[$key];
 			}
 
