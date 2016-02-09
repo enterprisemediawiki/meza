@@ -263,18 +263,52 @@ $wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
 $wgDBmysql5 = false;
 
 /**
- *  All wikis will use the Meta Wiki for certain tables. For now only the
- *  interwiki table is being shared. At some point the user and user_properties
- *  table will be shared so people can keep preferences and other data across
- *  wikis.
+ *  If a primewiki is defined then every wiki will use that wiki db for certain
+ *  tables. The shared `interwiki` table allows users to use the same interwiki
+ *  prefixes across all wikis. The `user` and `user_properties` tables make all
+ *  wikis have the same set of users and user properties/preferences. This does
+ *  not affect the user groups, so a user can be a sysop on one wiki and just a
+ *  user on another.
+ *
+ *  To enable a primewiki create the file $m_htdocs/__common/primewiki and make
+ *  the file contents be the id of the desired wiki.
+ *
+ *  In order for this to work properly the wikis need to have been created with
+ *  a single user table in mind. If you're starting a new wiki farm then you're
+ *  all set. If you're importing wikis which didn't previously have shared user
+ *  tables, then you'll need to use TBD user-merge script.
+ *
  **/
-// $wgSharedDB     = 'wiki_meta';
-// $wgSharedTables = array(
-// 	'interwiki',
-// 	'user',
-// 	'user_properties',
-// );
+if ( file_exists( "$m_htdocs/__common/primewiki" ) ) {
 
+	// grab prime wiki data using closure to encapsulate the data
+	// and not overwrite existing config ($wgSitename, etc)
+	$primewiki = call_user_func( function() use ( $m_htdocs ) {
+
+		$primeWikiId = trim( file_get_contents( "$m_htdocs/__common/primewiki" ) );
+
+		require_once "$m_htdocs/wikis/$primeWikiId/config/setup.php";
+
+		if ( isset( $mezaCustomDBname ) ) {
+			$primeWikiDBname = $mezaCustomDBname;
+		} else {
+			$primeWikiDBname = "wiki_$primeWikiId";
+		}
+
+		return array(
+			'id' => $primeWikiId,
+			'database' => $primeWikiDBname,
+		);
+	} );
+
+	$wgSharedDB = $primewiki[ 'database' ];
+	$wgSharedTables = array(
+		'user',            // default
+		'user_properties', // default
+		'interwiki',       // additional
+	);
+
+}
 
 
 
@@ -470,7 +504,7 @@ $wgFileExtensions = array(
 #
 # Enable Semantic MediaWiki semantics
 #
-enableSemantics( $wikiId . '.' . $_SERVER[ 'SERVER_NAME' ] );
+enableSemantics( $wikiId );
 
 
 #
@@ -875,7 +909,7 @@ require_once $egExtensionLoader->registerLegacyExtension(
 require_once $egExtensionLoader->registerLegacyExtension(
 	"SummaryTimeline",
 	"https://github.com/darenwelsh/SummaryTimeline.git",
-	"tags/0.1.3"
+	"tags/0.2.0"
 );
 
 
@@ -995,7 +1029,7 @@ $wgVisualEditorParsoidPrefix = $wikiId;
 // Define which namespaces will use VE
 $wgVisualEditorNamespaces = array_merge(
 	$wgContentNamespaces,
-        array( NS_USER, 
+        array( NS_USER,
           NS_HELP,
           NS_PROJECT
 	)
@@ -1078,37 +1112,41 @@ $wgUploadWizardConfig = array(
 #
 # Extension:Flow
 #
-require_once $egExtensionLoader->registerLegacyExtension(
-	'Flow',
-	'https://gerrit.wikimedia.org/r/mediawiki/extensions/Flow.git',
-	'REL1_25'
-);
+# Note: Flow removed due to being unable to search discussions. While the
+# improved interface is great, it's useless if we can't search our old content.
+# See issues #272.
+#
+// require_once $egExtensionLoader->registerLegacyExtension(
+// 	'Flow',
+// 	'https://gerrit.wikimedia.org/r/mediawiki/extensions/Flow.git',
+// 	'REL1_25'
+// );
 
-// only allow sysops to create new flow boards
-$wgGroupPermissions['sysop']['flow-create-board'] = true;
+// // only allow sysops to create new flow boards
+// $wgGroupPermissions['sysop']['flow-create-board'] = true;
 
-// store posts as html using Parsoid
-$wgFlowContentFormat = 'html';
+// // store posts as html using Parsoid
+// $wgFlowContentFormat = 'html';
 
-// use VE
-$wgFlowEditorList = array( 'visualeditor', 'none' );
+// // use VE
+// $wgFlowEditorList = array( 'visualeditor', 'none' );
 
-// Define which namespaces will use Flow
-$wgNamespaceContentModels[NS_PROJECT_TALK]        = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_USER_TALK]           = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_TALK]                = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_HELP_TALK]           = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_FILE_TALK]           = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_CATEGORY_TALK]       = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_MEDIAWIKI_TALK]      = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[NS_TEMPLATE_TALK]       = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[SMW_NS_FORM_TALK]       = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[SMW_NS_PROPERTY_TALK]   = CONTENT_MODEL_FLOW_BOARD;
-$wgNamespaceContentModels[SMW_NS_CONCEPT_TALK]    = CONTENT_MODEL_FLOW_BOARD;
+// // Define which namespaces will use Flow
+// $wgNamespaceContentModels[NS_PROJECT_TALK]        = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_USER_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_TALK]                = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_HELP_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_FILE_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_CATEGORY_TALK]       = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_MEDIAWIKI_TALK]      = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_TEMPLATE_TALK]       = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[SMW_NS_FORM_TALK]       = CONTENT_MODEL_FLOW_BOARD; // MW throws error: SMW_NS_FORM_TALK not a constant
+// $wgNamespaceContentModels[SMW_NS_PROPERTY_TALK]   = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[SMW_NS_CONCEPT_TALK]    = CONTENT_MODEL_FLOW_BOARD;
 
-// Connect Flow to Parsoid
-$wgFlowParsoidURL = 'http://127.0.0.1:8000';
-$wgFlowParsoidPrefix = $wikiId;
+// // Connect Flow to Parsoid
+// $wgFlowParsoidURL = 'http://127.0.0.1:8000';
+// $wgFlowParsoidPrefix = $wikiId;
 
 
 
