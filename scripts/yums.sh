@@ -129,6 +129,8 @@ yum install -y \
     pam-devel \
     cifs-utils \
     httpd-devel \
+    mod_ssl \
+    mod_proxy_html \
     ghostscript
 cmd_profile "END yum install dependency list"
 
