@@ -292,7 +292,7 @@ class MezaUnifyUserTables extends Maintenance {
 			// $thisWikiUserTable = $db->query( "SELECT user_id, user_name FROM user" );
 			// print_r( $thisWikiUserTable );
 
-			$usernameToOldId = array();
+			// $usernameToOldId = array();
 			$newIdToOld = array(); // array like $newIdToOld[ newId ] = oldId
 			$oldIdToNew = array(); // opposite of above...
 
@@ -303,7 +303,7 @@ class MezaUnifyUserTables extends Maintenance {
 				$newUserId = $info['user_id'];
 
 				// quick convert-from-this-to-that arrays
-				$usernameToOldId[$userName] = $oldUserId;
+				// $usernameToOldId[$userName] = $oldUserId;
 				// $newIdToOld[$newUserId] = $oldUserId;
 				$oldIdToNew[$oldUserId] = $newUserId;
 
