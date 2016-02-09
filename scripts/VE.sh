@@ -23,9 +23,9 @@ done
 
 
 # MediaWiki's API URI, for parsoid. Parsoid communicates with MediaWiki PHP API
-# via Apache httpd over port 8142. Note: protocol was $mw_api_protocol, but was
+# via Apache httpd over port 9000. Note: protocol was $mw_api_protocol, but was
 # changed to hard-coded http when Parsoid was given it's own port.
-mw_api_uri="http://$mw_api_domain:8142/"
+mw_api_uri="http://$mw_api_domain:9000/"
 
 
 echo "******* Downloading node.js *******"
