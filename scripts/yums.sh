@@ -131,6 +131,7 @@ yum install -y \
     httpd-devel \
     mod_ssl \
     mod_proxy_html \
+    net-tools \
     ghostscript
 cmd_profile "END yum install dependency list"
 
