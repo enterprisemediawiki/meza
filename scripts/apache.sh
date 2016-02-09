@@ -4,19 +4,10 @@
 
 print_title "Starting script apache.sh"
 
-
-#
-# Apache user
-#
-groupadd www
-useradd -G www -r apache
-chown -R apache:www /etc/httpd
-
-
 #
 # Setup document root
 #
-chown -R apache:www "$m_htdocs"
+chown -R apache:apache "$m_htdocs"
 chmod -R 775 "$m_htdocs"
 
 
@@ -36,20 +27,6 @@ chmod -R 775 "$m_htdocs"
 
 
 cd /etc/httpd/conf
-
-#
-# Commenting out all modifications to httpd.conf. These should all be in
-# "meza/scripts/config/httpd.conf" now. Anything
-#
-# update document root
-# sed -r -i 's/\/usr\/local\/apache2\/htdocs/\/var\/www\/meza\/htdocs/g;' ./httpd.conf
-# direct apache to execute PHP
-# cat $m_meza/scripts/httpd-conf-additions.conf >> ./httpd.conf
-# serve index.php as default file
-# sed -r -i 's/DirectoryIndex\s*index.html/DirectoryIndex index.php index.html/g;' ./httpd.conf
-# modify user that will handle web requests
-# sed -r -i 's/User\s*daemon/User apache/g;' ./httpd.conf
-# sed -r -i 's/Group\s*daemon/Group www/g;' ./httpd.conf
 
 
 # rename default configuration file, get meza config file
