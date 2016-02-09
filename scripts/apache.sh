@@ -6,9 +6,17 @@ print_title "Starting script apache.sh"
 
 
 #
+# Apache user
+#
+groupadd www
+useradd -G www -r apache
+chown -R apache:www /etc/httpd
+
+
+#
 # Setup document root
 #
-chown -R apache:apache "$m_htdocs"
+chown -R apache:www "$m_htdocs"
 chmod -R 775 "$m_htdocs"
 
 
