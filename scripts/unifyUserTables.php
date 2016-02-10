@@ -26,6 +26,53 @@
 require_once( '/opt/meza/htdocs/mediawiki/maintenance/Maintenance.php' );
 class MezaUnifyUserTables extends Maintenance {
 
+	public $tablesToModify = array(
+		"page_restrictions"  => array( "idField" => "pr_user" ),
+		"protected_titles"   => array( "idField" => "pt_user" ),
+		"uploadstash"        => array( "idField" => "us_user" ),
+		"user_former_groups" => array( "idField" => "ufg_user" ),
+		"user_groups"        => array( "idField" => "ug_user" ),
+		"user_newtalk"       => array( "idField" => "user_id" ),
+		"watchlist"          => array( "idField" => "wl_user" ),
+
+		// these have IDs and usernames, but usernames should not need to be modified or used
+		"archive"       => array( "idField" => "ar_user",  "userNameField" => "ar_user_text" ),
+		"filearchive"   => array( "idField" => "fa_user",  "userNameField" => "fa_user_text" ),
+		"image"         => array( "idField" => "img_user", "userNameField" => "img_user_text" ),
+		"logging"       => array( "idField" => "log_user", "userNameField" => "log_user_text" ),
+		"oldimage"      => array( "idField" => "oi_user",  "userNameField" => "oi_user_text" ),
+		"recentchanges" => array( "idField" => "rc_user",  "userNameField" => "rc_user_text" ),
+		"revision"      => array( "idField" => "rev_user", "userNameField" => "rev_user_text" ),
+
+		// extension tables
+		'watch_tracking_user' => array( "idField" => 'user_id' ),
+		// 'wiretap'             => array( "idField" => NONE, username only )
+
+	);
+
+	// $idAndNameTables = array(
+	// 	"archive"       => array( "idField" => "ar_user",  "userNameField" => "ar_user_text" ),
+	// 	"filearchive"   => array( "idField" => "fa_user",  "userNameField" => "fa_user_text" ),
+	// 	"image"         => array( "idField" => "img_user", "userNameField" => "img_user_text" ),
+	// 	"logging"       => array( "idField" => "log_user", "userNameField" => "log_user_text" ),
+	// 	"oldimage"      => array( "idField" => "oi_user",  "userNameField" => "oi_user_text" ),
+	// 	"recentchanges" => array( "idField" => "rc_user",  "userNameField" => "rc_user_text" ),
+	// 	"revision"      => array( "idField" => "rev_user", "userNameField" => "rev_user_text" ),
+	// );
+
+
+	public $userTable = array( "idField" => "user_id", "userNameField" => "user_name" );
+	public $userPropsTable = array( "idField" => "up_user" );
+
+	public $userTableRows = false;
+
+	// FIXME: make the script check for the largest value
+	public $initialOffset = 10000; // make sure this is larger than your largest user ID
+
+	public $userArray = array();
+	public $newUserProps = array();
+
+
 	public function __construct() {
 		parent::__construct();
 
@@ -39,87 +86,103 @@ class MezaUnifyUserTables extends Maintenance {
 
 	}
 
+
 	public function execute() {
 
-		global $m_htdocs;
+		// Perform checks to make sure ready for unification
+		$this->checkSetup();
 
-		$userTableRows = false;
+		// ???
+		$this->getWikiIDs();
+
+		// make array of all wiki database names + connection configs, including prime wiki
+		$this->getWikiDatabaseConfigs();
+
+		// actually get array of database connection objects
+		$this->getWikiDBs();
+
+		// ???
+		$this->originalUserIDs = $this->getUserIDsByWiki();
+
+		// Add $this->initialOffset to all user IDs on all tables on all wikis
+		// and delete an unneeded table. Read new IDS into $this->tempUserIDs
+		$this->prepDatabases();
+
+		// ???
+		$this->temporaryUserIDs = $this->getUserIDsByWiki();
+
+		// Create $this->userArray by reading table `user` from all databases
+		// From this array comes the new user IDs for all users
+		$this->createUserArray();
+
+		// Update all tables of all wikis with the new user IDs from $this->userArray
+		// including primeWiki. Delete user and user_properties tables of all except
+		// primeWiki.
+		$this->performTableModification();
+
+		// ???
+		$this->createUnifiedUserTable();
+
+		// ???
+		$this->createUnifiedUserPropertiesTable();
+
+		// ???
+		$this->closeout();
+
+	}
+
+	public function checkSetup () {
+
+		global $m_htdocs;
 
 		if ( is_file( "$m_htdocs/__common/primewiki" ) ) {
 			die( "A prime wiki is already set in $m_htdocs/__common/primewiki. You cannot run this script." );
 		}
 
 		// prime wiki ID and database name
-		$primeWiki = trim( $this->getOption( "prime-wiki" ) );
+		$this->primeWiki = trim( $this->getOption( "prime-wiki" ) );
+
+	}
+
+	public function getWikiIDs () {
+		global $m_htdocs;
 
 		// all other wiki IDs
 		$wikisDirectory = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
-		$wikiIDs = array();
+		$this->wikiIDs = array();
 		foreach( $wikisDirectory as $fileOrDir ) {
 			if ( is_dir( "$m_htdocs/wikis/$fileOrDir" ) ) {
-				$wikiIDs[] = $fileOrDir;
+				$this->wikiIDs[] = $fileOrDir;
 			}
 		}
-		unset( $wikisDirectory );
 
+		return $this->wikiIDs;
 
-		// make array of all wiki database names, including prime wiki
+	}
 
-		$wikiDBconnections[$primeWiki] = $this->getWikiDbConfig( $primeWiki );
-		foreach ( $wikiIDs as $wikiID ) {
-			$wikiDBconnections[$wikiID] = $this->getWikiDbConfig( $wikiID );
-		}
-
-		// FIXME: make the script check for the largest value
-		$initialOffset = 10000; // make sure this is larger than your largest user ID
-
-
-		// $idAndNameTables = array(
-		// 	"archive"       => array( "idField" => "ar_user",  "userNameField" => "ar_user_text" ),
-		// 	"filearchive"   => array( "idField" => "fa_user",  "userNameField" => "fa_user_text" ),
-		// 	"image"         => array( "idField" => "img_user", "userNameField" => "img_user_text" ),
-		// 	"logging"       => array( "idField" => "log_user", "userNameField" => "log_user_text" ),
-		// 	"oldimage"      => array( "idField" => "oi_user",  "userNameField" => "oi_user_text" ),
-		// 	"recentchanges" => array( "idField" => "rc_user",  "userNameField" => "rc_user_text" ),
-		// 	"revision"      => array( "idField" => "rev_user", "userNameField" => "rev_user_text" ),
-		// );
-
-
-		$userTable = array( "idField" => "user_id", "userNameField" => "user_name" );
-
-		$tablesToModify = array(
-			"page_restrictions"  => array( "idField" => "pr_user" ),
-			"protected_titles"   => array( "idField" => "pt_user" ),
-			"uploadstash"        => array( "idField" => "us_user" ),
-			"user_former_groups" => array( "idField" => "ufg_user" ),
-			"user_groups"        => array( "idField" => "ug_user" ),
-			"user_newtalk"       => array( "idField" => "user_id" ),
-			"watchlist"          => array( "idField" => "wl_user" ),
-
-			// these have IDs and usernames, but usernames should not need to be modified or used
-			"archive"       => array( "idField" => "ar_user",  "userNameField" => "ar_user_text" ),
-			"filearchive"   => array( "idField" => "fa_user",  "userNameField" => "fa_user_text" ),
-			"image"         => array( "idField" => "img_user", "userNameField" => "img_user_text" ),
-			"logging"       => array( "idField" => "log_user", "userNameField" => "log_user_text" ),
-			"oldimage"      => array( "idField" => "oi_user",  "userNameField" => "oi_user_text" ),
-			"recentchanges" => array( "idField" => "rc_user",  "userNameField" => "rc_user_text" ),
-			"revision"      => array( "idField" => "rev_user", "userNameField" => "rev_user_text" ),
-
-			// extension tables
-			'watch_tracking_user' => array( "idField" => 'user_id' ),
-			// 'wiretap'             => array( "idField" => NONE, username only )
-
+	public function getWikiDatabaseConfigs () {
+		$this->wikiDatabaseConfigs = array(
+			$this->primeWiki => $this->getWikiDbConfig( $this->primeWiki )
 		);
+		foreach ( $this->wikiIDs as $wikiID ) {
+			if ( $wikiID == $this->primeWiki ) {
+				continue;
+			}
+			$this->wikiDatabaseConfigs[$wikiID] = $this->getWikiDbConfig( $wikiID );
+		}
+		return $this->wikiDatabaseConfigs;
+	}
 
+	public function getWikiDBs () {
 
-		$wikiDBs = array();
-		$originalUserIDs = array();
+		$this->wikiDBs = array();
+		$this->originalUserIDs = array();
 		global $wgDBtype, $wgDBserver;
-		foreach( $wikiDBconnections as $wikiID => $conn ) {
+		foreach( $this->wikiDatabaseConfigs as $wikiID => $conn ) {
 			$this->output( "\nConnecting to database $wiki");
-			// $wikiDBs[$wiki] = new DB( $wiki );
+			// $this->wikiDBs[$wiki] = new DB( $wiki );
 
-			$wikiDBs[$wikiID] = DatabaseBase::factory(
+			$this->wikiDBs[$wikiID] = DatabaseBase::factory(
 				$wgDBtype,
 				array(
 					'host' => $wgDBserver,
@@ -133,60 +196,69 @@ class MezaUnifyUserTables extends Maintenance {
 				)
 			);
 
-			$db = $wikiDBs[$wikiID];
+		}
+
+	}
+
+	public function getUserIDsByWiki () {
+
+		$usersByWiki = array();
+
+		foreach ( $this->wikiDBs as $wikiID => $db ) {
 
 			$thisWikiUserTable = $db->query( "SELECT user_id, user_name FROM user" );
 
-			$originalUserIDs[$wikiID] = array();
+			$usersByWiki[$wikiID] = array();
 			while( $row = $thisWikiUserTable->fetchRow() ) {
 				$userName  = $row['user_name'];
-				$oldUserId = $row['user_id'];
+				$userID = $row['user_id'];
 
-				$originalUserIDs[$wikiID][$userName] = $oldUserId;
+				$usersByWiki[$wikiID][$userName] = $userID;
 			}
 
 		}
 
+		return $usersByWiki;
+	}
 
-
-
-
-
-		/**
-		 *  For each database, add $initialOffset to all user IDs in all tables
-		 *
-		 *  This just makes it so user IDs are always unique
-		 *
-		 *  Also remove unneeded table
-		 *
-		 **/
-		foreach( $wikiDBs as $wikiID => $db ) {
+	/**
+	 *  For each database, add $this->initialOffset to all user IDs in all tables
+	 *
+	 *  This just makes it so user IDs are always unique
+	 *
+	 *  Also remove unneeded table
+	 *
+	 **/
+	public function prepDatabases () {
+		foreach( $this->wikiDBs as $wikiID => $db ) {
 
 			$this->output( "\n#\n# Adding initial offset to user IDs in $wikiID\n#" );
 
-			foreach ( $tablesToModify + array( "user" => $userTable ) as $tableName => $tableInfo ) {
+			$prepTables = $this->tablesToModify
+				+ array( "user" => $this->userTable )
+				+ array( "user_properties" => $this->userPropsTable );
+
+			foreach ( $prepTables as $tableName => $tableInfo ) {
 				$idField = $tableInfo['idField'];
-				$db->query( "UPDATE $tableName SET $idField = $idField + $initialOffset" );
+				$db->query( "UPDATE $tableName SET $idField = $idField + $this->initialOffset" );
 			}
 
-			$db->query( "UPDATE ipblocks SET ipb_user = ipb_user + $initialOffset, ipb_by = ipb_by + $initialOffset");
+			$db->query( "UPDATE ipblocks SET ipb_user = ipb_user + $this->initialOffset, ipb_by = ipb_by + $this->initialOffset");
 
 			// DROP external_user table. See https://www.mediawiki.org/wiki/Manual:External_user_table
 			$db->query( "DROP TABLE IF EXISTS external_user" );
 
 		}
+	}
 
 
-
-
-		/**
-		 *  Create $userArray by reading table `user` from all databases
-		 *
-		 *
-		 *
-		 **/
-		$userArray = array();
-		$newUserProps = array();
+	/**
+	 *  Create $this->userArray by reading table `user` from all databases
+	 *
+	 *
+	 *
+	 **/
+	public function createUserArray () {
 		$userColumnsIssetChecks = array(
 			'user_email',
 			'user_real_name',
@@ -195,8 +267,8 @@ class MezaUnifyUserTables extends Maintenance {
 
 		$this->output( "\nCreating userArray from all user tables" );
 
-		// Read user table for all wikis, add to $userArray giving each username a new unique ID
-		foreach( $wikiDBs as $wikiID => $db ) {
+		// Read user table for all wikis, add to $this->userArray giving each username a new unique ID
+		foreach( $this->wikiDBs as $wikiID => $db ) {
 
 			$this->output( "\nAdding $wikiID to userArray" );
 
@@ -207,47 +279,47 @@ class MezaUnifyUserTables extends Maintenance {
 
 			while( $row = $result->fetchRow() ) {
 
-				if ( ! $userTableRows ) {
-					$userTableRows = array();
+				if ( ! $this->userTableRows ) {
+					$this->userTableRows = array();
 					foreach( $row as $key => $value ) {
-						$userTableRows[] = $key;
+						$this->userTableRows[] = $key;
 					}
 				}
 
 				$userName = $row['user_name'];
 
-				if ( ! isset( $userArray[$userName] ) ) {
+				if ( ! isset( $this->userArray[$userName] ) ) {
 
-					$userArray[$userName] = $row;
+					$this->userArray[$userName] = $row;
 
 					// give new ID
-					$newId = count( $userArray );
+					$newId = count( $this->userArray );
 
-					$userArray[$userName]["user_id"] = $newId;
+					$this->userArray[$userName]["user_id"] = $newId;
 
 				} else {
 
 					// sum edit counts
-					$userArray[$userName]["user_editcount"] += $row['user_editcount'];
+					$this->userArray[$userName]["user_editcount"] += $row['user_editcount'];
 
 					// If this wiki ($row) has an older user_registration, use this wiki's value
-					if ( $userArray[$userName]["user_registration"] > $row['user_registration'] ) {
-						$userArray[$userName]["user_registration"] = $row['user_registration'];
+					if ( $this->userArray[$userName]["user_registration"] > $row['user_registration'] ) {
+						$this->userArray[$userName]["user_registration"] = $row['user_registration'];
 					}
 
 					// If this wiki ($row) has been touched more recently, use this wiki's value
-					if ( $userArray[$userName]["user_touched"] < $row['user_touched'] ) {
-						$userArray[$userName]["user_touched"] = $row['user_touched'];
+					if ( $this->userArray[$userName]["user_touched"] < $row['user_touched'] ) {
+						$this->userArray[$userName]["user_touched"] = $row['user_touched'];
 
 						// also use this wikis password since they've accessed it more recently
 						if ( $row['user_password'] ) {
-							$userArray[$userName]["user_password"] = $row['user_password'];
+							$this->userArray[$userName]["user_password"] = $row['user_password'];
 						}
 					}
 
 					foreach ( $userColumnsIssetChecks as $col ) {
-						if ( ! $userArray[$userName][$col] && $row[$col] ) {
-							$userArray[$userName][$col] = $row[$col];
+						if ( ! $this->userArray[$userName][$col] && $row[$col] ) {
+							$this->userArray[$userName][$col] = $row[$col];
 						}
 					}
 
@@ -256,27 +328,28 @@ class MezaUnifyUserTables extends Maintenance {
 
 		}
 
+	}
 
 
+	/**
+	 *  For all wikis, make changes to tables with usernames and user IDs
+	 *
+	 *  Loop through the ~17 tables with usernames and user IDs (except the user
+	 *  and user_properties tables) and update them accordingly
+	 *
+	 *  In the end, only one user and user_properties table will exist across all
+	 *  wikis.
+	 *
+	 **/
+	public function performTableModification () {
 
-
-		/**
-		 *  For all wikis, make changes to tables with usernames and user IDs
-		 *
-		 *  Loop through the ~17 tables with usernames and user IDs (except the user
-		 *  and user_properties tables) and update them accordingly
-		 *
-		 *  In the end, only one user and user_properties table will exist across all
-		 *  wikis.
-		 *
-		 **/
 		$this->output( "\n#\n# Starting major table modifications\n#");
-		foreach ( $wikiDBs as $wikiID => $db ) {
+		foreach ( $this->wikiDBs as $wikiID => $db ) {
 
 			$this->output( "\n# Starting major modifications to $wikiID");
 
-			// // For tables with username and id columns: replace the id with the id from $userArray
-			// foreach( $userArray as $userName => $newUserId ) {
+			// // For tables with username and id columns: replace the id with the id from $this->userArray
+			// foreach( $this->userArray as $userName => $newUserId ) {
 			// 	foreach( $tablesWithUsernameAndId as $tableName => $tableInfo ) {
 			// 		$idField = $tableInfo['idField'];
 			// 		$userNameField = $tableInfo['userNameField'];
@@ -287,34 +360,33 @@ class MezaUnifyUserTables extends Maintenance {
 			// 	}
 			// }
 
-			// Lookup the ID in the user table, use username to get new ID from $UserArray, update ID
-			// $originalUserIDs[$wikiID][$userName] = old user id
+			// Lookup the ID in the user table, use username to get new ID from $this->userArray, update ID
+			// $this->originalUserIDs[$wikiID][$userName] = old user id
 			// $thisWikiUserTable = $db->query( "SELECT user_id, user_name FROM user" );
 			// print_r( $thisWikiUserTable );
 
 			// $usernameToOldId = array();
 			$newIdToOld = array(); // array like $newIdToOld[ newId ] = oldId
-			$oldIdToNew = array(); // opposite of above...
+			$tempToNew = array(); // opposite of above...
 
 			// foreach( $thisWikiUserTable as $row ) {
-			foreach( $originalUserIDs[$wikiID] as $userName => $oldUserId ) {
+			foreach( $this->temporaryUserIDs[$wikiID] as $userName => $tempUserID ) {
 
-				$info = $userArray[$userName];
-				$newUserId = $info['user_id'];
+				$newUserId = $this->userArray[$userName]['user_id'];
 
 				// quick convert-from-this-to-that arrays
-				// $usernameToOldId[$userName] = $oldUserId;
-				// $newIdToOld[$newUserId] = $oldUserId;
-				$oldIdToNew[$oldUserId] = $newUserId;
+				// $usernameToOldId[$userName] = $tempUserID;
+				// $newIdToOld[$newUserId] = $tempUserID;
+				$tempToNew[$tempUserID] = $newUserId;
 
 
-				foreach( $tablesToModify as $tableName => $tableInfo ) {
+				foreach( $this->tablesToModify as $tableName => $tableInfo ) {
 					$idField = $tableInfo['idField'];
 
 					$db->update(
 						$tableName,
 						array( $idField => $newUserId ), // set values
-						array( $idField => $oldUserId ), // conditions: set this where ID field = old value
+						array( $idField => $tempUserID ), // conditions: set this where ID field = old value
 						__METHOD__
 					);
 
@@ -324,13 +396,13 @@ class MezaUnifyUserTables extends Maintenance {
 				$db->update(
 					'ipblocks',
 					array( 'ipb_user' => $newUserId ),
-					array( 'ipb_user' => $oldUserId ),
+					array( 'ipb_user' => $tempUserID ),
 					__METHOD__
 				);
 				$db->update(
 					'ipblocks',
 					array( 'ipb_by' => $newUserId ),
-					array( 'ipb_by' => $oldUserId ),
+					array( 'ipb_by' => $tempUserID ),
 					__METHOD__
 				);
 			}
@@ -341,19 +413,19 @@ class MezaUnifyUserTables extends Maintenance {
 			$oldUserProps = $db->query( "SELECT * FROM user_properties" );
 			// $this->output( "\n\nOLDUSERPROPS:\n");
 			// print_r( $oldUserProps );
-			// $this->output( "\n\oldIdToNew:\n");
-			// print_r( $oldIdToNew );
+			// $this->output( "\n\tempToNew:\n");
+			// print_r( $tempToNew );
 
 			while( $row = $oldUserProps->fetchRow() ) {
-				if ( isset( $oldIdToNew[ $row['up_user'] ] ) ) {
-					$newPropUserId = $oldIdToNew[ $row['up_user'] ];
+				if ( isset( $tempToNew[ $row['up_user'] ] ) ) {
+					$newPropUserId = $tempToNew[ $row['up_user'] ];
 
 					$row['up_user'] = $newPropUserId; // could be dupes across wikis...need to upsert at end
-					$newUserProps[] = $row;
+					$this->newUserProps[] = $row;
 				} else {
 					$oldId = $row['up_user'];
-					$this->output( "\nUser ID #$oldId not found in oldIdToNew array for $wikiID.");
-					//$this->output( print_r( array( "id" => $row['up_user'], "array" => $oldIdToNew ), true ) );
+					$this->output( "\nUser ID #$oldId not found in tempToNew array for $wikiID." );
+					//$this->output( print_r( array( "id" => $row['up_user'], "array" => $tempToNew ), true ) );
 				}
 			}
 
@@ -362,76 +434,99 @@ class MezaUnifyUserTables extends Maintenance {
 			$db->query( "DELETE FROM user" );
 			$db->query( "DELETE FROM user_properties" );
 
+			$this->output( "\n# Complete with major modifications to $wikiID" );
+
 		}
 
+		$this->output( "\n# Complete with major modifications to all wikis\n" );
 
+	}
 
+	/**
+	 *  Create new user table on the one wiki with the shared user table
+	 *
+	 *
+	 *
+	 **/
+	public function createUnifiedUserTable () {
 
-		/**
-		 *  Create new user table on the one wiki with the shared user table
-		 *
-		 *
-		 *
-		 **/
-		$userArrayForInsert = array();
-		while( $row = array_pop( $userArray ) ) {
+		$this->output( "\n# Creating unified user table. \n" );
 
-			$i = count( $userArrayForInsert );
-			foreach( $userTableRows as $key ) {
+		$this->userArrayForInsert = array();
+		while( $row = array_pop( $this->userArray ) ) {
+
+			$i = count( $this->userArrayForInsert );
+			foreach( $this->userTableRows as $key ) {
 
 				// if $key doesn't start with "user_" then skip it (it's not a valid field name)
 				if ( strpos( $key, "user_" ) !== 0 ) {
 					continue;
 				}
 
-				$userArrayForInsert[$i][$key] = $row[$key];
+				$this->userArrayForInsert[$i][$key] = $row[$key];
 			}
 
 		}
 
-		$db = $wikiDBs[$primeWiki];
+		$db = $this->wikiDBs[$this->primeWiki];
 		$db->query( 'DELETE FROM user' );
 		$db->insert(
 			'user',
-			$userArrayForInsert,
+			$this->userArrayForInsert,
 			__METHOD__
 		);
-		$autoInc = count( $userArrayForInsert ) + 1;
+		$autoInc = count( $this->userArrayForInsert ) + 1;
 		$db->query( "ALTER TABLE user AUTO_INCREMENT = $autoInc;" );
 
+	}
 
 
+	/**
+	 *  Create new user_properties table on the one wiki with the shared user table
+	 *
+	 *
+	 *
+	 **/
+	public function createUnifiedUserPropertiesTable () {
 
-		/**
-		 *  Create new user_properties table on the one wiki with the shared user table
-		 *
-		 *
-		 *
-		 **/
-		$newUserPropsForInsert = array();
-		while( $row = array_pop( $newUserProps ) ) {
-			$newUserPropsForInsert[] = array(
+		$this->output( "\n# Creating unified user_properties table. \n" );
+
+		$this->newUserPropsForInsert = array();
+		while( $row = array_pop( $this->newUserProps ) ) {
+			$this->newUserPropsForInsert[] = array(
 				'up_user'     => $row['up_user'],
 				'up_property' => $row['up_property'],
 				'up_value'    => $row['up_value'],
 			);
 		}
 
+		$db = $this->wikiDBs[$this->primeWiki];
 		$db->query( 'DELETE FROM user_properties' );
 		$db->insert(
 			'user_properties',
-			$newUserPropsForInsert,
+			$this->newUserPropsForInsert,
 			__METHOD__,
 			array( 'IGNORE' ) // IGNORE or ON DUPLICATE KEY UPDATE ???
 		);
 
+	}
 
-		# Declare the prime-wiki as prime! Write prime wiki's wiki ID to file
-		file_put_contents( "$m_htdocs/__common/primewiki", $primeWiki );
+	public function closeout () {
+		global $m_htdocs;
 
-		$this->output( "\n#\n# SCRIPT COMPLETE\n#" ); //end of script
+		// Declare the prime-wiki as prime! Write prime wiki's wiki ID to file
+		if ( file_put_contents( "$m_htdocs/__common/primewiki", $this->primeWiki ) ) {
+			$this->output( "\n# Primewiki written to $m_htdocs/__common/primewiki\n" );
+		}
+		else {
+			$this->output( "\n# Primewiki not written to $m_htdocs/__common/primewiki" );
+		}
+
+		// Victory!
+		$this->output( "\n#\n# User table unification COMPLETE!\n#\n" );
 
 	}
+
 
 	// FIXME this belongs in a "Extension:meza" or something
 	// this very closely duplicates LocalSettings.php prime wiki check
