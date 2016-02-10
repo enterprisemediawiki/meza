@@ -1832,7 +1832,7 @@ ldap.max_links = -1
 
 [opcache]
 ; add OPcache file location
-zend_extension=/usr/local/php/lib/php/extensions/no-debug-zts-20131226/opcache.so
+zend_extension=/usr/local/php/lib/php/extensions/no-debug-non-zts-20131226/opcache.so
 
 ; Determines if Zend OPCache is enabled
 opcache.enable=1
