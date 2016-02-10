@@ -84,6 +84,24 @@ else
 
 fi
 
+#
+# Below attempts to make SELinux play nice with services. This works for
+# elasticsearch, but parsoid runs sooooo sloooow. Disabling SELinux.
+#
+
+# enable SELinux management commands
+# yum -y install setroubleshoot-server selinux-policy-devel
+
+# Make SELinux respect parsoid
+# sudo semanage port -a -t http_port_t -p tcp 8000
+
+# make SELinux respect elasticsearc
+# sudo semanage port -a -t http_port_t -p tcp 9200
+# sudo semanage port -a -t http_port_t -p tcp 9300
+
+# disable SELinux
+setenforce 0
+
 
 echo -e "\n\napache.sh complete."
 # Apache httpd service not started yet. Started in php.sh
