@@ -99,8 +99,10 @@ fi
 # sudo semanage port -a -t http_port_t -p tcp 9200
 # sudo semanage port -a -t http_port_t -p tcp 9300
 
-# disable SELinux
-setenforce 0
+
+# set SELinux to permissive mode permanently and immediately
+sed -r -i "s/SELINUX=.*$/SELINUX=permissive/g;" /etc/selinux/config
+setenforce permissive
 
 
 echo -e "\n\napache.sh complete."
