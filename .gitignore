@@ -4,3 +4,6 @@ sources/*
 logs/*
 !logs/README.md
 remote-wiki-config.sh
+
+# ignore wiki blender landing page
+htdocs/WikiBlender

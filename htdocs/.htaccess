@@ -13,6 +13,9 @@
     # and settings are located)
     RewriteRule ^wikis(?:/|$)(.*)$ - [L]
 
+    # Allow access to WikiBlender landing page and support files
+	RewriteRule ^WikiBlender(?:/|$)(.*)$ - [L]
+
     # Taken from MediaWiki.org [[Extension:Simple Farm]]
     #
     # Redirect virtual wiki path to physical wiki path. There
