@@ -70,6 +70,11 @@ then
 	firewall-cmd --zone=public --add-port=http/tcp
 	firewall-cmd --zone=public --add-port=http/tcp --permanent
 
+	# access to 8008 for reverse proxy for elasticsearch
+	firewall-cmd --zone=public --add-port=8008/tcp
+	firewall-cmd --zone=public --add-port=8008/tcp --permanent
+
+
 else
     echo "Enterprise Linux version 6. Applying rule changes to iptables"
 

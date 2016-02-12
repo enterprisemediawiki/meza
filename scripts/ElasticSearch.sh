@@ -110,3 +110,8 @@ chown -R elasticsearch /var/work/elasticsearch
 echo "******* Starting elasticsearch service *******"
 service elasticsearch start
 sleep 20  # Waits 10 seconds
+
+
+# install kopf and head plugins
+/usr/share/elasticsearch/bin/plugin install lmenezes/elasticsearch-kopf/1.0
+/usr/share/elasticsearch/bin/plugin install mobz/elasticsearch-head
