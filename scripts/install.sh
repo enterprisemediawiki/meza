@@ -263,6 +263,10 @@ rm -f ~/.composer/auth.json
 # remove downloads directory (miscellaneous downloaded files)
 rm -rf /root/mezadownloads
 
+# print time requirements for each script
+echo "COMMAND TIMES:"
+node "$m_meza/scripts/commandTimes.js" "$cmdlog"
+
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
 cat "$m_meza/scripts/pigeon.txt"
 
