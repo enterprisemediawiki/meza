@@ -1,12 +1,11 @@
-/opt/meza/logs/httpd/*.log {
-    rotate 5
-    daily
-    size 128M
-    compress
-    delaycompress
+/var/log/httpd/*log {
+    missingok
+    notifempty
     sharedscripts
-
+    daily
+    rotate 7
     postrotate
-        service httpd restart > /dev/null
+        /sbin/service httpd reload > /var/log/httpd/rotate 2>&1 || true
     endscript
+    compress
 }
