@@ -1019,7 +1019,6 @@ $wgHiddenPrefs[] = 'visualeditor-enable';
 
 // URL to the Parsoid instance
 // MUST NOT end in a slash due to Parsoid bug
-// Use port 9000 if you use the Debian package
 $wgVisualEditorParsoidURL = 'http://127.0.0.1:8000';
 
 // Interwiki prefix to pass to the Parsoid instance
