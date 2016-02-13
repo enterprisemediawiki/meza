@@ -94,7 +94,7 @@ sudo ln -s /usr/local/php/bin/php /usr/bin/php
 #
 # Initiate php.ini
 #
-cp "$m_meza/scripts/php.ini-development" /usr/local/php/lib/php.ini
+cp "$m_meza/scripts/php.ini" /usr/local/php/lib/php.ini
 
 
 #
