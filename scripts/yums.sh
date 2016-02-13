@@ -128,6 +128,11 @@ yum install -y \
     libmcrypt-devel \
     pam-devel \
     cifs-utils \
+    httpd-devel \
+    mod_ssl \
+    mod_proxy_html \
+    net-tools \
+    vim \
     ghostscript
 cmd_profile "END yum install dependency list"
 

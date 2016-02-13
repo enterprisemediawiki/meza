@@ -48,7 +48,7 @@ cd "$m_meza/sources/php-$phpversion/"
 #
 cmd_profile "START php build"
 ./configure \
-    --with-apxs2=/usr/local/apache2/bin/apxs \
+    --with-apxs2=/usr/bin/apxs \
     --enable-bcmath \
     --with-bz2 \
     --enable-calendar \
@@ -82,7 +82,6 @@ cmd_profile "START php build"
     --enable-inline-optimization \
     --enable-mbregex \
     --enable-opcache \
-    --enable-fpm \
     --enable-intl \
     --prefix=/usr/local/php
 make
@@ -95,7 +94,7 @@ sudo ln -s /usr/local/php/bin/php /usr/bin/php
 #
 # Initiate php.ini
 #
-cp "$m_meza/scripts/php.ini-development" /usr/local/php/lib/php.ini
+cp "$m_meza/scripts/php.ini" /usr/local/php/lib/php.ini
 
 
 #
