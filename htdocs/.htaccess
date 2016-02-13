@@ -14,7 +14,7 @@
     RewriteRule ^wikis(?:/|$)(.*)$ - [L]
 
     # Allow access to WikiBlender landing page and support files
-	RewriteRule ^WikiBlender(?:/|$)(.*)$ - [L]
+    RewriteRule ^WikiBlender(?:/|$)(.*)$ - [L]
 
     # Taken from MediaWiki.org [[Extension:Simple Farm]]
     #
