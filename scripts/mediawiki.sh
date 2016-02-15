@@ -50,14 +50,14 @@ if [ "$mediawiki_git_install" = "y" ]; then
 	cd mediawiki
 
 	# Checkout latest released version
-	git checkout tags/1.25.1
+	git checkout tags/1.26.2
 	cmd_profile "END mediawiki git clone"
 else
 	cmd_profile "START mediawiki get from tarball"
-	wget http://releases.wikimedia.org/mediawiki/1.25/mediawiki-core-1.25.1.tar.gz
+	wget http://releases.wikimedia.org/mediawiki/1.26/mediawiki-core-1.26.2.tar.gz
 
 	mkdir mediawiki
-	tar xpvf mediawiki-core-1.25.1.tar.gz -C ./mediawiki --strip-components 1
+	tar xpvf mediawiki-core-1.26.1.tar.gz -C ./mediawiki --strip-components 1
 	cd mediawiki
 	cmd_profile "END mediawiki get from tarball"
 fi
@@ -81,12 +81,12 @@ if [ "$mediawiki_git_install" = "y" ]; then
 	# git clone https://github.com/wikimedia/mediawiki-skins-Vector.git Vector
 	git clone https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git Vector
 	cd Vector
-	git checkout REL1_25
+	git checkout REL1_26
 	cd ..
 else
-	wget https://github.com/wikimedia/mediawiki-skins-Vector/archive/REL1_25.tar.gz
+	wget https://github.com/wikimedia/mediawiki-skins-Vector/archive/REL1_26.tar.gz
 	mkdir Vector
-	tar xpvf REL1_25.tar.gz -C ./Vector --strip-components 1
+	tar xpvf REL1_26.tar.gz -C ./Vector --strip-components 1
 fi
 
 #

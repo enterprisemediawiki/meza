@@ -66,7 +66,7 @@ usergithubtoken=${usergithubtoken:-$default_usergithubtoken}
 #   9260e5d       (a sha1 hash)
 #   tags/v0.4.1   (a tag name)
 #   master        (a branch name)
-parsoid_version="ba26a55"
+parsoid_version="8976ab9"
 
 # Prompt user for PHP version
 default_phpversion="5.6.14"

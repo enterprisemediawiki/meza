@@ -84,7 +84,7 @@ echo "******* Downloading configuration files *******"
 cd "$m_meza/scripts"
 
 # Copy Parsoid settings from Meza to Parsoid install
-cp ./localsettings.js /etc/parsoid/api/localsettings.js
+cp ./localsettings.js /etc/parsoid/localsettings.js
 
 # Insert proper MediaWiki API URI
 # Insert contents of "$mw_api_uri" in place of "<<INSERTED_BY_VE.sh>>"

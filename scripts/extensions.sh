@@ -48,6 +48,9 @@ git submodule update --init
 cd "$m_mediawiki/extensions/Elastica"
 composer install
 
+# Install SyntaxHighlight dependencies
+cd "$m_mediawiki/extensions/SyntaxHighlight_GeSHi"
+composer install
 
 
 

@@ -11,10 +11,10 @@
 USER="parsoid"
 
 DAEMON="/usr/local/bin/node"
-ROOT_DIR="/etc/parsoid/api"
+ROOT_DIR="/etc/parsoid/bin"
 
 SERVER="$ROOT_DIR/server.js"
-LOG_FILE="$ROOT_DIR/server.js.log"
+LOG_FILE="$ROOT_DIR/../server.js.log"
 
 LOCK_FILE="/var/lock/subsys/node-server"
 
