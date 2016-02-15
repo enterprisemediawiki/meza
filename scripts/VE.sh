@@ -90,7 +90,7 @@ cp ./localsettings.js /etc/parsoid/localsettings.js
 # Insert contents of "$mw_api_uri" in place of "<<INSERTED_BY_VE.sh>>"
 # Note on escape syntax: result="${original_var//text_to_replace/text_to_replace_with}
 escaped_mw_api_uri=${mw_api_uri//\//\\\/} # need to replace / with \/ for regex
-sed -r -i "s/INSERTED_BY_VE_SCRIPT/$escaped_mw_api_uri/g;" /etc/parsoid/api/localsettings.js
+sed -r -i "s/INSERTED_BY_VE_SCRIPT/$escaped_mw_api_uri/g;" /etc/parsoid/localsettings.js
 
 
 #
