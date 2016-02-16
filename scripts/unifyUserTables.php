@@ -179,7 +179,7 @@ class MezaUnifyUserTables extends Maintenance {
 		$this->originalUserIDs = array();
 		global $wgDBtype, $wgDBserver;
 		foreach( $this->wikiDatabaseConfigs as $wikiID => $conn ) {
-			$this->output( "\nConnecting to database $wiki");
+			$this->output( "\nConnecting to database $wikiID");
 			// $this->wikiDBs[$wiki] = new DB( $wiki );
 
 			$this->wikiDBs[$wikiID] = DatabaseBase::factory(
