@@ -27,8 +27,8 @@ Note that this connection is read-only. You can only perform GET requests to Ela
 
 To access each plugin, navigate to the following URIs:
 
-* Kopf: http://<your-domain>:8008/_plugin/kopf
-* Head: http://<your-domain>:8008/_plugin/elasticsearch-head
-* Bigdesk: http://<your-domain>:8008/_plugin/bigdesk
-* Inquisitor: http://<your-domain>:8008/_plugin/inquisitor
+* Kopf: `http://<your-domain>:8008/_plugin/kopf`
+* Head: `http://<your-domain>:8008/_plugin/elasticsearch-head`
+* Bigdesk: `http://<your-domain>:8008/_plugin/bigdesk`
+* Inquisitor: `http://<your-domain>:8008/_plugin/inquisitor`
 
