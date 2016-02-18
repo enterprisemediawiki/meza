@@ -1,4 +1,4 @@
-A description of you pull request
+A description of the pull request
 
 ### Testing
 
@@ -18,3 +18,4 @@ A description of you pull request
 ### Issues
 
 * Closes #123456789 ???
+* Addresses #987654321 ???
