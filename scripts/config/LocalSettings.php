@@ -1110,6 +1110,18 @@ $wgUploadWizardConfig = array(
 
 
 #
+# Extension:CollapsibleVector
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	'CollapsibleVector',
+	'https://gerrit.wikimedia.org/r/mediawiki/extensions/CollapsibleVector',
+	'REL1_25'
+);
+
+
+
+
+#
 # Extension:Flow
 #
 # Note: Flow removed due to being unable to search discussions. While the
