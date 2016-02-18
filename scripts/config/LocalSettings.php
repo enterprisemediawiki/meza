@@ -1004,6 +1004,7 @@ require_once $egExtensionLoader->registerLegacyExtension(
 if ( isset( $_SERVER['REMOTE_ADDR'] ) && isset( $_SERVER['SERVER_ADDR'] )
 	&& $_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR'] )
 {
+	$wgServer = preg_replace( '/^http:\/\/([a-zA-Z\d-\.]+):9000/', 'https://$1', $wgServer );
 	$wgGroupPermissions['*']['read'] = true;
 	$wgGroupPermissions['*']['edit'] = true;
 }
