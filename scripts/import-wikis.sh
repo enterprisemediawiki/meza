@@ -87,6 +87,13 @@ if [ "$imports_dir" = "new" ]; then
 fi
 
 
+echo
+echo
+echo "Announce completion of each wiki on Slack?"
+echo "Enter webhook URI or leave blank to opt out:"
+read slackwebhook
+
+
 # setup configuration variables
 wikis_install_dir="$m_htdocs/wikis"
 skipped_wikis=""
@@ -213,7 +220,12 @@ for d in */ ; do
 		echo -e "\nSKIPPING elastic-build-index.sh (no CirrusSearch)"
 	fi
 
-	echo -e "\nWiki \"$wiki_id\" has been imported\n"
+	complete_msg="Wiki \"$wiki_id\" has been imported"
+	echo -e "\n$complete_msg\n"
+
+	if [[ ! -z "$slackwebhook" ]]; then
+		sudo bash "$m_meza/scripts/slack.sh" "$slackwebhook" "$complete_msg"
+	fi
 
 	# delete remaining source files?
 

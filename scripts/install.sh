@@ -275,31 +275,7 @@ echo "$cmd_times"
 
 # Announce on Slack if a slack webhook provided
 if [[ ! -z "$slackwebhook" ]]; then
-
-	text="Your meza installation is complete"
-
-	escapedText=$(echo $text | sed 's/"/\"/g' | sed "s/'/\'/g" )
-	json="{
-	    \"attachments\": [
-	        {
-	            \"color\": \"#339966\",
-	            \"fallback\": \"Installation times\",
-	            \"fields\": [
-	                {
-	                    \"short\": false,
-	                    \"title\": \"Installation times\",
-	                    \"value\": \"$cmd_times\"
-	                }
-	            ]
-	        }
-	    ],
-	    \"text\": \"Your meza installation is complete\"
-	}"
-
-	curl -s -d "payload=$json" "$slackwebhook"
-	echo
-	echo "Message sent to Slack webhook $slackwebhook"
-
+	sudo bash "$m_meza/scripts/slack.sh" "$slackwebhook" "Your meza installation is complete. Install times:" "$cmd_times"
 fi
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
