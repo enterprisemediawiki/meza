@@ -279,7 +279,7 @@ echo "$cmd_times"
 
 # Announce on Slack if a slack webhook provided
 if [[ ! -z "$slackwebhook" ]]; then
-	sudo bash "$m_meza/scripts/slack.sh" "$slackwebhook" "Your meza installation is complete. Install times:" "$cmd_times"
+	bash "$m_meza/scripts/slack.sh" "$slackwebhook" "Your meza installation is complete. Install times:" "$cmd_times"
 fi
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory

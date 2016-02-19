@@ -226,7 +226,7 @@ for d in */ ; do
 	echo -e "\n$complete_msg\n"
 
 	if [[ ! -z "$slackwebhook" ]]; then
-		sudo bash "$m_meza/scripts/slack.sh" "$slackwebhook" "$complete_msg"
+		bash "$m_meza/scripts/slack.sh" "$slackwebhook" "$complete_msg"
 	fi
 
 	# delete remaining source files?
