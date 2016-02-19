@@ -220,7 +220,7 @@ for d in */ ; do
 		echo -e "\nSKIPPING elastic-build-index.sh (no CirrusSearch)"
 	fi
 
-	complete_msg="Wiki \"$wiki_id\" has been imported"
+	complete_msg="Wiki '$wiki_id' has been imported"
 	echo -e "\n$complete_msg\n"
 
 	if [[ ! -z "$slackwebhook" ]]; then
