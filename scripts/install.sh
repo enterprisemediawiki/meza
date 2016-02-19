@@ -127,6 +127,9 @@ read -s dummy # is there another way to do this?
 sudo openssl req -newkey rsa:2048 -nodes -keyout /etc/pki/tls/private/meza.key -x509 -days 365 -out /etc/pki/tls/certs/meza.crt
 
 
+echo "Announce completion on Slack? Enter webhook URI:"
+read $slackwebhook
+
 
 # Check if git installed, and install it if required
 if ! hash git 2>/dev/null; then
@@ -265,7 +268,37 @@ rm -rf /root/mezadownloads
 
 # print time requirements for each script
 echo "COMMAND TIMES:"
-node "$m_meza/scripts/commandTimes.js" "$cmdlog"
+cmd_times=`node "$m_meza/scripts/commandTimes.js" "$cmdlog"`
+echo "$cmd_times"
+
+# Announce on Slack if a slack webhook provided
+if [[ ! -z "$slackwebhook" ]]; then
+
+	text="Your meza installation is complete"
+
+	escapedText=$(echo $text | sed 's/"/\"/g' | sed "s/'/\'/g" )
+	json="{
+	    \"attachments\": [
+	        {
+	            \"color\": \"#339966\",
+	            \"fallback\": \"Installation times\",
+	            \"fields\": [
+	                {
+	                    \"short\": false,
+	                    \"title\": \"Installation times\",
+	                    \"value\": \"$cmd_times\"
+	                }
+	            ]
+	        }
+	    ],
+	    \"text\": \"Your meza installation is complete\"
+	}"
+
+	curl -s -d "payload=$json" "$slackwebhook"
+	echo
+	echo "Message sent to Slack webhook $slackwebhook"
+
+fi
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
 cat "$m_meza/scripts/pigeon.txt"
