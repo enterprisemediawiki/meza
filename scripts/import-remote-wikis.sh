@@ -118,6 +118,18 @@ done
 
 cd "$full_remote_wikis_path"
 
+
+echo
+echo
+echo "Announce completion of each wiki on Slack?"
+echo "Enter webhook URI or leave blank to opt out:"
+read slackwebhook
+
+if [[ -z "$slackwebhook" ]]; then
+	slackwebhook="n"
+fi
+
+
 echo -e "\n\n\nIMPORTING WIKIS: $which_wikis\n"
 
 # copy each selected wiki directory, then get database
