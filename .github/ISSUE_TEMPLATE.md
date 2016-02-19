@@ -2,10 +2,10 @@ Please don't forget to check out [CONTRIBUTING.md](https://github.com/enterprise
 
 ### Environment
 
-- OS: 
-- PHP: 
-- MySQL: 
-- MediaWiki:
-- other useful variables?
+- Machine or Virtual Machine details: (VirtualBox, VMWare, Digital Ocean, AWS, etc)
+- Operating System: (run `cat redhat-release` and report output)
+- meza version hash: (run `cd /opt/meza && git rev-parse --short HEAD` and report output)
 
 ### Issue details
+
+Please provide any error messages you receieved. Consider reporting relevant data from /opt/meza/logs
