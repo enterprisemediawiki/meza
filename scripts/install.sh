@@ -126,9 +126,11 @@ read -s dummy # is there another way to do this?
 # generate a self-signed SSL signature (for swap-out of a good signature later, of course!)
 sudo openssl req -newkey rsa:2048 -nodes -keyout /etc/pki/tls/private/meza.key -x509 -days 365 -out /etc/pki/tls/certs/meza.crt
 
-
-echo "Announce completion on Slack? Enter webhook URI:"
-read $slackwebhook
+echo
+echo
+echo "Announce completion on Slack?"
+echo "Enter webhook URI or leave blank to opt out:"
+read slackwebhook
 
 
 # Check if git installed, and install it if required
