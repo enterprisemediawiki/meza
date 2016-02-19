@@ -132,6 +132,10 @@ echo "Announce completion on Slack?"
 echo "Enter webhook URI or leave blank to opt out:"
 read slackwebhook
 
+if [[ -z "$slackwebhook" ]]; then
+	slackwebhook="n"
+fi
+
 
 # Check if git installed, and install it if required
 if ! hash git 2>/dev/null; then

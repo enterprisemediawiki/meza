@@ -87,11 +87,13 @@ if [ "$imports_dir" = "new" ]; then
 fi
 
 
-echo
-echo
-echo "Announce completion of each wiki on Slack?"
-echo "Enter webhook URI or leave blank to opt out:"
-read slackwebhook
+if [[ -z "$slackwebhook" ]]; then
+	echo
+	echo
+	echo "Announce completion of each wiki on Slack?"
+	echo "Enter webhook URI or leave blank to opt out:"
+	read slackwebhook
+fi
 
 
 # setup configuration variables

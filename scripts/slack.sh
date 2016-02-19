@@ -6,9 +6,12 @@ slackwebhook="$1"
 title="$2"
 text="$3"
 
-
 # Announce on Slack if a slack webhook provided
 if [[ ! -z "$slackwebhook" ]]; then
+
+	if [[ "$slackwebhook" = "n" ]]; then
+		exit;
+	fi
 
 	if [[ ! -z "$title$text" ]]; then
 		primary="$title"
