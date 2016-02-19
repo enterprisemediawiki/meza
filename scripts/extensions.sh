@@ -20,8 +20,10 @@ echo -e "\n\nCreating new wiki called \"Demo Wiki\""
 imports_dir="new"
 wiki_id="demo"
 wiki_name="Demo Wiki"
+temp_slack="$slackwebhook" # don't notify when Demo Wiki is created.
+slackwebhook="n"
 source "$m_meza/scripts/create-wiki.sh"
-
+slackwebhook="$temp_slack"
 
 # Clone ExtensionLoader
 echo -e "\n\n## meza: Install ExtensionLoader and apply changes to MW settings"

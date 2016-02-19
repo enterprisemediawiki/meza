@@ -126,6 +126,15 @@ read -s dummy # is there another way to do this?
 # generate a self-signed SSL signature (for swap-out of a good signature later, of course!)
 sudo openssl req -newkey rsa:2048 -nodes -keyout /etc/pki/tls/private/meza.key -x509 -days 365 -out /etc/pki/tls/certs/meza.crt
 
+echo
+echo
+echo "Announce completion on Slack?"
+echo "Enter webhook URI or leave blank to opt out:"
+read slackwebhook
+
+if [[ -z "$slackwebhook" ]]; then
+	slackwebhook="n"
+fi
 
 
 # Check if git installed, and install it if required
@@ -265,7 +274,13 @@ rm -rf /root/mezadownloads
 
 # print time requirements for each script
 echo "COMMAND TIMES:"
-node "$m_meza/scripts/commandTimes.js" "$cmdlog"
+cmd_times=`node "$m_meza/scripts/commandTimes.js" "$cmdlog"`
+echo "$cmd_times"
+
+# Announce on Slack if a slack webhook provided
+if [[ ! -z "$slackwebhook" ]]; then
+	bash "$m_meza/scripts/slack.sh" "$slackwebhook" "Your meza installation is complete. Install times:" "$cmd_times"
+fi
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
 cat "$m_meza/scripts/pigeon.txt"
