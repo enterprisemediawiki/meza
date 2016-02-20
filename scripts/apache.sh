@@ -10,18 +10,15 @@ print_title "Starting script apache.sh"
 chown -R apache:apache "$m_htdocs"
 chmod -R 775 "$m_htdocs"
 
-cd /etc/httpd/conf
-
 # rename default configuration file, get meza config file
 mv httpd.conf httpd.default.conf
-cp "$m_meza/scripts/config/httpd.conf" ./httpd.conf
+ln -s "$m_config/meza/httpd.conf" "$m_apache/conf/httpd.conf"
 
 # replace INSERT-DOMAIN-OR-IP with domain...or IP address
 sed -r -i "s/INSERT-DOMAIN-OR-IP/$mw_api_domain/g;" ./httpd.conf
 
 # create logrotate file
-cd /etc/logrotate.d
-cp "$m_meza/scripts/logrotated_httpd" ./httpd
+cp "$m_meza/scripts/logrotated_httpd" /etc/logrotate.d/httpd
 
 
 # modify firewall rules

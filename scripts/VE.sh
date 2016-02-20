@@ -84,13 +84,14 @@ echo "******* Downloading configuration files *******"
 cd "$m_meza/scripts"
 
 # Copy Parsoid settings from Meza to Parsoid install
-cp ./localsettings.js /etc/parsoid/api/localsettings.js
+ln -s "$m_config/meza/localsettings.js" /etc/parsoid/api/localsettings.js
 
 # Insert proper MediaWiki API URI
 # Insert contents of "$mw_api_uri" in place of "<<INSERTED_BY_VE.sh>>"
 # Note on escape syntax: result="${original_var//text_to_replace/text_to_replace_with}
+# FIXME: localsettings.js should not be modified
 escaped_mw_api_uri=${mw_api_uri//\//\\\/} # need to replace / with \/ for regex
-sed -r -i "s/INSERTED_BY_VE_SCRIPT/$escaped_mw_api_uri/g;" /etc/parsoid/api/localsettings.js
+sed -r -i "s/INSERTED_BY_VE_SCRIPT/$escaped_mw_api_uri/g;" "$m_config/meza/localsettings.js"
 
 
 #
@@ -110,8 +111,7 @@ chown parsoid:parsoid /etc/parsoid -R
 # https://github.com/narath/brigopedia#setup-visualeditor-extension
 # Create service script
 echo "******* Creating parsoid service *******"
-cd "$m_meza/scripts"
-cp ./initd_parsoid.sh /etc/init.d/parsoid
+ln -s "$m_config/meza/initd_parsoid.sh" /etc/init.d/parsoid
 chmod 755 /etc/init.d/parsoid
 chkconfig --add /etc/init.d/parsoid
 

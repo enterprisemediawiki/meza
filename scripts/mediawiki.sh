@@ -92,13 +92,13 @@ fi
 #
 # Copy in LocalSettings.php
 #
-cp "$m_meza/scripts/config/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
+ln -s "$m_config/meza/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
 
 
 #
 # Create common database credentials
 #
-echo -e "<?php\n\$wgDBuser = \"root\";\n\$wgDBpassword = \"$mysql_root_pass\";\n" > "$m_htdocs/__common/dbUserPass.php"
+echo -e "<?php\n\$wgDBuser = \"root\";\n\$wgDBpassword = \"$mysql_root_pass\";\n" > "$m_config/local/dbUserPass.php"
 
 
 #
@@ -109,7 +109,7 @@ cd "$m_htdocs"
 git clone https://github.com/jamesmontalvo3/WikiBlender.git
 cd WikiBlender
 git checkout rebaseline # use rebaseline until WikiBlender is updated
-cp "$m_meza/scripts/config/BlenderSettings.php" ./BlenderSettings.php
+cp "$m_config/template/BlenderSettings.php" ./BlenderSettings.php
 
 # end of script
 echo -e "\n\nMediaWiki has been installed"

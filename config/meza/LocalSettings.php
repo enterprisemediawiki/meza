@@ -31,9 +31,11 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  **/
 
 // same value as bash variable in config.sh
-$m_htdocs = '/opt/meza/htdocs';
+$m_meza = '/opt/meza';
+$m_config = $m_meza . '/config';
+$m_htdocs = $m_meza . '/htdocs';
 
-require_once "$m_htdocs/__common/AllWikiSettings.php";
+require_once "$m_config/local/AllWikiSettings.php";
 
 if( $wgCommandLineMode ) {
 
@@ -250,7 +252,7 @@ if ( isset( $mezaCustomDBuser ) && isset ( $mezaCustomDBpass ) ) {
 	$wgDBuser = $mezaCustomDBuser;
 	$wgDBpassword = $mezaCustomDBpass;
 } else {
-	require_once "$m_htdocs/__common/dbUserPass.php";
+	require_once "$m_config/local/dbUserPass.php";
 }
 
 # MySQL specific settings
@@ -270,7 +272,7 @@ $wgDBmysql5 = false;
  *  not affect the user groups, so a user can be a sysop on one wiki and just a
  *  user on another.
  *
- *  To enable a primewiki create the file $m_htdocs/__common/primewiki and make
+ *  To enable a primewiki create the file $m_config/local/primewiki and make
  *  the file contents be the id of the desired wiki.
  *
  *  In order for this to work properly the wikis need to have been created with
@@ -279,13 +281,13 @@ $wgDBmysql5 = false;
  *  tables, then you'll need to use TBD user-merge script.
  *
  **/
-if ( file_exists( "$m_htdocs/__common/primewiki" ) ) {
+if ( file_exists( "$m_config/local/primewiki" ) ) {
 
 	// grab prime wiki data using closure to encapsulate the data
 	// and not overwrite existing config ($wgSitename, etc)
 	$primewiki = call_user_func( function() use ( $m_htdocs ) {
 
-		$primeWikiId = trim( file_get_contents( "$m_htdocs/__common/primewiki" ) );
+		$primeWikiId = trim( file_get_contents( "$m_config/local/primewiki" ) );
 
 		require_once "$m_htdocs/wikis/$primeWikiId/config/setup.php";
 
@@ -1175,6 +1177,9 @@ require_once $egExtensionLoader->registerLegacyExtension(
  *
  *
  **/
+if ( file_exists( "$m_config/local/overrides.php" ) ) {
+	require_once "$m_config/local/overrides.php";
+}
 if ( file_exists( "$m_htdocs/wikis/$wikiId/config/overrides.php" ) ) {
 	require_once "$m_htdocs/wikis/$wikiId/config/overrides.php";
 }

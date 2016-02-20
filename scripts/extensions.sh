@@ -10,7 +10,7 @@ print_title "Starting script extensions.sh"
 # Since SMW is not installed yet, we need to temporarily remove
 # the enableSemantics() function in LocalSettings.php
 #
-sed -r -i 's/^enableSemantics/\/\/enableSemantics/;' "$m_mediawiki/LocalSettings.php"
+sed -r -i 's/^enableSemantics/\/\/enableSemantics/;' "$m_config/meza/LocalSettings.php"
 
 
 #
@@ -68,7 +68,7 @@ cmd_profile "END extensions composer require"
 
 
 # Now do enableSemantics()...uncomment function
-sed -r -i 's/^\/\/enableSemantics/enableSemantics/;' "$m_mediawiki/LocalSettings.php"
+sed -r -i 's/^\/\/enableSemantics/enableSemantics/;' "$m_config/meza/LocalSettings.php"
 
 
 # update database
