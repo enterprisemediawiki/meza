@@ -97,3 +97,23 @@ This process can be used to import wikis from some types of servers. The authors
   2. `sudo vi remote-wiki-config.sh` and pasting in your pre-built config
 3. `cd scripts`
 4. `sudo bash import-remote-wikis.sh`. You should only need to enter your username and password for the remote server if you filled `remote-wiki-config.sh`
+
+
+## Making a wiki the "primary" wiki
+
+A wiki can be setup as the "primary" wiki. This means that all other wikis will use its user and interwiki tables. If all wikis are related, and are going to have similar users, you should do this. To make one wiki the primary wiki simply add a file called "primewiki" to the `__common` directory:
+
+```bash
+cd /opt/meza/htdocs/__common
+echo "wiki-id" > primewiki
+```
+
+In this example "wiki-id" is the ID of the wiki you want to be primary.
+
+Note that if you run `unifyUserTables.php` on a set of wikis that do not share user and interwiki tables, the script will automatically setup the `primewiki` file for you. To run `unifyUserTables.php` perform the following:
+
+```bash
+WIKI=anywiki php /opt/meza/scripts/unifyUserTables.php --prime-wiki=anotherwiki
+```
+
+In this case above you need to specify any existing wiki at the beginning. This is simply so LocalSettings.php will load properly. Any of your existing wikis will do. After the `--prime-wiki=` add the wiki ID of the wiki you want to be prime.
