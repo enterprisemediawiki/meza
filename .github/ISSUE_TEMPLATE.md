@@ -8,4 +8,4 @@ Please don't forget to check out [CONTRIBUTING.md](https://github.com/enterprise
 
 ### Issue details
 
-Please provide any error messages you receieved. Consider reporting relevant data from /opt/meza/logs
+Please provide any error messages you receieved and, if possible, steps to reproduce it. Consider reporting relevant data from /opt/meza/logs
