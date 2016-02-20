@@ -19,7 +19,7 @@ ln -s "$m_config/meza/httpd.conf" "$m_apache/conf/httpd.conf"
 sed -r -i "s/INSERT-DOMAIN-OR-IP/$mw_api_domain/g;" ./httpd.conf
 
 # create logrotate file
-cp "$m_meza/scripts/logrotated_httpd" /etc/logrotate.d/httpd
+ln -s " $m_config/meza/logrotated_httpd" /etc/logrotate.d/httpd
 
 
 # modify firewall rules
