@@ -11,6 +11,7 @@ chown -R apache:apache "$m_htdocs"
 chmod -R 775 "$m_htdocs"
 
 # rename default configuration file, get meza config file
+cd "$m_apache/conf"
 mv httpd.conf httpd.default.conf
 ln -s "$m_config/meza/httpd.conf" "$m_apache/conf/httpd.conf"
 
