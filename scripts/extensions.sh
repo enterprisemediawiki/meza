@@ -78,7 +78,7 @@ WIKI=demo php maintenance/update.php --quick
 
 # Import pages required for SemanticMeetingMinutes and rebuild indices
 echo -e "\n\n## meza: import pages for SemanticMeetingMinutes"
-WIKI=demo php maintenance/importDump.php < ./extensions/SemanticMeetingMinutes/ImportFiles/import.xml
+WIKI=demo php maintenance/importDump.php --report --debug < ./extensions/SemanticMeetingMinutes/ImportFiles/import.xml
 echo -e "\n\n## meza: rebuildrecentchanges.php"
 WIKI=demo php maintenance/rebuildrecentchanges.php
 echo -e "\n\n## meza: Extension:TitleKey rebuildTitleKeys.php"
