@@ -1053,7 +1053,6 @@ require_once $egExtensionLoader->registerLegacyExtension(
 	"REL1_25"
 );
 $wgSearchType = 'CirrusSearch';
-include "$m_htdocs/wikis/$wikiId/config/disableSearchUpdate.php";
 //$wgCirrusSearchServers = array( 'search01', 'search02' );
 
 
