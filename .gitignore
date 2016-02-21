@@ -8,3 +8,6 @@ config/local/*
 
 # ignore wiki blender landing page
 htdocs/WikiBlender
+
+htdocs/mediawiki
+htdocs/wikis/*

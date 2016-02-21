@@ -21,13 +21,6 @@ do
 	read mw_api_domain
 done
 
-
-# MediaWiki's API URI, for parsoid. Parsoid communicates with MediaWiki PHP API
-# via Apache httpd over port 9000. Note: protocol was $mw_api_protocol, but was
-# changed to hard-coded http when Parsoid was given it's own port.
-mw_api_uri="http://$mw_api_domain:9000/"
-
-
 echo "******* Downloading node.js *******"
 cmd_profile "START node.js build"
 cd ~/mezadownloads
@@ -86,12 +79,10 @@ cd "$m_meza/scripts"
 # Copy Parsoid settings from Meza to Parsoid install
 ln -s "$m_config/meza/localsettings.js" /etc/parsoid/api/localsettings.js
 
-# Insert proper MediaWiki API URI
-# Insert contents of "$mw_api_uri" in place of "<<INSERTED_BY_VE.sh>>"
-# Note on escape syntax: result="${original_var//text_to_replace/text_to_replace_with}
-# FIXME: localsettings.js should not be modified
-escaped_mw_api_uri=${mw_api_uri//\//\\\/} # need to replace / with \/ for regex
-sed -r -i "s/INSERTED_BY_VE_SCRIPT/$escaped_mw_api_uri/g;" "$m_config/meza/localsettings.js"
+# MediaWiki's API URI, for parsoid. Parsoid communicates with MediaWiki PHP API
+# via Apache httpd over port 9000. Note: protocol was $mw_api_protocol, but was
+# changed to hard-coded http when Parsoid was given it's own port.
+echo "$mw_api_domain" > /opt/meza/config/local/parsoid_mw_api_uri
 
 
 #
