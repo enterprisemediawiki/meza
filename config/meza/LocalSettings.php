@@ -17,7 +17,6 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  *    6) GENERAL CONFIGURATION
  *    7) EXTENSION SETTINGS
  *    8) LOAD OVERRIDES
- *    9) HOMELESS ITEMS
  *
  **/
 
@@ -34,8 +33,6 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 $m_meza = '/opt/meza';
 $m_config = $m_meza . '/config';
 $m_htdocs = $m_meza . '/htdocs';
-
-require_once "$m_config/local/AllWikiSettings.php";
 
 if( $wgCommandLineMode ) {
 
@@ -64,8 +61,10 @@ if ( ! in_array( $wikiId, $wikis ) ) {
 
 }
 
+// Load all-wikis setup.php first, then allow wiki-specific setup.php to modify
+require_once "$m_config/local/setup.php";
 
-// Get's wiki-specific config variables like:
+// Gets wiki-specific config variables like:
 // $wgSitename, $mezaAuthType, $mezaDebug, $mezaEnableWikiEmail
 require_once "$m_htdocs/wikis/$wikiId/config/setup.php";
 
@@ -251,8 +250,6 @@ if ( isset( $mezaCustomDBname ) ) {
 if ( isset( $mezaCustomDBuser ) && isset ( $mezaCustomDBpass ) ) {
 	$wgDBuser = $mezaCustomDBuser;
 	$wgDBpassword = $mezaCustomDBpass;
-} else {
-	require_once "$m_config/local/dbUserPass.php";
 }
 
 # MySQL specific settings
@@ -1183,19 +1180,3 @@ if ( file_exists( "$m_config/local/overrides.php" ) ) {
 if ( file_exists( "$m_htdocs/wikis/$wikiId/config/overrides.php" ) ) {
 	require_once "$m_htdocs/wikis/$wikiId/config/overrides.php";
 }
-
-
-
-
-
-
-
-
-
-/**
- *  9) HOMELESS ITEMS
- *
- *  EVERYTHING BELOW HERE SHOULD BE MOVED INTO THE APPROPRIATE PLACE IN THIS
- *  DOCUMENT OR SUPPORTING SETTINGS DOCUMENTS.
- **/
-
