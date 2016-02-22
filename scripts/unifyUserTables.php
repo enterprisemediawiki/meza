@@ -135,8 +135,8 @@ class MezaUnifyUserTables extends Maintenance {
 
 		global $m_htdocs;
 
-		if ( is_file( "$m_htdocs/__common/primewiki" ) ) {
-			die( "A prime wiki is already set in $m_htdocs/__common/primewiki. You cannot run this script." );
+		if ( is_file( "$m_config/local/primewiki" ) ) {
+			die( "A prime wiki is already set in $m_config/local/primewiki. You cannot run this script." );
 		}
 
 		// prime wiki ID and database name
@@ -515,11 +515,11 @@ class MezaUnifyUserTables extends Maintenance {
 		global $m_htdocs;
 
 		// Declare the prime-wiki as prime! Write prime wiki's wiki ID to file
-		if ( file_put_contents( "$m_htdocs/__common/primewiki", $this->primeWiki ) ) {
-			$this->output( "\n# Primewiki written to $m_htdocs/__common/primewiki\n" );
+		if ( file_put_contents( "$m_config/local/primewiki", $this->primeWiki ) ) {
+			$this->output( "\n# Primewiki written to $m_config/local/primewiki\n" );
 		}
 		else {
-			$this->output( "\n# Primewiki not written to $m_htdocs/__common/primewiki" );
+			$this->output( "\n# Primewiki not written to $m_config/local/primewiki" );
 		}
 
 		// Victory!

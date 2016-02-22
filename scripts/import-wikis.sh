@@ -25,7 +25,7 @@ fi
 # and thus it needs to know how to get to the config.sh script on it's own
 #
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-source "$DIR/config.sh"
+source "/opt/meza/config/meza/config.sh"
 
 
 # Prompt user for locations of wiki data
@@ -78,7 +78,7 @@ if [ "$imports_dir" = "new" ]; then
 	fi
 	mkdir wikis
 	imports_dir="/tmp/wikis"
-	cp -avr "$m_meza/wiki-init" "$imports_dir/$wiki_id"
+	cp -avr "$m_config/template/wiki-init" "$imports_dir/$wiki_id"
 
 	# get SQL file from MediaWiki
 	echo "Copying MediaWiki tables.sql"
@@ -147,19 +147,16 @@ for d in */ ; do
 
 	# check if logo.png, favicon.ico, setup.php and CustomSettings.php exist. Else use defaults
 	if [ ! -f "$wiki_install_path/config/logo.png" ]; then
-		cp "$m_meza/wiki-init/config/logo.png" "$wiki_install_path/config/logo.png"
+		cp "$m_config/template/wiki-init/config/logo.png" "$wiki_install_path/config/logo.png"
 	fi
 	if [ ! -f "$wiki_install_path/config/favicon.ico" ]; then
-		cp "$m_meza/wiki-init/config/favicon.ico" "$wiki_install_path/config/favicon.ico"
+		cp "$m_config/template/wiki-init/config/favicon.ico" "$wiki_install_path/config/favicon.ico"
 	fi
-	if [ ! -f "$wiki_install_path/config/CustomSettings.php" ]; then
-		cp "$m_meza/wiki-init/config/CustomSettings.php" "$wiki_install_path/config/CustomSettings.php"
+	if [ ! -f "$wiki_install_path/config/overrides.php" ]; then
+		cp "$m_config/template/wiki-init/config/overrides.php" "$wiki_install_path/config/CustomSettings.php"
 	fi
 	if [ ! -f "$wiki_install_path/config/setup.php" ]; then
-		cp "$m_meza/wiki-init/config/setup.php" "$wiki_install_path/config/setup.php"
-	fi
-	if [ ! -f "$wiki_install_path/config/disableSearchUpdate.php" ]; then
-		cp "$m_meza/wiki-init/config/disableSearchUpdate.php" "$wiki_install_path/config/disableSearchUpdate.php"
+		cp "$m_config/template/wiki-init/config/setup.php" "$wiki_install_path/config/setup.php"
 	fi
 	chmod -R 755 "$wiki_install_path/config"
 
