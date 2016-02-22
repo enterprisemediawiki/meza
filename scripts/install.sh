@@ -171,8 +171,9 @@ else
 fi
 
 
-# Prompt for Slack webhook
-if [[ "$slackwebhook" != "n" ]]; then
+# Prompt for Slack webhook if it's not "n" and also is empty
+# e.g. don't prompt if it has something other than "n"
+if [ "$slackwebhook" != "n" ] && [ -z "$slackwebhook" ]; then
 
 	echo
 	echo
