@@ -93,7 +93,7 @@ This process can be used to import wikis from some types of servers. The authors
 
 1. `cd /opt/meza/config/local`
 2. Create `config/local/remote-wiki-config.sh` by doing one of the following:
-  1. `sudo cp ./config/template/remote-wiki-config.example.sh ./remote-wiki-config.sh` and editing the file
+  1. `sudo cp /opt/meza/config/template/remote-wiki-config.example.sh ./remote-wiki-config.sh` and editing the file
   2. `sudo vi remote-wiki-config.sh` and pasting in your pre-built config
 3. `cd /opt/meza/scripts`
 4. `sudo bash import-remote-wikis.sh`. You should only need to enter your username and password for the remote server if you filled `remote-wiki-config.sh`
