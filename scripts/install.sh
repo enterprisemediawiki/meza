@@ -13,6 +13,8 @@ if [[ $PATH != *"/usr/local/bin"* ]]; then
 	PATH="/usr/local/bin:$PATH"
 fi
 
+working_dir=`pwd`
+
 echo -e "\nWelcome to meza v0.4\n"
 
 
@@ -48,13 +50,22 @@ fi
 
 # Check for install config file before prompts
 if [[ ! -z "$1" ]]; then
-	if [[ ! -f "$1" ]]; then
+
+	# check absolute path
+	if [[ -f "$1" ]]; then
+		source "$1"
+
+	# check relative path
+	elif [[ -f "$working_dir/$1" ]]; then
+		source "$working_dir/$1"
+
+	# not a valid file name
+	else
 		echo
 		echo "$1 is not a file. Exiting."
 		exit 1
-	else
-		source "$1"
 	fi
+
 fi
 
 
