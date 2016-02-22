@@ -82,7 +82,7 @@ ln -s "$m_config/meza/localsettings.js" /etc/parsoid/api/localsettings.js
 # MediaWiki's API URI, for parsoid. Parsoid communicates with MediaWiki PHP API
 # via Apache httpd over port 9000. Note: protocol was $mw_api_protocol, but was
 # changed to hard-coded http when Parsoid was given it's own port.
-echo "$mw_api_domain" > /opt/meza/config/local/parsoid_mw_api_uri
+echo "$mw_api_domain" > /opt/meza/config/local/domain
 
 
 #

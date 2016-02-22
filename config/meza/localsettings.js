@@ -18,7 +18,10 @@ exports.setup = function(parsoidConfig) {
 	var wikis = fs.readdirSync( '/opt/meza/htdocs/wikis' );
 
 	// Domain, which will be setup by the meza installer
-	var domain = "http://" + fs.readFileSync( '/opt/meza/config/local/parsoid_mw_api_uri' ).trim() + ":9000/";
+	var domain = "http://" + fs.readFileSync(
+		'/opt/meza/config/local/domain',
+		{ encoding: 'utf8' }
+	).trim() + ":9000/";
 
 	// loop through all wiki IDs and do setMwApi
 	for ( var i = 0; i < wikis.length; i++ ) {

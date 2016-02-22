@@ -3,14 +3,14 @@ bash printTitle.sh "Begin $0"
 echo "******* Generating elasticsearch index *******"
 
 # disable search update in wiki-specific overrides
-echo "\$wgDisableSearchUpdate = true;" >> "$m_htdocs/wikis/$wikiId/config/overrides.php"
+echo "\$wgDisableSearchUpdate = true;" >> "$m_htdocs/wikis/$wiki_id/config/overrides.php"
 
 # Run script to generate elasticsearch index
 cd "$m_mediawiki"
 WIKI="$wiki_id" php "$m_mediawiki/extensions/CirrusSearch/maintenance/updateSearchIndexConfig.php"
 
 # Remove search-update disable in wiki-specific overrides
-sed -r -i 's/\$wgDisableSearchUpdate = true;//g;' "$m_htdocs/wikis/$wikiId/config/overrides.php"
+sed -r -i 's/\$wgDisableSearchUpdate = true;//g;' "$m_htdocs/wikis/$wiki_id/config/overrides.php"
 
 # Bootstrap the search index
 #
