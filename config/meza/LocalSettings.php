@@ -850,16 +850,6 @@ $wgGroupPermissions['sysop']['interwiki'] = true;
 
 
 #
-# Extension:IMSQuery
-#
-require_once $egExtensionLoader->registerLegacyExtension(
-	"IMSQuery",
-	"https://github.com/jamesmontalvo3/IMSQuery.git",
-	"master"
-);
-
-
-#
 # Extension:MasonryMainPage
 #
 require_once $egExtensionLoader->registerLegacyExtension(
@@ -899,16 +889,6 @@ require_once $egExtensionLoader->registerLegacyExtension(
 	"Variables",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Variables.git",
 	"REL1_25"
-);
-
-
-#
-# Extension:SummaryTimeline
-#
-require_once $egExtensionLoader->registerLegacyExtension(
-	"SummaryTimeline",
-	"https://github.com/darenwelsh/SummaryTimeline.git",
-	"tags/0.2.0"
 );
 
 
