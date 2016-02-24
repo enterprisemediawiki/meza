@@ -133,6 +133,7 @@ yum install -y \
     mod_proxy_html \
     net-tools \
     vim \
+    sendmail \
     ghostscript
 cmd_profile "END yum install dependency list"
 
