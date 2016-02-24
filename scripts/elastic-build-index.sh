@@ -7,7 +7,7 @@ echo "\$wgDisableSearchUpdate = true;" >> "$m_htdocs/wikis/$wiki_id/config/overr
 
 # Run script to generate elasticsearch index
 cd "$m_mediawiki"
-WIKI="$wiki_id" php "$m_mediawiki/extensions/CirrusSearch/maintenance/updateSearchIndexConfig.php"
+WIKI="$wiki_id" php "$m_mediawiki/extensions/CirrusSearch/maintenance/updateSearchIndexConfig.php" --startOver
 
 # Remove search-update disable in wiki-specific overrides
 sed -r -i 's/\$wgDisableSearchUpdate = true;//g;' "$m_htdocs/wikis/$wiki_id/config/overrides.php"
