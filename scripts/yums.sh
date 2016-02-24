@@ -134,6 +134,8 @@ yum install -y \
     net-tools \
     vim \
     sendmail \
+    sendmail-cf \
+    m4 \
     ghostscript
 cmd_profile "END yum install dependency list"
 
