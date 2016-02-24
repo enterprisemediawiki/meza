@@ -214,9 +214,9 @@ else {
 
 ## UPO means: this is also a user preference option
 $wgEnableUserEmail = $wgEnableEmail; # UPO
-$wgEnotifUserTalk = false; # UPO
-$wgEnotifWatchlist = false; # UPO
-$wgEmailAuthentication = true;
+$wgEnotifUserTalk = $wgEnableEmail; # UPO
+$wgEnotifWatchlist = $wgEnableEmail; # UPO
+$wgEmailAuthentication = $wgEnableEmail;
 
 
 
