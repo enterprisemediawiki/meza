@@ -136,6 +136,8 @@ yum install -y \
     sendmail \
     sendmail-cf \
     m4 \
+    expect \
+    expectk \
     ghostscript
 cmd_profile "END yum install dependency list"
 
