@@ -33,7 +33,7 @@ if ( isset( $mezaLoadSummaryTimeline ) && $mezaLoadSummaryTimeline ) {
 	require_once $egExtensionLoader->registerLegacyExtension(
 		"SummaryTimeline",
 		"https://github.com/darenwelsh/SummaryTimeline.git",
-		"tags/0.2.0"
+		"tags/v0.2.0"
 	);
 
 }
