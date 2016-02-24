@@ -218,12 +218,6 @@ $wgEnotifUserTalk = false; # UPO
 $wgEnotifWatchlist = false; # UPO
 $wgEmailAuthentication = true;
 
-// https://www.mediawiki.org/wiki/Manual:$wgEmergencyContact
-$wgEmergencyContact = "enterprisemediawiki@gmail.com"; // @todo: this should be in setup, but this is easier for now.
-
-// https://www.mediawiki.org/wiki/Manual:$wgPasswordSender
-$wgPasswordSender = "enterprisemediawiki@gmail.com"; // @todo: this should be in setup, but this is easier for now.
-
 
 
 
