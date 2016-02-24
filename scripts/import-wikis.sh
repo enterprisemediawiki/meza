@@ -206,9 +206,9 @@ for d in */ ; do
 		# Run runJobs.php
 		# Note that should prob be removed: Daren saw 12k+ jobs in the queue after performing the above steps
 		echo "Running MediaWiki maintenance script \"runJobs.php\""
-		sed -r -i 's/false/true/g;' "$m_htdocs/wikis/$wiki_id/config/disableSearchUpdate.php"
+		echo "\$wgDisableSearchUpdate = true;" >> "$m_htdocs/wikis/$wiki_id/config/overrides.php"
 		WIKI="$wiki_id" php "$m_mediawiki/maintenance/runJobs.php" --quick
-		sed -r -i 's/true/false/g;' "$m_htdocs/wikis/$wiki_id/config/disableSearchUpdate.php"
+		sed -r -i 's/\$wgDisableSearchUpdate = true;//g;' "$m_htdocs/wikis/$wiki_id/config/overrides.php"
 	else
 		echo -e "\nSKIPPING SemanticMediaWiki rebuildData.php and runjobs.php (no SMW)"
 	fi
