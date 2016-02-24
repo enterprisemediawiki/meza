@@ -4,8 +4,8 @@
 # application and database servers).
 #
 
-if [ -f "/opt/meza/remote-wiki-config.sh" ]; then
-	source "/opt/meza/remote-wiki-config.sh"
+if [ -f "/opt/meza/config/local/remote-wiki-config.sh" ]; then
+	source "/opt/meza/config/local/remote-wiki-config.sh"
 fi
 
 

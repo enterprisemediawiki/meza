@@ -8,8 +8,7 @@ yum -y install memcached
 
 echo "******* Copying memcached config file *******"
 rm -f /etc/sysconfig/memcached
-cd "$m_meza/scripts/config"
-cp ./memcached /etc/sysconfig/memcached
+ln -s "$m_config/meza/memcached" /etc/sysconfig/memcached
 
 # Set Memcached to start automatically on boot
 echo "******* Creating memcached service *******"

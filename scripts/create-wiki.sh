@@ -24,7 +24,7 @@ fi
 # and thus it needs to know how to get to the config.sh script on it's own
 #
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-source "$DIR/config.sh"
+source "/opt/meza/config/meza/config.sh"
 
 
 # Set $imports_dir to "new", so import-wikis.sh won't attempt to import existing wikis

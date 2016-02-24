@@ -4,7 +4,7 @@ $blenderTitle = "Meza Wikis";
 $blenderServer = "https://" . $_SERVER['SERVER_ADDR'] . "/";
 $blenderScriptPath = '/WikiBlender';
 
-$primeWikiFile = '/opt/meza/htdocs/__common/primewiki';
+$primeWikiFile = '/opt/meza/config/local/primewiki';
 if ( file_exists( $primeWikiFile ) ) {
 	$primeWiki = file_get_contents( $primeWikiFile );
 	$blenderFavicon = "/wikis/$primeWiki/config/favicon.ico";

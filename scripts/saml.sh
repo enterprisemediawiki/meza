@@ -20,7 +20,7 @@ fi
 # and thus it needs to know how to get to the config.sh script on it's own
 #
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-source "$DIR/config.sh"
+source "/opt/meza/config/meza/config.sh"
 
 
 #
@@ -124,6 +124,7 @@ sed -r -i "s/'technicalcontact_email'.*$/'technicalcontact_email' => '$saml_admi
 # This inserts the contents of one file (saml_httpd.conf) below a marker
 # in httpd.conf. See link below for more info:
 # http://unix.stackexchange.com/questions/32908/how-to-insert-the-content-of-a-file-into-another-file-before-a-pattern-marker
+# FIXME: httpd.conf should not be modified
 sed -i -e "/ADD SPECIAL CONFIG BELOW/r $m_meza/scripts/config/SAML/saml_httpd.conf" "$m_apache/conf/httpd.conf"
 
 # restart apache
@@ -132,9 +133,11 @@ service httpd restart
 # Setup identity provider (IdP) for SimpleSamlPHP
 cd "$m_meza/simplesamlphp/metadata"
 rm ./saml20-idp-remote.php
-cp "$m_meza/scripts/config/SAML/saml20-idp-remote.php" ./saml20-idp-remote.php
+cp "$m_config/template/saml20-idp-remote.php" "$m_config/local/saml20-idp-remote.php"
+ln -s "$m_config/local/saml20-idp-remote.php" "$m_meza/simplesamlphp/metadata/saml20-idp-remote.php"
 
 # input correct values for your IdP
+cd "$m_config/local"
 sed -r -i "s/idp_entity_id/$idp_entity_id/g;" ./saml20-idp-remote.php
 sed -r -i "s/sign_on_url/$sign_on_url/g;" ./saml20-idp-remote.php
 sed -r -i "s/logout_url/$logout_url/g;" ./saml20-idp-remote.php
@@ -142,9 +145,11 @@ sed -r -i "s/cert_fingerprint/$cert_fingerprint/g;" ./saml20-idp-remote.php
 
 
 # Setup authsources.php
-cd ../config
-sed -r -i "s/'entityID' => null,/'entityID' => '$sp_entity_id',\n\t'NameIDPolicy' => '$name_id_policy',\n/g;" ./authsources.php
-sed -r -i "s/'idp' => null,/'idp' => '$idp_entity_id',/g;" ./authsources.php
+cd "$m_config/local"
+mv "$m_meza/simplesamlphp/config/authsources.php" ./simplesaml_authsources.php
+sed -r -i "s/'entityID' => null,/'entityID' => '$sp_entity_id',\n\t'NameIDPolicy' => '$name_id_policy',\n/g;" ./simplesaml_authsources.php
+sed -r -i "s/'idp' => null,/'idp' => '$idp_entity_id',/g;" ./simplesaml_authsources.php
+ln -s "$m_config/local/simplesaml_authsources.php" "$m_meza/simplesamlphp/config/authsources.php"
 
 
 echo -e "\n"
@@ -164,7 +169,7 @@ git clone https://github.com/jamesmontalvo3/AccessDenied
 # added to some non-LocalSettings.php file? Something like deltas.php)
 #
 # First: make temporary file
-cp "$m_meza/scripts/config/SAML/SAML-LocalSettings-Additions.php" ~/SAML-LocalSettings-Additions.php
+cp "$m_config/template/SAML-LocalSettings-Additions.php" ~/SAML-LocalSettings-Additions.php
 
 # Replace attributes with user input
 sed -r -i "s/username_attr/$username_attr/g;" ~/SAML-LocalSettings-Additions.php
@@ -172,7 +177,7 @@ sed -r -i "s/realname_attr/$realname_attr/g;" ~/SAML-LocalSettings-Additions.php
 sed -r -i "s/email_attr/$email_attr/g;" ~/SAML-LocalSettings-Additions.php
 
 # Add these lines to the bottom of LocalSettings.php, then remove the temp file
-cat ~/SAML-LocalSettings-Additions.php >> "$m_mediawiki/LocalSettings.php";
+cat ~/SAML-LocalSettings-Additions.php >> "$m_config/local/overrides.php";
 rm ~/SAML-LocalSettings-Additions.php
 
 
