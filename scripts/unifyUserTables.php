@@ -26,48 +26,101 @@
 require_once( '/opt/meza/htdocs/mediawiki/maintenance/Maintenance.php' );
 class MezaUnifyUserTables extends Maintenance {
 
+	public $recordDir;
 	public $tablesToModify = array(
-		"page_restrictions"  => array( "idField" => "pr_user" ),
-		"protected_titles"   => array( "idField" => "pt_user" ),
-		"uploadstash"        => array( "idField" => "us_user" ),
-		"user_former_groups" => array( "idField" => "ufg_user" ),
-		"user_groups"        => array( "idField" => "ug_user" ),
-		"user_newtalk"       => array( "idField" => "user_id" ),
-		"watchlist"          => array( "idField" => "wl_user" ),
+
+		// tables with id only
+		"page_restrictions"  => array(
+			"unique" => "pr_id",
+			"idField" => "pr_user"
+		),
+		"protected_titles"   => array(
+			"unique" => array("pt_namespace","pt_title"),
+			"idField" => "pt_user"
+		),
+		"uploadstash"        => array(
+			"unique" => "us_id",
+			"idField" => "us_user"
+		),
+		"user_former_groups" => array(
+			"unique" => array("ufg_user","ufg_group"),
+			"idField" => "ufg_user"
+		),
+		"user_groups"        => array(
+			"unique" => array("ug_user", "ug_group"),
+			"idField" => "ug_user"
+		),
+		"user_newtalk"       => array(
+			"unique" => array("user_id","user_ip"),
+			"idField" => "user_id"
+		),
+		"watchlist"          => array(
+			"unique" => array("wl_user","wl_namespace","wl_title"),
+			"idField" => "wl_user"
+		),
+
 
 		// these have IDs and usernames, but usernames should not need to be modified or used
-		"archive"       => array( "idField" => "ar_user",  "userNameField" => "ar_user_text" ),
-		"filearchive"   => array( "idField" => "fa_user",  "userNameField" => "fa_user_text" ),
-		"image"         => array( "idField" => "img_user", "userNameField" => "img_user_text" ),
-		"logging"       => array( "idField" => "log_user", "userNameField" => "log_user_text" ),
-		"oldimage"      => array( "idField" => "oi_user",  "userNameField" => "oi_user_text" ),
-		"recentchanges" => array( "idField" => "rc_user",  "userNameField" => "rc_user_text" ),
-		"revision"      => array( "idField" => "rev_user", "userNameField" => "rev_user_text" ),
+		"archive"       => array(
+			"unique" => "ar_id",
+			"idField" => "ar_user",
+			"userNameField" => "ar_user_text"
+		),
+		"filearchive"   => array(
+			"unique" => "fa_id",
+			"idField" => "fa_user",
+			"userNameField" => "fa_user_text"
+		),
+		"image"         => array(
+			"unique" => "img_name",
+			"idField" => "img_user",
+			"userNameField" => "img_user_text"
+		),
+		"logging"       => array(
+			"unique" => "log_id",
+			"idField" => "log_user",
+			"userNameField" => "log_user_text"
+		),
+		"oldimage"      => array(
+			"unique" => "oi_sha1",
+			"idField" => "oi_user",
+			"userNameField" => "oi_user_text"
+		),
+		"recentchanges" => array(
+			"unique" => "rc_id",
+			"idField" => "rc_user",
+			"userNameField" => "rc_user_text"
+		),
+		"revision"      => array(
+			"unique" => "rev_id",
+			"idField" => "rev_user",
+			"userNameField" => "rev_user_text"
+		),
+
 
 		// extension tables
-		'watch_tracking_user' => array( "idField" => 'user_id' ),
-		// 'wiretap'             => array( "idField" => NONE, username only )
+		'watch_tracking_user' => array(
+			"unique" => array("tracking_timestamp", "user_id"),
+			"idField" => 'user_id'
+		),
 
 	);
 
-	// $idAndNameTables = array(
-	// 	"archive"       => array( "idField" => "ar_user",  "userNameField" => "ar_user_text" ),
-	// 	"filearchive"   => array( "idField" => "fa_user",  "userNameField" => "fa_user_text" ),
-	// 	"image"         => array( "idField" => "img_user", "userNameField" => "img_user_text" ),
-	// 	"logging"       => array( "idField" => "log_user", "userNameField" => "log_user_text" ),
-	// 	"oldimage"      => array( "idField" => "oi_user",  "userNameField" => "oi_user_text" ),
-	// 	"recentchanges" => array( "idField" => "rc_user",  "userNameField" => "rc_user_text" ),
-	// 	"revision"      => array( "idField" => "rev_user", "userNameField" => "rev_user_text" ),
-	// );
 
+	$this->successes = 0;
+	$this->failures = 0;
+	$this->totalChecks = 0;
 
 	public $userTable = array( "idField" => "user_id", "userNameField" => "user_name" );
-	public $userPropsTable = array( "idField" => "up_user" );
+	public $userPropsTable = array(
+		"unique" => array("up_user", "up_property"),
+		"idField" => "up_user"
+	);
 
 	public $userTableRows = false;
 
-	// FIXME: make the script check for the largest value
-	public $initialOffset = 10000; // make sure this is larger than your largest user ID
+	// If you have a wiki with more than a million users, pay me to update this
+	public $initialOffset = 1000000;
 
 	public $userArray = array();
 	public $newUserProps = array();
@@ -76,6 +129,7 @@ class MezaUnifyUserTables extends Maintenance {
 	public function __construct() {
 		parent::__construct();
 
+		$this->recordDir = __DIR__ . '/record';
 		$this->mDescription = "This combines all user tables into one. This is potentially very destructive. Make a backup first.";
 
 		// addOption ($name, $description, $required=false, $withArg=false, $shortName=false)
@@ -83,6 +137,8 @@ class MezaUnifyUserTables extends Maintenance {
 			'prime-wiki',
 			'Wiki ID of prime wiki',
 			true, true );
+
+		$this->recordTables = $this->tablesToModify + array( "user_properties" => $this->userPropsTable );
 
 	}
 
@@ -103,6 +159,9 @@ class MezaUnifyUserTables extends Maintenance {
 
 		// ???
 		$this->originalUserIDs = $this->getUserIDsByWiki();
+
+		// Record relevant info from all tables for checking later
+		$this->recordOriginalIDs();
 
 		// Add $this->initialOffset to all user IDs on all tables on all wikis
 		// and delete an unneeded table. Read new IDS into $this->tempUserIDs
@@ -125,6 +184,9 @@ class MezaUnifyUserTables extends Maintenance {
 
 		// ???
 		$this->createUnifiedUserPropertiesTable();
+
+		// Run tests against data recorded prior to ID changes
+		$this->testNewIDs();
 
 		// ???
 		$this->closeout();
@@ -219,6 +281,91 @@ class MezaUnifyUserTables extends Maintenance {
 		}
 
 		return $usersByWiki;
+	}
+
+
+	/**
+	 *  For each database, record each tables unique identifier, initial id,
+	 *  and initial username
+	 *
+	 **/
+	public function recordOriginalIDs () {
+
+		// don't love this
+		mkdir( $this->recordDir );
+
+		$recordTables = $this->recordTables;
+
+		foreach( $this->wikiDBs as $wikiID => $db ) {
+
+			$this->output( "\n#\n# Adding initial offset to user IDs in $wikiID\n#" );
+
+			foreach ( $recordTables as $tableName => $tableInfo ) {
+
+				list( $result, $uniqueFields ) = $this->getRecordSelect( $tableName );
+
+				$filetext = '';
+				$uniques = array();
+				while( $row = $result->fetchRow() ) {
+					$uniqueString = $this->getUniqueFieldString( $uniqueFields, $row );
+					$filetext .= $uniqueString . "\t" . $row['user_id_number'] . "\t" . $row['user_name_text']
+				}
+				file_put_contents( "{$this->recordDir}/$wikiID.$tableName", $filetext );
+
+			}
+
+			// FIXME: This doesn't run a test against the ipblock table because it's a unique case
+			// and it was difficult to implement and not relevant to the developer who had
+			// no rows in his ipblocks table
+
+		}
+	}
+
+	// perform database select for recording the pre-modification state
+	// which is also used for testing the modifications after the fact
+	//
+	// NOTE: WE ALWAYS SELECT the username from the user table to make
+	// sure we're actually seeing that the user ID is being updated
+	// properly
+	public function getRecordSelect ( $tableName ) {
+
+		$tableInfo = $this->recordTables[$tableName];
+
+		$idField = $tableInfo['idField'];
+		if ( is_array( $tableInfo['unique'] ) ) {
+			$uniqueFields = $tableInfo['unique'];
+		}
+		else {
+			$uniqueFields = array( $tableInfo['unique'] );
+		}
+
+		$selectTables = array( $tableName, 'user' );
+		$selectFields = array(
+			'user_id_number' => "$tableName.$idField",
+			'user_name_text' => 'user.user_name',
+		);
+
+		foreach( $uniqueFields as $field ) {
+			$selectFields[$f] = "$tableName.$field";
+		}
+
+		$result = $db->select(
+			$selectTables,
+			$selectFields,
+			'',
+			__METHOD__
+		);
+
+		return array( $result, $uniqueFields );
+
+	}
+
+	public getUniqueFieldString ( $uniqueFields, $row ) {
+		foreach( $uniqueFields as $field ) {
+			$uniques[] = $row[$field];
+		}
+
+		return implode(',', $uniques)
 	}
 
 	/**
@@ -508,6 +655,70 @@ class MezaUnifyUserTables extends Maintenance {
 			__METHOD__,
 			array( 'IGNORE' ) // IGNORE or ON DUPLICATE KEY UPDATE ???
 		);
+
+	}
+
+	public function testNewIDs () {
+
+		$recordFiles = scandir( $this->recordDir );
+		$logFileContents = '';
+		foreach ( $recordFiles as $filename ) {
+			$filepath = $this->recordDir . "/$filename";
+			if ( ! is_file( $filepath ) ) {
+				continue;
+			}
+
+			$source = explode( '.', $filename );
+			$wikiID = $source[0];
+			$tableName = $source[1];
+
+			// user_name_text, original_id, some number of unique fields
+			list( $result, $uniqueFields ) = $this->getRecordSelect( $tableName );
+
+			$tester = array();
+			foreach( $row = $result->fetchRow() ) {
+				$uniqueString = $this->getUniqueFieldString( $uniqueFields, $row );
+				$tester[$uniqueString] = array(
+					'new_user_name' => $row['user_name_text'],
+					'new_user_id' => $row['user_id_number']
+				);
+			}
+			unset( $result );
+
+			// loop through all previously recorded rows
+			$records = explode("\n", file_get_contents( $filepath ) );
+			foreach ( $records as $record ) {
+				if ( trim( $record ) == "" ) {
+					continue;
+				}
+				$parts = explode( "\t", $record );
+				$unique = $parts[0];
+				$originalID = $parts[1];
+				$originalUserText = $parts[2];
+
+				$newUserText = $tester[$unique]['new_user_name'];
+				$newUserID = $tester[$unique]['user_id_number'];
+
+				// check original user name matches new
+				if ( $originalUserText === $newUserText ) {
+					$success = "[SUCCESS]";
+					$this->successes++;
+				}
+				else {
+					$success = "[FAILURE]";
+					$this->failures++;
+				}
+				$this->totalChecks++;
+
+				$logLine = "$success [$wikiID.$tableName.$unique] [IDs: $originalID --> $newUserID] [Names: $originalUserText --> $newUserText]";
+				$logFileContents .= $logLine . "\n";
+				$this->output( "\n$logLine" );
+			}
+
+
+		}
+
+		file_put_contents( $this->recordDir . '/results.log' , $logFileContents );
 
 	}
 
