@@ -80,14 +80,15 @@ require_once "$m_htdocs/wikis/$wikiId/config/setup.php";
  *  chosen. Options are listed from least impact to most impact.
  *    1) Add to the URI you're requesting `requestDebug=true` to enable debug
  *       for just that request.
- *    2) Set `$mezaCommandLineDebug = true;` for debug on the command line
+ *    2) Set `$mezaCommandLineDebug = true;` for debug on the command line.
+ *       This is the default, which can be overriden in setup.php.
  *    3) Set `$mezaDebug = array( "NDC\Your-ndc", ... );` in a wiki's setup.sh
  *       to enable debug for just specific users on a single wiki.
  *    4) Set `$mezaDebug = true;` in a wiki's setup.sh to enable debug for all
  *       users of a single wiki.
  *    5) Set `$mezaForceDebug = true;` to turn on debug for all users and wikis
  **/
-$mezaCommandLineDebug = false;
+$mezaCommandLineDebug = true; // don't we always want debug on command line?
 $mezaForceDebug = false;
 
 
