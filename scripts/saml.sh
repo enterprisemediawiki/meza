@@ -177,6 +177,9 @@ sed -r -i "s/realname_attr/$realname_attr/g;" ~/SAML-LocalSettings-Additions.php
 sed -r -i "s/email_attr/$email_attr/g;" ~/SAML-LocalSettings-Additions.php
 
 # Add these lines to the bottom of LocalSettings.php, then remove the temp file
+if [ ! -f "$m_config/local/overrides.php" ]; then
+    echo -e "<?php\n\n" > "$m_config/local/overrides.php"
+fi
 cat ~/SAML-LocalSettings-Additions.php >> "$m_config/local/overrides.php";
 rm ~/SAML-LocalSettings-Additions.php
 
