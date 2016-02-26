@@ -107,9 +107,9 @@ class MezaUnifyUserTables extends Maintenance {
 	);
 
 
-	$this->successes = 0;
-	$this->failures = 0;
-	$this->totalChecks = 0;
+	public $successes = 0;
+	public $failures = 0;
+	public $totalChecks = 0;
 
 	public $userTable = array( "idField" => "user_id", "userNameField" => "user_name" );
 	public $userPropsTable = array(
@@ -298,17 +298,17 @@ class MezaUnifyUserTables extends Maintenance {
 
 		foreach( $this->wikiDBs as $wikiID => $db ) {
 
-			$this->output( "\n#\n# Adding initial offset to user IDs in $wikiID\n#" );
+			$this->output( "\n#\n# Recording original info for $wikiID\n#" );
 
 			foreach ( $recordTables as $tableName => $tableInfo ) {
 
-				list( $result, $uniqueFields ) = $this->getRecordSelect( $tableName );
+				list( $result, $uniqueFields ) = $this->getRecordSelect( $wikiID, $tableName );
 
 				$filetext = '';
 				$uniques = array();
 				while( $row = $result->fetchRow() ) {
 					$uniqueString = $this->getUniqueFieldString( $uniqueFields, $row );
-					$filetext .= $uniqueString . "\t" . $row['user_id_number'] . "\t" . $row['user_name_text']
+					$filetext .= $uniqueString . "\t" . $row['user_id_number'] . "\t" . $row['user_name_text'] . "\n";
 				}
 				file_put_contents( "{$this->recordDir}/$wikiID.$tableName", $filetext );
 
@@ -327,7 +327,7 @@ class MezaUnifyUserTables extends Maintenance {
 	// NOTE: WE ALWAYS SELECT the username from the user table to make
 	// sure we're actually seeing that the user ID is being updated
 	// properly
-	public function getRecordSelect ( $tableName ) {
+	public function getRecordSelect ( $wikiID, $tableName ) {
 
 		$tableInfo = $this->recordTables[$tableName];
 
@@ -346,10 +346,10 @@ class MezaUnifyUserTables extends Maintenance {
 		);
 
 		foreach( $uniqueFields as $field ) {
-			$selectFields[$f] = "$tableName.$field";
+			$selectFields[$field] = "$tableName.$field";
 		}
 
-		$result = $db->select(
+		$result = $this->wikiDBs[$wikiID]->select(
 			$selectTables,
 			$selectFields,
 			'',
@@ -360,12 +360,12 @@ class MezaUnifyUserTables extends Maintenance {
 
 	}
 
-	public getUniqueFieldString ( $uniqueFields, $row ) {
+	public function getUniqueFieldString ( $uniqueFields, $row ) {
 		foreach( $uniqueFields as $field ) {
 			$uniques[] = $row[$field];
 		}
 
-		return implode(',', $uniques)
+		return implode(',', $uniques);
 	}
 
 	/**
@@ -673,10 +673,10 @@ class MezaUnifyUserTables extends Maintenance {
 			$tableName = $source[1];
 
 			// user_name_text, original_id, some number of unique fields
-			list( $result, $uniqueFields ) = $this->getRecordSelect( $tableName );
+			list( $result, $uniqueFields ) = $this->getRecordSelect( $wikiID, $tableName );
 
 			$tester = array();
-			foreach( $row = $result->fetchRow() ) {
+			while( $row = $result->fetchRow() ) {
 				$uniqueString = $this->getUniqueFieldString( $uniqueFields, $row );
 				$tester[$uniqueString] = array(
 					'new_user_name' => $row['user_name_text'],
