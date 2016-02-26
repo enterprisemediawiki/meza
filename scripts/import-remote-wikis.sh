@@ -116,7 +116,6 @@ do
 	read -s remote_db_password
 done
 
-cd "$full_remote_wikis_path"
 
 
 echo
@@ -129,8 +128,9 @@ if [[ -z "$slackwebhook" ]]; then
 	slackwebhook="n"
 fi
 
-
 echo -e "\n\n\nIMPORTING WIKIS: $which_wikis\n"
+
+cd "$full_remote_wikis_path"
 
 # copy each selected wiki directory, then get database
 for wiki in $which_wikis
@@ -139,7 +139,7 @@ do
 	echo "Starting import of wiki '$wiki'"
 
 	echo "  Getting files..."
-	cp -r "./$wiki" /root/wikis
+	rsync -rva "./$wiki" /root/wikis
 
 	wiki_db=`php /opt/meza/scripts/getDatabaseNameFromSetup.php $full_remote_wikis_path/$wiki/config/setup.php`
 	if [ -z "$wiki_db" ]; then
@@ -147,7 +147,7 @@ do
 	fi
 
 	echo "  Getting database..."
-	mysqldump -h $remote_db_server -u $remote_db_username -p$remote_db_password $wiki_db > "/root/wikis/$wiki/wiki.sql"
+	mysqldump -v -h $remote_db_server -u $remote_db_username -p$remote_db_password $wiki_db > "/root/wikis/$wiki/wiki.sql"
 
 done
 

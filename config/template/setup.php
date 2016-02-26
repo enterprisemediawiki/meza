@@ -11,8 +11,13 @@
  * Enables or disables wiki email capabilities for all wikis, regardless of
  * of what their individual settings say.
  *
- * @todo enable this when
  **/
 // disabled by default for now, should be enabled later for
 $mezaEnableAllWikiEmail = false;
+
+// https://www.mediawiki.org/wiki/Manual:$wgPasswordSender
+$wgPasswordSender = "admin@example.com";
+
+// https://www.mediawiki.org/wiki/Manual:$wgEmergencyContact
+$wgEmergencyContact = $wgPasswordSender;
 
