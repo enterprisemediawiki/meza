@@ -145,7 +145,7 @@ for d in */ ; do
 		mkdir "$wiki_install_path/config"
 	fi
 
-	# check if logo.png, favicon.ico, setup.php and CustomSettings.php exist. Else use defaults
+	# check if logo.png, favicon.ico, setup.php and overrides.php exist. Else use defaults
 	if [ ! -f "$wiki_install_path/config/logo.png" ]; then
 		cp "$m_config/template/wiki-init/config/logo.png" "$wiki_install_path/config/logo.png"
 	fi
@@ -153,7 +153,7 @@ for d in */ ; do
 		cp "$m_config/template/wiki-init/config/favicon.ico" "$wiki_install_path/config/favicon.ico"
 	fi
 	if [ ! -f "$wiki_install_path/config/overrides.php" ]; then
-		cp "$m_config/template/wiki-init/config/overrides.php" "$wiki_install_path/config/CustomSettings.php"
+		cp "$m_config/template/wiki-init/config/overrides.php" "$wiki_install_path/config/overrides.php"
 	fi
 	if [ ! -f "$wiki_install_path/config/setup.php" ]; then
 		cp "$m_config/template/wiki-init/config/setup.php" "$wiki_install_path/config/setup.php"
