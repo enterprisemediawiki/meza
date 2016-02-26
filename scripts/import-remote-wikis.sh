@@ -4,8 +4,8 @@
 # application and database servers).
 #
 
-if [ -f "/opt/meza/remote-wiki-config.sh" ]; then
-	source "/opt/meza/remote-wiki-config.sh"
+if [ -f "/opt/meza/config/local/remote-wiki-config.sh" ]; then
+	source "/opt/meza/config/local/remote-wiki-config.sh"
 fi
 
 
@@ -117,6 +117,18 @@ do
 done
 
 cd "$full_remote_wikis_path"
+
+
+echo
+echo
+echo "Announce completion of each wiki on Slack?"
+echo "Enter webhook URI or leave blank to opt out:"
+read slackwebhook
+
+if [[ -z "$slackwebhook" ]]; then
+	slackwebhook="n"
+fi
+
 
 echo -e "\n\n\nIMPORTING WIKIS: $which_wikis\n"
 

@@ -17,7 +17,6 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  *    6) GENERAL CONFIGURATION
  *    7) EXTENSION SETTINGS
  *    8) LOAD OVERRIDES
- *    9) HOMELESS ITEMS
  *
  **/
 
@@ -31,9 +30,9 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  **/
 
 // same value as bash variable in config.sh
-$m_htdocs = '/opt/meza/htdocs';
-
-require_once "$m_htdocs/__common/AllWikiSettings.php";
+$m_meza = '/opt/meza';
+$m_config = $m_meza . '/config';
+$m_htdocs = $m_meza . '/htdocs';
 
 if( $wgCommandLineMode ) {
 
@@ -62,8 +61,10 @@ if ( ! in_array( $wikiId, $wikis ) ) {
 
 }
 
+// Load all-wikis setup.php first, then allow wiki-specific setup.php to modify
+require_once "$m_config/local/setup.php";
 
-// Get's wiki-specific config variables like:
+// Gets wiki-specific config variables like:
 // $wgSitename, $mezaAuthType, $mezaDebug, $mezaEnableWikiEmail
 require_once "$m_htdocs/wikis/$wikiId/config/setup.php";
 
@@ -249,8 +250,6 @@ if ( isset( $mezaCustomDBname ) ) {
 if ( isset( $mezaCustomDBuser ) && isset ( $mezaCustomDBpass ) ) {
 	$wgDBuser = $mezaCustomDBuser;
 	$wgDBpassword = $mezaCustomDBpass;
-} else {
-	require_once "$m_htdocs/__common/dbUserPass.php";
 }
 
 # MySQL specific settings
@@ -270,7 +269,7 @@ $wgDBmysql5 = false;
  *  not affect the user groups, so a user can be a sysop on one wiki and just a
  *  user on another.
  *
- *  To enable a primewiki create the file $m_htdocs/__common/primewiki and make
+ *  To enable a primewiki create the file $m_config/local/primewiki and make
  *  the file contents be the id of the desired wiki.
  *
  *  In order for this to work properly the wikis need to have been created with
@@ -279,13 +278,13 @@ $wgDBmysql5 = false;
  *  tables, then you'll need to use TBD user-merge script.
  *
  **/
-if ( file_exists( "$m_htdocs/__common/primewiki" ) ) {
+if ( file_exists( "$m_config/local/primewiki" ) ) {
 
 	// grab prime wiki data using closure to encapsulate the data
 	// and not overwrite existing config ($wgSitename, etc)
 	$primewiki = call_user_func( function() use ( $m_htdocs ) {
 
-		$primeWikiId = trim( file_get_contents( "$m_htdocs/__common/primewiki" ) );
+		$primeWikiId = trim( file_get_contents( "$m_config/local/primewiki" ) );
 
 		require_once "$m_htdocs/wikis/$primeWikiId/config/setup.php";
 
@@ -851,16 +850,6 @@ $wgGroupPermissions['sysop']['interwiki'] = true;
 
 
 #
-# Extension:IMSQuery
-#
-require_once $egExtensionLoader->registerLegacyExtension(
-	"IMSQuery",
-	"https://github.com/jamesmontalvo3/IMSQuery.git",
-	"master"
-);
-
-
-#
 # Extension:MasonryMainPage
 #
 require_once $egExtensionLoader->registerLegacyExtension(
@@ -900,16 +889,6 @@ require_once $egExtensionLoader->registerLegacyExtension(
 	"Variables",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Variables.git",
 	"REL1_25"
-);
-
-
-#
-# Extension:SummaryTimeline
-#
-require_once $egExtensionLoader->registerLegacyExtension(
-	"SummaryTimeline",
-	"https://github.com/darenwelsh/SummaryTimeline.git",
-	"tags/0.2.0"
 );
 
 
@@ -1004,6 +983,7 @@ require_once $egExtensionLoader->registerLegacyExtension(
 if ( isset( $_SERVER['REMOTE_ADDR'] ) && isset( $_SERVER['SERVER_ADDR'] )
 	&& $_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR'] )
 {
+	$wgServer = preg_replace( '/^http:\/\/([a-zA-Z\d-\.]+):9000/', 'https://$1', $wgServer );
 	$wgGroupPermissions['*']['read'] = true;
 	$wgGroupPermissions['*']['edit'] = true;
 }
@@ -1019,7 +999,6 @@ $wgHiddenPrefs[] = 'visualeditor-enable';
 
 // URL to the Parsoid instance
 // MUST NOT end in a slash due to Parsoid bug
-// Use port 8142 if you use the Debian package
 $wgVisualEditorParsoidURL = 'http://127.0.0.1:8000';
 
 // Interwiki prefix to pass to the Parsoid instance
@@ -1054,7 +1033,6 @@ require_once $egExtensionLoader->registerLegacyExtension(
 	"REL1_25"
 );
 $wgSearchType = 'CirrusSearch';
-include "$m_htdocs/wikis/$wikiId/config/disableSearchUpdate.php";
 //$wgCirrusSearchServers = array( 'search01', 'search02' );
 
 
@@ -1098,7 +1076,7 @@ $wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard"; //Updat
 $wgUploadWizardConfig = array(
 	'debug' => false,
 	'autoCategory' => 'Uploaded with UploadWizard',
-	'feedbackPage' => 'FeedbackTest2',
+	'feedbackPage' => 'Project:UploadWizard/Feedback',
 	'altUploadForm' => 'Special:Upload',
 	'fallbackToAltUploadForm' => false,
 	'enableFormData' => true,  # Should FileAPI uploads be used on supported browsers?
@@ -1107,6 +1085,18 @@ $wgUploadWizardConfig = array(
 	'tutorial' => array('skip' => true),
 	'fileExtensions' => $wgFileExtensions //omitting this can cause errors
 );
+
+
+#
+# Extension:CollapsibleVector
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	'CollapsibleVector',
+	'https://gerrit.wikimedia.org/r/mediawiki/extensions/CollapsibleVector',
+	'REL1_25'
+);
+
+
 
 
 #
@@ -1163,22 +1153,9 @@ $wgUploadWizardConfig = array(
  *
  *
  **/
+if ( file_exists( "$m_config/local/overrides.php" ) ) {
+	require_once "$m_config/local/overrides.php";
+}
 if ( file_exists( "$m_htdocs/wikis/$wikiId/config/overrides.php" ) ) {
 	require_once "$m_htdocs/wikis/$wikiId/config/overrides.php";
 }
-
-
-
-
-
-
-
-
-
-/**
- *  9) HOMELESS ITEMS
- *
- *  EVERYTHING BELOW HERE SHOULD BE MOVED INTO THE APPROPRIATE PLACE IN THIS
- *  DOCUMENT OR SUPPORTING SETTINGS DOCUMENTS.
- **/
-

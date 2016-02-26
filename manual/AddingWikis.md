@@ -51,7 +51,7 @@ wikis
 	eng
 ```
 
-If you have this directory in root's user directory, you would enter `/root/wikis/` for step 1 above. Note that using `~/wikis/` doesn't seem to work.
+If you have this directory in root's user directory, you would enter `/root/wikis/` for step 1 above. Note that using `~/wikis/` doesn't seem to work, but if you're using a user other than root with sudo rights you could use `/home/username/wikis/`.
 
 Each of these identifiers will be used throughout meza, but the place you'll notice it most is in your URLs. For example, your Engineering Department's wiki may be at `https://example.com/eng`.
 
@@ -91,20 +91,20 @@ To transfer files to your server you can use SCP (or PSCP on Windows):
 
 This process can be used to import wikis from some types of servers. The authors of this script have only tested it where the remote server is running Windows.
 
-1. `cd /opt/meza`
-2. Create `remote-wiki-config.sh` by doing one of the following:
-  1. `sudo cp ./scripts/config/remote-wiki-config.example.sh ./remote-wiki-config.sh` and editing the file
+1. `cd /opt/meza/config/local`
+2. Create `config/local/remote-wiki-config.sh` by doing one of the following:
+  1. `sudo cp /opt/meza/config/template/remote-wiki-config.example.sh ./remote-wiki-config.sh` and editing the file
   2. `sudo vi remote-wiki-config.sh` and pasting in your pre-built config
-3. `cd scripts`
+3. `cd /opt/meza/scripts`
 4. `sudo bash import-remote-wikis.sh`. You should only need to enter your username and password for the remote server if you filled `remote-wiki-config.sh`
 
 
 ## Making a wiki the "primary" wiki
 
-A wiki can be setup as the "primary" wiki. This means that all other wikis will use its user and interwiki tables. If all wikis are related, and are going to have similar users, you should do this. To make one wiki the primary wiki simply add a file called "primewiki" to the `__common` directory:
+A wiki can be setup as the "primary" wiki. This means that all other wikis will use its user and interwiki tables. If all wikis are related, and are going to have similar users, you should do this. To make one wiki the primary wiki simply add a file called "primewiki" to the `config/local` directory:
 
 ```bash
-cd /opt/meza/htdocs/__common
+cd /opt/meza/config/local
 echo "wiki-id" > primewiki
 ```
 

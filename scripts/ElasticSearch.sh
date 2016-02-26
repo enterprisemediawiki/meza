@@ -58,7 +58,7 @@ cd "$m_meza/scripts"
 rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
 
 # Add yum repo file
-cp ./elasticsearch.repo /etc/yum.repos.d/elasticsearch.repo
+ln -s "$m_config/meza/elasticsearch.repo" /etc/yum.repos.d/elasticsearch.repo
 
 # Install repo
 yum -y install elasticsearch
@@ -84,11 +84,10 @@ echo "******* Adding Elasticsearch configuration *******"
 # Add host name per https://github.com/elastic/elasticsearch/issues/6611
 echo "127.0.0.1 meza" >> /etc/hosts
 
-# Rename the standard config file and copy over our custom config file
+# Rename the standard config file and link to our custom file
 cd /etc/elasticsearch
-mv ./elasticsearch.yml ./elasticsearch-old.yml
-cd "$m_meza/scripts"
-cp ./elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
+mv /etc/elasticsearch/elasticsearch.yml /etc/elasticsearch/elasticsearch-old.yml
+ln -s "$m_config/meza/elasticsearch.yml" /etc/elasticsearch/elasticsearch.yml
 
 # Make directories called out in elasticsearch.yml
 # ref: http://elasticsearch-users.115913.n3.nabble.com/Elasticsearch-Not-Working-td4059398.html
@@ -110,3 +109,12 @@ chown -R elasticsearch /var/work/elasticsearch
 echo "******* Starting elasticsearch service *******"
 service elasticsearch start
 sleep 20  # Waits 10 seconds
+
+
+# install kopf, head, bigdesk and inquisitor plugins
+/usr/share/elasticsearch/bin/plugin install lmenezes/elasticsearch-kopf/1.0
+/usr/share/elasticsearch/bin/plugin install mobz/elasticsearch-head
+/usr/share/elasticsearch/bin/plugin install lukas-vlcek/bigdesk
+/usr/share/elasticsearch/bin/plugin install polyfractal/elasticsearch-inquisitor
+
+

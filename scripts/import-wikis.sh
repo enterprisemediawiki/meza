@@ -25,7 +25,7 @@ fi
 # and thus it needs to know how to get to the config.sh script on it's own
 #
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-source "$DIR/config.sh"
+source "/opt/meza/config/meza/config.sh"
 
 
 # Prompt user for locations of wiki data
@@ -78,12 +78,21 @@ if [ "$imports_dir" = "new" ]; then
 	fi
 	mkdir wikis
 	imports_dir="/tmp/wikis"
-	cp -avr "$m_meza/wiki-init" "$imports_dir/$wiki_id"
+	cp -avr "$m_config/template/wiki-init" "$imports_dir/$wiki_id"
 
 	# get SQL file from MediaWiki
 	echo "Copying MediaWiki tables.sql"
 	cp -avr "$m_mediawiki/maintenance/tables.sql" "$imports_dir/$wiki_id/wiki.sql"
 
+fi
+
+
+if [[ -z "$slackwebhook" ]]; then
+	echo
+	echo
+	echo "Announce completion of each wiki on Slack?"
+	echo "Enter webhook URI or leave blank to opt out:"
+	read slackwebhook
 fi
 
 
@@ -138,19 +147,16 @@ for d in */ ; do
 
 	# check if logo.png, favicon.ico, setup.php and CustomSettings.php exist. Else use defaults
 	if [ ! -f "$wiki_install_path/config/logo.png" ]; then
-		cp "$m_meza/wiki-init/config/logo.png" "$wiki_install_path/config/logo.png"
+		cp "$m_config/template/wiki-init/config/logo.png" "$wiki_install_path/config/logo.png"
 	fi
 	if [ ! -f "$wiki_install_path/config/favicon.ico" ]; then
-		cp "$m_meza/wiki-init/config/favicon.ico" "$wiki_install_path/config/favicon.ico"
+		cp "$m_config/template/wiki-init/config/favicon.ico" "$wiki_install_path/config/favicon.ico"
 	fi
-	if [ ! -f "$wiki_install_path/config/CustomSettings.php" ]; then
-		cp "$m_meza/wiki-init/config/CustomSettings.php" "$wiki_install_path/config/CustomSettings.php"
+	if [ ! -f "$wiki_install_path/config/overrides.php" ]; then
+		cp "$m_config/template/wiki-init/config/overrides.php" "$wiki_install_path/config/CustomSettings.php"
 	fi
 	if [ ! -f "$wiki_install_path/config/setup.php" ]; then
-		cp "$m_meza/wiki-init/config/setup.php" "$wiki_install_path/config/setup.php"
-	fi
-	if [ ! -f "$wiki_install_path/config/disableSearchUpdate.php" ]; then
-		cp "$m_meza/wiki-init/config/disableSearchUpdate.php" "$wiki_install_path/config/disableSearchUpdate.php"
+		cp "$m_config/template/wiki-init/config/setup.php" "$wiki_install_path/config/setup.php"
 	fi
 	chmod -R 755 "$wiki_install_path/config"
 
@@ -197,9 +203,9 @@ for d in */ ; do
 		# Run runJobs.php
 		# Note that should prob be removed: Daren saw 12k+ jobs in the queue after performing the above steps
 		echo "Running MediaWiki maintenance script \"runJobs.php\""
-		sed -r -i 's/false/true/g;' "$m_htdocs/wikis/$wiki_id/config/disableSearchUpdate.php"
+		echo "\$wgDisableSearchUpdate = true;" >> "$m_htdocs/wikis/$wiki_id/config/overrides.php"
 		WIKI="$wiki_id" php "$m_mediawiki/maintenance/runJobs.php" --quick
-		sed -r -i 's/true/false/g;' "$m_htdocs/wikis/$wiki_id/config/disableSearchUpdate.php"
+		sed -r -i 's/\$wgDisableSearchUpdate = true;//g;' "$m_htdocs/wikis/$wiki_id/config/overrides.php"
 	else
 		echo -e "\nSKIPPING SemanticMediaWiki rebuildData.php and runjobs.php (no SMW)"
 	fi
@@ -213,7 +219,12 @@ for d in */ ; do
 		echo -e "\nSKIPPING elastic-build-index.sh (no CirrusSearch)"
 	fi
 
-	echo -e "\nWiki \"$wiki_id\" has been imported\n"
+	complete_msg="Wiki '$wiki_id' has been imported"
+	echo -e "\n$complete_msg\n"
+
+	if [[ ! -z "$slackwebhook" ]]; then
+		bash "$m_meza/scripts/slack.sh" "$slackwebhook" "$complete_msg"
+	fi
 
 	# delete remaining source files?
 

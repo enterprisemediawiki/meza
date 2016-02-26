@@ -1,4 +1,4 @@
-# meza v0.4
+# meza v0.9-dev
 
 meza configures a CentOS/RedHat server with a complete enterprise MediaWiki installation.
 
@@ -25,11 +25,10 @@ This script will retrieve a script from the meza repository, which will subseque
 
 * **Git branch**: The branch of meza to use. This is mostly for testing. Type "master" in most cases.
 * **GitHub Token**: This allows you to download more things from GitHub than you would normally. Using the default is fine.
-* **PHP version**: Right now, use 5.4.42. In the future more versions will be supported
 * **MySQL password**: Pick a good, secure password for MySQL root user
 * **domain or IP address**: If you'll access your wiki at http://example.com, your type `example.com`. If you'll access it at http://192.168.56.56, type `192.168.56.56`.
 * **Install with git**: Type `y`. You want to install with git.
-* Setup of self-signed SSL certificate (for access over https): Enter location, organization and administrator info.
+* Setup of self-signed SSL certificate (for access over https): Enter location, organization and administrator info. For the sake of development enter any value for these fields, as your choices don't really matter. For the sake of a production server you should not be relying upon a self-signed certificate anyway. Generate the certificate with any choices, and replace with a trusted certificate after installation is complete.
 
 ## Manual Install
 
@@ -38,6 +37,8 @@ While the goal is to have an entirely scripted install of CentOS and the entire 
 ## See Also
 
 * [Creating and importing wikis](manual/AddingWikis.md)
+* [Accessing Elasticsearch plugins](manual/ElasticsearchPlugins.md)
+* [Installing additional extensions](manual/installing-additional-extensions.md)
 
 ## Contributing
 If you'd like to contribute to this project, please see [this guide on how to help](CONTRIBUTING.md).

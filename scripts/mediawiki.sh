@@ -50,14 +50,14 @@ if [ "$mediawiki_git_install" = "y" ]; then
 	cd mediawiki
 
 	# Checkout latest released version
-	git checkout tags/1.25.1
+	git checkout tags/1.25.5
 	cmd_profile "END mediawiki git clone"
 else
 	cmd_profile "START mediawiki get from tarball"
-	wget http://releases.wikimedia.org/mediawiki/1.25/mediawiki-core-1.25.1.tar.gz
+	wget http://releases.wikimedia.org/mediawiki/1.25/mediawiki-core-1.25.5.tar.gz
 
 	mkdir mediawiki
-	tar xpvf mediawiki-core-1.25.1.tar.gz -C ./mediawiki --strip-components 1
+	tar xpvf mediawiki-core-1.25.5.tar.gz -C ./mediawiki --strip-components 1
 	cd mediawiki
 	cmd_profile "END mediawiki get from tarball"
 fi
@@ -92,14 +92,28 @@ fi
 #
 # Copy in LocalSettings.php
 #
-cp "$m_meza/scripts/config/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
+ln -s "$m_config/meza/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
+cp "$m_config/template/setup.php" "$m_config/local/setup.php"
 
 
 #
-# Create common database credentials
+# Add common database credentials to setup.php
 #
-echo -e "<?php\n\$wgDBuser = \"root\";\n\$wgDBpassword = \"$mysql_root_pass\";\n" > "$m_htdocs/__common/dbUserPass.php"
+echo -e "\n\n"                              >> "$m_config/local/setup.php"
+echo "// All-wiki db user and password"     >> "$m_config/local/setup.php"
+echo "\$wgDBuser = 'root';"                 >> "$m_config/local/setup.php"
+echo "\$wgDBpassword = '$mysql_root_pass';" >> "$m_config/local/setup.php"
+echo -e "\n\n"                              >> "$m_config/local/setup.php"
 
+#
+# Get WikiBlender
+#
+echo "Installing WikiBlender"
+cd "$m_htdocs"
+git clone https://github.com/jamesmontalvo3/WikiBlender.git
+cd WikiBlender
+git checkout rebaseline # use rebaseline until WikiBlender is updated
+cp "$m_config/template/BlenderSettings.php" ./BlenderSettings.php
 
 # end of script
 echo -e "\n\nMediaWiki has been installed"
