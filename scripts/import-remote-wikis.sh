@@ -139,7 +139,7 @@ do
 	echo "Starting import of wiki '$wiki'"
 
 	echo "  Getting files..."
-	rsync -rva "./$wiki" /root/wikis
+	rsync -rva "./$wiki" /root/wikis/
 
 	wiki_db=`php /opt/meza/scripts/getDatabaseNameFromSetup.php $full_remote_wikis_path/$wiki/config/setup.php`
 	if [ -z "$wiki_db" ]; then
