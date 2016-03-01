@@ -82,7 +82,7 @@ class MezaUnifyUserTables extends Maintenance {
 			"userNameField" => "log_user_text"
 		),
 		"oldimage"      => array(
-			"unique" => "oi_sha1",
+			"unique" => "oi_archive_name",
 			"idField" => "oi_user",
 			"userNameField" => "oi_user_text"
 		),
