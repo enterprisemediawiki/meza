@@ -133,8 +133,14 @@ echo -e "\n\n\nIMPORTING WIKIS: $which_wikis\n"
 cd "$full_remote_wikis_path"
 
 # copy each selected wiki directory, then get database
-for wiki in $which_wikis
+for wiki_dir in $which_wikis
 do
+
+	# trim trailing slash from directory name
+	# ref: http://stackoverflow.com/questions/1848415/remove-slash-from-the-end-of-a-variable
+	# ref: http://www.network-theory.co.uk/docs/bashref/ShellParameterExpansion.html
+	wiki=${wiki_dir%/}
+
 	# @todo: delete existing wiki data?
 	echo "Starting import of wiki '$wiki'"
 
