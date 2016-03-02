@@ -82,7 +82,8 @@ class MezaUnifyUserTables extends Maintenance {
 			"userNameField" => "log_user_text"
 		),
 		"oldimage"      => array(
-			"unique" => "oi_archive_name",
+			// tried oi_sha1 (not unique) and oi_archive_name (sometimes blank)
+			"unique" => array('oi_name','oi_timestamp'),
 			"idField" => "oi_user",
 			"userNameField" => "oi_user_text"
 		),
@@ -129,7 +130,6 @@ class MezaUnifyUserTables extends Maintenance {
 	public function __construct() {
 		parent::__construct();
 
-		$this->recordDir = __DIR__ . '/record';
 		$this->mDescription = "This combines all user tables into one. This is potentially very destructive. Make a backup first.";
 
 		// addOption ($name, $description, $required=false, $withArg=false, $shortName=false)
@@ -195,7 +195,7 @@ class MezaUnifyUserTables extends Maintenance {
 
 	public function checkSetup () {
 
-		global $m_htdocs, $m_config;
+		global $m_htdocs, $m_config, $m_meza;
 
 		if ( is_file( "$m_config/local/primewiki" ) ) {
 			die( "A prime wiki is already set in $m_config/local/primewiki. You cannot run this script." );
@@ -203,6 +203,8 @@ class MezaUnifyUserTables extends Maintenance {
 
 		// prime wiki ID and database name
 		$this->primeWiki = trim( $this->getOption( "prime-wiki" ) );
+
+		$this->recordDir = "$m_meza/logs/user-unify-" . date( "YmdHis" );
 
 	}
 
@@ -724,9 +726,6 @@ class MezaUnifyUserTables extends Maintenance {
 				);
 			}
 			unset( $result );
-
-			// asdfasdfasdf FIXME
-			file_put_contents( $this->recordDir . "/AAA.$filename.log" , print_r( $tester, true ) );
 
 			// loop through all previously recorded rows
 			$records = explode("\n", file_get_contents( $filepath ) );
