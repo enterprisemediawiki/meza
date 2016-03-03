@@ -277,7 +277,7 @@ if ( file_exists( "$m_config/local/primewiki" ) ) {
 
 	// grab prime wiki data using closure to encapsulate the data
 	// and not overwrite existing config ($wgSitename, etc)
-	$primewiki = call_user_func( function() use ( $m_htdocs ) {
+	$primewiki = call_user_func( function() use ( $m_htdocs, $m_config ) {
 
 		$primeWikiId = trim( file_get_contents( "$m_config/local/primewiki" ) );
 
