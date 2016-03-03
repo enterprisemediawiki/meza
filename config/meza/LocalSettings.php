@@ -321,8 +321,12 @@ $wgMainCacheType = CACHE_MEMCACHED;
 $wgParserCacheType = CACHE_NONE; // optional; if set to CACHE_MEMCACHED, templates used to format query results in generic footer don't work
 $wgMessageCacheType = CACHE_MEMCACHED; // optional
 $wgMemCachedServers = array( "127.0.0.1:11211" );
-$wgSessionsInObjectCache = true; // optional
-$wgSessionCacheType = CACHE_MEMCACHED; // optional
+
+// memcached is setup and will work for sessions with meza, unless you use
+// SimpleSamlPhp. For that reason memcached is disabled for sessions. This will
+// be fixed in a later version.
+$wgSessionsInObjectCache = false; // optional
+$wgSessionCacheType = CACHE_NONE; // optional
 
 
 ## To enable image uploads, make sure the 'images' directory
