@@ -16,7 +16,7 @@ mv httpd.conf httpd.default.conf
 ln -s "$m_config/meza/httpd.conf" "$m_apache/conf/httpd.conf"
 
 # replace INSERT-DOMAIN-OR-IP with domain...or IP address
-sed -r -i "s/INSERT-DOMAIN-OR-IP/$mw_api_domain/g;" ./httpd.conf
+sed -r -i "s/INSERT-DOMAIN-OR-IP/$mw_api_domain/g;" "$m_config/meza/httpd.conf"
 
 # create logrotate file
 ln -s " $m_config/meza/logrotated_httpd" /etc/logrotate.d/httpd
