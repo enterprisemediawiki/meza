@@ -125,7 +125,7 @@ sed -r -i "s/'technicalcontact_email'.*$/'technicalcontact_email' => '$saml_admi
 # in httpd.conf. See link below for more info:
 # http://unix.stackexchange.com/questions/32908/how-to-insert-the-content-of-a-file-into-another-file-before-a-pattern-marker
 # FIXME: httpd.conf should not be modified
-sed -i -e "/ADD SPECIAL CONFIG BELOW/r $m_meza/scripts/config/SAML/saml_httpd.conf" "$m_apache/conf/httpd.conf"
+sed -i -e "/ADD SPECIAL CONFIG BELOW/r $m_config/template/saml_httpd.conf" "$m_config/meza/httpd.conf"
 
 # restart apache
 service httpd restart
@@ -177,6 +177,9 @@ sed -r -i "s/realname_attr/$realname_attr/g;" ~/SAML-LocalSettings-Additions.php
 sed -r -i "s/email_attr/$email_attr/g;" ~/SAML-LocalSettings-Additions.php
 
 # Add these lines to the bottom of LocalSettings.php, then remove the temp file
+if [ ! -f "$m_config/local/overrides.php" ]; then
+    echo -e "<?php\n\n" > "$m_config/local/overrides.php"
+fi
 cat ~/SAML-LocalSettings-Additions.php >> "$m_config/local/overrides.php";
 rm ~/SAML-LocalSettings-Additions.php
 

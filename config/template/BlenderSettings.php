@@ -1,7 +1,7 @@
 <?php
 
 $blenderTitle = "Meza Wikis";
-$blenderServer = "https://" . $_SERVER['SERVER_ADDR'] . "/";
+$blenderServer = "https://" . trim( file_get_contents( '/opt/meza/config/local/domain' ) ) . "/";
 $blenderScriptPath = '/WikiBlender';
 
 $primeWikiFile = '/opt/meza/config/local/primewiki';
