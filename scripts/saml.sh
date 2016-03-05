@@ -20,7 +20,7 @@ fi
 # and thus it needs to know how to get to the config.sh script on it's own
 #
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-source "/opt/meza/config/meza/config.sh"
+source "/opt/meza/config/core/config.sh"
 
 
 #
@@ -125,7 +125,7 @@ sed -r -i "s/'technicalcontact_email'.*$/'technicalcontact_email' => '$saml_admi
 # in httpd.conf. See link below for more info:
 # http://unix.stackexchange.com/questions/32908/how-to-insert-the-content-of-a-file-into-another-file-before-a-pattern-marker
 # FIXME: httpd.conf should not be modified
-sed -i -e "/ADD SPECIAL CONFIG BELOW/r $m_config/template/saml_httpd.conf" "$m_config/meza/httpd.conf"
+sed -i -e "/ADD SPECIAL CONFIG BELOW/r $m_config/template/saml_httpd.conf" "$m_config/core/httpd.conf"
 
 # restart apache
 service httpd restart

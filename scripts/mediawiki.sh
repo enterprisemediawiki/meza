@@ -92,7 +92,7 @@ fi
 #
 # Copy in LocalSettings.php
 #
-ln -s "$m_config/meza/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
+ln -s "$m_config/core/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
 cp "$m_config/template/setup.php" "$m_config/local/setup.php"
 
 

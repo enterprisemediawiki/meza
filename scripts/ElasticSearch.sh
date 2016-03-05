@@ -58,7 +58,7 @@ cd "$m_meza/scripts"
 rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
 
 # Add yum repo file
-ln -s "$m_config/meza/elasticsearch.repo" /etc/yum.repos.d/elasticsearch.repo
+ln -s "$m_config/core/elasticsearch.repo" /etc/yum.repos.d/elasticsearch.repo
 
 # Install repo
 yum -y install elasticsearch
@@ -87,7 +87,7 @@ echo "127.0.0.1 meza" >> /etc/hosts
 # Rename the standard config file and link to our custom file
 cd /etc/elasticsearch
 mv /etc/elasticsearch/elasticsearch.yml /etc/elasticsearch/elasticsearch-old.yml
-ln -s "$m_config/meza/elasticsearch.yml" /etc/elasticsearch/elasticsearch.yml
+ln -s "$m_config/core/elasticsearch.yml" /etc/elasticsearch/elasticsearch.yml
 
 # Make directories called out in elasticsearch.yml
 # ref: http://elasticsearch-users.115913.n3.nabble.com/Elasticsearch-Not-Working-td4059398.html

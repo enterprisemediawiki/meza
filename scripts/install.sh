@@ -295,7 +295,7 @@ fi
 
 # Load config constants. Unfortunately right now have to write out full path to
 # meza since we can't be certain of consistent method of accessing install.sh.
-source /opt/meza/config/meza/config.sh
+source /opt/meza/config/core/config.sh
 
 # Enable time sync
 # Ref: http://www.cyberciti.biz/faq/howto-install-ntp-to-synchronize-server-clock/
