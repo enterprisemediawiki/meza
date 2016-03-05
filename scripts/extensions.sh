@@ -59,7 +59,7 @@ echo -e "\n\n## meza: Install composer-supported extensions"
 cd "$m_mediawiki"
 cmd_profile "START extensions composer require"
 composer require \
-	mediawiki/semantic-media-wiki:~2.0 \
+	mediawiki/semantic-media-wiki:dev-master#7bd74da95fb63c497090480f325bd65836e3d219 \
 	mediawiki/semantic-result-formats:~2.0 \
 	mediawiki/sub-page-list:~1.1 \
 	mediawiki/semantic-meeting-minutes:~0.3 \

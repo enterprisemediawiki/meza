@@ -947,15 +947,15 @@ require_once $egExtensionLoader->registerLegacyExtension(
 #
 # Extension:PdfHandler
 #
-require_once $egExtensionLoader->registerLegacyExtension(
-	"PdfHandler",
-	"https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler",
-	"REL1_25"
-);
+// require_once $egExtensionLoader->registerLegacyExtension(
+// 	"PdfHandler",
+// 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler",
+// 	"REL1_25"
+// );
 // Location of PdfHandler dependencies
-$wgPdfProcessor = '/usr/bin/gs'; // installed via yum
-$wgPdfPostProcessor = '/usr/local/bin/convert'; // built from source
-$wgPdfInfo = '/usr/local/bin/pdfinfo'; // pre-built binaries installed
+// $wgPdfProcessor = '/usr/bin/gs'; // installed via yum
+// $wgPdfPostProcessor = '/usr/local/bin/convert'; // built from source
+// $wgPdfInfo = '/usr/local/bin/pdfinfo'; // pre-built binaries installed
 
 
 #
