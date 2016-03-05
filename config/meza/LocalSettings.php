@@ -16,7 +16,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  *    5) DATABASE SETUP
  *    6) GENERAL CONFIGURATION
  *    7) EXTENSION SETTINGS
- *    8) LOAD OVERRIDES
+ *    8) PERMISSIONS
+ *    9) LOAD OVERRIDES
  *
  **/
 
