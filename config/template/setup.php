@@ -21,3 +21,5 @@ $wgPasswordSender = "admin@example.com";
 // https://www.mediawiki.org/wiki/Manual:$wgEmergencyContact
 $wgEmergencyContact = $wgPasswordSender;
 
+// set a default $mezaAuthType for all wikis that don't specify one
+// $mezaAuthType = 'viewer-read';

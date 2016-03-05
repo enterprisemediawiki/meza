@@ -1141,12 +1141,97 @@ require_once $egExtensionLoader->registerLegacyExtension(
 
 
 
+/**
+ *  8) PERMISSIONS
+ *
+ *
+ *
+ **/
+if ( ! isset( $mezaAuthType ) ) {
+	$mezaAuthType = 'anon-edit'; // default: wide open!
+}
+if ( $mezaAuthType === 'anon-edit' ) {
 
+    // allow anonymous read
+    $wgGroupPermissions['*']['read'] = true;
+    $wgGroupPermissions['user']['read'] = true;
+
+    // allow anonymous write
+    $wgGroupPermissions['*']['edit'] = true;
+    $wgGroupPermissions['user']['edit'] = true;
+
+}
+
+else if ( $mezaAuthType === 'anon-read' ) {
+
+    // allow anonymous read
+    $wgGroupPermissions['*']['read'] = true;
+    $wgGroupPermissions['user']['read'] = true;
+
+    // allow anonymous write
+    $wgGroupPermissions['*']['edit'] = false;
+    $wgGroupPermissions['user']['edit'] = false;
+
+}
+
+else if ( $mezaAuthType === 'user-edit' ) {
+
+    // no anonymous
+    $wgGroupPermissions['*']['read'] = false;
+    $wgGroupPermissions['*']['edit'] = false;
+
+    // users read and write
+    $wgGroupPermissions['user']['read'] = true;
+    $wgGroupPermissions['user']['edit'] = true;
+
+}
+
+else if ( $mezaAuthType === 'user-read' ) {
+
+    // no anonymous
+    $wgGroupPermissions['*']['read'] = false;
+    $wgGroupPermissions['*']['edit'] = false;
+
+    // users read NOT write
+    $wgGroupPermissions['user']['read'] = true;
+    $wgGroupPermissions['user']['edit'] = false;
+
+    $wgGroupPermissions['Contributor'] = $wgGroupPermissions['user'];
+    $wgGroupPermissions['Contributor']['edit'] = true;
+
+}
+
+else if ( $mezaAuthType === 'viewer-read' ) {
+
+    // no anonymous or ordinary users
+    $wgGroupPermissions['*']['read'] = false;
+    $wgGroupPermissions['*']['edit'] = false;
+    $wgGroupPermissions['user']['read'] = false;
+    $wgGroupPermissions['user']['edit'] = false;
+
+    // load the access-denied extension because there appears to be no way to
+    // prevent registered users from viewing pages in stock mediawiki
+    require_once $egExtensionLoader->registerLegacyExtension(
+        'AccessDenied',
+        'https://github.com/JamesMontalvo3/AccessDenied.git',
+        'master'
+    );
+    $egAccessDeniedViewerGroup = "Viewer";
+
+    // create the Viewer group. Note this group requires no permissions
+    // since the extension will manage whether they can get into the wiki
+    $wgGroupPermissions['Viewer'] = $wgGroupPermissions['user'];
+
+    // Create a contributors group that can edit
+    $wgGroupPermissions['Contributor'] = $wgGroupPermissions['user'];
+    $wgGroupPermissions['Contributor']['edit'] = true;
+
+}
 
 
 
 /**
- *  8) LOAD OVERRIDES
+ *  9) LOAD OVERRIDES
  *
  *
  *

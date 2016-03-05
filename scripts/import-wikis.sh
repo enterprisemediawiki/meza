@@ -162,7 +162,6 @@ for d in */ ; do
 
 	# insert wiki name and auth type into setup.php if it's still "placeholder"
 	sed -r -i "s/wgSitename = 'placeholder';/wgSitename = '$wiki_name';/g;" "$wiki_install_path/config/setup.php"
-	sed -r -i "s/mezaAuthType = 'placeholder';/mezaAuthType = 'local_dev';/g;" "$wiki_install_path/config/setup.php"
 
 	# If setup.php already existed, it may have a $mezaCustomDBname set.`This
 	# import script normalizes all database names to be in the form
