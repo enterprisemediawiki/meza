@@ -62,12 +62,12 @@ if ( ! in_array( $wikiId, $wikis ) ) {
 
 }
 
-// Load all-wikis setup.php first, then allow wiki-specific setup.php to modify
-require_once "$m_config/local/setup.php";
+// Load all-wikis preLocalSettings_allWikis.php first, then allow wiki-specific preLocalSettings.php to modify
+require_once "$m_config/local/preLocalSettings_allWikis.php";
 
 // Gets wiki-specific config variables like:
 // $wgSitename, $mezaAuthType, $mezaDebug, $mezaEnableWikiEmail
-require_once "$m_htdocs/wikis/$wikiId/config/setup.php";
+require_once "$m_htdocs/wikis/$wikiId/config/preLocalSettings.php";
 
 
 
@@ -82,10 +82,10 @@ require_once "$m_htdocs/wikis/$wikiId/config/setup.php";
  *    1) Add to the URI you're requesting `requestDebug=true` to enable debug
  *       for just that request.
  *    2) Set `$mezaCommandLineDebug = true;` for debug on the command line.
- *       This is the default, which can be overriden in setup.php.
- *    3) Set `$mezaDebug = array( "NDC\Your-ndc", ... );` in a wiki's setup.php
+ *       This is the default, which can be overriden in preLocalSettings_allWiki.php.
+ *    3) Set `$mezaDebug = array( "NDC\Your-ndc", ... );` in a wiki's preLocalSettings.php
  *       to enable debug for just specific users on a single wiki.
- *    4) Set `$mezaDebug = true;` in a wiki's setup.php to enable debug for all
+ *    4) Set `$mezaDebug = true;` in a wiki's preLocalSettings.php to enable debug for all
  *       users of a single wiki.
  *    5) Set `$mezaForceDebug = true;` to turn on debug for all users and wikis
  **/
@@ -182,8 +182,8 @@ $wgFavicon = "/wikis/$wikiId/config/favicon.ico";
 // https://www.mediawiki.org/wiki/Manual:$wgMetaNamespace
 $wgMetaNamespace = str_replace( ' ', '_', $wgSitename );
 
-// @todo: handle auth type from setup.php
-// @todo: handle debug from setup.php
+// @todo: handle auth type from preLocalSettings.php
+// @todo: handle debug from preLocalSettings_allWikis.php
 
 // From MW web install: Uncomment this to disable output compression
 # $wgDisableOutputCompression = true;
@@ -282,7 +282,7 @@ if ( file_exists( "$m_config/local/primewiki" ) ) {
 
 		$primeWikiId = trim( file_get_contents( "$m_config/local/primewiki" ) );
 
-		require_once "$m_htdocs/wikis/$primeWikiId/config/setup.php";
+		require_once "$m_htdocs/wikis/$primeWikiId/config/preLocalSettings.php";
 
 		if ( isset( $mezaCustomDBname ) ) {
 			$primeWikiDBname = $mezaCustomDBname;
@@ -1240,9 +1240,9 @@ require_once $egExtensionLoader->registerLegacyExtension(
  *
  *
  **/
-if ( file_exists( "$m_config/local/overrides.php" ) ) {
-	require_once "$m_config/local/overrides.php";
+if ( file_exists( "$m_config/local/postLocalSettings_allWikis.php" ) ) {
+	require_once "$m_config/local/postLocalSettings_allWikis.php";
 }
-if ( file_exists( "$m_htdocs/wikis/$wikiId/config/overrides.php" ) ) {
-	require_once "$m_htdocs/wikis/$wikiId/config/overrides.php";
+if ( file_exists( "$m_htdocs/wikis/$wikiId/config/postLocalSettings.php" ) ) {
+	require_once "$m_htdocs/wikis/$wikiId/config/postLocalSettings.php";
 }

@@ -93,17 +93,17 @@ fi
 # Copy in LocalSettings.php
 #
 ln -s "$m_config/core/LocalSettings.php" "$m_htdocs/mediawiki/LocalSettings.php"
-cp "$m_config/template/setup.php" "$m_config/local/setup.php"
+cp "$m_config/template/preLocalSettings_allWikis.php" "$m_config/local/preLocalSettings_allWikis.php"
 
 
 #
-# Add common database credentials to setup.php
+# Add common database credentials to preLocalSettings_allWikis.php
 #
-echo -e "\n\n"                              >> "$m_config/local/setup.php"
-echo "// All-wiki db user and password"     >> "$m_config/local/setup.php"
-echo "\$wgDBuser = 'root';"                 >> "$m_config/local/setup.php"
-echo "\$wgDBpassword = '$mysql_root_pass';" >> "$m_config/local/setup.php"
-echo -e "\n\n"                              >> "$m_config/local/setup.php"
+echo -e "\n\n"                              >> "$m_config/local/preLocalSettings_allWikis.php"
+echo "// All-wiki db user and password"     >> "$m_config/local/preLocalSettings_allWikis.php"
+echo "\$wgDBuser = 'root';"                 >> "$m_config/local/preLocalSettings_allWikis.php"
+echo "\$wgDBpassword = '$mysql_root_pass';" >> "$m_config/local/preLocalSettings_allWikis.php"
+echo -e "\n\n"                              >> "$m_config/local/preLocalSettings_allWikis.php"
 
 #
 # Get WikiBlender

@@ -107,7 +107,7 @@ skipped_wikis=""
 #   wiki1
 #     images[/|.tar|.tar.gz]
 #     wiki.sql
-#     config/ (optional logo.png, favicon.ico, setup.php, CustomSettings.php)
+#     config/ (optional logo.png, favicon.ico, preLocalSettings.php, CustomSettings.php)
 #   wiki2
 #     ...
 #   wikiN
@@ -145,30 +145,40 @@ for d in */ ; do
 		mkdir "$wiki_install_path/config"
 	fi
 
-	# check if logo.png, favicon.ico, setup.php and overrides.php exist. Else use defaults
+	# check if logo.png, favicon.ico, preLocalSettings.php and postLocalSettings_allWikis.php exist. Else use defaults
 	if [ ! -f "$wiki_install_path/config/logo.png" ]; then
 		cp "$m_config/template/wiki-init/config/logo.png" "$wiki_install_path/config/logo.png"
 	fi
 	if [ ! -f "$wiki_install_path/config/favicon.ico" ]; then
 		cp "$m_config/template/wiki-init/config/favicon.ico" "$wiki_install_path/config/favicon.ico"
 	fi
-	if [ ! -f "$wiki_install_path/config/overrides.php" ]; then
-		cp "$m_config/template/wiki-init/config/overrides.php" "$wiki_install_path/config/overrides.php"
+	if [ ! -f "$wiki_install_path/config/postLocalSettings.php" ]; then
+		# old method used overrides.php...rename that file if it exists
+		if [ -f "$wiki_install_path/config/overrides.php" ]; then
+			mv "$wiki_install_path/config/overrides.php" "$wiki_install_path/config/postLocalSettings.php"
+		else
+			cp "$m_config/template/wiki-init/config/postLocalSettings.php" "$wiki_install_path/config/postLocalSettings.php"
+		fi
 	fi
-	if [ ! -f "$wiki_install_path/config/setup.php" ]; then
-		cp "$m_config/template/wiki-init/config/setup.php" "$wiki_install_path/config/setup.php"
+	if [ ! -f "$wiki_install_path/config/preLocalSettings.php" ]; then
+		# old method used setup.php...rename that file if it exists
+		if [ -f "$wiki_install_path/config/setup.php" ]; then
+			mv "$wiki_install_path/config/setup.php" "$wiki_install_path/config/preLocalSettings.php"
+		else
+			cp "$m_config/template/wiki-init/config/preLocalSettings.php" "$wiki_install_path/config/preLocalSettings.php"
+		fi
 	fi
 	chmod -R 755 "$wiki_install_path/config"
 
-	# insert wiki name and auth type into setup.php if it's still "placeholder"
-	sed -r -i "s/wgSitename = 'placeholder';/wgSitename = '$wiki_name';/g;" "$wiki_install_path/config/setup.php"
+	# insert wiki name and auth type into preLocalSettings.php if it's still "placeholder"
+	sed -r -i "s/wgSitename = 'placeholder';/wgSitename = '$wiki_name';/g;" "$wiki_install_path/config/preLocalSettings.php"
 
-	# If setup.php already existed, it may have a $mezaCustomDBname set.`This
-	# import script normalizes all database names to be in the form
+	# If preLocalSettings.php already existed, it may have a $mezaCustomDBname set.
+	# This import script normalizes all database names to be in the form
 	# "wiki_$wiki_id", so if $wiki_id is "eva" then the database is "wiki_eva"
 	#
 	# This command just comments out the old database name
-	sed -i "s/\$mezaCustomDBname/\/\/ \$mezaCustomDBname/g;" "$wiki_install_path/config/setup.php"
+	sed -i "s/\$mezaCustomDBname/\/\/ \$mezaCustomDBname/g;" "$wiki_install_path/config/preLocalSettings.php"
 
 	# import SQL file
 	# Import database - Ref: https://www.mediawiki.org/wiki/Manual:Restoring_a_wiki_from_backup
@@ -196,15 +206,16 @@ for d in */ ; do
 		# does not mention that. Attempting without that. If that is required, then
 		# will have to determine a method to test for completion of rebuild, and run it
 		# in a while loop
+		rebuild_exception_log="$m_meza/logs/rebuilddata-exceptions-$wiki_id-.log"
 		echo "Running Semantic MediaWiki maintenance script \"rebuildData.php\""
-		WIKI="$wiki_id" php "$m_mediawiki/extensions/SemanticMediaWiki/maintenance/rebuildData.php" -d 5 -v
+		WIKI="$wiki_id" php "$m_mediawiki/extensions/SemanticMediaWiki/maintenance/rebuildData.php" -d 5 -v --ignore-exceptions --exception-log="$rebuild_exception_log"
 
 		# Run runJobs.php
 		# Note that should prob be removed: Daren saw 12k+ jobs in the queue after performing the above steps
 		echo "Running MediaWiki maintenance script \"runJobs.php\""
-		echo "\$wgDisableSearchUpdate = true;" >> "$m_htdocs/wikis/$wiki_id/config/overrides.php"
+		echo "\$wgDisableSearchUpdate = true;" >> "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
 		WIKI="$wiki_id" php "$m_mediawiki/maintenance/runJobs.php" --quick
-		sed -r -i 's/\$wgDisableSearchUpdate = true;//g;' "$m_htdocs/wikis/$wiki_id/config/overrides.php"
+		sed -r -i 's/\$wgDisableSearchUpdate = true;//g;' "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
 	else
 		echo -e "\nSKIPPING SemanticMediaWiki rebuildData.php and runjobs.php (no SMW)"
 	fi
@@ -219,8 +230,10 @@ for d in */ ; do
 	fi
 
 	complete_msg="Wiki '$wiki_id' has been imported"
+	if [[ -f "$rebuild_exception_log" ]]; then
+		complete_msg="$complete_msg\nSemanticMediaWiki rebuildData exceptions:\n\n$(cat $rebuild_exception_log)"
+	fi
 	echo -e "\n$complete_msg\n"
-
 	if [[ ! -z "$slackwebhook" ]]; then
 		bash "$m_meza/scripts/slack.sh" "$slackwebhook" "$complete_msg"
 	fi

@@ -805,7 +805,7 @@ class MezaUnifyUserTables extends Maintenance {
 
 		global $m_htdocs, $wgDBuser, $wgDBpassword;
 
-		include "$m_htdocs/wikis/$wikiID/config/setup.php";
+		include "$m_htdocs/wikis/$wikiID/config/preLocalSettings.php";
 
 		if ( isset( $mezaCustomDBname ) ) {
 			$wikiDBname = $mezaCustomDBname;

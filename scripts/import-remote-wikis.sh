@@ -147,7 +147,7 @@ do
 	echo "  Getting files..."
 	rsync -rva "./$wiki/" "/root/wikis/$wiki"
 
-	wiki_db=`php /opt/meza/scripts/getDatabaseNameFromSetup.php $full_remote_wikis_path/$wiki/config/setup.php`
+	wiki_db=`php /opt/meza/scripts/getDatabaseNameFromSetup.php $full_remote_wikis_path/$wiki/config/preLocalSettings.php`
 	if [ -z "$wiki_db" ]; then
 		wiki_db="wiki_$wiki"
 	fi
