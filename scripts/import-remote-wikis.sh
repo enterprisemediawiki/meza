@@ -150,10 +150,11 @@ do
 	wiki_pre_localsettings="$full_remote_wikis_path/$wiki/config/preLocalSettings.php"
 	if [ ! -f "$wiki_pre_localsettings" ]; then
 		# maintain old method of getting wiki db
+		echo -e "\nThere is no preLocalSettings.php file; using setup.php instead\n"
 		wiki_pre_localsettings="$full_remote_wikis_path/$wiki/config/setup.php"
 	fi
 
-	wiki_db=`php /opt/meza/scripts/getDatabaseNameFromSetup.php $full_remote_wikis_path/$wiki/config/preLocalSettings.php`
+	wiki_db=`php /opt/meza/scripts/getDatabaseNameFromSetup.php $wiki_pre_localsettings`
 	if [ -z "$wiki_db" ]; then
 		wiki_db="wiki_$wiki"
 	fi
