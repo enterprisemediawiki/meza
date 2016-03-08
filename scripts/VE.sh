@@ -77,7 +77,7 @@ echo "******* Downloading configuration files *******"
 cd "$m_meza/scripts"
 
 # Copy Parsoid settings from Meza to Parsoid install
-ln -s "$m_config/meza/localsettings.js" /etc/parsoid/api/localsettings.js
+ln -s "$m_config/core/localsettings.js" /etc/parsoid/api/localsettings.js
 
 # MediaWiki's API URI, for parsoid. Parsoid communicates with MediaWiki PHP API
 # via Apache httpd over port 9000. Note: protocol was $mw_api_protocol, but was
@@ -102,7 +102,7 @@ chown parsoid:parsoid /etc/parsoid -R
 # https://github.com/narath/brigopedia#setup-visualeditor-extension
 # Create service script
 echo "******* Creating parsoid service *******"
-ln -s "$m_config/meza/initd_parsoid.sh" /etc/init.d/parsoid
+ln -s "$m_config/core/initd_parsoid.sh" /etc/init.d/parsoid
 chmod 755 /etc/init.d/parsoid
 chkconfig --add /etc/init.d/parsoid
 

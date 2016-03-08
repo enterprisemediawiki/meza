@@ -1,7 +1,7 @@
 <?php
 
 /**
- * setup.php is used to modify all wiki settings. This is where any
+ * preLocalSettings.php is used to modify all wiki settings. This is where any
  * any changes to the standard meza configuration should be kept. It also
  * is where database user and password info is stored
  **/
@@ -21,3 +21,5 @@ $wgPasswordSender = "admin@example.com";
 // https://www.mediawiki.org/wiki/Manual:$wgEmergencyContact
 $wgEmergencyContact = $wgPasswordSender;
 
+// set a default $mezaAuthType for all wikis that don't specify one
+// $mezaAuthType = 'viewer-read';

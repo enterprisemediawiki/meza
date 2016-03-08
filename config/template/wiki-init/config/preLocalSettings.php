@@ -19,10 +19,9 @@
 $wgSitename = 'placeholder';
 
 /**
- * meza uses an authentication system with a few default types. They are:
- * ndc_closed, ndc_open, local_dev. FIXME: need better docs
+ * meza uses an authentication system with a few default types. See LocalSettings.php
  **/
-$mezaAuthType = 'placeholder';
+// $mezaAuthType = 'viewer-read';
 
 /**
  * Enables several debugging options. FIXME: better docs (allow entering usernames)

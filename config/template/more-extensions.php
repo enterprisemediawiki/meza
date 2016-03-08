@@ -4,13 +4,14 @@
  *
  *  While you can choose to load additional extensions into meza however you'd,
  *  this is one method. Move this file into `/opt/meza/config/local` and rename
- *  it to `overrides.php`. If you already have `overrides.php` and would prefer
- *  not to add all this content to it, pick another name and `require_once` the
- *  file.
+ *  it to `postLocalSettings_allWikis.php`. If you already have
+ *  `postLocalSettings_allWikis.php` and would prefer not to add all this
+ *  content to it, pick another name and `require_once` the file.
  *
  *  In the file below five other extensions are loaded, one by default and four
  *  only if certain variables are set to `true`. Enabling these four extensions
- *  can be done in each wiki's `setup.php` file (not the all-wiki `setup.php`)
+ *  can be done in each wiki's `preLocalSettings.php` file (not the all-wiki
+ *  `preLocalSettings.php`)
  *
  **/
 

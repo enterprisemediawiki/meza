@@ -15,8 +15,9 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  *    4) EMAIL
  *    5) DATABASE SETUP
  *    6) GENERAL CONFIGURATION
- *    7) EXTENSION SETTINGS
- *    8) LOAD OVERRIDES
+ *    7) PERMISSIONS
+ *    8) EXTENSION SETTINGS
+ *    9) LOAD OVERRIDES
  *
  **/
 
@@ -61,12 +62,12 @@ if ( ! in_array( $wikiId, $wikis ) ) {
 
 }
 
-// Load all-wikis setup.php first, then allow wiki-specific setup.php to modify
-require_once "$m_config/local/setup.php";
+// Load all-wikis preLocalSettings_allWikis.php first, then allow wiki-specific preLocalSettings.php to modify
+require_once "$m_config/local/preLocalSettings_allWikis.php";
 
 // Gets wiki-specific config variables like:
 // $wgSitename, $mezaAuthType, $mezaDebug, $mezaEnableWikiEmail
-require_once "$m_htdocs/wikis/$wikiId/config/setup.php";
+require_once "$m_htdocs/wikis/$wikiId/config/preLocalSettings.php";
 
 
 
@@ -81,10 +82,10 @@ require_once "$m_htdocs/wikis/$wikiId/config/setup.php";
  *    1) Add to the URI you're requesting `requestDebug=true` to enable debug
  *       for just that request.
  *    2) Set `$mezaCommandLineDebug = true;` for debug on the command line.
- *       This is the default, which can be overriden in setup.php.
- *    3) Set `$mezaDebug = array( "NDC\Your-ndc", ... );` in a wiki's setup.sh
+ *       This is the default, which can be overriden in preLocalSettings_allWiki.php.
+ *    3) Set `$mezaDebug = array( "NDC\Your-ndc", ... );` in a wiki's preLocalSettings.php
  *       to enable debug for just specific users on a single wiki.
- *    4) Set `$mezaDebug = true;` in a wiki's setup.sh to enable debug for all
+ *    4) Set `$mezaDebug = true;` in a wiki's preLocalSettings.php to enable debug for all
  *       users of a single wiki.
  *    5) Set `$mezaForceDebug = true;` to turn on debug for all users and wikis
  **/
@@ -181,8 +182,8 @@ $wgFavicon = "/wikis/$wikiId/config/favicon.ico";
 // https://www.mediawiki.org/wiki/Manual:$wgMetaNamespace
 $wgMetaNamespace = str_replace( ' ', '_', $wgSitename );
 
-// @todo: handle auth type from setup.php
-// @todo: handle debug from setup.php
+// @todo: handle auth type from preLocalSettings.php
+// @todo: handle debug from preLocalSettings_allWikis.php
 
 // From MW web install: Uncomment this to disable output compression
 # $wgDisableOutputCompression = true;
@@ -281,7 +282,7 @@ if ( file_exists( "$m_config/local/primewiki" ) ) {
 
 		$primeWikiId = trim( file_get_contents( "$m_config/local/primewiki" ) );
 
-		require_once "$m_htdocs/wikis/$primeWikiId/config/setup.php";
+		require_once "$m_htdocs/wikis/$primeWikiId/config/preLocalSettings.php";
 
 		if ( isset( $mezaCustomDBname ) ) {
 			$primeWikiDBname = $mezaCustomDBname;
@@ -484,6 +485,96 @@ $wgFileExtensions = array(
 
 
 
+/**
+ *  7) PERMISSIONS
+ *
+ *
+ *
+ **/
+if ( ! isset( $mezaAuthType ) ) {
+	$mezaAuthType = 'anon-edit'; // default: wide open!
+}
+if ( $mezaAuthType === 'anon-edit' ) {
+
+    // allow anonymous read
+    $wgGroupPermissions['*']['read'] = true;
+    $wgGroupPermissions['user']['read'] = true;
+
+    // allow anonymous write
+    $wgGroupPermissions['*']['edit'] = true;
+    $wgGroupPermissions['user']['edit'] = true;
+
+}
+
+else if ( $mezaAuthType === 'anon-read' ) {
+
+    // allow anonymous read
+    $wgGroupPermissions['*']['read'] = true;
+    $wgGroupPermissions['user']['read'] = true;
+
+    // allow anonymous write
+    $wgGroupPermissions['*']['edit'] = false;
+    $wgGroupPermissions['user']['edit'] = true;
+
+}
+
+else if ( $mezaAuthType === 'user-edit' ) {
+
+    // no anonymous
+    $wgGroupPermissions['*']['read'] = false;
+    $wgGroupPermissions['*']['edit'] = false;
+
+    // users read and write
+    $wgGroupPermissions['user']['read'] = true;
+    $wgGroupPermissions['user']['edit'] = true;
+
+}
+
+else if ( $mezaAuthType === 'user-read' ) {
+
+    // no anonymous
+    $wgGroupPermissions['*']['read'] = false;
+    $wgGroupPermissions['*']['edit'] = false;
+
+    // users read NOT write
+    $wgGroupPermissions['user']['read'] = true;
+    $wgGroupPermissions['user']['edit'] = false;
+
+    $wgGroupPermissions['Contributor'] = $wgGroupPermissions['user'];
+    $wgGroupPermissions['Contributor']['edit'] = true;
+
+}
+
+else if ( $mezaAuthType === 'viewer-read' ) {
+
+    // no anonymous or ordinary users
+    $wgGroupPermissions['*']['read'] = false;
+    $wgGroupPermissions['*']['edit'] = false;
+    $wgGroupPermissions['user']['read'] = false;
+    $wgGroupPermissions['user']['edit'] = false;
+
+    // load the access-denied extension because there appears to be no way to
+    // prevent registered users from viewing pages in stock mediawiki
+    require_once $egExtensionLoader->registerLegacyExtension(
+        'AccessDenied',
+        'https://github.com/JamesMontalvo3/AccessDenied.git',
+        'master'
+    );
+    $egAccessDeniedViewerGroup = "Viewer";
+
+    // create the Viewer group. Note this group requires no permissions
+    // since the extension will manage whether they can get into the wiki
+    $wgGroupPermissions['Viewer'] = $wgGroupPermissions['user'];
+
+    // Create a contributors group that can edit
+    $wgGroupPermissions['Contributor'] = $wgGroupPermissions['user'];
+    $wgGroupPermissions['Contributor']['edit'] = true;
+
+}
+
+
+
+
 
 
 
@@ -491,7 +582,7 @@ $wgFileExtensions = array(
 
 
 /**
- *  7) EXTENSION SETTINGS
+ *  8) EXTENSION SETTINGS
  *
  *  Code to load the extension "ExtensionLoader", which then installs and loads
  *  other extensions as defined in "ExtensionSettings.php". Note that the file
@@ -947,15 +1038,15 @@ require_once $egExtensionLoader->registerLegacyExtension(
 #
 # Extension:PdfHandler
 #
-require_once $egExtensionLoader->registerLegacyExtension(
-	"PdfHandler",
-	"https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler",
-	"REL1_25"
-);
+// require_once $egExtensionLoader->registerLegacyExtension(
+// 	"PdfHandler",
+// 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler",
+// 	"REL1_25"
+// );
 // Location of PdfHandler dependencies
-$wgPdfProcessor = '/usr/bin/gs'; // installed via yum
-$wgPdfPostProcessor = '/usr/local/bin/convert'; // built from source
-$wgPdfInfo = '/usr/local/bin/pdfinfo'; // pre-built binaries installed
+// $wgPdfProcessor = '/usr/bin/gs'; // installed via yum
+// $wgPdfPostProcessor = '/usr/local/bin/convert'; // built from source
+// $wgPdfInfo = '/usr/local/bin/pdfinfo'; // pre-built binaries installed
 
 
 #
@@ -1142,19 +1233,16 @@ require_once $egExtensionLoader->registerLegacyExtension(
 
 
 
-
-
-
 /**
- *  8) LOAD OVERRIDES
+ *  9) LOAD OVERRIDES
  *
  *
  *
  *
  **/
-if ( file_exists( "$m_config/local/overrides.php" ) ) {
-	require_once "$m_config/local/overrides.php";
+if ( file_exists( "$m_config/local/postLocalSettings_allWikis.php" ) ) {
+	require_once "$m_config/local/postLocalSettings_allWikis.php";
 }
-if ( file_exists( "$m_htdocs/wikis/$wikiId/config/overrides.php" ) ) {
-	require_once "$m_htdocs/wikis/$wikiId/config/overrides.php";
+if ( file_exists( "$m_htdocs/wikis/$wikiId/config/postLocalSettings.php" ) ) {
+	require_once "$m_htdocs/wikis/$wikiId/config/postLocalSettings.php";
 }
