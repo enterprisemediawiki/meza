@@ -112,7 +112,6 @@ echo "Installing WikiBlender"
 cd "$m_htdocs"
 git clone https://github.com/jamesmontalvo3/WikiBlender.git
 cd WikiBlender
-git checkout rebaseline # use rebaseline until WikiBlender is updated
 cp "$m_config/template/BlenderSettings.php" ./BlenderSettings.php
 
 # end of script
