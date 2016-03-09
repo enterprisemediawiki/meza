@@ -553,15 +553,6 @@ else if ( $mezaAuthType === 'viewer-read' ) {
     $wgGroupPermissions['user']['read'] = false;
     $wgGroupPermissions['user']['edit'] = false;
 
-    // load the access-denied extension because there appears to be no way to
-    // prevent registered users from viewing pages in stock mediawiki
-    require_once $egExtensionLoader->registerLegacyExtension(
-        'AccessDenied',
-        'https://github.com/JamesMontalvo3/AccessDenied.git',
-        'master'
-    );
-    $egAccessDeniedViewerGroup = "Viewer";
-
     // create the Viewer group. Note this group requires no permissions
     // since the extension will manage whether they can get into the wiki
     $wgGroupPermissions['Viewer'] = $wgGroupPermissions['user'];

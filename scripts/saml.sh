@@ -169,19 +169,27 @@ git clone https://github.com/jamesmontalvo3/AccessDenied
 # added to some non-LocalSettings.php file? Something like deltas.php)
 #
 # First: make temporary file
-cp "$m_config/template/SAML-LocalSettings-Additions.php" ~/SAML-LocalSettings-Additions.php
+cp "$m_config/template/SAML-postLocalSettings.php" ~/SAML-postLocalSettings.php
 
 # Replace attributes with user input
-sed -r -i "s/username_attr/$username_attr/g;" ~/SAML-LocalSettings-Additions.php
-sed -r -i "s/realname_attr/$realname_attr/g;" ~/SAML-LocalSettings-Additions.php
-sed -r -i "s/email_attr/$email_attr/g;" ~/SAML-LocalSettings-Additions.php
+sed -r -i "s/username_attr/$username_attr/g;" ~/SAML-postLocalSettings.php
+sed -r -i "s/realname_attr/$realname_attr/g;" ~/SAML-postLocalSettings.php
+sed -r -i "s/email_attr/$email_attr/g;" ~/SAML-postLocalSettings.php
 
-# Add these lines to the bottom of LocalSettings.php, then remove the temp file
+# Add these lines to the bottom of postLocalSettings_allWikis.php, then remove the temp file
 if [ ! -f "$m_config/local/postLocalSettings_allWikis.php" ]; then
     echo -e "<?php\n\n" > "$m_config/local/postLocalSettings_allWikis.php"
 fi
-cat ~/SAML-LocalSettings-Additions.php >> "$m_config/local/postLocalSettings_allWikis.php";
-rm ~/SAML-LocalSettings-Additions.php
+cat ~/SAML-postLocalSettings.php >> "$m_config/local/postLocalSettings_allWikis.php";
+rm ~/SAML-postLocalSettings.php
+
+
+# Add these lines to the bottom of preLocalSettings_allWikis.php, then remove the temp file
+# these disable account creation for users
+if [ ! -f "$m_config/local/preLocalSettings_allWikis.php" ]; then
+    echo -e "<?php\n\n" > "$m_config/local/preLocalSettings_allWikis.php"
+fi
+cat "$m_config/template/SAML-preLocalSettings.php" >> "$m_config/local/preLocalSettings_allWikis.php";
 
 
 echo "Complete with SAML setup"
