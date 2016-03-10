@@ -23,61 +23,94 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source "/opt/meza/config/core/config.sh"
 
 
+if [ -f "$m_config/local/saml-setup-config.sh" ]; then
+	source "$m_config/local/saml-setup-config.sh"
+fi
+
 #
 # Get admin name
 #
-echo -e "\nType a SAML admin full name and press [ENTER]:"
-read saml_admin
+if [ -z "$saml_admin" ]; then
+	echo -e "\nType a SAML admin full name and press [ENTER]:"
+	read saml_admin
+fi
 
 
 #
 # Get admin password
 #
 default_saml_password="1234"
-echo -e "\nType a SAML admin password and press [ENTER]:"
-read -s saml_password
-saml_password=${saml_password:-$default_saml_password}
+if [ -z "$saml_password" ]; then
+	echo -e "\nType a SAML admin password and press [ENTER]:"
+	read -s saml_password
+	saml_password=${saml_password:-$default_saml_password}
+fi
 
 
 #
 # Get admin email
 #
-echo -e "\nType a SAML admin e-mail and press [ENTER]:"
-read saml_admin_email
+if [ -z "$saml_admin_email" ]; then
+	echo -e "\nType a SAML admin e-mail and press [ENTER]:"
+	read saml_admin_email
+fi
 
 
 #
 # Setup identity provider and service provider
 #
-echo -e "\nIdentity Provider (IdP) then [ENTER]:"
-echo -e "Ex: Probably your identity provider's URL, like https://id.example.com"
-read idp_entity_id
+if [ -z "$idp_entity_id" ]; then
+	echo -e "\nIdentity Provider (IdP) then [ENTER]:"
+	echo -e "Ex: Probably your identity provider's URL, like https://id.example.com"
+	read idp_entity_id
+fi
 
-echo -e "\nIdP sign-on URL then [ENTER]:"
-read sign_on_url
+if [ -z "$sign_on_url" ]; then
+	echo -e "\nIdP sign-on URL then [ENTER]:"
+	read sign_on_url
+fi
 
-echo -e "\nIdP logout URL then [ENTER]:"
-read logout_url
 
-echo -e "\nIdP certificate fingerprint then [ENTER]:"
-read cert_fingerprint
+if [ -z "$logout_url" ]; then
+	echo -e "\nIdP logout URL then [ENTER]:"
+	read logout_url
+fi
 
-echo -e "\nService Provider (SP) entity ID then [ENTER]:"
-echo -e "Ex: Probably your application's URL, like https://myapp.example.com"
-read sp_entity_id
+if [ -z "$cert_fingerprint" ]; then
+	echo -e "\nIdP certificate fingerprint then [ENTER]:"
+	read cert_fingerprint
+fi
 
-echo -e "\nName-ID Policy then [ENTER]:"
-echo -e "Ex: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
-read name_id_policy
 
-echo -e "\nSAML attribute name to map to MediaWiki username then [ENTER]:"
-read username_attr
+if [ -z "$sp_entity_id" ]; then
+	echo -e "\nService Provider (SP) entity ID then [ENTER]:"
+	echo -e "Ex: Probably your application's URL, like https://myapp.example.com"
+	read sp_entity_id
+fi
 
-echo -e "\nSAML attribute name to map to MediaWiki realname then [ENTER]:"
-read realname_attr
+if [ -z "$name_id_policy" ]; then
+	echo -e "\nName-ID Policy then [ENTER]:"
+	echo -e "Ex: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+	read name_id_policy
+fi
 
-echo -e "\nSAML attribute name to map to MediaWiki e-mail then [ENTER]:"
-read email_attr
+
+if [ -z "$username_attr" ]; then
+	echo -e "\nSAML attribute name to map to MediaWiki username then [ENTER]:"
+	read username_attr
+fi
+
+
+if [ -z "$realname_attr" ]; then
+	echo -e "\nSAML attribute name to map to MediaWiki realname then [ENTER]:"
+	read realname_attr
+fi
+
+
+if [ -z "$email_attr" ]; then
+	echo -e "\nSAML attribute name to map to MediaWiki e-mail then [ENTER]:"
+	read email_attr
+fi
 
 
 # Escape values of inputs which could have disallowed characters: / \ &
