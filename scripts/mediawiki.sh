@@ -105,6 +105,7 @@ echo "\$wgDBuser = 'root';"                 >> "$m_config/local/preLocalSettings
 echo "\$wgDBpassword = '$mysql_root_pass';" >> "$m_config/local/preLocalSettings_allWikis.php"
 echo -e "\n\n"                              >> "$m_config/local/preLocalSettings_allWikis.php"
 
+
 #
 # Get WikiBlender
 #
@@ -112,7 +113,9 @@ echo "Installing WikiBlender"
 cd "$m_htdocs"
 git clone https://github.com/jamesmontalvo3/WikiBlender.git
 cd WikiBlender
-cp "$m_config/template/BlenderSettings.php" ./BlenderSettings.php
+ln -s "$m_config/core/BlenderSettings.php" ./BlenderSettings.php
+cp "$m_config/template/LandingPage.php" "$m_config/local/LandingPage.php"
+
 
 # end of script
 echo -e "\n\nMediaWiki has been installed"
