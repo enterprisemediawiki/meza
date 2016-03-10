@@ -14,7 +14,7 @@ if ( file_exists( $primeWikiFile ) ) {
 }
 
 // Location of wikis directory
-$blenderWikisDir = __DIR__ . '/../wikis';
+$blenderWikisDir = '/opt/meza/config/wikis';
 
 // Everything above is standard for all meza. This file has server-specific settings.
 require_once '/opt/meza/config/local/LandingPage.php';

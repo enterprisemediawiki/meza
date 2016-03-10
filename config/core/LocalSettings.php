@@ -131,7 +131,7 @@ if ( $debug ) {
 	ini_set( 'log_errors', 1 );
 
 	// Output errors to log file
-	ini_set( 'error_log', __DIR__ . '/php.log' );
+	ini_set( 'error_log', "$m_meza/logs/php.log" );
 
 	// MediaWiki Debug Tools
 	$wgShowExceptionDetails = true;
