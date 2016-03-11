@@ -194,10 +194,6 @@ echo -e "\n"
 cd "$m_mediawiki/extensions"
 git clone https://github.com/jornane/mwSimpleSamlAuth.git SimpleSamlAuth -b v0.6
 
-# Clone Extension:AccessDenied
-# Same applies here about loading with ExtensionLoader
-git clone https://github.com/jamesmontalvo3/AccessDenied
-
 # Add Exension:SimpleSamlAuth lines to LocalSettings.php (@todo should this be
 # added to some non-LocalSettings.php file? Something like deltas.php)
 #

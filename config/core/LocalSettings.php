@@ -553,9 +553,13 @@ else if ( $mezaAuthType === 'viewer-read' ) {
     $wgGroupPermissions['user']['read'] = false;
     $wgGroupPermissions['user']['edit'] = false;
 
-    // create the Viewer group. Note this group requires no permissions
-    // since the extension will manage whether they can get into the wiki
+    // create the Viewer group with read permissions
     $wgGroupPermissions['Viewer'] = $wgGroupPermissions['user'];
+    $wgGroupPermissions['Viewer']['read'] = true;
+
+    // also explicitly give sysop read since you otherwise end up with
+    // a chicken/egg situation prior to giving people Viewer
+    $wgGroupPermissions['sysop']['read'] = true;
 
     // Create a contributors group that can edit
     $wgGroupPermissions['Contributor'] = $wgGroupPermissions['user'];
