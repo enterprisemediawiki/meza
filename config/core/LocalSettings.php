@@ -1157,7 +1157,7 @@ require_once $egExtensionLoader->registerLegacyExtension(
 $wgApiFrameOptions = 'SAMEORIGIN';
 
 // Use UploadWizard by default in navigation bar
-$wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard"; //Update with #156
+$wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard"; 
 $wgUploadWizardConfig = array(
 	'debug' => false,
 	'autoCategory' => 'Uploaded with UploadWizard',
@@ -1169,6 +1169,16 @@ $wgUploadWizardConfig = array(
 	'enableMultiFileSelect' => true,
 	'tutorial' => array('skip' => true),
 	'fileExtensions' => $wgFileExtensions //omitting this can cause errors
+    	'licensing' => array(
+		'ownWorkDefault' => 'own',
+		'ownWork' => array(
+			'type' => 'or',
+			'template' => 'licensing', // this adds a link to Template:Licensing to the file info page
+			'licenses' => array(
+				'generic',
+			)
+		),
+	),
 );
 
 
