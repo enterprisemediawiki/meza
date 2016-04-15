@@ -2,9 +2,9 @@
 /**
  *  Additional extensions for meza
  *
- *  While you can choose to load additional extensions into meza however you'd,
- *  this is one method. Move this file into `/opt/meza/config/local` and rename
- *  it to `postLocalSettings_allWikis.php`. If you already have
+ *  While you can choose to load additional extensions into meza however you'd
+ *  like, this is one method. Move this file into `/opt/meza/config/local` and
+ *  rename it to `postLocalSettings_allWikis.php`. If you already have
  *  `postLocalSettings_allWikis.php` and would prefer not to add all this
  *  content to it, pick another name and `require_once` the file.
  *
