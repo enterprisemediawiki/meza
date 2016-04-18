@@ -107,7 +107,7 @@ skipped_wikis=""
 #   wiki1
 #     images[/|.tar|.tar.gz]
 #     wiki.sql
-#     config/ (optional logo.png, favicon.ico, preLocalSettings.php, CustomSettings.php)
+#     config/ (optional logo.png, favicon.ico, preLocalSettings.php, postLocalSettings.php)
 #   wiki2
 #     ...
 #   wikiN
