@@ -75,7 +75,7 @@ The contents of `config` are as follows:
 * `logo.png` is the image that is displayed in the top-right of your wiki.
 * `favicon.ico` is the wikis [favicon](https://en.wikipedia.org/wiki/Favicon).
 * `preLocalSettings.php` has some meza-specific configuration variables in it. If you don't already have this file, let the install process generate one for you.
-* `CustomSettings.php` will also be auto-generated. It contains any settings specific to this particular wiki, different from your other wikis. Ideally it should be blank (keep all your wikis configured the same way).
+* `postLocalSettings.php` will also be auto-generated. It contains any settings specific to this particular wiki, different from your other wikis. Ideally it should be blank (keep all your wikis configured the same way).
 
 The `wiki.sql` file is what will build your database. You can generate this file by running the `mysqldump` command on your current wiki. The command may look something like: `mysqldump -u my_username -p my_database > /path/to/your/output/file.sql`
 
