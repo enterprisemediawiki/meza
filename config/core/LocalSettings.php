@@ -1170,13 +1170,15 @@ $wgUploadWizardConfig = array(
 	'tutorial' => array('skip' => true),
 	'fileExtensions' => $wgFileExtensions, //omitting this can cause errors
 	'licensing' => array(
-		'defaultType' => 'thirdparty',
+		// alternatively, use "thirdparty". Set in postLocalSettings.php like:
+		// $wgUploadWizardConfig['licensing']['defaultType'] = 'thirdparty';
+		'defaultType' => 'ownwork',
 
 		'ownWork' => array(
 			'type' => 'or',
-			// Use [[Template:Licensing]] instead of default [[Template:Generic]]
-			'template' => 'Licensing',
-			'defaults' => 'generic',
+			// Use [[Project:General disclaimer]] instead of default [[Template:Generic]]
+			'template' => 'Project:General disclaimer',
+			'defaults' => array( 'generic' ),
 			'licenses' => array( 'generic' )
 		),
 
@@ -1186,7 +1188,7 @@ $wgUploadWizardConfig = array(
 			'licenseGroups' => array(
 				array(
 					'head' => 'mwe-upwiz-license-generic-head',
-					'template' => 'Licensing', // again, use [[Template:Licensing]]
+					'template' => 'Project:General disclaimer', // again, use General disclaimer
 					'licenses' => array( 'generic' ),
 				),
 			)
