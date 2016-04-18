@@ -64,7 +64,7 @@ eng
 		logo.png
 		favicon.ico
 		preLocalSettings.php
-		CustomSettings.php
+		postLocalSettings.php
 	wiki.sql
 ```
 
