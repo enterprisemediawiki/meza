@@ -1168,14 +1168,27 @@ $wgUploadWizardConfig = array(
 	'enableMultipleFiles' => true,
 	'enableMultiFileSelect' => true,
 	'tutorial' => array('skip' => true),
-	'fileExtensions' => $wgFileExtensions //omitting this can cause errors
-    	'licensing' => array(
-		'ownWorkDefault' => 'own',
+	'fileExtensions' => $wgFileExtensions, //omitting this can cause errors
+	'licensing' => array(
+		'defaultType' => 'thirdparty',
+
 		'ownWork' => array(
 			'type' => 'or',
-			'template' => 'licensing', // this adds a link to Template:Licensing to the file info page
-			'licenses' => array(
-				'generic',
+			// Use [[Template:Licensing]] instead of default [[Template:Generic]]
+			'template' => 'Licensing',
+			'defaults' => 'generic',
+			'licenses' => array( 'generic' )
+		),
+
+		'thirdParty' => array(
+			'type' => 'or',
+			'defaults' => array( 'generic' ),
+			'licenseGroups' => array(
+				array(
+					'head' => 'mwe-upwiz-license-generic-head',
+					'template' => 'Licensing', // again, use [[Template:Licensing]]
+					'licenses' => array( 'generic' ),
+				),
 			)
 		),
 	),
