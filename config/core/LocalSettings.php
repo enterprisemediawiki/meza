@@ -271,7 +271,7 @@ $wgDBmysql5 = false;
  *  In order for this to work properly the wikis need to have been created with
  *  a single user table in mind. If you're starting a new wiki farm then you're
  *  all set. If you're importing wikis which didn't previously have shared user
- *  tables, then you'll need to use TBD user-merge script.
+ *  tables, then you'll need to use the unifyUserTables.php script.
  *
  **/
 if ( file_exists( "$m_config/local/primewiki" ) ) {

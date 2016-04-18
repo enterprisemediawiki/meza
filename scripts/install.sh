@@ -15,7 +15,7 @@ fi
 
 working_dir=`pwd`
 
-echo -e "\nWelcome to meza v0.4\n"
+echo -e "\nWelcome to the meza MediaWiki installer\n"
 
 
 #
