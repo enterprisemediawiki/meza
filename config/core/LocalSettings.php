@@ -512,7 +512,7 @@ else if ( $mezaAuthType === 'anon-read' ) {
     $wgGroupPermissions['*']['read'] = true;
     $wgGroupPermissions['user']['read'] = true;
 
-    // allow anonymous write
+    // do not allow anonymous write (must be registered user)
     $wgGroupPermissions['*']['edit'] = false;
     $wgGroupPermissions['user']['edit'] = true;
 
