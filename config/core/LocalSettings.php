@@ -1157,7 +1157,7 @@ require_once $egExtensionLoader->registerLegacyExtension(
 $wgApiFrameOptions = 'SAMEORIGIN';
 
 // Use UploadWizard by default in navigation bar
-$wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard"; //Update with #156
+$wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard"; 
 $wgUploadWizardConfig = array(
 	'debug' => false,
 	'autoCategory' => 'Uploaded with UploadWizard',
@@ -1168,7 +1168,32 @@ $wgUploadWizardConfig = array(
 	'enableMultipleFiles' => true,
 	'enableMultiFileSelect' => true,
 	'tutorial' => array('skip' => true),
-	'fileExtensions' => $wgFileExtensions //omitting this can cause errors
+	'fileExtensions' => $wgFileExtensions, //omitting this can cause errors
+	'licensing' => array(
+		// alternatively, use "thirdparty". Set in postLocalSettings.php like:
+		// $wgUploadWizardConfig['licensing']['defaultType'] = 'thirdparty';
+		'defaultType' => 'ownwork',
+
+		'ownWork' => array(
+			'type' => 'or',
+			// Use [[Project:General disclaimer]] instead of default [[Template:Generic]]
+			'template' => 'Project:General disclaimer',
+			'defaults' => array( 'generic' ),
+			'licenses' => array( 'generic' )
+		),
+
+		'thirdParty' => array(
+			'type' => 'or',
+			'defaults' => array( 'generic' ),
+			'licenseGroups' => array(
+				array(
+					'head' => 'mwe-upwiz-license-generic-head',
+					'template' => 'Project:General disclaimer', // again, use General disclaimer
+					'licenses' => array( 'generic' ),
+				),
+			)
+		),
+	),
 );
 
 
