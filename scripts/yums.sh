@@ -27,7 +27,7 @@ elif [ "$architecture" = "64" ]; then
 	    epel_version="6/x86_64/epel-release-6-8.noarch.rpm"
 	else
 		echo "Downloading EPEL for 64-bit Enterprise Linux v7"
-		epel_version="7/x86_64/e/epel-release-7-5.noarch.rpm"
+		epel_version="7/x86_64/e/epel-release-7-6.noarch.rpm"
 	fi
 
 else
