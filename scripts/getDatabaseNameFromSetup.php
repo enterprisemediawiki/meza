@@ -1,7 +1,7 @@
 <?php
 /**
  *  The purpose of this script is simply to return the $mezaCustomDBname from
- *  a wiki's setup.php file if there is one. This allows shell scripts to
+ *  a wiki's preLocalSettings.php file if there is one. This allows shell scripts to
  *  easily retrieve this value using this very quick PHP script.
  **/
 

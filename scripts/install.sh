@@ -13,7 +13,9 @@ if [[ $PATH != *"/usr/local/bin"* ]]; then
 	PATH="/usr/local/bin:$PATH"
 fi
 
-echo -e "\nWelcome to meza v0.4\n"
+working_dir=`pwd`
+
+echo -e "\nWelcome to the meza MediaWiki installer\n"
 
 
 #
@@ -45,43 +47,152 @@ else
     enterprise_linux_version=6
 fi
 
+
+# Check for install config file before prompts
+if [[ ! -z "$1" ]]; then
+
+	# check absolute path
+	if [[ -f "$1" ]]; then
+		source "$1"
+
+	# check relative path
+	elif [[ -f "$working_dir/$1" ]]; then
+		source "$working_dir/$1"
+
+	# not a valid file name
+	else
+		echo
+		echo "$1 is not a file. Exiting."
+		exit 1
+	fi
+
+fi
+
+
+# # # # # # # # # #
+#  BEGIN PROMPTS  #
+# # # # # # # # # #
+
 # Prompt user for git branch
 default_git_branch="master"
-echo -e "\nType the git branch of meza you want to use and press [ENTER]:"
-read -e -i $default_git_branch git_branch
-git_branch=${git_branch:-$default_git_branch}
+
+while [ -z "$git_branch" ]; do
+
+	echo -e "\n\nType the git branch of meza you want to use and press [ENTER]:"
+	read -e -i $default_git_branch git_branch
+	git_branch=${git_branch:-$default_git_branch}
+
+done
+
 
 # Prompt user for GitHub API personal access token
 default_usergithubtoken="e9191bc6d394d64011273d19f4c6be47eb10e25b" # From Oscar Rogers
-echo -e "\nIf you run this script multiple times from one IP address,"
-echo -e "you might exceed GitHub's API rate limit."
-echo -e "\nYou may just press [ENTER] to use our generic token (which may exceed limits if used too much) or"
-echo -e "Visit https://github.com/settings/tokens to generate a new token (with no scopes)."
-echo -e "and copy/paste your 40-character token and press [ENTER]: "
-read usergithubtoken
-usergithubtoken=${usergithubtoken:-$default_usergithubtoken}
 
-# Set Parsoid version.
-# This should be able to be set in any of these forms:
-#   9260e5d       (a sha1 hash)
-#   tags/v0.4.1   (a tag name)
-#   master        (a branch name)
-parsoid_version="ba26a55"
+while [ -z "$usergithubtoken" ]; do
 
-# Prompt user for PHP version
-default_phpversion="5.6.14"
-phpversion=$default_phpversion #hard code version for now based on #24
-# echo -e "\nVisit http://php.net/downloads.php for version numbers"
-# echo -e "Type the version of PHP you would like (such as 5.4.42) and press [ENTER]:"
-# read -e -i $default_phpversion phpversion
-# phpversion=${phpversion:-$default_phpversion}
+	echo -e "\nIf you run this script multiple times from one IP address,"
+	echo -e "you might exceed GitHub's API rate limit."
+	echo -e "\nYou may just press [ENTER] to use our generic token (which may exceed limits if used too much) or"
+	echo -e "Visit https://github.com/settings/tokens to generate a new token (with no scopes)."
+	echo -e "and copy/paste your 40-character token and press [ENTER]: "
+	read usergithubtoken
+	usergithubtoken=${usergithubtoken:-$default_usergithubtoken}
+
+done
+
 
 # Prompt user for MySQL password
 default_mysql_root_pass=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
-echo -e "\nType your desired MySQL root password"
-echo -e "or leave blank for a randomly generated password and press [ENTER]:"
-read -s mysql_root_pass
-mysql_root_pass=${mysql_root_pass:-$default_mysql_root_pass}
+
+while [ -z "$mysql_root_pass" ]; do
+
+	echo -e "\nType your desired MySQL root password"
+	echo -e "or leave blank for a randomly generated password and press [ENTER]:"
+	read -s mysql_root_pass
+	mysql_root_pass=${mysql_root_pass:-$default_mysql_root_pass}
+
+done
+
+
+# Prompt user for MW API Domain or IP address
+while [ -z "$mw_api_domain" ]; do
+
+	# This for loop attempts to find the correct network adapter from which to pull the domain or IP address
+	# If multiple adapters are configured (as in our VirtualBox configs), put the most-likely correct one last
+	for networkadapter in eth0 eth1 enp0s3 enp0s8
+	do
+		if [ -n "ip addr | grep $networkadapter | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'" ]; then
+			default_mw_api_domain="`ip addr | grep $networkadapter | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'`"
+		fi
+	done
+
+	echo -e "\nType domain or IP address of your wiki and press [ENTER]:"
+	# If the above logic found a value to use as a default suggestion, display it and still prompt user for value
+	if [ -n "$default_mw_api_domain" ]; then
+	        read -e -i $default_mw_api_domain mw_api_domain
+	# If the above logic did not find a value to suggest, only read the value in (this fixes #238)
+	else
+	        read -e mw_api_domain
+	fi
+	mw_api_domain=${mw_api_domain:-$default_mw_api_domain}
+
+done
+
+
+# Prompt user for MW install method
+default_mediawiki_git_install="y"
+
+while [ -z "$mediawiki_git_install" ]; do
+
+	echo -e "\nInstall MediaWiki with git? (y/n) [ENTER]:"
+	read -e -i $default_mediawiki_git_install mediawiki_git_install
+	mediawiki_git_install=${mediawiki_git_install:-$default_mediawiki_git_install}
+
+done
+
+
+# Prompt for SSL self-signed certificate info
+if [ -z "$openssl_self_sign_subject" ]; then
+
+	echo
+	echo "Next you're going to setup your self-signed certificate for https."
+	echo "Enter values for each of the following fields. Hit any key to continue."
+	read -s dummy # is there another way to do this?
+
+	# generate a self-signed SSL signature (for swap-out of a good signature later, of course!)
+	openssl req -newkey rsa:4096 -nodes -keyout /etc/pki/tls/private/meza.key -x509 -days 365 -out /etc/pki/tls/certs/meza.crt
+
+else
+
+	openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
+	    -subj "$openssl_self_sign_subject" \
+	    -keyout /etc/pki/tls/private/meza.key -out /etc/pki/tls/certs/meza.crt
+
+fi
+
+
+# Prompt for Slack webhook if it's not "n" and also is empty
+# e.g. don't prompt if it has something other than "n"
+if [ "$slackwebhook" != "n" ] && [ -z "$slackwebhook" ]; then
+
+	echo
+	echo
+	echo "Announce completion on Slack?"
+	echo "Enter webhook URI or leave blank to opt out:"
+	read slackwebhook
+
+fi
+
+if [[ -z "$slackwebhook" ]]; then
+	slackwebhook="n"
+fi
+
+# # # # # # # #
+# END PROMPTS #
+# # # # # # # #
+
+
+
 
 # Prompt user for MW API protocol -- ASSUME HTTPS. Perhaps we'll remove this assumption later
 # default_mw_api_protocol="http"
@@ -90,43 +201,15 @@ mysql_root_pass=${mysql_root_pass:-$default_mysql_root_pass}
 # mw_api_protocol=${mw_api_protocol:-$default_mw_api_protocol}
 mw_api_protocol=https
 
-# Prompt user for MW API Domain or IP address
-# This for loop attempts to find the correct network adapter from which to pull the domain or IP address
-# If multiple adapters are configured (as in our VirtualBox configs), put the most-likely correct one last
-for networkadapter in eth0 eth1 enp0s3 enp0s8
-do
-	if [ -n "ip addr | grep $networkadapter | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'" ]; then
-		default_mw_api_domain="`ip addr | grep $networkadapter | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'`"
-	fi
-done
 
-echo -e "\nType domain or IP address of your wiki and press [ENTER]:"
-# If the above logic found a value to use as a default suggestion, display it and still prompt user for value
-if [ -n "$default_mw_api_domain" ]; then
-        read -e -i $default_mw_api_domain mw_api_domain
-# If the above logic did not find a value to suggest, only read the value in (this fixes #238)
-else
-        read -e mw_api_domain
-fi
-mw_api_domain=${mw_api_domain:-$default_mw_api_domain}
+# Set Parsoid version.
+# This should be able to be set in any of these forms:
+#   9260e5d       (a sha1 hash)
+#   tags/v0.4.1   (a tag name)
+#   master        (a branch name)
+parsoid_version="ba26a55"
 
-# Prompt user for MW install method
-default_mediawiki_git_install="y"
-echo -e "\nInstall MediaWiki with git? (y/n) [ENTER]:"
-read -e -i $default_mediawiki_git_install mediawiki_git_install
-mediawiki_git_install=${mediawiki_git_install:-$default_mediawiki_git_install}
-
-
-echo ""
-echo "Next you're going to setup your self-signed certificate for https."
-echo "Enter values for each of the following fields. Hit any key to continue."
-read -s dummy # is there another way to do this?
-
-
-# generate a self-signed SSL signature (for swap-out of a good signature later, of course!)
-sudo openssl req -newkey rsa:2048 -nodes -keyout /etc/pki/tls/private/meza.key -x509 -days 365 -out /etc/pki/tls/certs/meza.crt
-
-
+phpversion="5.6.14"
 
 # Check if git installed, and install it if required
 if ! hash git 2>/dev/null; then
@@ -212,7 +295,7 @@ fi
 
 # Load config constants. Unfortunately right now have to write out full path to
 # meza since we can't be certain of consistent method of accessing install.sh.
-source /opt/meza/scripts/config.sh
+source /opt/meza/config/core/config.sh
 
 # Enable time sync
 # Ref: http://www.cyberciti.biz/faq/howto-install-ntp-to-synchronize-server-clock/
@@ -262,6 +345,17 @@ rm -f ~/.composer/auth.json
 
 # remove downloads directory (miscellaneous downloaded files)
 rm -rf /root/mezadownloads
+
+# print time requirements for each script
+echo "COMMAND TIMES:"
+cmd_times=`node "$m_meza/scripts/commandTimes.js" "$cmdlog"`
+echo "$cmd_times"
+
+# Announce on Slack if a slack webhook provided
+if [[ ! -z "$slackwebhook" ]]; then
+	announce_domain=`cat "$m_config/local/domain"`
+	bash "$m_meza/scripts/slack.sh" "$slackwebhook" "Your meza installation $announce_domain is complete. Install times:" "$cmd_times"
+fi
 
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
 cat "$m_meza/scripts/pigeon.txt"

@@ -4,8 +4,8 @@
 # application and database servers).
 #
 
-if [ -f "/opt/meza/remote-wiki-config.sh" ]; then
-	source "/opt/meza/remote-wiki-config.sh"
+if [ -f "/opt/meza/config/local/remote-wiki-config.sh" ]; then
+	source "/opt/meza/config/local/remote-wiki-config.sh"
 fi
 
 
@@ -116,26 +116,51 @@ do
 	read -s remote_db_password
 done
 
-cd "$full_remote_wikis_path"
+
+
+echo
+echo
+echo "Announce completion of each wiki on Slack?"
+echo "Enter webhook URI or leave blank to opt out:"
+read slackwebhook
+
+if [[ -z "$slackwebhook" ]]; then
+	slackwebhook="n"
+fi
 
 echo -e "\n\n\nIMPORTING WIKIS: $which_wikis\n"
 
+cd "$full_remote_wikis_path"
+
 # copy each selected wiki directory, then get database
-for wiki in $which_wikis
+for wiki_dir in $which_wikis
 do
+
+	# trim trailing slash from directory name
+	# ref: http://stackoverflow.com/questions/1848415/remove-slash-from-the-end-of-a-variable
+	# ref: http://www.network-theory.co.uk/docs/bashref/ShellParameterExpansion.html
+	wiki=${wiki_dir%/}
+
 	# @todo: delete existing wiki data?
 	echo "Starting import of wiki '$wiki'"
 
 	echo "  Getting files..."
-	cp -r "./$wiki" /root/wikis
+	rsync -rva "./$wiki/" "/root/wikis/$wiki"
 
-	wiki_db=`php /opt/meza/scripts/getDatabaseNameFromSetup.php $full_remote_wikis_path/$wiki/config/setup.php`
+	wiki_pre_localsettings="$full_remote_wikis_path/$wiki/config/preLocalSettings.php"
+	if [ ! -f "$wiki_pre_localsettings" ]; then
+		# maintain old method of getting wiki db
+		echo -e "\nThere is no preLocalSettings.php file; using setup.php instead\n"
+		wiki_pre_localsettings="$full_remote_wikis_path/$wiki/config/setup.php"
+	fi
+
+	wiki_db=`php /opt/meza/scripts/getDatabaseNameFromSetup.php $wiki_pre_localsettings`
 	if [ -z "$wiki_db" ]; then
 		wiki_db="wiki_$wiki"
 	fi
 
 	echo "  Getting database..."
-	mysqldump -h $remote_db_server -u $remote_db_username -p$remote_db_password $wiki_db > "/root/wikis/$wiki/wiki.sql"
+	mysqldump -v -h $remote_db_server -u $remote_db_username -p$remote_db_password $wiki_db > "/root/wikis/$wiki/wiki.sql"
 
 done
 

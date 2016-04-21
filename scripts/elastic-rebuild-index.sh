@@ -1,9 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 #
-# This script is a wrapper on `import-wikis.sh`. By setting the $imports_dir
-# variable it overrides the import script's mechanism for finding the source for
-# new wikis and instead installs a new wiki.
-
+#
 
 # must be root or sudoer
 if [ "$(whoami)" != "root" ]; then
@@ -27,8 +24,14 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source "/opt/meza/config/core/config.sh"
 
 
-# Set $imports_dir to "new", so import-wikis.sh won't attempt to import existing wikis
-imports_dir="new"
+while [ -z "$wiki_id" ]; do
+	echo "Please enter the ID of the wiki needing index rebuilding:"
+	read wiki_id_test
+	if [ ! -z "$wiki_id_test" ] && [ -d "$m_htdocs/wikis/$wiki_id_test" ]; then
+		wiki_id="$wiki_id_test"
+	fi
+done
 
-# Run import script
-source "$DIR/import-wikis.sh"
+echo "Rebuilding index for $wiki_id"
+
+source "$m_meza/scripts/elastic-build-index.sh"

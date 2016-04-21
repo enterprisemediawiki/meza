@@ -43,14 +43,17 @@ if ( $samlRemoteAddrCheck !== $samlServerAddrCheck ) {
 		//),
 	);
 
+	$GLOBALS['wgHooks']['SpecialPage_initList'][] = function (&$list) {
+		unset( $list['Userlogout'] );
+		unset( $list['Userlogin'] );
+		return true;
+	};
 
-	require_once $egExtensionLoader->registerLegacyExtension(
-		'AccessDenied',
-		'https://github.com/JamesMontalvo3/AccessDenied.git',
-		'master'
-	);
-	$egAccessDeniedViewerGroup = "Viewer";
-	$wgGroupPermissions['Viewer'] = $wgGroupPermissions['user'];
-	$wgGroupPermissions['Contributor'] = $wgGroupPermissions['user'];
+	$GLOBALS['wgHooks']['PersonalUrls'][] = function (&$personal_urls, &$wgTitle) {
+		unset( $personal_urls["login"] );
+		unset( $personal_urls["logout"] );
+		unset( $personal_urls['anonlogin'] );
+		return true;
+	};
 
 }
