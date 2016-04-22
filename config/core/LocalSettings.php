@@ -744,7 +744,7 @@ require_once $egExtensionLoader->registerLegacyExtension(
 require_once $egExtensionLoader->registerLegacyExtension(
 	"SemanticForms",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticForms.git",
-	"REL1_25"
+	"tags/3.5"
 );
 
 
@@ -1157,7 +1157,7 @@ require_once $egExtensionLoader->registerLegacyExtension(
 $wgApiFrameOptions = 'SAMEORIGIN';
 
 // Use UploadWizard by default in navigation bar
-$wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard"; 
+$wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard";
 $wgUploadWizardConfig = array(
 	'debug' => false,
 	'autoCategory' => 'Uploaded with UploadWizard',
