@@ -10,7 +10,7 @@ print_title "Starting script extensions.sh"
 # Since SMW is not installed yet, we need to temporarily remove
 # the enableSemantics() function in LocalSettings.php
 #
-sed -r -i 's/^enableSemantics/\/\/enableSemantics/;' "$m_mediawiki/LocalSettings.php"
+sed -r -i 's/^enableSemantics/\/\/enableSemantics/;' "$m_config/core/LocalSettings.php"
 
 
 #
@@ -20,8 +20,10 @@ echo -e "\n\nCreating new wiki called \"Demo Wiki\""
 imports_dir="new"
 wiki_id="demo"
 wiki_name="Demo Wiki"
+temp_slack="$slackwebhook" # don't notify when Demo Wiki is created.
+slackwebhook="n"
 source "$m_meza/scripts/create-wiki.sh"
-
+slackwebhook="$temp_slack"
 
 # Clone ExtensionLoader
 echo -e "\n\n## meza: Install ExtensionLoader and apply changes to MW settings"
@@ -57,7 +59,7 @@ echo -e "\n\n## meza: Install composer-supported extensions"
 cd "$m_mediawiki"
 cmd_profile "START extensions composer require"
 composer require \
-	mediawiki/semantic-media-wiki:~2.0 \
+	mediawiki/semantic-media-wiki:dev-master#787d70fb7f1c1db800e02e0dde0eee8ccc4b7e95 \
 	mediawiki/semantic-result-formats:~2.0 \
 	mediawiki/sub-page-list:~1.1 \
 	mediawiki/semantic-meeting-minutes:~0.3 \
@@ -66,7 +68,7 @@ cmd_profile "END extensions composer require"
 
 
 # Now do enableSemantics()...uncomment function
-sed -r -i 's/^\/\/enableSemantics/enableSemantics/;' "$m_mediawiki/LocalSettings.php"
+sed -r -i 's/^\/\/enableSemantics/enableSemantics/;' "$m_config/core/LocalSettings.php"
 
 
 # update database
@@ -76,7 +78,7 @@ WIKI=demo php maintenance/update.php --quick
 
 # Import pages required for SemanticMeetingMinutes and rebuild indices
 echo -e "\n\n## meza: import pages for SemanticMeetingMinutes"
-WIKI=demo php maintenance/importDump.php < ./extensions/SemanticMeetingMinutes/ImportFiles/import.xml
+WIKI=demo php maintenance/importDump.php --report --debug < ./extensions/SemanticMeetingMinutes/ImportFiles/import.xml
 echo -e "\n\n## meza: rebuildrecentchanges.php"
 WIKI=demo php maintenance/rebuildrecentchanges.php
 echo -e "\n\n## meza: Extension:TitleKey rebuildTitleKeys.php"
