@@ -1207,6 +1207,20 @@ require_once $egExtensionLoader->registerLegacyExtension(
 );
 
 
+#
+# Extension:Math
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	'Math',
+	'https://gerrit.wikimedia.org/r/mediawiki/extensions/Math.git',
+	'REL1_25'
+);
+
+$wgMathValidModes[] = MW_MATH_MATHJAX; // Define MathJax as one of the valid math rendering modes
+$wgUseMathJax = true; // Enable MathJax as a math rendering option for users to pick
+$wgDefaultUserOptions['math'] = MW_MATH_MATHJAX; // Set MathJax as the default rendering option for all users (optional)
+$wgMathDisableTexFilter = true; // or compile "texvccheck"
+$wgDefaultUserOptions['mathJax'] = true; // Enable the MathJax checkbox option
 
 
 #
