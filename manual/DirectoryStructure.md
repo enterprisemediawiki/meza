@@ -54,6 +54,7 @@ This is an overview of the directory structure used by a meza server. This does 
 |		|-- data/
 |		|	|-- elasticsearch/
 |		|	|	|-- data/ (indices for ES)
+|		|	|	|-- plugins/ (plugins for ES)
 |		|	|	└-- work/ (temp files for ES)
 |		|	|-- mysql/
 |		|	|	└-- databases/
@@ -114,7 +115,8 @@ This is an overview of the directory structure used by a meza server. This does 
 |-- tmp/ (Used by at least PHP and MW, probably by other applications)
 └-- var/
 	|-- lib/
-	|	|-- mysql.sock
+	|	|-- mysql/
+	|		└-- mysql.sock
 	└-- log/
 		|-- elasticsearch/
 		|-- httpd/
