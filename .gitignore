@@ -6,6 +6,13 @@ logs/*
 config/local/*
 !config/local/README.md
 
+# data directory used to hold MySQL and Elasticsearch data
+# which should not be added to this repo. However, there are
+# some README files as placeholders in this directory which
+# have been explicitly added to the repo.
+data/*
+
+
 # ignore wiki blender landing page
 htdocs/WikiBlender
 
@@ -13,3 +20,4 @@ htdocs/mediawiki
 htdocs/wikis/*
 
 simplesamlphp/
+

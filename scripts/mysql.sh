@@ -34,6 +34,14 @@ yum -y install mysql-community-server
 
 
 #
+# Setup storage of MySQL data in /opt/meza/data/mysql
+#
+chown mysql:mysql "$m_meza/data/mysql"
+rm /etc/my.cnf
+ln -s "$m_config/core/my.cnf" /etc/my.cnf
+
+
+#
 # Start MySQL service
 #
 chkconfig mysqld on

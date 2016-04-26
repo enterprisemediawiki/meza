@@ -91,18 +91,14 @@ ln -s "$m_config/core/elasticsearch.yml" /etc/elasticsearch/elasticsearch.yml
 
 # Make directories called out in elasticsearch.yml
 # ref: http://elasticsearch-users.115913.n3.nabble.com/Elasticsearch-Not-Working-td4059398.html
-cd /var
-mkdir data
-cd data
-mkdir elasticsearch
-cd /var
-mkdir work
-cd work
-mkdir elasticsearch
-cd /var
+mkdir "$m_meza/data/elasticsearch/data"
+mkdir "$m_meza/data/elasticsearch/work"
+mkdir "$m_meza/data/elasticsearch/plugins"
+
 # Grant elasticsearch user ownership of these new directories
-chown -R elasticsearch /var/data/elasticsearch
-chown -R elasticsearch /var/work/elasticsearch
+chown -R elasticsearch "$m_meza/data/elasticsearch/data"
+chown -R elasticsearch "$m_meza/data/elasticsearch/work"
+chown -R elasticsearch "$m_meza/data/elasticsearch/plugins"
 
 
 # Start Elasticsearch
