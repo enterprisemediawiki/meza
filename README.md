@@ -1,4 +1,4 @@
-# meza v0.9-dev
+# meza v0.9
 
 meza configures a CentOS/RedHat server with a complete enterprise MediaWiki installation.
 
