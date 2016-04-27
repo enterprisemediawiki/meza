@@ -1,4 +1,4 @@
-# meza v0.4
+# meza v0.9
 
 meza configures a CentOS/RedHat server with a complete enterprise MediaWiki installation.
 
@@ -37,6 +37,9 @@ While the goal is to have an entirely scripted install of CentOS and the entire 
 ## See Also
 
 * [Creating and importing wikis](manual/AddingWikis.md)
+* [Accessing Elasticsearch plugins](manual/ElasticsearchPlugins.md)
+* [Installing additional extensions](manual/installing-additional-extensions.md)
+* [Directory structure overview](manual/DirectoryStructure.md)
 
 ## Contributing
 If you'd like to contribute to this project, please see [this guide on how to help](CONTRIBUTING.md).

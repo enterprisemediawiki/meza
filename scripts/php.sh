@@ -48,7 +48,7 @@ cd "$m_meza/sources/php-$phpversion/"
 #
 cmd_profile "START php build"
 ./configure \
-    --with-apxs2=/usr/local/apache2/bin/apxs \
+    --with-apxs2=/usr/bin/apxs \
     --enable-bcmath \
     --with-bz2 \
     --enable-calendar \
@@ -82,7 +82,6 @@ cmd_profile "START php build"
     --enable-inline-optimization \
     --enable-mbregex \
     --enable-opcache \
-    --enable-fpm \
     --enable-intl \
     --prefix=/usr/local/php
 make
@@ -95,7 +94,7 @@ sudo ln -s /usr/local/php/bin/php /usr/bin/php
 #
 # Initiate php.ini
 #
-cp "$m_meza/scripts/php.ini-development" /usr/local/php/lib/php.ini
+ln -s "$m_config/core/php.ini" /usr/local/php/lib/php.ini
 
 
 #
@@ -105,5 +104,9 @@ chkconfig httpd on
 service httpd status
 service httpd restart
 
+# Install PEAR and PEAR Mail
+chmod 744 "$m_meza/scripts/install-pear.sh"
+"$m_meza/scripts/install-pear.sh"
+/usr/local/php/bin/pear install --alldeps Mail
 
 echo -e "\n\nPHP has been setup.\n\nPlease use the web browser on your host computer to navigate to http://192.168.56.56/info.php to verify php is being executed."
