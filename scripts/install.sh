@@ -357,6 +357,9 @@ if [[ ! -z "$slackwebhook" ]]; then
 	bash "$m_meza/scripts/slack.sh" "$slackwebhook" "Your meza installation $announce_domain is complete. Install times:" "$cmd_times"
 fi
 
+# Provide buns for anaconda
+cp /opt/meza/scripts/buns.jpg /var/log/anaconda/buns.jpg
+
 # Display Most Plusquamperfekt Wiki Pigeon of Victory
 cat "$m_meza/scripts/pigeon.txt"
 
