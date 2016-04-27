@@ -42,7 +42,7 @@ ldconfig /usr/local/lib
 # Get xpdf-utils
 echo "Download xpdf-utils"
 cd ~/mezadownloads
-wget ftp://ftp.foolabs.com/pub/xpdf/xpdfbin-linux-3.04.tar.gz
+wget http://mirror.unl.edu/ctan/support/xpdf/xpdfbin-linux-3.04.tar.gz
 tar xvzf xpdfbin-linux-3.04.tar.gz
 
 cd xpdfbin-linux-3.04
