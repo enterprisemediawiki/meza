@@ -32,10 +32,10 @@ for d in */ ; do
 	echo "Starting $wiki_id"
 
 	echo "Running ExtensionLoader updateExtensions.php for $wiki_id"
-	php "WIKI=$wiki_id" "$m_mediawiki/extensions/ExtensionLoader/updateExtensions.php" --skip-log="$skiplog"
+	"WIKI=$wiki_id" php "$m_mediawiki/extensions/ExtensionLoader/updateExtensions.php" --skip-log="$skiplog"
 
 	echo "Running MediaWiki update.php for $wikiId"
-	php "WIKI=$wiki_id" "$m_mediawiki/maintenance/update.php" --quick
+	"WIKI=$wiki_id" php "$m_mediawiki/maintenance/update.php" --quick
 
 done
 
