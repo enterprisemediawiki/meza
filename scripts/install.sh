@@ -37,8 +37,12 @@ then
     echo "Setting Enterprise Linux version to \"7\""
     enterprise_linux_version=7
 
-	# Make sure firewalld is enabled and started (it's not on Digital Ocean)
+	# Make sure firewalld is installed, enabled, and started
+	# On Digital Ocean it is installed but not enabled/started. On centos.org
+	# minimal install it is installed/enabled/started. On OTF minimal install
+	# it is not even installed.
 	# This should be done as soon as possible to make sure we're protected early
+	yum -y install firewalld
 	systemctl enable firewalld
 	systemctl start firewalld
 
