@@ -64,10 +64,15 @@ npm install
 cmd_profile "END npm install parsoid"
 # npm install results in "npm WARN prefer global jshint@2.8.0 should be installed with -g"
 
-echo "******* Testing parsoid *******"
-cmd_profile "START npm test parsoid"
-npm test #optional?
-cmd_profile "END npm test parsoid"
+# For the sake of faster build times, this has been commented out.
+# It should be put inside a "test" config-variable, that allows us to
+# run a special type of install that runs tests. For most installs these
+# tests are pointless, since the user isn't likely to go look through
+# the logs and see if all the tests passed.
+#echo "******* Testing parsoid *******"
+#cmd_profile "START npm test parsoid"
+#npm test #optional?
+#cmd_profile "END npm test parsoid"
 # several warnings come out of npm test
 
 # Configure parsoid for wiki use
