@@ -36,6 +36,11 @@ cmd_profile "END build ImageMagick"
 echo "Configure dynamic linker"
 ldconfig /usr/local/lib
 
+# Add to policy.xml to prevent remote code execution. See
+# imagick-secure-policy.xml for more details
+sed -i -e "/<policymap>/r $m_config/template/imagick-secure-policy.xml" /usr/local/etc/ImageMagick-6/policy.xml
+
+
 # For testing should run: `make check`
 
 
