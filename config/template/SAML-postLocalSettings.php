@@ -18,7 +18,7 @@ if ( $samlRemoteAddrCheck !== $samlServerAddrCheck ) {
 
 	// the base SAML config variables exist in this file, such that it's
 	// easy for the landing page to use them, too.
-	require_once "$m_meza/config/local/SAMLConfig.php"
+	require_once "$m_meza/config/local/SAMLConfig.php";
 
 	// Array: [MediaWiki group][SAML attribute name][SAML expected value]
 	// If the SAML assertion matches, the user is added to the MediaWiki group
