@@ -342,6 +342,9 @@ cmd_tee "source mediawiki.sh"
 cd "$m_meza/scripts"
 cmd_tee "source extensions.sh"
 
+cd "$m_meza/scripts"
+cmd_tee "source security.sh"
+
 # Remove GitHub API personal access token from .composer dir
 # @todo: change the following to instead just remove the token from the file
 #        in case there are other authentication entries
