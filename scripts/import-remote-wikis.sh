@@ -40,8 +40,16 @@ mkdir "/mnt/$mount_name"
 mount.cifs "$remote_share" "/mnt/$mount_name" -o "user=$remote_username"
 
 
+# if not set by remote-wiki-config.sh, then put the wiki data in /opt/mezawikis
+# Chose to put in /opt since most likely this directory has lots of space
+# regardless of partitioning, since it's where all the wiki data will end up
+# anyway.
+if [[ -z "$local_wiki_tmp" ]]; then
+	local_wiki_tmp="/opt/mezawikis"
+fi
+
 # make directory to copy to
-mkdir /root/wikis
+mkdir "$local_wiki_tmp"
 
 
 # list directory of mount point
@@ -145,7 +153,7 @@ do
 	echo "Starting import of wiki '$wiki'"
 
 	echo "  Getting files..."
-	rsync -rva "./$wiki/" "/root/wikis/$wiki"
+	rsync -rva "./$wiki/" "$local_wiki_tmp/$wiki"
 
 	wiki_pre_localsettings="$full_remote_wikis_path/$wiki/config/preLocalSettings.php"
 	if [ ! -f "$wiki_pre_localsettings" ]; then
@@ -160,10 +168,10 @@ do
 	fi
 
 	echo "  Getting database..."
-	mysqldump -v -h $remote_db_server -u $remote_db_username -p$remote_db_password $wiki_db > "/root/wikis/$wiki/wiki.sql"
+	mysqldump -v -h $remote_db_server -u $remote_db_username -p$remote_db_password $wiki_db > "$local_wiki_tmp/$wiki/wiki.sql"
 
 done
 
-imports_dir=/root/wikis
+imports_dir="$local_wiki_tmp"
 source /opt/meza/scripts/import-wikis.sh
 
