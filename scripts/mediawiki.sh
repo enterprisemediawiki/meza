@@ -63,6 +63,20 @@ else
 fi
 
 
+# Hotfix
+#
+# Before composer-merge-plugin v1.2.0, MW incorrectly required
+# v1.0.0 of the Composer internal composer-plugin-api component.
+# Composer recently bumped this internal version to v1.1.0 [0].
+# A patch to MW is in work, but this is required to keep meza
+# building properly.
+#
+# [0]: https://github.com/composer/composer/commit/aeafe2fe59992efd1bc3f890b760f1a9c4874e1c
+#
+# Replace v1.0.0 with v1.3.1 of wikimedia/composer-merge-plugin in composer.json
+sed -r -i 's/"wikimedia\/composer-merge-plugin": "1.0.0",/"wikimedia\/composer-merge-plugin": "1.3.1",/;' "$m_mediawiki/composer.json"
+
+
 #
 # Update Composer dependencies
 #
