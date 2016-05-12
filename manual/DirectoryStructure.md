@@ -111,6 +111,7 @@ This is an overview of the directory structure used by a meza server. This does 
 |		|	|-- mezaCreateUser.php
 |		|	|-- saml.sh
 |		|	|-- security.sh (Script for security-related items not appropriate in any other install script)
+|		|	|-- ssl-selftest.sh (Installs drwetter/testssl.sh (if required) and runs scan for all vulnerabilities against localhost)
 |		|	|-- unifyUserTables.php
 |		|	|-- updateExtensions.sh (Script to run ExtensionLoader/updateExtensions.php and MediaWiki/update.php for all wikis)
 |		|	└-- vmsetupwin.bat
