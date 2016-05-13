@@ -154,10 +154,6 @@ while [ -z "$mediawiki_git_install" ]; do
 
 done
 
-# Generate self-signed device and CA certificates and keys
-# These should be replaced by appropriate keys later
-sudo bash "$m_meza/scripts/generate-certs.sh" "$mw_api_domain"
-
 
 # Prompt for Slack webhook if it's not "n" and also is empty
 # e.g. don't prompt if it has something other than "n"

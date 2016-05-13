@@ -78,5 +78,10 @@ sed -r -i "s/SELINUX=.*$/SELINUX=permissive/g;" /etc/selinux/config
 setenforce permissive
 
 
+# Generate self-signed device and CA certificates and keys
+# These should be replaced by appropriate keys later
+bash "$m_meza/scripts/generate-certs.sh" "$mw_api_domain"
+
+
 echo -e "\n\napache.sh complete."
 # Apache httpd service not started yet. Started in php.sh
