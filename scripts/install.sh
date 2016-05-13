@@ -154,25 +154,9 @@ while [ -z "$mediawiki_git_install" ]; do
 
 done
 
-
-# Prompt for SSL self-signed certificate info
-if [ -z "$openssl_self_sign_subject" ]; then
-
-	echo
-	echo "Next you're going to setup your self-signed certificate for https."
-	echo "Enter values for each of the following fields. Hit any key to continue."
-	read -s dummy # is there another way to do this?
-
-	# generate a self-signed SSL signature (for swap-out of a good signature later, of course!)
-	openssl req -newkey rsa:4096 -nodes -keyout /etc/pki/tls/private/meza.key -x509 -days 365 -out /etc/pki/tls/certs/meza.crt
-
-else
-
-	openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
-	    -subj "$openssl_self_sign_subject" \
-	    -keyout /etc/pki/tls/private/meza.key -out /etc/pki/tls/certs/meza.crt
-
-fi
+# Generate self-signed device and CA certificates and keys
+# These should be replaced by appropriate keys later
+sudo bash "$m_meza/scripts/generate-certs.sh" "$mw_api_domain"
 
 
 # Prompt for Slack webhook if it's not "n" and also is empty
