@@ -16,10 +16,9 @@ username=`whoami`
 #
 # Prompt for VM name
 #
+echo
 while [ -z "$vmname" ]; do
-	echo
-	echo "Type your desired VM name"
-	read vmname
+	read -e -p "New VM name: " vmname
 done
 
 #
@@ -35,16 +34,11 @@ if [ "$hostOS" = "msys" ]; then
 	guestadditions="/c/Program Files/Oracle/VirtualBox/VBoxGuestAdditions.iso"
 
 	# VM directory and hard drive location
-	vmdir="/c/users/$username/VirtualBox VMs/$vmname"
+	userdir="/c/users/$username"
+	vmdir="$userdir/VirtualBox VMs/$vmname"
 	harddrive="$vmdir/$vmname.vdi"
 
-elif [ "$hostOS" = "mac" ]; then
-
-	echo
-	echo "Mac is not yet supported. I'm not sure what the hostOS variable even will be."
-	exit 1
-
-	### FIXME: GUESSING ON OSX CONFIG ###
+elif [[ "$hostOS" == darwin* ]]; then
 
 	# vboxmanage command path
 	vboxm="/Applications/VirtualBox.app/Contents/MacOS/VBoxManage"
@@ -52,7 +46,8 @@ elif [ "$hostOS" = "mac" ]; then
 	guestadditions="/Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso"
 
 	# VM directory and hard drive location
-	vmdir="/c/Users/$username/VirtualBox VMs/$vmname"
+	userdir="$HOME"
+	vmdir="$userdir/VirtualBox VMs/$vmname"
 	harddrive="$vmdir/$vmname.vdi"
 
 else
@@ -75,10 +70,9 @@ fi
 #
 # Prompt for path to CentOS ISO file
 #
-user="/c/Users/$username"
-isos="$user/*.iso"
+isos="$userdir/*.iso"
 echo
-echo "Below is a list of ISO files in your user directory ($user)"
+echo "Below is a list of ISO files in your user directory ($userdir)"
 echo
 echo "Please select the correct ISO for your install"
 select FILENAME in $isos;
@@ -94,12 +88,9 @@ done
 #
 # Prompt: Hard Drive Size
 #
-default_storage=20
+echo
 while [ -z "$storage" ]; do
-	echo
-	echo "How many gigabytes of storage do you want?"
-	read -e -i $default_storage storage
-	storage=${storage:-$default_storage}
+	read -e -p "Gigabytes of storage: " storage
 done
 storage="$(($storage * 1024))"
 
@@ -107,12 +98,8 @@ storage="$(($storage * 1024))"
 #
 # Prompt: RAM
 #
-default_memory=1
 while [ -z "$memory" ]; do
-	echo
-	echo "How many gigabytes of RAM do you want?"
-	read -e -i $default_memory memory
-	memory=${memory:-$default_memory}
+	read -e -p "Gigabytes of RAM: " memory
 done
 memory="$(($memory * 1024))"
 
