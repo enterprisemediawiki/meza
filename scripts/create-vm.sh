@@ -111,6 +111,55 @@ hostonlyadapter=`"$vboxm" list hostonlyifs | grep "^Name:" | sed "s/^Name:[[:spa
 
 
 #
+# If Host-Only adapter is multiple lines, then there are multiple that we can choose from
+#
+if (( $(grep -c . <<<"$hostonlyadapter") > 1 )); then
+
+	echo
+
+	if [ ! -z "$ZSH_VERSION" ]; then
+		echo "Due to an issue with zsh handling of select-menus on string variables,"
+		echo "zsh is not supported. Re-run this command in bash."
+		exit 1
+	fi
+
+	"$vboxm" list hostonlyifs
+
+	echo
+	echo "You have two Host-Only adapters. Their info is above. Choose which to use below."
+	echo
+
+	select adapter in $hostonlyadapter;
+	do
+		echo "You chose: $adapter"
+		hostonlyadapter=$adapter
+		break
+	done
+
+#
+# If Host-Only adapter is blank, create one
+#
+elif [ -z `"$vboxm" list hostonlyifs` ]; then
+
+	echo
+	echo "Your system is not setup with a Host-Only adapter, so one is being created."
+
+	"$vboxm" hostonlyif create
+
+	echo
+	echo "Info for the new Host-Only adapter:"
+	echo
+
+	# Get host only adapter name again
+	hostonlyadapter=`"$vboxm" list hostonlyifs | grep "^Name:" | sed "s/^Name:[[:space:]]*//"`
+
+	echo
+	echo "Your host-only adapter info:"
+	"$vboxm" list hostonlyifs
+
+fi
+
+#
 # Now go forth and create a VM
 #
 
