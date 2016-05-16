@@ -14,7 +14,7 @@ meza requires a minimal installation of Enterprise Linux. Attempting to install 
 Login to your server and run the following:
 
 ```
-curl -LO https://raw.githubusercontent.com/enterprisemediawiki/meza/master/scripts/install.sh
+curl -LO https://raw.github.com/enterprisemediawiki/meza/master/scripts/install.sh
 sudo bash install.sh
 ```
 
