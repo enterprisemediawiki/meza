@@ -4,7 +4,7 @@ meza configures a CentOS/RedHat server with a complete enterprise MediaWiki inst
 
 ## Server setup
 
-Depending on where you're installing meza you'll have different initial setup steps. The following environments have been tested.
+meza requires a minimal installation of Enterprise Linux. Attempting to install it on a server with many other things already installed may not work properly due to conflicts. Depending on where you're installing meza you'll have different initial setup steps. The following environments have been tested.
 
 * [Setup Digital Ocean](manual/SetupDigitalOcean.md)
 * [Setup VirtualBox](manual/1.0-SettingUpVirtualBox.md)
