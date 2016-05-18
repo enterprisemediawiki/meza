@@ -85,8 +85,13 @@ openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
     -subj "$openssl_self_sign_subject" \
     -keyout /etc/pki/tls/private/meza.key -out /etc/pki/tls/certs/meza.crt
 
-echo "# Use 443.conf to add directives to HTTPS connections" > /opt/meza/config/local/httpd/443.conf
-echo "# See /opt/meza/config/core/httpd.conf"               >> /opt/meza/config/local/httpd/443.conf
+
+# Make directory and file that will eventually hold info about CA Certificate location
+local_httpd_conf="/opt/meza/config/local/httpd"
+mkdir "$local_httpd_conf"
+echo "# Use 443.conf to add directives to HTTPS connections" > "$local_httpd_conf/443.conf"
+echo "# See /opt/meza/config/core/httpd.conf"               >> "$local_httpd_conf/443.conf"
+
 
 echo
 echo "apache.sh complete. httpd service not started yet (will start in php.sh)"
