@@ -78,10 +78,15 @@ sed -r -i "s/SELINUX=.*$/SELINUX=permissive/g;" /etc/selinux/config
 setenforce permissive
 
 
-# Generate self-signed device and CA certificates and keys
-# These should be replaced by appropriate keys later
-bash "$m_meza/scripts/generate-certs.sh" "$mw_api_domain"
+# Generate private key and self-signed certificate
+# These should be replaced by appropriate files later
+openssl_self_sign_subject="/C=US/ST=TX/L=Houston/O=EnterpriseMediaWiki/CN=enterprisemediawiki.org"
+openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
+    -subj "$openssl_self_sign_subject" \
+    -keyout /etc/pki/tls/private/meza.key -out /etc/pki/tls/certs/meza.crt
 
+echo "# Use 443.conf to add directives to HTTPS connections" > /opt/meza/config/local/httpd/443.conf
+echo "# See /opt/meza/config/core/httpd.conf"               >> /opt/meza/config/local/httpd/443.conf
 
-echo -e "\n\napache.sh complete."
-# Apache httpd service not started yet. Started in php.sh
+echo
+echo "apache.sh complete. httpd service not started yet (will start in php.sh)"
