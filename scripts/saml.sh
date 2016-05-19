@@ -194,24 +194,24 @@ echo -e "\n"
 cd "$m_mediawiki/extensions"
 git clone https://github.com/jornane/mwSimpleSamlAuth.git SimpleSamlAuth -b v0.6
 
-# Add Exension:SimpleSamlAuth lines to LocalSettings.php (@todo should this be
-# added to some non-LocalSettings.php file? Something like deltas.php)
-#
-# First: make temporary file
-cp "$m_config/template/SAML-postLocalSettings.php" ~/SAML-postLocalSettings.php
+# Create a local SAML config file from template file. This file will be used by
+# both MediaWiki (all wikis) and the landing page (and possibly other things in
+# the future). MediaWiki will be aware of this file because it will be required
+# from within SAML-postLocalSettings.php (see below).
+cp "$m_config/template/SAMLConfig.php" "$m_config/local/SAMLConfig.php"
 
 # Replace attributes with user input
-sed -r -i "s/username_attr/$username_attr/g;" ~/SAML-postLocalSettings.php
-sed -r -i "s/realname_attr/$realname_attr/g;" ~/SAML-postLocalSettings.php
-sed -r -i "s/email_attr/$email_attr/g;" ~/SAML-postLocalSettings.php
+sed -r -i "s/username_attr/$username_attr/g;" "$m_config/local/SAMLConfig.php"
+sed -r -i "s/realname_attr/$realname_attr/g;" "$m_config/local/SAMLConfig.php"
+sed -r -i "s/email_attr/$email_attr/g;" "$m_config/local/SAMLConfig.php"
 
-# Add these lines to the bottom of postLocalSettings_allWikis.php, then remove the temp file
+# Create a postLocalSettings_allWikis.php if it doesn't exist
 if [ ! -f "$m_config/local/postLocalSettings_allWikis.php" ]; then
     echo -e "<?php\n\n" > "$m_config/local/postLocalSettings_allWikis.php"
 fi
-cat ~/SAML-postLocalSettings.php >> "$m_config/local/postLocalSettings_allWikis.php";
-rm ~/SAML-postLocalSettings.php
 
+# Add SAML-specific settings to postLocalSettings_allWikis.php
+cat "$m_config/template/SAML-postLocalSettings.php" >> "$m_config/local/postLocalSettings_allWikis.php";
 
 # Add these lines to the bottom of preLocalSettings_allWikis.php, then remove the temp file
 # these disable account creation for users

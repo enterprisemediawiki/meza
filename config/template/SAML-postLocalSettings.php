@@ -16,24 +16,9 @@ if ( $samlRemoteAddrCheck !== $samlServerAddrCheck ) {
 		'tags/v0.6'
 	);
 
-	// make sure that session storage matches to the one used in simplesaml most likely default PHPSESSID
-	$wgSessionName = "PHPSESSID";
-
-	// SAML_OPTIONAL // SAML_LOGIN_ONLY // SAML_REQUIRED
-	$wgSamlRequirement = SAML_REQUIRED;
-
-	// Should users be created if they don't exist in the database yet?
-	$wgSamlCreateUser = true;
-
-	// SAML attributes
-	$wgSamlUsernameAttr = 'username_attr';
-	$wgSamlRealnameAttr = 'realname_attr';
-	$wgSamlMailAttr = 'email_attr';
-
-	// SimpleSamlPhp settings
-	$wgSamlSspRoot = '/opt/meza/simplesamlphp';
-	$wgSamlAuthSource = 'default-sp';
-	$wgSamlPostLogoutRedirect = NULL;
+	// the base SAML config variables exist in this file, such that it's
+	// easy for the landing page to use them, too.
+	require_once "$m_meza/config/local/SAMLConfig.php";
 
 	// Array: [MediaWiki group][SAML attribute name][SAML expected value]
 	// If the SAML assertion matches, the user is added to the MediaWiki group
