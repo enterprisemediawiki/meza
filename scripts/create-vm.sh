@@ -126,7 +126,7 @@ if (( $(grep -c . <<<"$hostonlyadapter") > 1 )); then
 	"$vboxm" list hostonlyifs
 
 	echo
-	echo "You have two Host-Only adapters. Their info is above. Choose which to use below."
+	echo "You have multiple Host-Only adapters. Their info is above. Choose which to use below."
 	echo
 
 	select adapter in $hostonlyadapter;
