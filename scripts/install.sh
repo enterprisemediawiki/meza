@@ -155,26 +155,6 @@ while [ -z "$mediawiki_git_install" ]; do
 done
 
 
-# Prompt for SSL self-signed certificate info
-if [ -z "$openssl_self_sign_subject" ]; then
-
-	echo
-	echo "Next you're going to setup your self-signed certificate for https."
-	echo "Enter values for each of the following fields. Hit any key to continue."
-	read -s dummy # is there another way to do this?
-
-	# generate a self-signed SSL signature (for swap-out of a good signature later, of course!)
-	openssl req -newkey rsa:4096 -nodes -keyout /etc/pki/tls/private/meza.key -x509 -days 365 -out /etc/pki/tls/certs/meza.crt
-
-else
-
-	openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
-	    -subj "$openssl_self_sign_subject" \
-	    -keyout /etc/pki/tls/private/meza.key -out /etc/pki/tls/certs/meza.crt
-
-fi
-
-
 # Prompt for Slack webhook if it's not "n" and also is empty
 # e.g. don't prompt if it has something other than "n"
 if [ "$slackwebhook" != "n" ] && [ -z "$slackwebhook" ]; then
@@ -341,6 +321,9 @@ cmd_tee "source mediawiki.sh"
 
 cd "$m_meza/scripts"
 cmd_tee "source extensions.sh"
+
+cd "$m_meza/scripts"
+cmd_tee "source security.sh"
 
 # Remove GitHub API personal access token from .composer dir
 # @todo: change the following to instead just remove the token from the file

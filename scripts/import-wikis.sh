@@ -9,6 +9,11 @@ if [ "$(whoami)" != "root" ]; then
 fi
 
 
+if [ -f "/opt/meza/config/local/local-import-config.sh" ]; then
+	source "/opt/meza/config/local/local-import-config.sh"
+fi
+
+
 # print title of script
 bash printTitle.sh "Begin import-wikis.sh"
 

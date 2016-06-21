@@ -87,6 +87,11 @@ To transfer files to your server you can use SCP (or PSCP on Windows):
 (p)scp -r /path/to/your/wiki/imports user@example.com:/home/user/wikis
 ```
 
+### Using an import config file
+
+If you don't want to enter prompts during import (e.g. if you're scripting your import), you'll want to use a config file. That file needs to be located at `/opt/meza/config/local/local-import-config.sh`. An example file can be found at [config/template/local-import-config.sh](../config/template/local-import-config.sh). Moving that file to `config/local` and modifying the values is all that is required. Then running `sudo bash /opt/meza/scripts/import-wikis.sh` will recognize the config file and use your values.
+
+
 ## Importing wikis directly from another server
 
 This process can be used to import wikis from some types of servers. The authors of this script have only tested it where the remote server is running Windows.

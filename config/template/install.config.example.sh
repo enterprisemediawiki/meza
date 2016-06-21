@@ -13,6 +13,4 @@ mw_api_domain="192.168.56.56"
 
 mediawiki_git_install="y"
 
-openssl_self_sign_subject="/C=US/ST=TX/L=Houston/O=EnterpriseMediaWiki/CN=enterprisemediawiki.org"
-
 slackwebhook="n"
