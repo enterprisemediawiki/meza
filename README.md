@@ -4,20 +4,17 @@ meza configures a CentOS/RedHat server with a complete enterprise MediaWiki inst
 
 ## Server setup
 
-Depending on where you're installing meza you'll have different initial setup steps. The following environments have been tested.
+meza requires a minimal installation of Enterprise Linux. Attempting to install it on a server with many other things already installed may not work properly due to conflicts. Depending on where you're installing meza you'll have different initial setup steps. The following environments have been tested.
 
 * [Setup Digital Ocean](manual/SetupDigitalOcean.md)
 * [Setup VirtualBox](manual/1.0-SettingUpVirtualBox.md)
-* [Setup VirtualBox on Windows](manual/1.0-SettingUpVirtualBoxWindows.md)
-* "Setup VMWare" steps to come
 
 ## Running the setup script
 
 Login to your server and run the following:
 
 ```
-cd ~
-curl -LO https://raw.githubusercontent.com/enterprisemediawiki/meza/master/scripts/install.sh
+curl -LO https://raw.github.com/enterprisemediawiki/meza/master/scripts/install.sh
 sudo bash install.sh
 ```
 
@@ -28,10 +25,6 @@ This script will retrieve a script from the meza repository, which will subseque
 * **MySQL password**: Pick a good, secure password for MySQL root user
 * **domain or IP address**: If you'll access your wiki at http://example.com, your type `example.com`. If you'll access it at http://192.168.56.56, type `192.168.56.56`.
 * **Install with git**: Type `y`. You want to install with git.
-
-## Manual Install
-
-While the goal is to have an entirely scripted install of CentOS and the entire MediaWiki platform and dependencies, we started with just [manual instructions](manual/README.md). We haven't used these in a while, and they'll probably be removed at some point. Use at your own risk.
 
 ## See Also
 

@@ -15,14 +15,6 @@ This manual describes how to prepare [Digital Ocean](https://digitalocean.com) f
 1. Click "create droplet"
 1. Wait about a minute for the droplet to be created
 
-## Install wget
-
-Your server lacks one really important thing for meza: `wget`. The `wget` command allows you to retrieve (get) files over HTTP, HTTPS, and FTP. To install `wget` perform the following:
-
-1. `yum install -y wget`
-
-That's it!
-
 ## Optional user setup
 
 If you'd like to setup a user other than root, perform the following:
