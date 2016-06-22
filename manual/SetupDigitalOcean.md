@@ -8,7 +8,7 @@ This manual describes how to prepare [Digital Ocean](https://digitalocean.com) f
 1. Choose a "droplet hostname", which can really be anything that identifies this droplet from the others. For example, if you're just testing out meza you may choose "meza_test_2015-07-26".
 1. Choose any droplet size with at least 1 GB RAM
 1. Select a region close the people who will be using your service
-1. Under "select image" select the CentOS operatings system, then under "version" select "6.5 x64"
+1. Under "select image" select the CentOS operatings system, then under "version" select "7.x x64"
 1. No additional settings required at this time
 1. It is highly recommended you setup SSH keys on your computer, and put the public key on Digital Ocean. See [this tutorial](https://help.github.com/articles/generating-ssh-keys/) explaining how to setup SSH keys.
 1. Once SSH keys are setup, choose yours for this droplet
