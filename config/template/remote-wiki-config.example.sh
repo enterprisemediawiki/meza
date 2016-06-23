@@ -28,3 +28,10 @@ mysql_root_pass="some-password"
 remote_db_server="database.example.com"
 remote_db_username="database-user"
 remote_db_password="database-password"
+
+
+remote_domain="domain.com"
+remote_ssh_username="yourusername"
+
+# slack web hook
+slackwebhook="https://hooks.slack.com/services/yourhookdetails"
