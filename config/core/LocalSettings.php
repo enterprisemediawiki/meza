@@ -1263,7 +1263,14 @@ $wgDefaultUserOptions['mathJax'] = true; // Enable the MathJax checkbox option
 // $wgFlowParsoidPrefix = $wikiId;
 
 
-
+#
+# Extension:Data Transfer
+#
+require_once $egExtensionLoader->registerLegacyExtension(
+	'DataTransfer',
+	'https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DataTransfer.git',
+	'tags/0.6.2'
+);
 
 
 
