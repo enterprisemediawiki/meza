@@ -50,6 +50,25 @@ if ( isset( $mezaLoadTOPO ) && $mezaLoadTOPO ) {
 		"https://github.com/emanspeaks/HideSubPage.git",
 		"master"
 	);
+	
+	
+	#
+	# Extension:CollapsibleSections
+	#
+	require_once $egExtensionLoader->registerLegacyExtension(
+		"CollapsibleSections",
+		"https://github.com/emanspeaks/CollapsibleSections.git",
+		"master"
+	);
+
+	// Creating TCHB namespace
+	define("NS_TCHB", 3000);
+	define("NS_TCHB_TALK", 3001);
+	$wgExtraNamespaces[NS_TCHB] = "TCHB";
+	$wgExtraNamespaces[NS_TCHB_TALK] = "TCHB_talk";
+	$wgContentNamespaces[] = NS_TCHB;
+	$wgExtCollapsibleSectionsNamespaces[] = NS_TCHB;
+	$wgExtCollapsibleSectionsClasses = "tchb-box";    
 
 	#
 	# Extension:CrossReference
