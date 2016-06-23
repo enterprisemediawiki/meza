@@ -61,12 +61,6 @@ if ( isset( $mezaLoadTOPO ) && $mezaLoadTOPO ) {
 		"master"
 	);
 
-	// Creating TCHB namespace
-	define("NS_TCHB", 3000);
-	define("NS_TCHB_TALK", 3001);
-	$wgExtraNamespaces[NS_TCHB] = "TCHB";
-	$wgExtraNamespaces[NS_TCHB_TALK] = "TCHB_talk";
-	$wgContentNamespaces[] = NS_TCHB;
 	$wgExtCollapsibleSectionsNamespaces[] = NS_TCHB;
 	$wgExtCollapsibleSectionsClasses = "tchb-box";    
 
