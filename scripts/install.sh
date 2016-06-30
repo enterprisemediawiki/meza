@@ -28,30 +28,6 @@ architecture=32
 fi
 
 
-#
-# CentOS/RHEL version 7 or 6?
-#
-# note: /etc/os-release does not exist in CentOS 6, but this works anyway
-if grep -Fxq "VERSION_ID=\"7\"" /etc/os-release
-then
-    echo "Setting Enterprise Linux version to \"7\""
-    enterprise_linux_version=7
-
-	# Make sure firewalld is installed, enabled, and started
-	# On Digital Ocean it is installed but not enabled/started. On centos.org
-	# minimal install it is installed/enabled/started. On OTF minimal install
-	# it is not even installed.
-	# This should be done as soon as possible to make sure we're protected early
-	yum -y install firewalld
-	systemctl enable firewalld
-	systemctl start firewalld
-
-else
-    echo "Setting Enterprise Linux version to \"6\""
-    enterprise_linux_version=6
-fi
-
-
 # Check for install config file before prompts
 if [[ ! -z "$1" ]]; then
 
@@ -171,12 +147,6 @@ if [[ -z "$slackwebhook" ]]; then
 	slackwebhook="n"
 fi
 
-# # # # # # # #
-# END PROMPTS #
-# # # # # # # #
-
-
-
 
 # Prompt user for MW API protocol -- ASSUME HTTPS. Perhaps we'll remove this assumption later
 # default_mw_api_protocol="http"
@@ -184,6 +154,35 @@ fi
 # read -e -i $default_mw_api_protocol mw_api_protocol
 # mw_api_protocol=${mw_api_protocol:-$default_mw_api_protocol}
 mw_api_protocol=https
+
+
+# # # # # # # #
+# END PROMPTS #
+# # # # # # # #
+
+
+#
+# CentOS/RHEL version 7 or 6?
+#
+# note: /etc/os-release does not exist in CentOS 6, but this works anyway
+if grep -Fxq "VERSION_ID=\"7\"" /etc/os-release
+then
+    echo "Setting Enterprise Linux version to \"7\""
+    enterprise_linux_version=7
+
+	# Make sure firewalld is installed, enabled, and started
+	# On Digital Ocean it is installed but not enabled/started. On centos.org
+	# minimal install it is installed/enabled/started. On OTF minimal install
+	# it is not even installed.
+	# This should be done as soon as possible to make sure we're protected early
+	yum -y install firewalld
+	systemctl enable firewalld
+	systemctl start firewalld
+
+else
+    echo "Setting Enterprise Linux version to \"6\""
+    enterprise_linux_version=6
+fi
 
 
 # Set Parsoid version.
