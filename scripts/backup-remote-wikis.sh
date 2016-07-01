@@ -10,6 +10,12 @@ if [ "$(whoami)" != "root" ]; then
 	exit 1
 fi
 
+# Announce start of backup on Slack if a slack webhook provided
+if [[ ! -z "$slackwebhook" ]]; then
+	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Starting backup" "$cmd_times"
+
+fi
+
 # If /usr/local/bin is not in PATH then add it
 # Ref enterprisemediawiki/meza#68 "Run install.sh with non-root user"
 if [[ $PATH != *"/usr/local/bin"* ]]; then
@@ -64,10 +70,10 @@ if [ -f "/opt/meza/config/local/remote-wiki-config.sh" ]; then
 	source "/opt/meza/config/local/remote-wiki-config.sh"
 fi
 
-# prompt user for MySQL root password
+# prompt user for local MySQL root password
 while [ -z "$mysql_root_pass" ]
 do
-	echo -e "\nEnter MySQL root password and press [ENTER]: "
+	echo -e "\nEnter local MySQL root password and press [ENTER]: "
 	read -s mysql_root_pass
 done
 
@@ -88,15 +94,27 @@ for d in */ ; do
 	wiki_id=${d%/}
 
 	echo "Removing $wiki_id files"
-	# TO-DO: Archive files
+	# Announce file removal on Slack if a slack webhook provided
+	if [[ ! -z "$slackwebhook" ]]; then
+		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Removing $wiki_id files" "$cmd_times"
+
+	fi
+	# TO-DO: Archive files instead of remove
+	# TO-DO: Instead of removing all, just remove those being replaced via which_wikis
 	rm -rf $wikis_install_dir/$wiki_id
 	echo "Complete"
 
 	# drop MySQL database
 	wiki_db_name="wiki_$wiki_id"
 	echo "Dropping $wiki_db_name database"
-	# TO-DO: Archive db dump
-	mysql -u root "--password=$mysql_root_pass" -e"DROP DATABASE IF EXISTS $wiki_db_name;"
+	# Announce db removal on Slack if a slack webhook provided
+	if [[ ! -z "$slackwebhook" ]]; then
+		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Dropping $wiki_id db" "$cmd_times"
+
+	fi
+	# TO-DO: Archive db dump instead of remove
+	# TO-DO: Instead of removing all, just remove those being replaced via which_wikis
+	mysql -u root "--password=$mysql_root_pass" -e "DROP DATABASE IF EXISTS $wiki_db_name;"
 	echo "Complete"
 
 done
@@ -140,7 +158,10 @@ echo "  Getting files..."
 
 
 # TO-DO modify default_which_wikis to only pull directories (not README.md)
-default_which_wikis="$(ssh $remote_ssh_username@$remote_domain ls $wikis_install_dir)"
+# default_which_wikis="$(ssh $remote_ssh_username@$remote_domain ls $wikis_install_dir)"
+default_which_wikis="$(ssh $remote_ssh_username@$remote_domain 'cd /opt/meza/htdocs/wikis; for d in */; do wiki_id=${d%/}; default_which_wikis="$default_which_wikis $wiki_id"; done; echo $default_which_wikis')"
+
+
 # check if already set (via remote-wiki-config.sh file)
 if [ -z "$which_wikis" ]; then
 	# Prompt user for which wikis to import
@@ -167,7 +188,17 @@ do
 	# @todo: delete existing wiki data?
 	echo "Starting import of wiki '$wiki'"
 
+	# make directory to copy to
+	if [ ! -d "$local_wiki_tmp/$wiki" ]; then
+	  mkdir "$local_wiki_tmp/$wiki"
+	fi
+
 	echo "  Getting files..."
+	# Announce file getting on Slack if a slack webhook provided
+	if [[ ! -z "$slackwebhook" ]]; then
+		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Getting $wiki files" "$cmd_times"
+
+	fi
 	# rsync -rva "./$wiki/" "$local_wiki_tmp/$wiki"
 	rsync -avHe ssh "$remote_ssh_username@$remote_domain:$wikis_install_dir/$wiki/" "$local_wiki_tmp/$wiki"
 
@@ -184,10 +215,34 @@ do
 	fi
 
 	echo "  Getting database..."
-	ssh "$remote_ssh_username@$remote_domain" mysqldump -u $remote_db_username --password=$remote_db_password $wiki_db > "$local_wiki_tmp/$wiki/wiki.sql"
+	# Announce db getting on Slack if a slack webhook provided
+	if [[ ! -z "$slackwebhook" ]]; then
+		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Getting $wiki db" "$cmd_times"
+
+	fi
+	# ssh $remote_ssh_username@$remote_domain mysqldump -h $remote_domain -u $remote_db_username --password=$remote_db_password $wiki_db > "$local_wiki_tmp/$wiki/wiki.sql"
+	ssh $remote_ssh_username@$remote_domain mysqldump -v -u $remote_db_username --password=$remote_db_password $wiki_db > "$local_wiki_tmp/$wiki/wiki.sql"
 	# mysqldump -v -h $remote_db_server -u $remote_db_username -p$remote_db_password $wiki_db > "$local_wiki_tmp/$wiki/wiki.sql"
 
 done
 
+# Announce file and db transfer complete, start import on Slack if a slack webhook provided
+if [[ ! -z "$slackwebhook" ]]; then
+	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Beginning to build your wiki farm" "$cmd_times"
+
+fi
+
 imports_dir="$local_wiki_tmp"
 source /opt/meza/scripts/import-wikis.sh
+
+# Announce completion of backup on Slack if a slack webhook provided
+if [[ ! -z "$slackwebhook" ]]; then
+	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Your meza backup is complete!" "$cmd_times"
+
+	# Announce errors on Slack if any were logged
+	if [[ ! -z "$errlog" ]]; then
+		announce_errors=`cat $errlog`
+		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Errors: $announce_errors" "$cmd_times"
+	fi
+
+fi
