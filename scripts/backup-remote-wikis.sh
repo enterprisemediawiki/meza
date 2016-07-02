@@ -240,7 +240,7 @@ if [[ ! -z "$slackwebhook" ]]; then
 	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Your meza backup is complete!" "$cmd_times"
 
 	# Announce errors on Slack if any were logged
-	if [[ ! -z "$errlog" ]]; then
+	if [[ ! -z "cat $errlog" ]]; then
 		announce_errors=`cat $errlog`
 		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Errors: $announce_errors" "$cmd_times"
 	fi
