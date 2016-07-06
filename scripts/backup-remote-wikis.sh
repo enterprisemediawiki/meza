@@ -2,126 +2,8 @@
 #
 # backup-remote-wikis.sh
 #
-# Deletes local wikis and imports a group of wikis from a remote server
+# Back up files and db from remote server wiki farm
 #
-
-if [ "$(whoami)" != "root" ]; then
-	echo "Try running this script with sudo: \"sudo bash install.sh\""
-	exit 1
-fi
-
-# Announce start of backup on Slack if a slack webhook provided
-if [[ ! -z "$slackwebhook" ]]; then
-	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Starting backup" "$cmd_times"
-
-fi
-
-# If /usr/local/bin is not in PATH then add it
-# Ref enterprisemediawiki/meza#68 "Run install.sh with non-root user"
-if [[ $PATH != *"/usr/local/bin"* ]]; then
-	PATH="/usr/local/bin:$PATH"
-fi
-
-#
-# Output command to screen and to log files
-#
-timestamp=$(date "+%Y%m%d%H%M%S")
-logpath="/opt/meza/logs" # @fixme: not DRY
-outlog="$logpath/${timestamp}_out.log"
-errlog="$logpath/${timestamp}_err.log"
-cmdlog="$logpath/${timestamp}_cmd.log"
-
-# writes a timestamp with a message for profiling purposes
-# Generally use in the form:
-# Thu Aug  6 10:44:07 CDT 2015: START some description of action
-cmd_profile()
-{
-	echo "`date`: $*" >> "$cmdlog"
-}
-
-# Use tee to send a command output to the terminal, but send stdout
-# to a log file and stderr to a different log file. Use like:
-# command_to_screen_and_logs "bash yums.sh"
-cmd_tee()
-{
-	cmd_profile "START $*"
-	$@ > >(tee -a "$outlog") 2> >(tee -a "$errlog" >&2)
-	sleep 1 # why is this needed? It is needed, but why?
-	cmd_profile "END $*"
-}
-
-# Creates generic title for the beginning of scripts
-print_title()
-{
-cat << EOM
-
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*                                                             *
-*  $*
-*                                                             *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-EOM
-}
-
-source /opt/meza/config/core/config.sh
-
-if [ -f "/opt/meza/config/local/remote-wiki-config.sh" ]; then
-	source "/opt/meza/config/local/remote-wiki-config.sh"
-fi
-
-# prompt user for local MySQL root password
-while [ -z "$mysql_root_pass" ]
-do
-	echo -e "\nEnter local MySQL root password and press [ENTER]: "
-	read -s mysql_root_pass
-done
-
-# setup configuration variables
-wikis_install_dir="$m_htdocs/wikis"
-
-# for each wiki directory
-#   drop mysql db
-#   remove wiki directory (and all files within)
-# Note: $d has trailing slash, like "wiki1/"
-cd $wikis_install_dir
-for d in */ ; do
-
-
-	# trim trailing slash from directory name
-	# ref: http://stackoverflow.com/questions/1848415/remove-slash-from-the-end-of-a-variable
-	# ref: http://www.network-theory.co.uk/docs/bashref/ShellParameterExpansion.html
-	wiki_id=${d%/}
-
-	echo "Removing $wiki_id files"
-	# Announce file removal on Slack if a slack webhook provided
-	if [[ ! -z "$slackwebhook" ]]; then
-		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Removing $wiki_id files" "$cmd_times"
-
-	fi
-	# TO-DO: Archive files instead of remove
-	# TO-DO: Instead of removing all, just remove those being replaced via which_wikis
-	rm -rf $wikis_install_dir/$wiki_id
-	echo "Complete"
-
-	# drop MySQL database
-	wiki_db_name="wiki_$wiki_id"
-	echo "Dropping $wiki_db_name database"
-	# Announce db removal on Slack if a slack webhook provided
-	if [[ ! -z "$slackwebhook" ]]; then
-		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Dropping $wiki_id db" "$cmd_times"
-
-	fi
-	# TO-DO: Archive db dump instead of remove
-	# TO-DO: Instead of removing all, just remove those being replaced via which_wikis
-	mysql -u root "--password=$mysql_root_pass" -e "DROP DATABASE IF EXISTS $wiki_db_name;"
-	echo "Complete"
-
-done
-
-
-# TO-DO:
-#	Make it so this doesn't wipe out a good backup with a bad backup. Maybe keep multiple db dumps.
 
 # Note this requires a dummy user with an ssh key pair to prevent prompts for ssh password
 # http://www.thegeekstuff.com/2008/11/3-steps-to-perform-ssh-login-without-password-using-ssh-keygen-ssh-copy-id/
@@ -135,31 +17,72 @@ done
 #	https://www.digitalocean.com/community/questions/i-can-t-ssh-with-root-or-setup-keys-properly
 
 
+if [ "$(whoami)" != "root" ]; then
+	echo "Try running this script with sudo: \"sudo bash backup-remote-wikis.sh\""
+	exit 1
+fi
+
+# If /usr/local/bin is not in PATH then add it
+# Ref enterprisemediawiki/meza#68 "Run install.sh with non-root user"
+if [[ $PATH != *"/usr/local/bin"* ]]; then
+	PATH="/usr/local/bin:$PATH"
+fi
+
+source /opt/meza/config/core/config.sh
+
+if [ -f "/opt/meza/config/local/remote-wiki-config.sh" ]; then
+	source "/opt/meza/config/local/remote-wiki-config.sh"
+fi
+
+#
+# Logging info
+#
+timestamp=$(date "+%Y%m%d%H%M%S")
+# default_backup_logpath="~/logs"
+# if [ -z "$backup_logpath" ]; then
+# 	# Prompt user for place to store backup logs
+# 	echo -e "\nType the path to store log files"
+# 	echo -e "or leave blank to use your user directory and press [ENTER]:"
+# 	read backup_logpath
+# fi
+# backup_logpath=${backup_logpath:-$default_backup_logpath}
+# backup_logpath="/home/root/logs"
+# cronlog="$backup_logpath/${timestamp}_cron.log"
+
+
+# prompt user for local MySQL root password
+while [ -z "$mysql_root_pass" ]
+do
+	echo -e "\nEnter local MySQL root password and press [ENTER]: "
+	read -s mysql_root_pass
+done
+
+# remote wikis installation directory
+wikis_install_dir="$m_htdocs/wikis"
+
+
 
 # if not set by remote-wiki-config.sh, then put the wiki data in /opt/mezawikis
 # Chose to put in /opt since most likely this directory has lots of space
 # regardless of partitioning, since it's where all the wiki data will end up
 # anyway.
-if [[ -z "$local_wiki_tmp" ]]; then
-	local_wiki_tmp="/opt/mezawikis"
+if [ -z "$local_wiki_backup" ]; then
+	# Prompt user for place to store backup files
+	echo -e "\nType the path to store backup files"
+	echo -e "and press [ENTER]:"
+	read local_wiki_backup
 fi
 
 # make directory to copy to
-if [ ! -d "$local_wiki_tmp" ]; then
-  mkdir "$local_wiki_tmp"
+if [ ! -d "$local_wiki_backup" ]; then
+  mkdir "$local_wiki_backup"
 fi
 
 
 echo -e "\n\n\nIMPORTING WIKIS \n"
 
-echo "  Getting files..."
 
-# rsync -avHe ssh "$remote_ssh_username@$remote_domain:$wikis_install_dir" "$local_wiki_tmp"
-
-
-# TO-DO modify default_which_wikis to only pull directories (not README.md)
-# default_which_wikis="$(ssh $remote_ssh_username@$remote_domain ls $wikis_install_dir)"
-default_which_wikis="$(ssh $remote_ssh_username@$remote_domain 'cd /opt/meza/htdocs/wikis; for d in */; do wiki_id=${d%/}; default_which_wikis="$default_which_wikis $wiki_id"; done; echo $default_which_wikis')"
+default_which_wikis="$(ssh -q $remote_ssh_username@$remote_domain 'cd /opt/meza/htdocs/wikis; for d in */; do wiki_id=${d%/}; default_which_wikis="$default_which_wikis $wiki_id"; done; echo $default_which_wikis')"
 
 
 # check if already set (via remote-wiki-config.sh file)
@@ -176,6 +99,12 @@ if [ "$which_wikis" = "IMPORT_ALL" ]; then
 	which_wikis="$default_which_wikis"
 fi
 
+# Announce start of backup on Slack if a slack webhook provided
+if [[ ! -z "$slackwebhook" ]]; then
+	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Starting backup for the following wikis at $timestamp:  $which_wikis" "$cmd_times"
+
+fi
+
 # copy each selected wiki directory, then get database
 for wiki_dir in $which_wikis
 do
@@ -185,28 +114,27 @@ do
 	# ref: http://www.network-theory.co.uk/docs/bashref/ShellParameterExpansion.html
 	wiki=${wiki_dir%/}
 
-	# @todo: delete existing wiki data?
 	echo "Starting import of wiki '$wiki'"
 
 	# make directory to copy to
-	if [ ! -d "$local_wiki_tmp/$wiki" ]; then
-	  mkdir "$local_wiki_tmp/$wiki"
+	if [ ! -d "$local_wiki_backup/$wiki" ]; then
+	  mkdir "$local_wiki_backup/$wiki"
 	fi
 
 	echo "  Getting files..."
 	# Announce file getting on Slack if a slack webhook provided
-	if [[ ! -z "$slackwebhook" ]]; then
-		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Getting $wiki files" "$cmd_times"
+	# if [[ ! -z "$slackwebhook" ]]; then
+	# 	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Getting $wiki files" "$cmd_times"
 
-	fi
-	# rsync -rva "./$wiki/" "$local_wiki_tmp/$wiki"
-	rsync -avHe ssh "$remote_ssh_username@$remote_domain:$wikis_install_dir/$wiki/" "$local_wiki_tmp/$wiki"
+	# fi
 
-	wiki_pre_localsettings="$local_wiki_tmp/$wiki/config/preLocalSettings.php"
+	rsync -avHe ssh -q "$remote_ssh_username@$remote_domain:$wikis_install_dir/$wiki/" "$local_wiki_backup/$wiki"
+
+	wiki_pre_localsettings="$local_wiki_backup/$wiki/config/preLocalSettings.php"
 	if [ ! -f "$wiki_pre_localsettings" ]; then
 		# maintain old method of getting wiki db
 		echo -e "\nThere is no preLocalSettings.php file; using setup.php instead\n"
-		wiki_pre_localsettings="$local_wiki_tmp/$wiki/config/setup.php"
+		wiki_pre_localsettings="$local_wiki_backup/$wiki/config/setup.php"
 	fi
 
 	wiki_db=`php /opt/meza/scripts/getDatabaseNameFromSetup.php $wiki_pre_localsettings`
@@ -216,33 +144,40 @@ do
 
 	echo "  Getting database..."
 	# Announce db getting on Slack if a slack webhook provided
-	if [[ ! -z "$slackwebhook" ]]; then
-		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Getting $wiki db" "$cmd_times"
+	# if [[ ! -z "$slackwebhook" ]]; then
+	# 	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Getting $wiki db" "$cmd_times"
 
-	fi
-	# ssh $remote_ssh_username@$remote_domain mysqldump -h $remote_domain -u $remote_db_username --password=$remote_db_password $wiki_db > "$local_wiki_tmp/$wiki/wiki.sql"
-	ssh $remote_ssh_username@$remote_domain mysqldump -v -u $remote_db_username --password=$remote_db_password $wiki_db > "$local_wiki_tmp/$wiki/wiki.sql"
-	# mysqldump -v -h $remote_db_server -u $remote_db_username -p$remote_db_password $wiki_db > "$local_wiki_tmp/$wiki/wiki.sql"
+	# fi
+	ssh -q $remote_ssh_username@$remote_domain mysqldump -u $remote_db_username --password=$remote_db_password $wiki_db > "$local_wiki_backup/$wiki/${timestamp}_wiki.sql"
+
+
+	# remove sql old sql files, keep 7 most-recent files
+	# Ref: http://stackoverflow.com/a/4447795/5103312
+	cd $local_wiki_backup/$wiki
+	find . -maxdepth 1 -type f -iname "*.sql" | sort -r | tail -n +8 | xargs rm -f
 
 done
 
-# Announce file and db transfer complete, start import on Slack if a slack webhook provided
-if [[ ! -z "$slackwebhook" ]]; then
-	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Beginning to build your wiki farm" "$cmd_times"
+# # Announce file and db transfer complete, start import on Slack if a slack webhook provided
+# if [[ ! -z "$slackwebhook" ]]; then
+# 	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Beginning to build your wiki farm" "$cmd_times"
 
-fi
+# fi
 
-imports_dir="$local_wiki_tmp"
-source /opt/meza/scripts/import-wikis.sh
+# imports_dir="$local_wiki_tmp"
+# source /opt/meza/scripts/import-wikis.sh
+
+
 
 # Announce completion of backup on Slack if a slack webhook provided
 if [[ ! -z "$slackwebhook" ]]; then
 	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Your meza backup is complete!" "$cmd_times"
 
 	# Announce errors on Slack if any were logged
-	if [[ ! -z "cat $errlog" ]]; then
-		announce_errors=`cat $errlog`
-		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Errors: $announce_errors" "$cmd_times"
-	fi
+	# Commented out because it's broken it doesn't work someone should lose their job
+	# if [ ! -e "$cronlog" ]; then
+	# 	announce_log=`cat $cronlog`
+	# 	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "$announce_log" "$cmd_times"
+	# fi
 
 fi
