@@ -35,3 +35,12 @@ remote_ssh_username="yourusername"
 
 # slack web hook
 slackwebhook="https://hooks.slack.com/services/yourhookdetails"
+
+# path for backup logs
+backup_logpath="/opt/meza/logs"
+
+# path for backup files
+local_wiki_backup="/opt/meza/backup"
+
+# temp directory used for copying files from source to be used during import
+local_wiki_tmp="/opt/mezawikis"
