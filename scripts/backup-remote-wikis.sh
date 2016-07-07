@@ -128,7 +128,7 @@ do
 
 	# fi
 
-	rsync -avHe ssh -q "$remote_ssh_username@$remote_domain:$wikis_install_dir/$wiki/" "$local_wiki_backup/$wiki"
+	rsync -avHe ssh "$remote_ssh_username@$remote_domain:$wikis_install_dir/$wiki/" "$local_wiki_backup/$wiki"
 
 	wiki_pre_localsettings="$local_wiki_backup/$wiki/config/preLocalSettings.php"
 	if [ ! -f "$wiki_pre_localsettings" ]; then
@@ -148,7 +148,7 @@ do
 	# 	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Getting $wiki db" "$cmd_times"
 
 	# fi
-	ssh -q $remote_ssh_username@$remote_domain mysqldump -u $remote_db_username --password=$remote_db_password $wiki_db > "$local_wiki_backup/$wiki/${timestamp}_wiki.sql"
+	ssh $remote_ssh_username@$remote_domain mysqldump -u $remote_db_username --password=$remote_db_password $wiki_db > "$local_wiki_backup/$wiki/${timestamp}_wiki.sql"
 
 
 	# remove sql old sql files, keep 7 most-recent files
