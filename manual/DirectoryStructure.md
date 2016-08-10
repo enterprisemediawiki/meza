@@ -102,11 +102,13 @@ This is an overview of the directory structure used by a meza server. This does 
 |		|	└-- user-unify-<sometimestamp>/ (lots of logging during user unification script)
 |		|-- manual/ (lots of markdown files for documentation)
 |		|-- scripts/
+|		|	|-- backup-remote-wikis.sh
 |		|	|-- create-wiki.sh
 |		|	|-- dev-networking.sh
 |		|	|-- elastic-rebuild-index.sh
 |		|	|-- import-remote-wikis.sh
 |		|	|-- import-wikis.sh
+|		|	|-- import-wikis-from-local-backup.sh
 |		|	|-- install.sh
 |		|	|-- mezaCreateUser.php
 |		|	|-- saml.sh
