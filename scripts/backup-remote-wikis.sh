@@ -151,10 +151,10 @@ do
 	ssh $remote_ssh_username@$remote_domain mysqldump -u $remote_db_username --password=$remote_db_password $wiki_db > "$local_wiki_backup/$wiki/${timestamp}_wiki.sql"
 
 
-	# remove sql old sql files, keep 7 most-recent files
+	# remove sql old sql files, keep 14 most-recent files
 	# Ref: http://stackoverflow.com/a/4447795/5103312
 	cd $local_wiki_backup/$wiki
-	find . -maxdepth 1 -type f -iname "*.sql" | sort -r | tail -n +8 | xargs rm -f
+	find . -maxdepth 1 -type f -iname "*.sql" | sort -r | tail -n +15 | xargs rm -f
 
 done
 
