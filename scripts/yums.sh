@@ -29,7 +29,7 @@ elif [ "$architecture" = "64" ]; then
 		echo "Downloading EPEL for 64-bit Enterprise Linux v7"
 		# First determine what the latest version of EPEL is. Meza kept breaking
 		# each time EPEL got a new version. See #375 and #401
-		epel_version=`curl -v --silent http://dl.fedoraproject.org/pub/epel/7/x86_64/e/ 2>&1 | grep -oh 'epel-release-7-[0-9]\+.noarch.rpm' epel.txt | head -1`
+		epel_version=`curl -v --silent http://dl.fedoraproject.org/pub/epel/7/x86_64/e/ 2>&1 | grep -oh 'epel-release-7-[0-9]\+.noarch.rpm' | head -1`
 		epel_version="7/x86_64/e/$epel_version"
 	fi
 
