@@ -121,6 +121,18 @@ skipped_wikis=""
 cd $imports_dir
 for d in */ ; do
 
+//////////////////
+keeping this here to deliberately screw up the script while I work
+
+input variables that need initializing (with defaults):
+
+$overwrite_existing_wikis = false (by default I do not think we want to wipe out existing wikis)
+$keep_imports_directories = false (I think by default we want to move the files to their final location and not duplicate them on the file system)
+$skip_database_update = false
+$skip_smw_rebuild = false
+
+exit 1
+//////////////////
 
 	# trim trailing slash from directory name
 	# ref: http://stackoverflow.com/questions/1848415/remove-slash-from-the-end-of-a-variable
@@ -132,12 +144,41 @@ for d in */ ; do
 	wiki_install_path="$wikis_install_dir/$wiki_id"
 
 	if [ -d "$wiki_install_path" ]; then
-		echo "$wiki_id directory already exists. Skipping."
-		skipped_wikis="$skipped_wikis\n$wiki_id"
-		continue
+
+		if [ "$overwrite_existing_wikis" = "true" ]; then
+			echo "$wiki_id directory already exists. Removing."
+			rm -rf $wiki_install_path
+		else
+			echo "$wiki_id directory already exists. Skipping."
+			skipped_wikis="$skipped_wikis\n$wiki_id"
+			continue
+		fi
 	fi
 
-	mv "$imports_dir/$wiki_id" "$wiki_install_path"
+	# new-backups-import
+	# This assumes we only need to copy the /config and /images directories from the backup set (to excluse sql files)
+	# We may need to modify this later if the architecture changes
+
+
+	# Create directory for wiki. We do not simply move the $imports_dir/$wiki_id
+	# directory because this may also include several additional files (namely
+	# SQL files) which are not required
+	mkdir "$wiki_install_path"
+
+
+	if [ "$keep_imports_directories" = "true" ]; then
+
+		cp -r "$imports_dir/$wiki_id/config" "$wiki_install_path/config"
+		cp -r "$imports_dir/$wiki_id/images" "$wiki_install_path/images"
+
+	else
+
+		mv "$imports_dir/$wiki_id/config" "$wiki_install_path/config"
+		mv "$imports_dir/$wiki_id/images" "$wiki_install_path/images"
+		# Note: we'll remove the $imports_dir/$wiki_id directory at the end of the loop
+
+	fi
+
 	chmod 755 "$wiki_install_path"
 
 	# Configure images folder
@@ -185,26 +226,50 @@ for d in */ ; do
 	# This command just comments out the old database name
 	sed -i "s/\$mezaCustomDBname/\/\/ \$mezaCustomDBname/g;" "$wiki_install_path/config/preLocalSettings.php"
 
+	# if a file exists called wiki.sql, use that. Else use the latest timestamped
+	import_sql_file="$wiki_install_path/wiki.sql"
+	if [ ! -f "$import_sql_file" ]; then
+		# wiki.sql does not exist. Determine and use most-recent sql file
+		# Ref: http://stackoverflow.com/a/4447795/5103312
+		import_sql_file="$(find $imports_dir/$wiki_id -maxdepth 1 -type f -iname "*.sql" | sort -r | head -n +1)"
+	fi
+
+	# If SQL file still not found we can't complete this import. Skip this wiki
+	# FIXME: perhaps this should be performed earlier before files are moved
+	if [ ! -f "$import_sql_file" ]; then
+		continue;
+	fi
+
 	# import SQL file
 	# Import database - Ref: https://www.mediawiki.org/wiki/Manual:Restoring_a_wiki_from_backup
-	import_sql_file="$wiki_install_path/wiki.sql"
 	wiki_db_name="wiki_$wiki_id"
 	echo "For $wiki_db_name: "
 	echo " * dropping if exists"
 	echo " * (re)creating"
 	echo " * importing file at $import_sql_file"
 	mysql -u root "--password=$mysql_root_pass" -e"DROP DATABASE IF EXISTS $wiki_db_name; CREATE DATABASE $wiki_db_name; use $wiki_db_name; SOURCE $import_sql_file;"
-	rm -rf "$import_sql_file"
 
+	# Remove the SQL file unless directed to keep it
+	if [ "$keep_imports_directories" = "false" ]; then
+		rm -rf "$import_sql_file"
+	fi
 
 	# Run update.php. The database you imported may not be up to the same version
-	# as meza, and thus you must update it.
-	echo "Running MediaWiki maintenance script \"update.php\""
-	WIKI="$wiki_id" php "$m_mediawiki/maintenance/update.php" --quick
+	# of meza, and then you must update it. If you know the database is for the
+	# same version of meza you can choose not to run this for time-savings. If
+	# you're not sure you should run it.
+	if [ "$skip_database_update" = "false" ]; then
+		echo "Running MediaWiki maintenance script \"update.php\""
+		WIKI="$wiki_id" php "$m_mediawiki/maintenance/update.php" --quick
+	fi
 
+	if [ "$skip_smw_rebuild" = "true" ]; then
+
+		echo
+		echo "SKIPPING SemanticMediaWiki rebuildData.php and runjobs.php per user direction"
 
 	# if SMW set up yet. On the very first install it will not be.
-	if [ -d "$m_mediawiki/extensions/SemanticMediaWiki" ]; then
+	elif [ -d "$m_mediawiki/extensions/SemanticMediaWiki" ]; then
 		# Run SMW rebuildData.php
 		# Some documenation says to run this in increments of ~3000 pages, but the most
 		# recent version of http://semantic-mediawiki.org/wiki/Help:RebuildData.php
@@ -221,23 +286,29 @@ for d in */ ; do
 		echo "\$wgDisableSearchUpdate = true;" >> "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
 		WIKI="$wiki_id" php "$m_mediawiki/maintenance/runJobs.php" --quick
 		sed -r -i 's/\$wgDisableSearchUpdate = true;//g;' "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
+
+	# SMW not set up yet (for new installations). Skip it.
 	else
-		echo -e "\nSKIPPING SemanticMediaWiki rebuildData.php and runjobs.php (no SMW)"
+		echo
+		echo "SKIPPING SemanticMediaWiki rebuildData.php and runjobs.php (no SMW)"
 	fi
 
-	# @FIXME: This has changed. CirrusSearch exists from the beginning now
-	# if CirrusSearch extension exists. On first install it will not yet.
-	if [ -d "$m_mediawiki/extensions/CirrusSearch" ]; then
-		echo "Building Elastic Search index"
-		source "$m_meza/scripts/elastic-build-index.sh"
-	else
-		echo -e "\nSKIPPING elastic-build-index.sh (no CirrusSearch)"
-	fi
 
+	#
+	# Completion of import (not search index, yet)
+	#
 	complete_msg="Wiki '$wiki_id' has been imported"
 	if [[ -f "$rebuild_exception_log" ]]; then
 		complete_msg="$complete_msg\nSemanticMediaWiki rebuildData exceptions:\n\n$(cat $rebuild_exception_log)"
 	fi
+
+	# Check if anything remains in $imports_dir/$wiki_id. If so don't delete, but report it.
+	if [ "$(ls -A $1)" ]; then
+		complete_msg="$complete_msg\n\nImport directory $imports_dir/$wiki_id is not empty. Not deleting."
+	else
+		rm "$imports_dir/$wiki_id"
+	fi
+
 	echo -e "\n$complete_msg\n"
 	if [[ ! -z "$slackwebhook" ]]; then
 		bash "$m_meza/scripts/slack.sh" "$slackwebhook" "$complete_msg"
@@ -257,3 +328,44 @@ if [ "$skipped_wikis" != "" ]; then
 	echo "$skipped_wikis"
 fi
 
+
+echo -e "\nBuilding search indices"
+# Announce building search indices on Slack if a slack webhook provided
+if [[ ! -z "$slackwebhook" ]]; then
+	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Building search indices for each wiki" ""
+
+fi
+
+cd $wikis_install_dir
+for d in */ ; do
+
+	# trim trailing slash from directory name
+	# ref: http://stackoverflow.com/questions/1848415/remove-slash-from-the-end-of-a-variable
+	# ref: http://www.network-theory.co.uk/docs/bashref/ShellParameterExpansion.html
+	wiki_id=${d%/}
+
+	# Announce building search indices on Slack if a slack webhook provided
+	if [[ ! -z "$slackwebhook" ]]; then
+		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Starting $wiki_id search index" ""
+
+	fi
+
+	echo "Building Elastic Search index for $wiki_id"
+	source "$m_meza/scripts/elastic-build-index.sh"
+
+done
+
+
+
+# Announce completion of backup on Slack if a slack webhook provided
+if [[ ! -z "$slackwebhook" ]]; then
+	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Your meza import and indexing is complete!" ""
+
+	# Announce errors on Slack if any were logged
+	# Commented out because it's broken it doesn't work someone should lose their job
+	# if [ ! -e "$cronlog" ]; then
+	# 	announce_log=`cat $cronlog`
+	# 	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "$announce_log" "$cmd_times"
+	# fi
+
+fi
