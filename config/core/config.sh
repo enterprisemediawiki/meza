@@ -7,6 +7,9 @@ m_meza="$m_install/meza" # was: m_meza="$m_install/meza1"
 # config dir
 m_config="$m_meza/config"
 
+# scripts dir
+m_scripts="$m_meza/scripts"
+
 # webserver variables
 m_htdocs="$m_meza/htdocs" # was: m_htdocs="$m_www_meza/htdocs"
 m_mediawiki="$m_htdocs/mediawiki"

@@ -9,15 +9,6 @@ if [ "$(whoami)" != "root" ]; then
 fi
 
 
-if [ -f "/opt/meza/config/local/local-import-config.sh" ]; then
-	source "/opt/meza/config/local/local-import-config.sh"
-fi
-
-
-# print title of script
-bash printTitle.sh "Begin import-wikis.sh"
-
-
 # If /usr/local/bin is not in PATH then add it
 # Ref enterprisemediawiki/meza#68 "Run install.sh with non-root user"
 if [[ $PATH != *"/usr/local/bin"* ]]; then
@@ -25,12 +16,54 @@ if [[ $PATH != *"/usr/local/bin"* ]]; then
 fi
 
 
-#
-# For now this script is not called within the same shell as install.sh
-# and thus it needs to know how to get to the config.sh script on it's own
-#
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# meza core config info
 source "/opt/meza/config/core/config.sh"
+
+
+# print title of script
+bash printTitle.sh "Begin import-wikis.sh"
+
+
+# INITIALIZE DEFAULTS. These can be overridden in import-config.sh (sourced below).
+
+# Default: Don't wipe out existing wikis
+overwrite_existing_wikis=false
+
+# Default: Move files to final locations and don't duplicate on file system
+keep_imports_directories=false
+
+# Default: Run update.php after import
+# (may not be required for imports from identical meza systems)
+skip_database_update=false
+
+# Default: Rebuild SMW data after import
+# (may not be required for imports from identical meza systems)
+skip_smw_rebuild=false
+
+
+if [ -f "/opt/meza/config/local/import-config.sh" ]; then
+	source "/opt/meza/config/local/import-config.sh"
+fi
+
+
+# setup configuration variables
+wikis_install_dir="$m_htdocs/wikis"
+skipped_wikis=""
+
+#
+# Logging info
+#
+timestamp=$(date "+%Y%m%d%H%M%S")
+# default_backup_logpath="~/logs"
+# if [ -z "$backup_logpath" ]; then
+# 	# Prompt user for place to store backup logs
+# 	echo -e "\nType the path to store log files"
+# 	echo -e "or leave blank to use your user directory and press [ENTER]:"
+# 	read backup_logpath
+# fi
+# backup_logpath=${backup_logpath:-$default_backup_logpath}
+# # backup_logpath="/home/root/logs"
+# cronlog="$backup_logpath/${timestamp}_cron.log"
 
 
 # Prompt user for locations of wiki data
@@ -47,7 +80,6 @@ do
 echo -e "\nEnter MySQL root password and press [ENTER]: "
 read -s mysql_root_pass
 done
-
 
 
 if [ "$imports_dir" = "new" ]; then
@@ -101,10 +133,6 @@ if [[ -z "$slackwebhook" ]]; then
 fi
 
 
-# setup configuration variables
-wikis_install_dir="$m_htdocs/wikis"
-skipped_wikis=""
-
 # Intended location of $imports_dir (if not creating new wiki): /home/your-user-name/wikis
 #
 # $imports_dir structured like:
@@ -120,19 +148,6 @@ skipped_wikis=""
 # Note: $d has trailing slash, like "wiki1/"
 cd $imports_dir
 for d in */ ; do
-
-//////////////////
-keeping this here to deliberately screw up the script while I work
-
-input variables that need initializing (with defaults):
-
-$overwrite_existing_wikis = false (by default I do not think we want to wipe out existing wikis)
-$keep_imports_directories = false (I think by default we want to move the files to their final location and not duplicate them on the file system)
-$skip_database_update = false
-$skip_smw_rebuild = false
-
-exit 1
-//////////////////
 
 	# trim trailing slash from directory name
 	# ref: http://stackoverflow.com/questions/1848415/remove-slash-from-the-end-of-a-variable

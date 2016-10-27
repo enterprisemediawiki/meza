@@ -30,8 +30,8 @@ fi
 
 source /opt/meza/config/core/config.sh
 
-if [ -f "/opt/meza/config/local/remote-wiki-config.sh" ]; then
-	source "/opt/meza/config/local/remote-wiki-config.sh"
+if [ -f "/opt/meza/config/local/import-config.sh" ]; then
+	source "/opt/meza/config/local/import-config.sh"
 fi
 
 #
@@ -62,7 +62,7 @@ wikis_install_dir="$m_htdocs/wikis"
 
 
 
-# if not set by remote-wiki-config.sh, then put the wiki data in /opt/mezawikis
+# if not set by import-config.sh, then put the wiki data in /opt/mezawikis
 # Chose to put in /opt since most likely this directory has lots of space
 # regardless of partitioning, since it's where all the wiki data will end up
 # anyway.
@@ -85,7 +85,7 @@ echo -e "\n\n\nIMPORTING WIKIS \n"
 default_which_wikis="$(ssh -q $remote_ssh_username@$remote_domain 'cd /opt/meza/htdocs/wikis; for d in */; do wiki_id=${d%/}; default_which_wikis="$default_which_wikis $wiki_id"; done; echo $default_which_wikis')"
 
 
-# check if already set (via remote-wiki-config.sh file)
+# check if already set (via import-config.sh file)
 if [ -z "$which_wikis" ]; then
 	# Prompt user for which wikis to import
 	echo -e "\nType which wikis you would like to import, separated by spaces"
@@ -94,7 +94,7 @@ if [ -z "$which_wikis" ]; then
 fi
 which_wikis=${which_wikis:-$default_which_wikis}
 
-# remote-wiki-config.sh method for getting all wikis is to set which_wikis to IMPORT_ALL
+# import-config.sh method for getting all wikis is to set which_wikis to IMPORT_ALL
 if [ "$which_wikis" = "IMPORT_ALL" ]; then
 	which_wikis="$default_which_wikis"
 fi
