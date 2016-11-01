@@ -4,6 +4,25 @@
 
 
 
+# For test purposes, setup some unique values for these
+backup_user_name="testuser4321"
+temp_pub_key_path="/tmp/pubkey-$backup_user_name"
+source_root_user="root" # root=root...duh, but keeping for easy changing later
+
+#
+# GETTING FILES AND/OR SQL VIA SSH
+# Note: TBD below will be modified by test script
+remote_domain=TBD
+remote_ssh_username="$backup_user_name" # used by backup-remote-wikis.sh
+
+
+remote_db_username=root
+remote_db_password=TBD
+
+# Location for backups to be stored, e.g. path to your wiki imports
+imports_dir="/opt/meza-test-backup"
+local_wiki_backup="$imports_dir" # used in backup-remote-wikis.sh
+
 
 
 #
@@ -12,7 +31,7 @@
 #
 
 # MySQL root password for local database
-mysql_root_pass="mypassword"
+mysql_root_pass=TBD
 
 # Use a webhook, or just put "n" for no
 slackwebhook="n"
@@ -22,8 +41,6 @@ slackwebhook="n"
 # This may or may not be used in multiple scripts
 which_wikis="IMPORT_ALL"
 
-# path to your wiki imports
-imports_dir="/path/to/wikis"
 
 
 # Default: Don't wipe out existing wikis
@@ -40,15 +57,6 @@ skip_database_update=false
 # (may not be required for imports from identical meza systems)
 skip_smw_rebuild=false
 
-
-
-#
-# GETTING FILES AND/OR SQL VIA SSH
-# Used to make an SSH connection with a server. Note: no setting for password
-# for security purposes. Setup SSH keys.
-#
-remote_domain="domain.com"
-remote_ssh_username="yourusername"
 
 
 #

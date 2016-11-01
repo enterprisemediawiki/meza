@@ -9,7 +9,7 @@ rootCheck # function that does the checks for root/sudo
 
 # Get test setup file for this test
 test_name="remote-backup"
-source "$m_test/$test_name/test-setup.sh"
+source "$m_test/$test_name/import-config.sh"
 
 
 # Create user for backup
