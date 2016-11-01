@@ -34,3 +34,12 @@ rootCheck() {
 		PATH="/usr/local/bin:$PATH"
 	fi
 }
+
+prompt_mysql_root_pass() {
+	# prompt user for MySQL root password
+	while [ -z "$mysql_root_pass" ]
+		do
+		echo -e "\nEnter MySQL root password and press [ENTER]: "
+		read -s mysql_root_pass
+	done
+}

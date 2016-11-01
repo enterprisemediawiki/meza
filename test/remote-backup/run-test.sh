@@ -77,7 +77,7 @@ echo
 echo
 echo "Putting public key on source server..."
 echo "Enter root user's password for $remote_domain"
-sleep 2
+sleep 1
 
 
 # --> Put SSH key on source server
@@ -102,7 +102,7 @@ echo
 echo
 echo "Setting up SSH access on source server..."
 echo "Enter root user's password for $remote_domain"
-sleep 2
+sleep 1
 
 
 # SSH into source server,
