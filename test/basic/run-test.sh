@@ -24,8 +24,8 @@ source "$m_scripts/create-wiki.sh"
 
 # Import a test wiki
 cd /tmp
-git clone "https://github.com/enterprisemediawiki/meza-test-cases"
-imports_dir="/tmp/meza-test-cases/wikis"
+git clone "https://github.com/enterprisemediawiki/meza-test"
+imports_dir="/tmp/meza-test/wikis"
 source "$m_scripts/import-wikis.sh"
 
 domain=`cat "$m_config/local/domain"`
@@ -35,7 +35,8 @@ imported=`curl --insecure "https://$domain/import_test/api.php?action=query&meta
 
 echo
 echo
-echo "API Checks:"
+echo
+echo "TESTS:"
 
 if [ "$demo" = "Demo Wiki" ]; then
 	echo "[PASS] Demo Wiki API check"
