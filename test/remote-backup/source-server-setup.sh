@@ -20,4 +20,4 @@ add_ssh_user "$backup_user_name"
 cat "$temp_pub_key_path" >> "/home/$backup_user_name/.ssh/authorized_keys"
 rm "$temp_pub_key_path"
 chmod 600 "/home/$backup_user_name/.ssh/authorized_keys"
-
+chown "$backup_user_name" "/home/$backup_user_name/.ssh/authorized_keys"
