@@ -67,8 +67,19 @@ source "$m_config/local/import-config.sh"
 source "$m_scripts/shell-functions/add-user.sh"
 add_ssh_user "$backup_user_name"
 
-# generate SSH key
+# generate SSH key for backup_user_name
 ssh-keygen -t rsa -N "" -f "/home/$backup_user_name/.ssh/id_rsa"
+
+
+# Waits 2 seconds to inform user that they're going to need to enter the source
+# server's root password
+echo
+echo
+echo "Putting public key on source server..."
+echo "Enter root user's password for $remote_domain"
+sleep 2
+
+
 # --> Put SSH key on source server
 # StrictHostKeyChecking=no == don't check if server fingerprint is okay
 scp -oStrictHostKeyChecking=no "/home/$backup_user_name/.ssh/id_rsa.pub" "$source_root_user@$source_server:$temp_pub_key_path"
@@ -83,6 +94,16 @@ if [ ! -d "$backup_logpath" ]; then
 	mkdir "$backup_logpath"
 fi
 # chmod 744 "$backup_logpath" # FIXME: Why?
+
+
+# Waits 2 seconds to inform user that they're going to need to enter the source
+# server's root password
+echo
+echo
+echo "Setting up SSH access on source server..."
+echo "Enter root user's password for $remote_domain"
+sleep 2
+
 
 # SSH into source server,
 ssh -oStrictHostKeyChecking=no -q "$source_root_user@$source_server" "bash $m_test/$test_name/source-server-setup.sh"
@@ -104,4 +125,5 @@ bash "$m_scripts/updateExtensions.sh"
 # FIXME: why do we need this?
 # service httpd restart
 
-echo "DONE"
+echo
+echo "Remote backup complete"
