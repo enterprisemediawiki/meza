@@ -121,7 +121,6 @@ This is an overview of the directory structure used by a meza server. This does 
 |		|	|-- elastic-rebuild-index.sh
 |		|	|-- import-remote-wikis.sh
 |		|	|-- import-wikis.sh
-|		|	|-- import-wikis-from-local-backup.sh
 |		|	|-- install.sh
 |		|	|-- mezaCreateUser.php
 |		|	|-- saml.sh

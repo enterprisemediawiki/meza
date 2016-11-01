@@ -3,9 +3,6 @@
 # An example config file for handling imports, regardless of import method:
 #
 #  * import-wikis.sh: Importing wikis from local files
-#  * import-wikis-from-local-backup.sh: A wrapper on import-wikis.sh designed
-#    to overwrite wikis with periodic backups. This is useful for keeping a
-#    cloned version of your wiki on a separate server.
 #  * import-remote-wikis: A wrapper on import-wikis.sh which pulls wikis from
 #    remote servers via CIFS.
 

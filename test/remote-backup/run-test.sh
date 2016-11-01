@@ -70,7 +70,8 @@ add_ssh_user "$backup_user_name"
 # generate SSH key
 ssh-keygen -t rsa -N "" -f "/home/$backup_user_name/.ssh/id_rsa"
 # --> Put SSH key on source server
-scp "/home/$backup_user_name/.ssh/id_rsa.pub" "$source_root_user@$source_server:$temp_pub_key_path"
+# StrictHostKeyChecking=no == don't check if server fingerprint is okay
+scp -oStrictHostKeyChecking=no "/home/$backup_user_name/.ssh/id_rsa.pub" "$source_root_user@$source_server:$temp_pub_key_path"
 
 # Take $backup_user_name's private key and let root use it
 mkdir -p "/root/.ssh"
@@ -84,16 +85,16 @@ fi
 # chmod 744 "$backup_logpath" # FIXME: Why?
 
 # SSH into source server,
-ssh -q "$source_root_user@$source_server" "bash $m_test/$test_name/source-server-setup.sh"
+ssh -oStrictHostKeyChecking=no -q "$source_root_user@$source_server" "bash $m_test/$test_name/source-server-setup.sh"
 
 # These should be modified in Git to make them 744 by default
 # FIXME: Set permissions via Git
-chmod 744 "$m_scripts/backup-remote-wikis.sh"
-chmod 744 "$m_scripts/import-wikis-from-local-backup.sh"
+# chmod 744 "$m_scripts/backup-remote-wikis.sh"
+# chmod 744 "$m_scripts/import-wikis.sh"
 
 # Run backup and import
 bash "$m_scripts/backup-remote-wikis.sh"
-bash "$m_scripts/import-wikis-from-local-backup.sh"
+bash "$m_scripts/import-wikis.sh"
 
 # Need to update extensions in case individual wikis have different reqs
 # FIXME: So should import-wikis.sh update extensions for each wiki imported? An
@@ -101,6 +102,6 @@ bash "$m_scripts/import-wikis-from-local-backup.sh"
 bash "$m_scripts/updateExtensions.sh"
 
 # FIXME: why do we need this?
-service httpd restart
+# service httpd restart
 
 echo "DONE"

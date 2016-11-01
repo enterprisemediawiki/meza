@@ -42,21 +42,17 @@ slackwebhook="n"
 which_wikis="IMPORT_ALL"
 
 
+# Each run of this script should clone the latest version of the wiki. Removing
+# the old version is required.
+overwrite_existing_wikis=true
 
-# Default: Don't wipe out existing wikis
-overwrite_existing_wikis=false
+# Imports directories are longer-term backups. Don't delete.
+keep_imports_directories=true
 
-# Default: Move files to final locations and don't duplicate on file system
-keep_imports_directories=false
-
-# Default: Run update.php after import
-# (may not be required for imports from identical meza systems)
-skip_database_update=false
-
-# Default: Rebuild SMW data after import
-# (may not be required for imports from identical meza systems)
-skip_smw_rebuild=false
-
+# Since backup server should be running an identical setup as the production
+# server, no need to do database updates.
+skip_database_update=true
+skip_smw_rebuild=true
 
 
 #
