@@ -5,9 +5,12 @@
 print_title "Starting script php.sh"
 
 
+# Install IUS repository
+yum install https://centos7.iuscommunity.org/ius-release.rpm
 
-cd "$m_meza/sources/meza-packages/RPMs"
-yum install -y ./php_*
+# Install yum-plugin-replace and replace the php packages with php56u packages:
+yum install yum-plugin-replace
+yum replace --replace-with php56u php
 
 
 #
