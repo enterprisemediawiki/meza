@@ -6,17 +6,42 @@ print_title "Starting script php.sh"
 
 
 # Install IUS repository
-yum install https://centos7.iuscommunity.org/ius-release.rpm
+yum -y install https://centos7.iuscommunity.org/ius-release.rpm
 
 # Install yum-plugin-replace and replace the php packages with php56u packages:
-yum install yum-plugin-replace
-yum replace --replace-with php56u php
+# yum install -y yum-plugin-replace
+# yum -y replace --replace-with php56u php
+
+# Install php56u packages
+yum install -y \
+	php56u \
+	php56u-cli \
+	php56u-common \
+	php56u-devel \
+	php56u-gd \
+	php56u-pecl-memcache \
+	php56u-pspell \
+	php56u-snmp \
+	php56u-xml \
+	php56u-xmlrpc \
+	php56u-mysqlnd \
+	php56u-pdo \
+	php56u-pear \
+	php56u-pecl-jsonc \
+	php56u-process \
+	php56u-bcmath \
+	php56u-intl \
+	php56u-opcache \
+	php56u-soap \
+	php56u-mbstring \
+	php56u-mcrypt
 
 
 #
 # Initiate php.ini
 #
-ln -s "$m_config/core/php.ini" /usr/local/php/lib/php.ini
+mv /etc/php.ini /etc/php.ini.default
+ln -s "$m_config/core/php.ini" /etc/php.ini
 
 
 #
