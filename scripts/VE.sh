@@ -82,7 +82,7 @@ echo "******* Downloading configuration files *******"
 cd "$m_meza/scripts"
 
 # Copy Parsoid settings from Meza to Parsoid install
-ln -s "$m_config/core/localsettings.js" /etc/parsoid/api/localsettings.js
+ln -s "$m_config/core/localsettings.js" /etc/parsoid/localsettings.js
 
 # MediaWiki's API URI, for parsoid. Parsoid communicates with MediaWiki PHP API
 # via Apache httpd over port 9000. Note: protocol was $mw_api_protocol, but was
