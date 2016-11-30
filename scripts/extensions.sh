@@ -95,7 +95,7 @@ WIKI=demo php extensions/TitleKey/rebuildTitleKeys.php
 # Other extensions could cause similar issues, so it's best that this go after
 # loading extensions.
 #
-WIKI=demo php "$m_meza/scripts/mezaCreateUser.php" --username=Admin --password=1234 --groups=sysop,bureaucrat
+WIKI=demo php "$m_meza/scripts/mezaCreateUser.php" --username=Admin --password=adminpass --groups=sysop,bureaucrat
 
 #
 # Generate ES index, since it is skipped in the initial create-wiki.sh

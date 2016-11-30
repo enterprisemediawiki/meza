@@ -637,13 +637,6 @@ $smwgNamespacesWithSemanticLinks[NS_TALK] = true;
 require_once "$IP/extensions/ExtensionLoader/ExtensionLoader.php";
 $egExtensionLoader = new ExtensionLoader();
 
-/**
- * May want to include ParserFunctionHelper in order to extension-ify templates
- */
-// 'ParserFunctionHelper' => array(
-// 	'git' => 'https://github.com/enterprisemediawiki/ParserFunctionHelper.git',
-// 	'branch' => 'master',
-// ),
 
 /**
  * ImportUsers is not in wikimedia git, now in github/kghbln. Also, it seems it
@@ -725,9 +718,19 @@ $wgCiteEnablePopups = true;
 
 
 #
-# Extension:WhoIsWatching
+# Extension:ParserFunctionHelper
 #
 $egExtensionLoader->load(
+	'ParserFunctionHelper',
+	'https://github.com/enterprisemediawiki/ParserFunctionHelper.git',
+	'master'
+);
+
+
+#
+# Extension:WhoIsWatching
+#
+require_once $egExtensionLoader->registerLegacyExtension(
 	"WhoIsWatching",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/WhoIsWatching.git",
 	"REL1_27"
@@ -953,7 +956,7 @@ require_once $egExtensionLoader->registerLegacyExtension(
 require_once $egExtensionLoader->registerLegacyExtension(
 	"WatchAnalytics",
 	"https://github.com/enterprisemediawiki/WatchAnalytics.git",
-	"extreg"
+	"master"
 );
 
 // makes Pending Reviews shake after X days
@@ -1151,7 +1154,7 @@ $wgThanksConfirmationRequired = false;
 #
 # Extension:Upload Wizard
 #
-$egExtensionLoader->load(
+require_once $egExtensionLoader->registerLegacyExtension(
 	'UploadWizard',
 	'https://gerrit.wikimedia.org/r/mediawiki/extensions/UploadWizard',
 	'REL1_27'
