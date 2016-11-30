@@ -26,6 +26,7 @@ yum install -y \
 	php56u-xmlrpc \
 	php56u-mysqlnd \
 	php56u-pdo \
+	php56u-odbc \
 	php56u-pear \
 	php56u-pecl-jsonc \
 	php56u-process \

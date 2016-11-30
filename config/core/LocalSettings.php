@@ -1090,11 +1090,15 @@ $wgHiddenPrefs[] = 'visualeditor-enable';
 #$wgDefaultUserOptions['visualeditor-enable-experimental'] = 1;
 
 // URL to the Parsoid instance MUST NOT end in a slash due to Parsoid bug
-// domain is localhost
-// Interwiki prefix to pass to the Parsoid instance
 $wgVirtualRestConfig['modules']['parsoid'] = array(
 	'url' => 'http://127.0.0.1:8000',
-	'domain' => 'localhost',
+
+	// domain here is not really the domain. It needs to be unique to each wiki
+	// and both domain and prefix must match settings in Parsoid's settings in
+	// /opt/meza/config/core/localsettings.js
+	// ref:
+	// https://www.mediawiki.org/wiki/Parsoid/Setup#Multiple_wikis_sharing_the_same_parsoid_service
+	'domain' => $wikiId,
 	'prefix' => $wikiId
 );
 
