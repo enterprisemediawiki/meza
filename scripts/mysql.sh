@@ -15,37 +15,26 @@ read -s mysql_root_pass
 done
 
 
-#
-# Install MySQL repo
-#
-if [ "$enterprise_linux_version" = "6" ]; then
-	echo "Install MySQL for Enterprise Linux 6"
-    yum -y install https://dev.mysql.com/get/mysql-community-release-el6-5.noarch.rpm
-else
-	echo "Install MySQL for Enterprise Linux 7"
-	yum -y install https://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
-fi
-
 
 #
-# Install MySQL server
+# Install MariaDB server
 #
-yum -y install mysql-community-server
+yum -y install mariadb-server
 
 
 #
 # Setup storage of MySQL data in /opt/meza/data/mysql
 #
-chown mysql:mysql "$m_meza/data/mysql"
+chown mysql:mysql "$m_meza/data/mariadb"
 rm /etc/my.cnf
 ln -s "$m_config/core/my.cnf" /etc/my.cnf
 
 
 #
-# Start MySQL service
+# Start MariaDB service
 #
-chkconfig mysqld on
-service mysqld start
+systemctl enable mariadb
+systemctl start mariadb
 
 
 #
