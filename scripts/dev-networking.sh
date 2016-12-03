@@ -3,6 +3,8 @@
 # Setup network configuration for a CentOS 6.6 virtual machine on VirtualBox
 # Please see directions at https://github.com/enterprisemediawiki/meza
 
+source "/opt/meza/config/core/config.sh"
+
 # Get host-only IP address
 while [ -z "$ipaddr" ]
 do
@@ -10,23 +12,11 @@ echo -e "Enter your desired IP address (follow meza VirtualBox Networking steps)
 read -e -i "192.168.56.56" ipaddr
 done
 
-
-#
-# Load meza repository
-#
-cd ~
-mkdir mezadownloads
-cd mezadownloads
-curl -L https://github.com/enterprisemediawiki/meza/tarball/master > meza.tar.gz
-mkdir meza
-tar xpvf meza.tar.gz -C ./meza --strip-components 1
-
 #
 # Modify network scripts in /etc/sysconfig/network-scripts,
 # ifcfg-eth0 (for NAT network adapter) and ifcfg-eth1 (for host-only)
 #
 cd /etc/sysconfig/network-scripts
-
 
 
 # CentOS/RHEL Version?
@@ -56,7 +46,7 @@ sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' "./$network_adapter1"
 
 # note: prefix with \ removes root's alias in .bashrc to "cp -i" which forces cp
 # to ask the user if they want to overwrite existing. We do want to overwrite.
-\cp "/root/mezadownloads/meza/config/template/$network_adapter2" "./$network_adapter2"
+\cp "$m_config/template/$network_adapter2" "./$network_adapter2"
 
 # modify IP address as required:
 sed -r -i "s/IPADDR=192.168.56.56/IPADDR=$ipaddr/g;" "./$network_adapter2"
