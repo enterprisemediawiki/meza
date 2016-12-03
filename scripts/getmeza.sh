@@ -20,7 +20,7 @@ systemctl start firewalld
 cd /opt
 git clone https://github.com/enterprisemediawiki/meza.git
 
-ln -s /opt/meza/scripts/meza.sh /usr/bin/meza
+ln -s "/opt/meza/scripts/meza.sh" "/usr/bin/meza"
 
 echo "meza command installed. Use it:"
 echo "  sudo meza install monolith"

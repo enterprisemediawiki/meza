@@ -58,11 +58,11 @@ case "$1" in
 		case "$2" in
 			"dev-networking")
 				# do dev networking stuff
-				source "/opt/meza/scripts/dev-networking.sh"
+				/opt/meza/scripts/dev-networking.sh
 				exit 0;
 				;;
 			"monolith")
-				source "/opt/meza/scripts/install.sh"
+				/opt/meza/scripts/install.sh
 				exit 0;
 				;;
 			"mw-app")
