@@ -67,12 +67,6 @@ yum -y install elasticsearch
 echo "******* Adding Elasticsearch service *******"
 chkconfig elasticsearch on
 
-# *** MANUAL INSTALLATION OPTION (delete) ***
-# cd ~/mezadownloads
-# curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.6.0.tar.gz
-# tar -xvf elasticsearch-1.6.0.tar.gz
-# cp -r elasticsearch-1.6.0 /etc/elasticsearch-1.6.0
-# cd /etc/elasticsearch-1.6.0/bin
 
 #
 # Elasticsearch Configuration

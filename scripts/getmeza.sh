@@ -9,12 +9,7 @@ if [ "$(whoami)" != "root" ]; then
 	exit 1
 fi
 
-yum install -y firewalld git
-
-# start firewall
-systemctl enable firewalld
-systemctl start firewalld
-
+yum install -y git
 
 # Get meza
 cd /opt

@@ -3,16 +3,6 @@ print_title "Starting script VE.sh"
 
 
 #
-# Prompt user for mw_api_protocol
-#
-while [ "$mw_api_protocol" != "http" ] && [ "$mw_api_protocol" != "https" ]
-do
-	echo -e "\nType \"http\" or \"https\" for MW API and press [ENTER]: "
-	read mw_api_protocol
-done
-
-
-#
 # Prompt user for MW API domain
 #
 while [ -z "$mw_api_domain" ]
@@ -23,14 +13,13 @@ done
 
 echo "******* Downloading node.js *******"
 cmd_profile "START node.js build"
-cd ~/mezadownloads
+cd /tmp
 
 if [ $architecture = 64 ]; then
 	node_version="node-v0.12.7-linux-x64"
 else
 	node_version="node-v0.12.7-linux-x86"
 fi
-
 
 # Download binaries
 # Ref: http://derpturkey.com/install-node-js-from-binaries/
