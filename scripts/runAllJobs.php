@@ -63,6 +63,8 @@ class RunAllJobs extends Maintenance {
 
 	public function execute () {
 
+		global $m_htdocs;
+
 		$totalmaxtime = (int) $this->getOption( 'totalmaxtime', 0 );
 		if ( $totalmaxtime > 0 ) {
 			// override default script timeout
@@ -79,14 +81,12 @@ class RunAllJobs extends Maintenance {
 
 		$wikiIds = $this->getOption( 'wikis', false );
 		if ( ! $wikiIds ) {
-			$wikiIds = scandir( '/opt/meza/htdocs/wikis' );
+			$wikiIds = scandir( "$m_htdocs/wikis" );
 		}
 		else {
 			// split comma-separate list of wiki IDs, trim whitespace from each
 			$wikiIds = array_map( 'trim', explode( ',', $wikiIds ) );
 		}
-
-		global $m_mediawiki;
 
 		// put keys in random order so wikis starting with A don't always get their
 		// jobs prioritized over wikis starting with Z.
@@ -94,8 +94,9 @@ class RunAllJobs extends Maintenance {
 
 		foreach ($wikiIds as $wikiId) {
 
-			// remove . and .. directories and any files
-			if ( $wikiId === '.' || $wikiId === '..' || ! is_dir( $wikiId ) ) {
+			// remove . and .. directories, and anything that's not a directory
+			// in the /opt/meza/htdocs/wikis directory
+			if ( $wikiId === '.' || $wikiId === '..' || ! is_dir( "$m_htdocs/wikis/$wikiId" ) ) {
 				continue;
 			}
 
@@ -103,7 +104,7 @@ class RunAllJobs extends Maintenance {
 			if ( sys_getloadavg()[0] < $maxload ) {
 
 				echo "Running jobs for $wikiId\n";
-				$command = "WIKI=$wikiId php $m_mediawiki/maintenance/runJobs.php $maxtime $maxjobs";
+				$command = "WIKI=$wikiId php $m_htdocs/mediawiki/maintenance/runJobs.php $maxtime $maxjobs";
 				$output = shell_exec( $command );
 				echo $output . "\n";
 

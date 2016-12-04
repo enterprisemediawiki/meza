@@ -40,9 +40,11 @@
 #		prompt for: all wikis? specific wiki?
 #			prompt for: pre or post (give info on what each is for)
 
+source "/opt/meza/config/core/config.sh"
+
 # no first parameter? display help
 if [ -z "$1" ]; then
-	cat "/opt/meza/manual/meza-command-help.txt"
+	cat "$m_meza/manual/meza-command-help.txt"
 	exit 0;
 fi
 
@@ -58,11 +60,11 @@ case "$1" in
 		case "$2" in
 			"dev-networking")
 				# do dev networking stuff
-				/opt/meza/scripts/dev-networking.sh
+				"$m_scripts/dev-networking.sh"
 				exit 0;
 				;;
 			"monolith")
-				/opt/meza/scripts/install.sh
+				"$m_scripts/install.sh"
 				exit 0;
 				;;
 			"mw-app")
@@ -98,8 +100,17 @@ case "$1" in
 		;;
 
 	create)
-		echo "This function not created yet"
-		exit 1;
+		case "$2" in
+			"wiki")
+				"$m_scripts/create-wiki.sh"
+				exit 0;
+				;;
+
+			*)
+				echo "Not a valid CREATE command"
+				exit 1;
+				;;
+		esac
 		;;
 
 	destroy)
@@ -110,6 +121,26 @@ case "$1" in
 	update)
 		echo "This function not created yet"
 		exit 1;
+		;;
+
+	maint)
+		case "$2" in
+			"jobs")
+				anywiki=`ls -d /opt/meza/htdocs/wikis/*/ | tail -1`
+				anywiki=`basename $anywiki`
+				if [ ! -z "$3" ]; then
+					WIKI="$anywiki" php "$m_scripts/runAllJobs.php" "--wikis=$3"
+				else
+					WIKI="$anywiki" php "$m_scripts/runAllJobs.php"
+				fi
+				exit 0;
+				;;
+
+			*)
+				echo "Not a valid MAINT command"
+				exit 1;
+				;;
+		esac
 		;;
 
 	import)
