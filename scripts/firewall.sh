@@ -8,8 +8,7 @@
 # note: /etc/os-release does not exist in CentOS 6, but this works anyway
 if grep -Fxq "VERSION_ID=\"7\"" /etc/os-release
 then
-	echo "Setting Enterprise Linux version to \"7\""
-	enterprise_linux_version=7
+	echo "Installing firewall for Enterprise Linux version \"7\""
 
 	# Make sure firewalld is installed, enabled, and started
 	# On Digital Ocean it is installed but not enabled/started. On centos.org
@@ -21,6 +20,5 @@ then
 	systemctl start firewalld
 
 else
-	echo "Setting Enterprise Linux version to \"6\""
-	enterprise_linux_version=6
+	echo "No install required for firewall on Enterprise Linux version \"6\""
 fi

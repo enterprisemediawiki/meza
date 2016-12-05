@@ -12,13 +12,10 @@ rootCheck
 
 source "$m_scripts/shell-functions/logging.sh"
 
-# Installation default config items
-source "$m_config/core/install.config.defaults.sh"
-
 # Override installation defaults
-if [ -f "$m_config/local/install.config.local.sh" ]; then
+if [ -f "$m_config/local/config.local.sh" ]; then
 	exit 1; # get file below
-	source "$m_config/local/install.config.local.sh"
+	source "$m_config/local/config.local.sh"
 fi
 
 

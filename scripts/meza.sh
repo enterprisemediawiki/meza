@@ -30,6 +30,9 @@
 #		local
 #		remote (fileshare)
 #		remote (scp,ssh,meza,nonmeza)
+#	config
+#		set: sudo meza config <key> <value>
+#		get: meza config <key>
 #	samba
 #	saml
 #	unify
@@ -122,6 +125,44 @@ case "$1" in
 		echo "This function not created yet"
 		exit 1;
 		;;
+
+	config)
+		# $2 is key
+		# $3 is optional, and is value to set to key
+		local_config_file="$m_config/local/config.local.sh"
+		if [ ! -f "$local_config_file" ]; then
+			echo -e "#!/bin/sh\n#\n# Local config overriding /opt/meza/config/core/config.sh\n\n" > "$local_config_file"
+		fi
+
+		source "$local_config_file"
+		var_name="$2"
+		new_val="$3"
+		eval current_val=\$$var_name
+
+		# No value, so just getting value
+		if [ -z "$new_val" ]; then
+			echo "$current_val"
+			exit 0;
+		else
+
+			if [ "$current_val" = "new_val" ]; then
+				echo "'$var_name' already set to '$current_val' in $local_config_file"
+				echo
+			elif [ -z `grep "^$var_name=" "$local_config_file"` ]; then
+				echo "Adding '$var_name' value '$new_val' to $local_config_file"
+				echo
+				# var_name not already in config.local.sh, append it
+				echo -e "\n\n$var_name=$new_val\n" >> "$local_config_file"
+			else
+				echo "Changing '$var_name' value in $local_config_file"
+				echo "  FROM: '$current_val'"
+				echo "  TO:   '$new_val'"
+				echo
+				# var_name already present, replace it
+				sed -i "s/^$var_name=.*$/$var_name=\"$new_val\"/g" "$local_config_file"
+			fi
+
+		fi
 
 	maint)
 		case "$2" in
