@@ -38,6 +38,9 @@ while [ -z "$mysql_root_pass" ]; do
 
 done
 
+# write config to config.local.sh
+meza config mysql_root_pass "$mysql_root_pass"
+
 
 # Prompt user for MW API Domain or IP address
 while [ -z "$mw_api_domain" ]; do
@@ -62,6 +65,9 @@ while [ -z "$mw_api_domain" ]; do
 	mw_api_domain=${mw_api_domain:-$default_mw_api_domain}
 
 done
+
+# write config to config.local.sh
+meza config mw_api_domain "$mw_api_domain"
 
 
 # # # # # # # #

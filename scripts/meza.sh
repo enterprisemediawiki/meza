@@ -131,7 +131,7 @@ case "$1" in
 		# $3 is optional, and is value to set to key
 		local_config_file="$m_config/local/config.local.sh"
 		if [ ! -f "$local_config_file" ]; then
-			echo -e "#!/bin/sh\n#\n# Local config overriding /opt/meza/config/core/config.sh\n\n" > "$local_config_file"
+			echo -e "#!/bin/sh\n#\n# Local config overriding /opt/meza/config/core/config.sh\n" > "$local_config_file"
 		fi
 
 		source "$local_config_file"
@@ -163,6 +163,7 @@ case "$1" in
 			fi
 
 		fi
+		;;
 
 	maint)
 		case "$2" in
