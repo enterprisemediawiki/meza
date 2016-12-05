@@ -156,13 +156,13 @@ case "$1" in
 			fi
 
 
-			if [ "$current_val" = "new_val" ]; then
+			if [ "$current_val" = "$new_val" ]; then
 				echo "'$var_name' already set to '$print_current_val' in $local_config_file"
 				echo
 
 			elif [ -z `grep "^$var_name=" "$local_config_file"` ]; then
 				# var_name not already in config.local.sh, append it
-				echo -e "\n\n$var_name=$new_val\n" >> "$local_config_file"
+				echo -e "\n\n$var_name=\"$new_val\"\n" >> "$local_config_file"
 
 				echo "Adding '$var_name' value '$print_new_val' to $local_config_file"
 				echo
