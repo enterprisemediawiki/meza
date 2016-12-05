@@ -45,9 +45,9 @@ fi
 #
 # Get development tools
 #
-cmd_profile "START yum groupinstall development"
-yum groupinstall -y development
-cmd_profile "END yum groupinstall development"
+# cmd_profile "START yum groupinstall development"
+# yum groupinstall -y development
+# cmd_profile "END yum groupinstall development"
 
 
 # Get EPEL repository
