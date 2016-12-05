@@ -174,7 +174,7 @@ case "$1" in
 				if [ "$quiet"="quiet" ]; then
 					current_val="<hidden-value>"
 					new_val="<hidden-value>"
-				else
+				fi
 
 				echo "Changing '$var_name' value in $local_config_file"
 				echo "  FROM: '$current_val'"
