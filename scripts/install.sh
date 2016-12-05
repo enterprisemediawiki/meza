@@ -38,7 +38,7 @@ while [ -z "$mysql_root_pass" ]; do
 done
 
 # write config to config.local.sh
-meza config mysql_root_pass "$mysql_root_pass"
+meza config mysql_root_pass "$mysql_root_pass" quiet
 
 
 # Prompt user for MW API Domain or IP address
