@@ -73,45 +73,23 @@ meza config mw_api_domain "$mw_api_domain"
 # END PROMPTS #
 # # # # # # # #
 
-source "$m_scripts/firewall.sh"
-source "$m_scripts/time-sync.sh"
-
-
 # @todo: Need to test for yums.sh functionality prior to proceeding
 #	with apache.sh, and Apache functionality prior to proceeding
 #	with php.sh, and so forth.
-cd "$m_meza/scripts"
-cmd_tee "source yums.sh"
+cmd_tee "source $m_scripts/firewall.sh"
+cmd_tee "source $m_scripts/time-sync.sh"
+cmd_tee "source $m_scripts/yums.sh"
+cmd_tee "source $m_scripts/imagemagick.sh"
+cmd_tee "source $m_scripts/apache.sh"
+cmd_tee "source $m_scripts/php.sh"
+cmd_tee "source $m_scripts/memcached.sh"
+cmd_tee "source $m_scripts/mariadb.sh"
+cmd_tee "source $m_scripts/VE.sh"
+cmd_tee "source $m_scripts/ElasticSearch.sh"
+cmd_tee "source $m_scripts/mediawiki.sh"
+cmd_tee "source $m_scripts/extensions.sh"
+cmd_tee "source $m_scripts/security.sh"
 
-cd "$m_meza/scripts"
-cmd_tee "source imagemagick.sh"
-
-cd "$m_meza/scripts"
-cmd_tee "source apache.sh"
-
-cd "$m_meza/scripts"
-cmd_tee "source php.sh"
-
-cd "$m_meza/scripts"
-cmd_tee "source memcached.sh"
-
-cd "$m_meza/scripts"
-cmd_tee "source mariadb.sh"
-
-cd "$m_meza/scripts"
-cmd_tee "source VE.sh"
-
-cd "$m_meza/scripts"
-cmd_tee "source ElasticSearch.sh"
-
-cd "$m_meza/scripts"
-cmd_tee "source mediawiki.sh"
-
-cd "$m_meza/scripts"
-cmd_tee "source extensions.sh"
-
-cd "$m_meza/scripts"
-cmd_tee "source security.sh"
 
 # Remove GitHub API personal access token from .composer dir
 # @todo: change the following to instead just remove the token from the file
