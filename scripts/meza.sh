@@ -147,38 +147,33 @@ case "$1" in
 
 			# for not echoing values in terminal, for passwords and such
 			quiet="$4"
+			if [ "$quiet" = "quiet" ]; then
+				print_new_val="<hidden-value>"
+				print_current_val="<hidden-value>"
+			else
+				print_new_val="$new_val"
+				print_current_val="$current_val"
+			fi
 
-			if [ "$current_val"="new_val" ]; then
-				if [ "$quiet"="quiet" ]; then
-					current_val="<hidden-value>"
-				fi
 
-				echo "'$var_name' already set to '$current_val' in $local_config_file"
+			if [ "$current_val" = "new_val" ]; then
+				echo "'$var_name' already set to '$print_current_val' in $local_config_file"
 				echo
 
 			elif [ -z `grep "^$var_name=" "$local_config_file"` ]; then
 				# var_name not already in config.local.sh, append it
 				echo -e "\n\n$var_name=$new_val\n" >> "$local_config_file"
 
-				if [ "$quiet"="quiet" ]; then
-					new_val="<hidden-value>"
-				fi
-
-				echo "Adding '$var_name' value '$new_val' to $local_config_file"
+				echo "Adding '$var_name' value '$print_new_val' to $local_config_file"
 				echo
 
 			else
 				# var_name already present, replace it
 				sed -i "s/^$var_name=.*$/$var_name=\"$new_val\"/g" "$local_config_file"
 
-				if [ "$quiet"="quiet" ]; then
-					current_val="<hidden-value>"
-					new_val="<hidden-value>"
-				fi
-
 				echo "Changing '$var_name' value in $local_config_file"
-				echo "  FROM: '$current_val'"
-				echo "  TO:   '$new_val'"
+				echo "  FROM: '$print_current_val'"
+				echo "  TO:   '$print_new_val'"
 				echo
 			fi
 
