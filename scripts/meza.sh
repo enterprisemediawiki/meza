@@ -162,6 +162,7 @@ case "$1" in
 
 		# No value, so just getting value
 		if [ -z "$new_val" ]; then
+			# no current value, so nothing to get
 			if [ -z "$current_val" ]; then
 				exit 1; # exit with failure exit code
 			else
@@ -213,11 +214,9 @@ case "$1" in
 		prompt_description="$3"
 		prompt_prefill="$4"
 
-		# source "$m_local_config_file"
-		if `meza config "$prompt_var"`; then
-			echo "'$prompt_var' already set in config, no prompt required."
-			exit 0;
-		fi
+		source "$m_local_config_file"
+		eval prompt_value=\$$prompt_var
+
 
 		while [ -z "$prompt_value" ]; do
 
@@ -245,10 +244,16 @@ case "$1" in
 		prompt_description="$3"
 		prompt_default="$4"
 
-		echo -e "\n$prompt_description"
-		read prompt_value
+		source "$m_local_config_file"
+		eval prompt_value=\$$prompt_var
 
-		prompt_value=${prompt_value:-$prompt_default}
+		if [ -z "$prompt_value" ]; then
+
+			echo -e "\n$prompt_description"
+			read prompt_value
+
+			prompt_value=${prompt_value:-$prompt_default}
+		fi
 
 		meza config "$prompt_var" "$prompt_value"
 		;;
@@ -257,18 +262,25 @@ case "$1" in
 		# $1 = prompt
 		prompt_var="$2"
 
-		# Generate a password
-		gen_password_length=${4:-32} # get password length from $4 or use default 32
-		def_chars="a-zA-Z0-9\!@#\$%^&*"
-		gen_password_chars=${5:-$def_chars} # get allowable chars from $5 or use default
-		gen_password=`cat /dev/urandom | tr -dc "$chars" | fold -w $gen_password_length | head -n 1`
+		source "$m_local_config_file"
+		eval prompt_value=\$$prompt_var
 
-		prompt_description="$3\n(or leave blank to generate $gen_password_length-character password)"
+		if [ -z "$prompt_value" ]; then
 
-		echo -e "\n$prompt_description"
-		read -s prompt_value
+			# Generate a password
+			gen_password_length=${4:-32} # get password length from $4 or use default 32
+			def_chars="a-zA-Z0-9\!@#\$%^&*"
+			gen_password_chars=${5:-$def_chars} # get allowable chars from $5 or use default
+			gen_password=`cat /dev/urandom | tr -dc "$chars" | fold -w $gen_password_length | head -n 1`
 
-		prompt_value=${prompt_value:-$gen_password}
+			prompt_description="$3\n(or leave blank to generate $gen_password_length-character password)"
+
+			echo -e "\n$prompt_description"
+			read -s prompt_value
+
+			prompt_value=${prompt_value:-$gen_password}
+
+		fi
 
 		meza config "$prompt_var" "$prompt_value" quiet
 		;;
