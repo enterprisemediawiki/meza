@@ -5,7 +5,7 @@
 print_title "Starting script mariadb.sh"
 
 if [ "$setup_database_server" = true ]; then
-	source "$m_scripts/mariadb-master.sh"
+	source "$m_scripts/mariadb-server.sh"
 else
 	source "$m_scripts/mariadb-client.sh"
 
