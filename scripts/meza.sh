@@ -150,20 +150,24 @@ case "$1" in
 	config)
 		# $2 is key
 		# $3 is optional, and is value to set to key
-		local_config_file="$m_config/local/config.local.sh"
-		if [ ! -f "$local_config_file" ]; then
-			echo -e "#!/bin/sh\n#\n# Local config overriding /opt/meza/config/core/config.sh\n" > "$local_config_file"
+		if [ ! -f "$m_local_config_file" ]; then
+			# No local config file; create one.
+			echo -e "#!/bin/sh\n#\n# Local config overriding /opt/meza/config/core/config.sh\n" > "$m_local_config_file"
 		fi
 
-		source "$local_config_file"
+		source "$m_local_config_file"
 		var_name="$2"
 		new_val="$3"
 		eval current_val=\$$var_name
 
 		# No value, so just getting value
 		if [ -z "$new_val" ]; then
-			echo "$current_val"
-			exit 0;
+			if [ -z "$current_val" ]; then
+				exit 1; # exit with failure exit code
+			else
+				echo "$current_val"
+				exit 0;
+			fi
 		else
 
 			# for not echoing values in terminal, for passwords and such
@@ -177,23 +181,24 @@ case "$1" in
 			fi
 
 			eval "$var_name=$new_val"
+			var_in_config_file=`grep "^$var_name=" "$m_local_config_file"`
 
 			if [ "$current_val" = "$new_val" ]; then
-				echo "'$var_name' already set to '$print_current_val' in $local_config_file"
+				echo "'$var_name' already set to '$print_current_val' in $m_local_config_file"
 				echo
 
-			elif [ -z `grep "^$var_name=" "$loca l_config_file"` ]; then
+			elif [ -z "$var_in_config_file" ]; then
 				# var_name not already in config.local.sh, append it
-				echo -e "\n\n$var_name=\"$new_val\"\n" >> "$local_config_file"
+				echo -e "\n\n$var_name=\"$new_val\"\n" >> "$m_local_config_file"
 
-				echo "Adding '$var_name' value '$print_new_val' to $local_config_file"
+				echo "Adding '$var_name' value '$print_new_val' to $m_local_config_file"
 				echo
 
 			else
 				# var_name already present, replace it
-				sed -i "s/^$var_name=.*$/$var_name=\"$new_val\"/g" "$local_config_file"
+				sed -i "s/^$var_name=.*$/$var_name=\"$new_val\"/g" "$m_local_config_file"
 
-				echo "Changing '$var_name' value in $local_config_file"
+				echo "Changing '$var_name' value in $m_local_config_file"
 				echo "  FROM: '$print_current_val'"
 				echo "  TO:   '$print_new_val'"
 				echo
@@ -207,6 +212,13 @@ case "$1" in
 		prompt_var="$2"
 		prompt_description="$3"
 		prompt_prefill="$4"
+
+		# source "$m_local_config_file"
+		if `meza config "$prompt_var"`; then
+			echo "'$prompt_var' already set in config, no prompt required."
+			exit 0;
+		fi
+
 		while [ -z "$prompt_value" ]; do
 
 			echo -e "\n$prompt_description"

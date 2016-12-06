@@ -25,6 +25,8 @@ m_mediawiki="$m_htdocs/mediawiki"
 # app locations
 m_apache="/etc/httpd"
 
+# files
+m_local_config_file="$m_config/local/config.local.sh"
 
 
 #
