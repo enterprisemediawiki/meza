@@ -182,7 +182,7 @@ case "$1" in
 				echo "'$var_name' already set to '$print_current_val' in $local_config_file"
 				echo
 
-			elif [ -z `grep "^$var_name=" "$local_config_file"` ]; then
+			elif [ -z `grep "^$var_name=" "$loca l_config_file"` ]; then
 				# var_name not already in config.local.sh, append it
 				echo -e "\n\n$var_name=\"$new_val\"\n" >> "$local_config_file"
 
@@ -215,7 +215,7 @@ case "$1" in
 			if [ -n "$prompt_prefill" ]; then
 
 				# If prefill suggestion given, display it and prompt user for changes
-				read -e -i $prompt_prefill prompt_value
+				read -e -i "$prompt_prefill" prompt_value
 
 			else
 				# no prefill, force user to enter
@@ -249,14 +249,16 @@ case "$1" in
 		gen_password_length=${4:-32} # get password length from $4 or use default 32
 		def_chars="a-zA-Z0-9\!@#\$%^&*"
 		gen_password_chars=${5:-$def_chars} # get allowable chars from $5 or use default
-		gen_pass=`cat /dev/urandom | tr -dc "$chars" | fold -w $len | head -n 1`
+		gen_password=`cat /dev/urandom | tr -dc "$chars" | fold -w $gen_password_length | head -n 1`
 
-		prompt_description="$3\n(or press [enter] to generate $gen_password_length character password)"
+		prompt_description="$3\n(or leave blank to generate $gen_password_length-character password)"
 
-		echo -e "\n$prompt_description\n"
+		echo -e "\n$prompt_description"
 		read -s prompt_value
 
-		prompt_value=${prompt_value:-$prompt_default}
+		prompt_value=${prompt_value:-$gen_password}
+
+		meza config "$prompt_var" "$prompt_value" quiet
 		;;
 
 	maint)
