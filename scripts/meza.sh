@@ -83,6 +83,9 @@ case "$1" in
 				meza config is_remote_db_server false
 				meza config setup_parsoid true
 				meza config setup_elasticsearch true
+
+				# meza prompt db_server
+
 				"$m_scripts/install.sh"
 				exit 0;
 				;;
@@ -173,6 +176,7 @@ case "$1" in
 				print_current_val="$current_val"
 			fi
 
+			eval $var_name="$new_val"
 
 			if [ "$current_val" = "$new_val" ]; then
 				echo "'$var_name' already set to '$print_current_val' in $local_config_file"
