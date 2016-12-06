@@ -176,7 +176,7 @@ case "$1" in
 				print_current_val="$current_val"
 			fi
 
-			eval $var_name="$new_val"
+			eval "$var_name=$new_val"
 
 			if [ "$current_val" = "$new_val" ]; then
 				echo "'$var_name' already set to '$print_current_val' in $local_config_file"
@@ -200,6 +200,63 @@ case "$1" in
 			fi
 
 		fi
+		;;
+
+	prompt)
+		# $1 = prompt
+		prompt_var="$2"
+		prompt_description="$3"
+		prompt_prefill="$4"
+		while [ -z "$prompt_value" ]; do
+
+			echo -e "\n$prompt_description"
+
+			# If $prompt_prefill not null/empty/""
+			if [ -n "$prompt_prefill" ]; then
+
+				# If prefill suggestion given, display it and prompt user for changes
+				read -e -i $prompt_prefill prompt_value
+
+			else
+				# no prefill, force user to enter
+				read -e prompt_value
+			fi
+
+		done
+
+		meza config "$prompt_var" "$prompt_value"
+		;;
+
+	prompt_default_on_blank)
+		# $1 = prompt
+		prompt_var="$2"
+		prompt_description="$3"
+		prompt_default="$4"
+
+		echo -e "\n$prompt_description"
+		read prompt_value
+
+		prompt_value=${prompt_value:-$prompt_default}
+
+		meza config "$prompt_var" "$prompt_value"
+		;;
+
+	prompt_secure)
+		# $1 = prompt
+		prompt_var="$2"
+
+		# Generate a password
+		gen_password_length=${4:-32} # get password length from $4 or use default 32
+		def_chars="a-zA-Z0-9\!@#\$%^&*"
+		gen_password_chars=${5:-$def_chars} # get allowable chars from $5 or use default
+		gen_pass=`cat /dev/urandom | tr -dc "$chars" | fold -w $len | head -n 1`
+
+		prompt_description="$3\n(or press [enter] to generate $gen_password_length character password)"
+
+		echo -e "\n$prompt_description\n"
+		read -s prompt_value
+
+		prompt_value=${prompt_value:-$prompt_default}
 		;;
 
 	maint)

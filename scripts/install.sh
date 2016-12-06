@@ -70,6 +70,10 @@ done
 meza config mw_api_domain "$mw_api_domain"
 meza config server_ip_address "$mw_api_domain"
 
+meza prompt var_to_get "Text description" default
+meza prompt_default_on_blank ...
+meza prompt_secure var_to_get ...
+
 # # # # # # # #
 # END PROMPTS #
 # # # # # # # #
