@@ -66,8 +66,9 @@ while [ -z "$mw_api_domain" ]; do
 done
 
 # write config to config.local.sh
+# FIXME: this is the IP address of the current server, even if not app server
 meza config mw_api_domain "$mw_api_domain"
-
+meza config server_ip_address "$mw_api_domain"
 
 # # # # # # # #
 # END PROMPTS #
@@ -79,15 +80,31 @@ meza config mw_api_domain "$mw_api_domain"
 cmd_tee "source $m_scripts/firewall.sh"
 cmd_tee "source $m_scripts/time-sync.sh"
 cmd_tee "source $m_scripts/yums.sh"
-cmd_tee "source $m_scripts/imagemagick.sh"
-cmd_tee "source $m_scripts/apache.sh"
-cmd_tee "source $m_scripts/php.sh"
-cmd_tee "source $m_scripts/memcached.sh"
-cmd_tee "source $m_scripts/mariadb.sh"
-cmd_tee "source $m_scripts/VE.sh"
-cmd_tee "source $m_scripts/ElasticSearch.sh"
-cmd_tee "source $m_scripts/mediawiki.sh"
-cmd_tee "source $m_scripts/extensions.sh"
+
+if [ "$is_app_server" = true ]; then
+	cmd_tee "source $m_scripts/imagemagick.sh"
+	cmd_tee "source $m_scripts/apache.sh"
+	cmd_tee "source $m_scripts/php.sh"
+	cmd_tee "source $m_scripts/memcached.sh"
+fi
+
+if [ "$setup_database" = true ]; then
+	cmd_tee "source $m_scripts/mariadb.sh"
+fi
+
+if [ "$setup_parsoid" = true ]; then
+	cmd_tee "source $m_scripts/VE.sh"
+fi
+
+if [ "$setup_elasticsearch" ]; then
+	cmd_tee "source $m_scripts/ElasticSearch.sh"
+fi
+
+if [ "$is_app_server" = true ]; then
+	cmd_tee "source $m_scripts/mediawiki.sh"
+	cmd_tee "source $m_scripts/extensions.sh"
+fi
+
 cmd_tee "source $m_scripts/security.sh"
 
 

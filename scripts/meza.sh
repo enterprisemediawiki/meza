@@ -67,6 +67,22 @@ case "$1" in
 				exit 0;
 				;;
 			"monolith")
+				meza config is_app_server true
+				meza config setup_database true
+				meza config setup_database_server true
+				meza config is_remote_db_server false
+				meza config setup_parsoid true
+				meza config setup_elasticsearch true
+				"$m_scripts/install.sh"
+				exit 0;
+				;;
+			"app-with-remote-db")
+				meza config is_app_server true
+				meza config setup_database true
+				meza config setup_database_server false
+				meza config is_remote_db_server false
+				meza config setup_parsoid true
+				meza config setup_elasticsearch true
 				"$m_scripts/install.sh"
 				exit 0;
 				;;
@@ -76,8 +92,10 @@ case "$1" in
 				exit 1;
 				;;
 			"db-master")
-				# do stuff
-				echo "This function not created yet"
+				meza config setup_database true
+				meza config setup_database_server true
+				meza config is_remote_db_server true
+				"$m_scripts/install.sh"
 				exit 1;
 				;;
 			"db-slave")

@@ -1,52 +1,25 @@
 #!/bin/bash
 #
-# Setup MySQL
+# Setup MariaDB
 
-print_title "Starting script mysql.sh"
+print_title "Starting script mariadb.sh"
 
+if [ "$setup_database_server" = true ]; then
+	source "$m_scripts/mariadb-master.sh"
+else
+	source "$m_scripts/mariadb-client.sh"
 
-#
-# Prompt for password
-#
-while [ -z "$mysql_root_pass" ]
-do
-echo -e "\n\n\n\nChoose a MySQL root password and press [ENTER]: "
-read -s mysql_root_pass
-done
+	# Check if master server is up
+	if mysql -u "$remote_db_user" -h "$remote_db_server" "--password=$mysql_root_pass" -e"select version();" | grep -q "MariaDB"; then
+		echo "Successfully reached database server"
+	else
+		echo "Unable to reach database server"
+		exit 1;
+	fi
 
-
-
-#
-# Install MariaDB server
-#
-yum -y install mariadb-server
-
-
-#
-# Setup storage of MySQL data in /opt/meza/data/mysql
-#
-chown mysql:mysql "$m_meza/data/mariadb"
-rm /etc/my.cnf
-ln -s "$m_config/core/my.cnf" /etc/my.cnf
-
-
-#
-# Start MariaDB service
-#
-systemctl enable mariadb
-systemctl start mariadb
-
-
-#
-# Set root password. Must be specified
-#
-mysqladmin -u root password "$mysql_root_pass"
-
-
-#
-# Login to root
-#
-mysql -u root "--password=$mysql_root_pass" -e"DELETE FROM mysql.user WHERE user=''; DELETE FROM mysql.user WHERE user='root' AND host NOT IN ('localhost', '127.0.0.1', '::1'); DROP DATABASE test;"
+	# create and sync slave servers
+	# TBD
+fi
 
 
 echo -e "\n\nMySQL setup complete\n"
