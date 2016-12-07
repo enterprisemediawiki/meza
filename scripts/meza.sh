@@ -199,7 +199,7 @@ case "$1" in
 				print_current_val="$current_val"
 			fi
 
-			eval "$var_name=$new_val"
+			eval "$var_name=\"$new_val\""
 			var_in_config_file=`grep "^$var_name=" "$m_local_config_file"`
 
 			if [ "$current_val" = "$new_val" ]; then

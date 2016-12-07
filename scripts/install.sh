@@ -64,13 +64,22 @@ done
 #
 packages=""
 for module in $modules; do
-	if [ -f "$m_modules/$module/packages.txt" ]; then
-		mod_packages=`cat "$m_modules/$module/packages.txt"`
-		packages="$packages\n$mod_packages"
+	mod_package_file="$m_modules/$module/packages.txt"
+	if [ -f "$mod_package_file" ]; then
+		while IFS='' read -r line || [[ -n "$line" ]]; do
+			if [ -z "$line" ]; then
+				echo "blank line"
+			elif [[ "$line" = \#* ]]; then
+				echo "line starts with hash: $line"
+			else
+				echo "Adding package: $line"
+				packages="$packages $line"
+			fi
+		done < "$mod_package_file"
 	fi
 done
-print_title "Yum installing packages"
-yum -y install $packages
+printTitle "Yum installing packages"
+yum -y install "$packages"
 
 #
 # Run module init scripts

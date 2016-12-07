@@ -14,6 +14,7 @@ m_config="$m_meza/config"
 
 # scripts dir
 m_scripts="$m_meza/scripts"
+m_modules="$m_scripts/modules"
 
 # test dir
 m_test="$m_meza/test"
