@@ -211,7 +211,7 @@ case "$1" in
 	prompt)
 		# $1 = prompt
 		prompt_var="$2"
-		prompt_description="$3"
+		prompt_description="$3 and press [ENTER]:"
 		prompt_prefill="$4"
 
 		source "$m_local_config_file"
@@ -241,7 +241,7 @@ case "$1" in
 	prompt_default_on_blank)
 		# $1 = prompt
 		prompt_var="$2"
-		prompt_description="$3"
+		prompt_description="$3 and press [ENTER]:"
 		prompt_default="$4"
 
 		source "$m_local_config_file"
@@ -273,7 +273,7 @@ case "$1" in
 			gen_password_chars=${5:-$def_chars} # get allowable chars from $5 or use default
 			gen_password=`cat /dev/urandom | tr -dc "$chars" | fold -w $gen_password_length | head -n 1`
 
-			prompt_description="$3\n(or leave blank to generate $gen_password_length-character password)"
+			prompt_description="$3 and press [ENTER]:\n(or leave blank to generate $gen_password_length-character password)"
 
 			echo -e "\n$prompt_description"
 			read -s prompt_value

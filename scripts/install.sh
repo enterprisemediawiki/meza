@@ -12,12 +12,6 @@ rootCheck
 
 source "$m_scripts/shell-functions/logging.sh"
 
-# Override installation defaults
-if [ -f "$m_config/local/config.local.sh" ]; then
-	source "$m_config/local/config.local.sh"
-fi
-
-
 echo -e "\nWelcome to the meza MediaWiki installer\n"
 
 
@@ -25,58 +19,38 @@ echo -e "\nWelcome to the meza MediaWiki installer\n"
 #  BEGIN PROMPTS  #
 # # # # # # # # # #
 
-# Prompt user for MySQL password
-default_mysql_root_pass=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
+meza prompt_secure mysql_root_pass   "Type your desired MySQL root password"
+meza prompt        mw_api_domain     "Type domain or IP address of your wiki"
+meza prompt        server_ip_address "Type IP address of this server"
 
-while [ -z "$mysql_root_pass" ]; do
-
-	echo -e "\nType your desired MySQL root password"
-	echo -e "or leave blank for a randomly generated password and press [ENTER]:"
-	read -s mysql_root_pass
-	mysql_root_pass=${mysql_root_pass:-$default_mysql_root_pass}
-
-done
-
-# write config to config.local.sh
-meza config mysql_root_pass "$mysql_root_pass" quiet
-
-
-# Prompt user for MW API Domain or IP address
-while [ -z "$mw_api_domain" ]; do
-
-	# This for loop attempts to find the correct network adapter from which to pull the domain or IP address
-	# If multiple adapters are configured (as in our VirtualBox configs), put the most-likely correct one last
-	for networkadapter in eth0 eth1 enp0s3 enp0s8
-	do
-		if [ -n "ip addr | grep $networkadapter | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'" ]; then
-			default_mw_api_domain="`ip addr | grep $networkadapter | awk 'NR==2 { print $2 }' | awk '-F[/]' '{ print $1 }'`"
-		fi
-	done
-
-	echo -e "\nType domain or IP address of your wiki and press [ENTER]:"
-	# If the above logic found a value to use as a default suggestion, display it and still prompt user for value
-	if [ -n "$default_mw_api_domain" ]; then
-		read -e -i $default_mw_api_domain mw_api_domain
-	# If the above logic did not find a value to suggest, only read the value in (this fixes #238)
-	else
-		read -e mw_api_domain
-	fi
-	mw_api_domain=${mw_api_domain:-$default_mw_api_domain}
-
-done
-
-# write config to config.local.sh
-# FIXME: this is the IP address of the current server, even if not app server
-meza config mw_api_domain "$mw_api_domain"
-meza config server_ip_address "$mw_api_domain"
-
-meza prompt var_to_get "Text description" default
-meza prompt_default_on_blank ...
-meza prompt_secure var_to_get ...
+# meza "prompt" command writes config changes to config.local, but those
+# changes don't immediately show up in this shell, so need to re-source
+# the config file after changes.
+source "$m_local_config_file"
 
 # # # # # # # #
 # END PROMPTS #
 # # # # # # # #
+
+# going through the items below, add to array those which apply.
+# then loop through the array for:
+#  1. prompts
+#  2. yum
+#  3. install module
+
+# modules="firewall time-sync yums"
+
+# for module in $modules; do
+# 	source "$m_modules/$module/prompts.sh"
+# done
+
+# for module in $modules; do
+# 	 "$m_modules/$module/packages.txt"
+# 	echo "$string" | tr '\n' ' '
+# done
+
+
+
 
 # @todo: Need to test for yums.sh functionality prior to proceeding
 #	with apache.sh, and Apache functionality prior to proceeding
