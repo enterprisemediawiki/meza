@@ -55,7 +55,8 @@ done
 #
 for module in $modules; do
 	if [ -f "$m_modules/$module/pre-setup.sh" ]; then
-		source "$m_modules/$module/pre-setup.sh"
+		printTitle "Starting module:$module:pre-setup"
+		cmd_tee "source $m_modules/$module/pre-setup.sh"
 	fi
 done
 
@@ -79,7 +80,8 @@ for module in $modules; do
 	fi
 done
 printTitle "Yum installing packages"
-yum -y install "$packages"
+echo "doing: yum -y install $packages"
+yum -y install $packages
 
 #
 # Run module init scripts
@@ -89,7 +91,7 @@ yum -y install "$packages"
 #	with php.sh, and so forth.
 for module in $modules; do
 	if [ -f "$m_modules/$module/init.sh" ]; then
-		print_title "Starting module:init:$module"
+		printTitle "Starting module:$module:init"
 		cmd_tee "source $m_modules/$module/init.sh"
 	fi
 done
