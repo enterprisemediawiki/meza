@@ -1,30 +1,6 @@
 #!/bin/bash
 #
 # Setup MediaWiki
-#
-# Example:
-#   bash mediawiki.sh
-#
-#   This script will prompt the user for several parameters
-#
-
-print_title "Starting script mediawiki.sh"
-
-
-#
-# Prompt for parameters
-#
-while [ -z "$mysql_root_pass" ]
-do
-echo -e "\n\nEnter MySQL root password and press [ENTER]: "
-read -s mysql_root_pass
-done
-
-while [ -z "$mediawiki_git_install" ]
-do
-echo -e "\nInstall MediaWiki with git? (y/n) [ENTER]: "
-read mediawiki_git_install
-done
 
 
 #

@@ -1,9 +1,6 @@
 #!/bin/bash
 #
 # Install MediaWiki extensions.
-#
-
-print_title "Starting script extensions.sh"
 
 
 #
@@ -83,8 +80,6 @@ echo -e "\n\n## meza: import pages for SemanticMeetingMinutes"
 WIKI=demo php maintenance/importDump.php --report --debug < ./extensions/SemanticMeetingMinutes/ImportFiles/import.xml
 echo -e "\n\n## meza: rebuildrecentchanges.php"
 WIKI=demo php maintenance/rebuildrecentchanges.php
-echo -e "\n\n## meza: Extension:TitleKey rebuildTitleKeys.php"
-WIKI=demo php extensions/TitleKey/rebuildTitleKeys.php
 
 #
 # Create "Admin" user on Demo Wiki

@@ -1,15 +1,9 @@
-
-print_title "Starting script ElasticSearch.sh"
+#!/bin/sh
+#
+# Install Elasticsearch
 
 #
 # This script installs everything required to use elasticsearch in MediaWiki
-#
-# Dependencies
-# - PHP compiled with cURL
-# - Elasticsearch
-#   - JAVA 7+
-# - Extension:Elastica
-# - Extension:CirrusSearch
 #
 # Ref:
 # https://www.mediawiki.org/wiki/Extension:CirrusSearch
@@ -31,7 +25,6 @@ fi
 #
 echo "******* Downloading and installing JAVA Development Kit *******"
 cd "$m_meza/scripts"
-yum -y install java-1.7.0-openjdk
 # Reference this for if we want to try JDK 8: http://tecadmin.net/install-java-8-on-centos-rhel-and-fedora/
 ## wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.rpm
 ## rpm -ivh jdk-8u45-linux-x64.rpm

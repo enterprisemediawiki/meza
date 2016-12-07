@@ -2,13 +2,7 @@
 #
 # Install ImageMagick, Ghostscript and Xpdf
 
-print_title "Starting script imagemagick.sh"
-
-
-if [ "$(whoami)" != "root" ]; then
-	echo "Try running this script with sudo: \"sudo bash imagemagick.sh\""
-	exit 1
-fi
+rootCheck
 
 cd "$m_meza/sources"
 git clone https://github.com/enterprisemediawiki/meza-packages
@@ -29,7 +23,7 @@ cd xpdfbin-linux-3.04
 
 # Copy correct-architecture executables to /usr/local/bin
 
-if [ $architecture = 64 ]; then
+if [ $m_architecture = 64 ]; then
 	echo "Move 64-bit executables to /usr/local/bin"
 	cp -a ./bin64/. /usr/local/bin/
 else

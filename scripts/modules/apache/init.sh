@@ -2,8 +2,6 @@
 #
 # Setup Apache webserver
 
-print_title "Starting script apache.sh"
-
 #
 # Setup document root
 #

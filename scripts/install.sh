@@ -19,9 +19,9 @@ echo -e "\nWelcome to the meza MediaWiki installer\n"
 #  BEGIN PROMPTS  #
 # # # # # # # # # #
 
-meza prompt_secure mysql_root_pass   "Type your desired MySQL root password"
-meza prompt        mw_api_domain     "Type domain or IP address of your wiki"
-meza prompt        server_ip_address "Type IP address of this server"
+# meza prompt_secure mysql_root_pass   "Type your desired MySQL root password"
+# meza prompt        mw_api_domain     "Type domain or IP address of your wiki"
+# meza prompt        server_ip_address "Type IP address of this server"
 
 # meza "prompt" command writes config changes to config.local, but those
 # changes don't immediately show up in this shell, so need to re-source
@@ -35,55 +35,55 @@ source "$m_local_config_file"
 # going through the items below, add to array those which apply.
 # then loop through the array for:
 #  1. prompts
-#  2. yum
-#  3. install module
-
-# modules="firewall time-sync yums"
-
-# for module in $modules; do
-# 	source "$m_modules/$module/prompts.sh"
-# done
-
-# for module in $modules; do
-# 	 "$m_modules/$module/packages.txt"
-# 	echo "$string" | tr '\n' ' '
-# done
+#  2. things that need to be done before yum
+#  3. yum
+#  4. install module
 
 
+#
+# Prompt for required info
+#
+for module in $modules; do
+	if [ -f "$m_modules/$module/prompts.sh" ]; then
+		source "$m_modules/$module/prompts.sh"
+	fi
+done
 
+#
+# Run pre-setup scripts if required (these are things that must preceed
+# yum-installs, like loading repositories)
+#
+for module in $modules; do
+	if [ -f "$m_modules/$module/pre-setup.sh" ]; then
+		source "$m_modules/$module/pre-setup.sh"
+	fi
+done
 
+#
+# Get list of packages to install with yum, then install them
+#
+packages=""
+for module in $modules; do
+	if [ -f "$m_modules/$module/packages.txt" ]; then
+		mod_packages=`cat "$m_modules/$module/packages.txt"`
+		packages="$packages\n$mod_packages"
+	fi
+done
+print_title "Yum installing packages"
+yum -y install $packages
+
+#
+# Run module init scripts
+#
 # @todo: Need to test for yums.sh functionality prior to proceeding
 #	with apache.sh, and Apache functionality prior to proceeding
 #	with php.sh, and so forth.
-cmd_tee "source $m_scripts/firewall.sh"
-cmd_tee "source $m_scripts/time-sync.sh"
-cmd_tee "source $m_scripts/yums.sh"
-
-if [ "$is_app_server" = true ]; then
-	cmd_tee "source $m_scripts/imagemagick.sh"
-	cmd_tee "source $m_scripts/apache.sh"
-	cmd_tee "source $m_scripts/php.sh"
-	cmd_tee "source $m_scripts/memcached.sh"
-fi
-
-if [ "$setup_database" = true ]; then
-	cmd_tee "source $m_scripts/mariadb.sh"
-fi
-
-if [ "$setup_parsoid" = true ]; then
-	cmd_tee "source $m_scripts/VE.sh"
-fi
-
-if [ "$setup_elasticsearch" ]; then
-	cmd_tee "source $m_scripts/ElasticSearch.sh"
-fi
-
-if [ "$is_app_server" = true ]; then
-	cmd_tee "source $m_scripts/mediawiki.sh"
-	cmd_tee "source $m_scripts/extensions.sh"
-fi
-
-cmd_tee "source $m_scripts/security.sh"
+for module in $modules; do
+	if [ -f "$m_modules/$module/init.sh" ]; then
+		print_title "Starting module:init:$module"
+		cmd_tee "source $m_modules/$module/init.sh"
+	fi
+done
 
 
 # Remove GitHub API personal access token from .composer dir

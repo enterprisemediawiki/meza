@@ -3,10 +3,6 @@
 # Setup network configuration for a CentOS 6.6 virtual machine on VirtualBox
 # Please see directions at https://github.com/enterprisemediawiki/meza
 
-source "/opt/meza/config/core/config.sh"
-
-# Get host-only IP address, write to config.local.sh for install steps
-meza prompt server_ip_address "Enter your desired IP address (follow meza VirtualBox Networking steps)" "192.168.56.56"
 
 #
 # Modify network scripts in /etc/sysconfig/network-scripts,
@@ -63,7 +59,6 @@ service network restart
 #
 # Setup SSH
 #
-yum install -y openssh-server openssh-clients
 chkconfig sshd on
 service sshd start
 

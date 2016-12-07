@@ -1,21 +1,13 @@
-
-print_title "Starting script VE.sh"
-
-
+#!/bin/sh
 #
-# Prompt user for MW API domain
-#
-while [ -z "$mw_api_domain" ]
-do
-	echo -e "\nType domain or IP address of your wiki and press [ENTER]: "
-	read mw_api_domain
-done
+# Install Node.JS and Parsoid
+
 
 echo "******* Downloading node.js *******"
 cmd_profile "START node.js build"
 cd /tmp
 
-if [ $architecture = 64 ]; then
+if [ $m_architecture = 64 ]; then
 	node_version="node-v0.12.7-linux-x64"
 else
 	node_version="node-v0.12.7-linux-x86"

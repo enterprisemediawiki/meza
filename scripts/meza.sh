@@ -67,12 +67,30 @@ case "$1" in
 				exit 0;
 				;;
 			"monolith")
-				meza config is_app_server true
-				meza config setup_database true
+
+				# base requirements for all meza installs
+				modules="base"
+
+				# mediawiki app server
+				modules="$modules imagemagick apache php memcached"
+
+				# database
+				modules="$modules db-server"
+
+				# parsoid
+				modules="$modules parsoid"
+
+				# elasticsearch
+				modules="$modules elasticsearch"
+
+				# more mediawiki app server stuff
+				modules="$modules mediawiki extensions"
+
+				# security. @todo: FIXME can this be rolled into base module?
+				modules="$modules security"
+
 				meza config setup_database_server true
-				meza config is_remote_db_server false
-				meza config setup_parsoid true
-				meza config setup_elasticsearch true
+				meza config modules "$modules"
 				"$m_scripts/install.sh"
 				exit 0;
 				;;

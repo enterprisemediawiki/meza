@@ -1,10 +1,7 @@
-
-print_title "Starting script memcached.sh"
+#!/bin/sh
+#
+# Install memcached
 # ref: http://www.if-not-true-then-false.com/2010/install-memcached-on-centos-fedora-red-hat/
-
-echo "******* Installing memcached *******"
-# Install Memcached package
-yum -y install memcached
 
 echo "******* Copying memcached config file *******"
 rm -f /etc/sysconfig/memcached

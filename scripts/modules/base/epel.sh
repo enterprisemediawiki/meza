@@ -3,10 +3,10 @@
 # Get EPEL
 
 
-if [ "$architecture" = "32" ]; then
+if [ "$m_architecture" = "32" ]; then
     echo "Downloading EPEL for 32-bit"
     epel_version="6/i386/epel-release-6-8.noarch.rpm"
-elif [ "$architecture" = "64" ]; then
+elif [ "$m_architecture" = "64" ]; then
 
     if grep -Fxq "VERSION_ID=\"7\"" /etc/os-release
     then

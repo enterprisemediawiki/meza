@@ -56,7 +56,7 @@ slackwebhook="n"
 
 # Get server architecture here so other scripts don't have to figure it out
 if [ $(uname -m | grep -c 64) -eq 1 ]; then
-    architecture=64 # 64-bit
+    m_architecture=64 # 64-bit
 else
-    architecture=32 # 32-bit
+    m_architecture=32 # 32-bit
 fi

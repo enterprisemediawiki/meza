@@ -1,9 +1,8 @@
 #!/bin/bash
 #
-# Setup everything that should be installed with yum.
+# Setup things that need to be installed before yum-installs are performed
 #
 
-print_title "Starting script yums.sh"
 
 #
 # Make sure deltarpm is installed
@@ -22,6 +21,7 @@ yum install -y deltarpm
 cmd_profile "START yum update"
 yum -y update
 cmd_profile "END yum update"
+
 
 #
 # Do any RedHat or CentOS specific items
@@ -51,61 +51,4 @@ fi
 
 
 # Get EPEL repository
-source "$m_scripts/epel.sh"
-
-
-#
-# Install all packages you'll need thoughout LAMP setup
-# Some may be included in groupinstall above, and will be ignored, but better
-# safe than sorry--attempt to install them now anyway.
-#
-cmd_profile "START yum install dependency list"
-yum install -y \
-    zlib-devel \
-    sqlite-devel \
-    bzip2-devel \
-    xz-libs \
-    openssh-server \
-    openssh-clients \
-    perl \
-    wget \
-    gcc \
-    pcre-devel \
-    openssl-devel \
-    curl-devel \
-    libxml2-devel \
-    libXpm-devel \
-    gmp-devel \
-    libicu-devel \
-    t1lib-devel \
-    aspell-devel \
-    libcurl-devel \
-    libjpeg-devel \
-    libvpx-devel \
-    libpng-devel \
-    freetype-devel \
-    readline-devel \
-    libtidy-devel \
-    libmcrypt-devel \
-    pam-devel \
-    cifs-utils \
-    httpd-devel \
-    mod_ssl \
-    mod_proxy_html \
-    net-tools \
-    vim \
-    sendmail \
-    sendmail-cf \
-    m4 \
-    expect \
-    expectk \
-    ghostscript
-cmd_profile "END yum install dependency list"
-
-
-#
-# @todo: Should these re-run? network setup may not run on all machines
-#
-# chkconfig sshd on
-# service sshd start
-
+source "$m_modules/base/epel.sh"

@@ -2,8 +2,6 @@
 #
 # Setup PHP
 
-print_title "Starting script php.sh"
-
 
 # Install IUS repository
 yum -y install https://centos7.iuscommunity.org/ius-release.rpm
