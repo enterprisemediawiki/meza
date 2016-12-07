@@ -1,3 +1,16 @@
 Mediawiki EZ Admin
 
-TBD manual for `meza` command
+Usage: yum COMMAND [directives]
+
+List of commands:
+
+install                   Used to install meza or portions of meza
+create                    Used to create new things, like wikis and users
+config                    Get or set config items
+prompt                    (dev only) Create a prompt for user input
+prompt_default_on_blank   (dev only) Create a prompt for user input
+prompt_secure             (dev only) Create a password prompt for user input
+maint                     Perform maintenance activities like running jobs
+
+Every command has directives. If you run any command without directives it will
+provide help for that command.

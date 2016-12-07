@@ -54,6 +54,10 @@ fi
 
 case "$1" in
 	install)
+		if [ -z "$2" ]; then
+			cat "$m_meza/manual/meza-command-help-install.txt"
+			exit 1;
+		fi
 		# dev-networking
 		# monolith
 		# mw-app
@@ -142,6 +146,11 @@ case "$1" in
 		;;
 
 	create)
+		if [ -z "$2" ]; then
+			cat "$m_meza/manual/meza-command-help-create.txt"
+			exit 1;
+		fi
+
 		case "$2" in
 			"wiki")
 				"$m_scripts/create-wiki.sh"
@@ -166,6 +175,11 @@ case "$1" in
 		;;
 
 	config)
+		if [ -z "$2" ]; then
+			cat "$m_meza/manual/meza-command-help-config.txt"
+			exit 1;
+		fi
+
 		# $2 is key
 		# $3 is optional, and is value to set to key
 		if [ ! -f "$m_local_config_file" ]; then
@@ -227,6 +241,11 @@ case "$1" in
 		;;
 
 	prompt)
+		if [ -z "$2" ]; then
+			cat "$m_meza/manual/meza-command-help-prompt.txt"
+			exit 1;
+		fi
+
 		# $1 = prompt
 		prompt_var="$2"
 		prompt_description="$3 and press [ENTER]:"
@@ -257,6 +276,11 @@ case "$1" in
 		;;
 
 	prompt_default_on_blank)
+		if [ -z "$2" ]; then
+			cat "$m_meza/manual/meza-command-help-prompt.txt"
+			exit 1;
+		fi
+
 		# $1 = prompt
 		prompt_var="$2"
 		prompt_description="$3 and press [ENTER]:"
@@ -277,6 +301,11 @@ case "$1" in
 		;;
 
 	prompt_secure)
+		if [ -z "$2" ]; then
+			cat "$m_meza/manual/meza-command-help-prompt.txt"
+			exit 1;
+		fi
+
 		# $1 = prompt
 		prompt_var="$2"
 
@@ -304,6 +333,11 @@ case "$1" in
 		;;
 
 	maint)
+		if [ -z "$2" ]; then
+			cat "$m_meza/manual/meza-command-help-maint.txt"
+			exit 1;
+		fi
+
 		case "$2" in
 			"jobs")
 				anywiki=`ls -d /opt/meza/htdocs/wikis/*/ | tail -1`
