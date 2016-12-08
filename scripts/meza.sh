@@ -121,7 +121,7 @@ case "$1" in
 				;;
 			"db-master")
 				meza config setup_database_server true
-				meza config modules "base db-master db-remote"
+				meza config modules "base db-server db-remote"
 				"$m_scripts/install.sh"
 				exit 1;
 				;;
@@ -312,7 +312,7 @@ case "$1" in
 			gen_password_length=${4:-32} # get password length from $4 or use default 32
 			def_chars="a-zA-Z0-9\!@#\$%^&*"
 			gen_password_chars=${5:-$def_chars} # get allowable chars from $5 or use default
-			gen_password=`cat /dev/urandom | tr -dc "$chars" | fold -w $gen_password_length | head -n 1`
+			gen_password=`cat /dev/urandom | tr -dc "$gen_password_chars" | fold -w $gen_password_length | head -n 1`
 
 			prompt_description="$3 and press [ENTER]:\n(or leave blank to generate $gen_password_length-character password)"
 
