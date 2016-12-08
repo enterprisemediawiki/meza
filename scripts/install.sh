@@ -12,6 +12,10 @@ rootCheck
 
 source "$m_scripts/shell-functions/logging.sh"
 
+# This will be re-sourced after prompts to get modified config, but needs to be
+# here mostly to get $modules variable
+source "$m_local_config_file"
+
 echo -e "\nWelcome to the meza MediaWiki installer\n"
 
 
