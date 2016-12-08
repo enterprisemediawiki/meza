@@ -1,6 +1,6 @@
 Mediawiki EZ Admin
 
-Usage: yum config key [value]
+Usage: meza config key [value]
 
 Set a value by specifying it. Else, get the current value (if exists) by not
 specifying the value.

@@ -1,6 +1,6 @@
 Mediawiki EZ Admin
 
-Usage: yum maint [directives]
+Usage: meza maint [directives]
 
 List of directives:
 

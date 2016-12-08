@@ -1,6 +1,6 @@
 Mediawiki EZ Admin
 
-Usage: yum prompt [directives]
+Usage: meza prompt [directives]
 
 List of directives:
 

@@ -45,19 +45,22 @@
 
 source "/opt/meza/config/core/config.sh"
 
-# no first parameter? display help
+# meza requires a command parameter. No first param, no command. Display help
 if [ -z "$1" ]; then
 	cat "$m_meza/manual/meza-command-help.txt"
 	exit 0;
 fi
 
+# Every command has a directive. No second param, no directives. Display help
+# for that specific directive.
+if [ -z "$2" ]; then
+	cat "$m_meza/manual/meza-cmd/$1.txt"
+	exit 1;
+fi
 
 case "$1" in
 	install)
-		if [ -z "$2" ]; then
-			cat "$m_meza/manual/meza-command-help-install.txt"
-			exit 1;
-		fi
+
 		# dev-networking
 		# monolith
 		# mw-app
@@ -117,9 +120,8 @@ case "$1" in
 				exit 1;
 				;;
 			"db-master")
-				meza config setup_database true
 				meza config setup_database_server true
-				meza config is_remote_db_server true
+				meza config modules "base db-master db-remote"
 				"$m_scripts/install.sh"
 				exit 1;
 				;;
@@ -138,6 +140,18 @@ case "$1" in
 				echo "This function not created yet"
 				exit 1;
 				;;
+			"modules")
+				if [ -z "$3" ]; then
+					cat "$m_meza/manual/meza-cmd/$1-$2.txt"
+					exit 1;
+				fi
+
+				# Install list of modules
+				#             $1      $2      $3
+				# (sudo) meza install modules "list of space-separated modules"
+				echo "This function not created yet"
+				exit 1;
+				;;
 			*)
 				echo "NOT A VALID INSTALL COMMAND"
 				exit 1;
@@ -146,10 +160,6 @@ case "$1" in
 		;;
 
 	create)
-		if [ -z "$2" ]; then
-			cat "$m_meza/manual/meza-command-help-create.txt"
-			exit 1;
-		fi
 
 		case "$2" in
 			"wiki")
@@ -175,10 +185,6 @@ case "$1" in
 		;;
 
 	config)
-		if [ -z "$2" ]; then
-			cat "$m_meza/manual/meza-command-help-config.txt"
-			exit 1;
-		fi
 
 		# $2 is key
 		# $3 is optional, and is value to set to key
@@ -241,10 +247,6 @@ case "$1" in
 		;;
 
 	prompt)
-		if [ -z "$2" ]; then
-			cat "$m_meza/manual/meza-command-help-prompt.txt"
-			exit 1;
-		fi
 
 		# $1 = prompt
 		prompt_var="$2"
@@ -276,10 +278,6 @@ case "$1" in
 		;;
 
 	prompt_default_on_blank)
-		if [ -z "$2" ]; then
-			cat "$m_meza/manual/meza-command-help-prompt.txt"
-			exit 1;
-		fi
 
 		# $1 = prompt
 		prompt_var="$2"
@@ -301,10 +299,6 @@ case "$1" in
 		;;
 
 	prompt_secure)
-		if [ -z "$2" ]; then
-			cat "$m_meza/manual/meza-command-help-prompt.txt"
-			exit 1;
-		fi
 
 		# $1 = prompt
 		prompt_var="$2"
@@ -333,10 +327,6 @@ case "$1" in
 		;;
 
 	maint)
-		if [ -z "$2" ]; then
-			cat "$m_meza/manual/meza-command-help-maint.txt"
-			exit 1;
-		fi
 
 		case "$2" in
 			"jobs")

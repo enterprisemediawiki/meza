@@ -1,6 +1,6 @@
 Mediawiki EZ Admin
 
-Usage: yum create [directives]
+Usage: meza create [directives]
 
 List of directives:
 

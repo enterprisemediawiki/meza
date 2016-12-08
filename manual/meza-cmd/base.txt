@@ -1,6 +1,6 @@
 Mediawiki EZ Admin
 
-Usage: yum COMMAND [directives]
+Usage: meza COMMAND [directives]
 
 List of commands:
 

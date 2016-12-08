@@ -1,6 +1,6 @@
 Mediawiki EZ Admin
 
-Usage: yum install [directives]
+Usage: meza install [directives]
 
 List of directives:
 
