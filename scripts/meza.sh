@@ -66,8 +66,8 @@ case "$1" in
 		# parsoid
 		case "$2" in
 			"dev-networking")
-				# do dev networking stuff
-				"$m_scripts/dev-networking.sh"
+				meza config modules "dev-networking"
+				"$m_scripts/install.sh"
 				exit 0;
 				;;
 			"monolith")
