@@ -15,28 +15,11 @@ source "$m_scripts/shell-functions/logging.sh"
 echo -e "\nWelcome to the meza MediaWiki installer\n"
 
 
-# # # # # # # # # #
-#  BEGIN PROMPTS  #
-# # # # # # # # # #
-
-# meza prompt_secure mysql_root_pass   "Type your desired MySQL root password"
-# meza prompt        mw_api_domain     "Type domain or IP address of your wiki"
-# meza prompt        server_ip_address "Type IP address of this server"
-
-# meza "prompt" command writes config changes to config.local, but those
-# changes don't immediately show up in this shell, so need to re-source
-# the config file after changes.
-source "$m_local_config_file"
-
-# # # # # # # #
-# END PROMPTS #
-# # # # # # # #
-
 # going through the items below, add to array those which apply.
 # then loop through the array for:
 #  1. prompts
 #  2. things that need to be done before yum
-#  3. yum
+#  3. yum installs
 #  4. install module
 
 
@@ -48,6 +31,11 @@ for module in $modules; do
 		source "$m_modules/$module/prompts.sh"
 	fi
 done
+
+# meza "prompt" command writes config changes to config.local, but those
+# changes don't immediately show up in this shell, so need to re-source
+# the config file after changes.
+source "$m_local_config_file"
 
 #
 # Run pre-setup scripts if required (these are things that must preceed
