@@ -3,11 +3,5 @@ ntpdate
 ntp-doc
 openssh-server
 openssh-clients
-perl
-wget
-gcc
-cifs-utils
-net-tools
 vim
-expect
-expectk
+net-tools

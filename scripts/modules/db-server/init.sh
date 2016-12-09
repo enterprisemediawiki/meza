@@ -21,24 +21,13 @@ rm /opt/meza/data/mariadb/mysql.sock # keeping this in standard location
 mv /etc/my.cnf /etc/my.default.cnf
 cp "$m_config/template/my.cnf" /etc/my.cnf
 
-# Restart mariadb with new config
-systemctl restart mariadb
-
-
-# configure SELinux
+# configure SELinux. These may be needed if not moving datadir after starting
+# it in the stock position
 # chcon -Rt mysqld_db_t "$m_meza/data/mariadb"
 # chcon -Ru system_u "$m_meza/data/mariadb"
 
-
-
-
-mount /database
-mkdir /database/db
-chcon -Rt mysqld_db_t /database/db
-chcon -Ru system_u /database/db
-chown -R mysql:mysql /database/db
-systemctl start mariadb
-
+# Restart mariadb with new config
+systemctl restart mariadb
 
 
 #
@@ -56,6 +45,8 @@ query=`cat <<EOF
 	DROP DATABASE test;
 	FLUSH PRIVILEGES;
 EOF`
+echo "Performing queries:"
+echo "$query"
 mysql -u root "--password=$mysql_root_pass" -e"$query"
 
 

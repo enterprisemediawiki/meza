@@ -62,7 +62,7 @@ case "$1" in
 	install)
 
 		# base requirements for all meza installs
-		mod_base="base"
+		mod_base="base base-extras"
 
 		# mediawiki app server
 		mod_app_initial="imagemagick apache php"

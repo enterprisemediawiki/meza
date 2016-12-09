@@ -71,11 +71,6 @@ fi
 # sudo semanage port -a -t http_port_t -p tcp 9300
 
 
-# set SELinux to permissive mode permanently and immediately
-sed -r -i "s/SELINUX=.*$/SELINUX=permissive/g;" /etc/selinux/config
-setenforce permissive
-
-
 # Generate private key and self-signed certificate
 # These should be replaced by appropriate files later
 openssl_self_sign_subject="/C=US/ST=TX/L=Houston/O=EnterpriseMediaWiki/CN=enterprisemediawiki.org"

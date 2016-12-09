@@ -52,3 +52,8 @@ fi
 
 # Get EPEL repository
 source "$m_modules/base/epel.sh"
+
+
+# set SELinux to permissive mode permanently and immediately
+sed -r -i "s/SELINUX=.*$/SELINUX=permissive/g;" /etc/selinux/config
+setenforce permissive
