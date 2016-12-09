@@ -24,9 +24,32 @@ mysqladmin -u root password "$mysql_root_pass"
 
 
 #
-# Login to root
+# Remove unneeded root access capabilities and remove test database
 #
-mysql -u root "--password=$mysql_root_pass" -e"DELETE FROM mysql.user WHERE user=''; DELETE FROM mysql.user WHERE user='root' AND host NOT IN ('localhost', '127.0.0.1', '::1'); DROP DATABASE test;"
+query=`cat <<EOF
+	DELETE FROM mysql.user WHERE user='';
+	DELETE FROM mysql.user WHERE user='root' AND host NOT IN ('localhost', '127.0.0.1', '::1');
+	DROP DATABASE test;
+	FLUSH PRIVILEGES;
+EOF`
+mysql -u root "--password=$mysql_root_pass" -e"$query"
 
 
-echo -e "\n\nMySQL setup complete\n"
+#
+# Make application user able to access from app server(s)
+# Note, for replication user must have REPLICATION CLIENT privilege per MW docs
+#
+for app_server_ip in $app_server_ips; do
+
+	query=`cat <<EOF
+		CREATE USER '$m_wiki_app_user'@'$app_server_ip' IDENTIFIED BY '$db_password';
+		GRANT ALL PRIVILEGES ON *.* TO '$m_wiki_app_user'@'$app_server_ip';
+		FLUSH PRIVILEGES;
+EOF`
+	mysql -u root "--password=$mysql_root_pass" -e"$query"
+
+done
+
+
+
+echo -e "\n\nMySQL server setup complete\n"

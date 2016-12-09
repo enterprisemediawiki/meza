@@ -61,6 +61,24 @@ fi
 case "$1" in
 	install)
 
+		# base requirements for all meza installs
+		mod_base="base"
+
+		# mediawiki app server
+		mod_app_initial="imagemagick apache php"
+
+		# services
+		mod_memcached="memcached"
+		mod_db="db-server"
+		mod_parsoid="parsoid"
+		mod_elastic="elasticsearch"
+
+		# more mediawiki app server stuff
+		mod_app_final="mediawiki extensions"
+
+		# security. @todo: FIXME can this be rolled into base module?
+		mod_security="security"
+
 		# dev-networking
 		# monolith
 		# mw-app
@@ -75,41 +93,29 @@ case "$1" in
 				;;
 			"monolith")
 
-				# base requirements for all meza installs
-				modules="base"
-
-				# mediawiki app server
-				modules="$modules imagemagick apache php memcached"
-
-				# database
-				modules="$modules db-server"
-
-				# parsoid
-				modules="$modules parsoid"
-
-				# elasticsearch
-				modules="$modules elasticsearch"
-
-				# more mediawiki app server stuff
-				modules="$modules mediawiki extensions"
-
-				# security. @todo: FIXME can this be rolled into base module?
-				modules="$modules security"
-
-				meza config setup_database_server true
+				# All modules, unmodified
+				modules="base $mod_app_initial $mod_db $mod_parsoid $mod_elastic $mod_app_final $mod_security"
 				meza config modules "$modules"
+
+				# Don't prompt for list of app-server IP addresses, since the
+				# monolith is the only server.
+				meza config app_server_ips "localhost"
+
+				# Don't prompt for a list of db-server IP addresses, either
+				meza config db_server_ips "localhost"
+
 				"$m_scripts/install.sh"
 				exit 0;
 				;;
 			"app-with-remote-db")
-				meza config is_app_server true
-				meza config setup_database true
-				meza config setup_database_server false
-				meza config is_remote_db_server false
-				meza config setup_parsoid true
-				meza config setup_elasticsearch true
 
-				# meza prompt db_server
+				# Don't install the database server, just the client
+				mod_db="db-client"
+				modules="base $mod_app_initial $mod_db $mod_parsoid $mod_elastic $mod_app_final $mod_security"
+				meza config modules "$modules"
+
+				# pseudo-monolithic setup
+				meza config app_server_ips "localhost"
 
 				"$m_scripts/install.sh"
 				exit 0;
@@ -120,8 +126,7 @@ case "$1" in
 				exit 1;
 				;;
 			"db-master")
-				meza config setup_database_server true
-				meza config modules "base db-server db-remote"
+				meza config modules "db-server db-remote"
 				"$m_scripts/install.sh"
 				exit 1;
 				;;

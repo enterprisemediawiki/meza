@@ -1,5 +1,4 @@
 #!/bin/sh
 
-meza prompt        remote_db_server   "Type domain or IP address of remote DB"
-meza prompt        remote_db_user     "Type user for remote DB"
-meza prompt_secure remote_db_pass     "Type password for remote DB user"
+meza prompt        db_server_ips   "Type domain or IP address (or 'localhost') of master DB"
+meza prompt_secure db_password     "Type password for master DB user"

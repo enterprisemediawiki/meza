@@ -28,7 +28,7 @@ m_apache="/etc/httpd"
 
 # files
 m_local_config_file="$m_config/local/config.local.sh"
-
+m_i18n="$m_config/i18n"
 
 #
 # Installation configuration
@@ -61,3 +61,6 @@ if [ $(uname -m | grep -c 64) -eq 1 ]; then
 else
     m_architecture=32 # 32-bit
 fi
+
+m_wiki_app_user="wiki_app_user"
+m_language="en"

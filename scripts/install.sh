@@ -16,6 +16,9 @@ source "$m_scripts/shell-functions/logging.sh"
 # here mostly to get $modules variable
 source "$m_local_config_file"
 
+# i18n message file
+source "$m_i18n/$m_language.sh"
+
 echo -e "\nWelcome to the meza MediaWiki installer\n"
 
 

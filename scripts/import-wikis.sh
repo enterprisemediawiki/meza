@@ -74,12 +74,10 @@ read imports_dir
 done
 
 
-# prompt user for MySQL root password
-while [ -z "$mysql_root_pass" ]
-do
-echo -e "\nEnter MySQL root password and press [ENTER]: "
-read -s mysql_root_pass
-done
+meza prompt        master_db_server   "Type domain or IP address (or 'localhost') of master DB"
+meza prompt        master_db_user     "Type user for master DB"
+meza prompt_secure master_db_pass     "Type password for master DB user"
+
 
 
 if [ "$imports_dir" = "new" ]; then
@@ -262,7 +260,9 @@ for d in */ ; do
 	echo " * dropping if exists"
 	echo " * (re)creating"
 	echo " * importing file at $import_sql_file"
-	mysql -u root "--password=$mysql_root_pass" -e"DROP DATABASE IF EXISTS $wiki_db_name; CREATE DATABASE $wiki_db_name; use $wiki_db_name; SOURCE $import_sql_file;"
+	# FIXME: use more secure password method
+	# ref: http://dev.mysql.com/doc/refman/5.7/en/password-security-user.html
+	mysql -u "$master_db_user" -h "$master_db_server" "--password=$master_db_pass" -e"DROP DATABASE IF EXISTS $wiki_db_name; CREATE DATABASE $wiki_db_name; use $wiki_db_name; SOURCE $import_sql_file;"
 
 	# Remove the SQL file unless directed to keep it
 	if [ "$keep_imports_directories" = "false" ]; then

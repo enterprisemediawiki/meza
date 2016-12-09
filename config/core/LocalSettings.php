@@ -234,19 +234,33 @@ $wgEmailAuthentication = $wgEnableEmail;
  *
  *
  **/
-$wgDBtype = "mysql";
-$wgDBserver = "";
-if ( isset( $mezaCustomDBname ) ) {
-	$wgDBname = $mezaCustomDBname;
-} else {
-	$wgDBname = "wiki_$wikiId";
+
+// even though using $wgDBservers method below, keep $wgDBname per warning in:
+// https://www.mediawiki.org/wiki/Manual:$wgDBservers
+$wgDBname = isset( $mezaCustomDBname ) ? $mezaCustomDBname : "wiki_$wikiId";
+
+// master server gets no read loading (write only) if there are slave servers,
+// e.g. if there is more than one server. If no slaves, set master loading
+// ratio to 1.
+$tempServerLoad = count( $mezaDatabaseServers ) > 1 ) ? 0 ; 1;
+
+// mezaDatabaseServers sourced from bash variable, which is space-delimited.
+// This is not an ideal data structure. FIXME. For now, explode on spaces.
+$mezaDatabaseServers = explode( ' ', $mezaDatabaseServers );
+$wgDBservers = array();
+foreach( $mezaDatabaseServers as $databaseServer ) {
+	$wgDBservers[] = array(
+		'host' => $databaseServer,
+		'dbname' => $wgDBname,
+		'user' => 'wiki_app_user',
+		'password' => $mezaDatabasePassword,
+		'type' => "mysql",
+		'flags' => DBO_DEFAULT,
+		'load' => $tempServerLoad,
+	);
+	$tempServerLoad = 1; // every server after the first gets the same loading
 }
 
-// Custom database user and password, if any wikis have that (none do now)
-if ( isset( $mezaCustomDBuser ) && isset ( $mezaCustomDBpass ) ) {
-	$wgDBuser = $mezaCustomDBuser;
-	$wgDBpassword = $mezaCustomDBpass;
-}
 
 # MySQL specific settings
 $wgDBprefix = "";
