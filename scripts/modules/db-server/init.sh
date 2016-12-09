@@ -6,6 +6,8 @@
 #
 # Setup storage of MySQL data in /opt/meza/data/mysql
 #
+chcon -Rt mysqld_db_t "$m_meza/data/mariadb" # configure SELinux
+chcon -Ru system_u "$m_meza/data/mariadb" # configure SELinux
 chown mysql:mysql "$m_meza/data/mariadb"
 mv /etc/my.cnf /etc/my.default.cnf
 cp "$m_config/template/my.cnf" /etc/my.cnf
