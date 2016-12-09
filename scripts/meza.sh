@@ -126,7 +126,7 @@ case "$1" in
 				exit 1;
 				;;
 			"db-master")
-				meza config modules "db-server db-remote"
+				meza config modules "base db-server db-remote"
 				"$m_scripts/install.sh"
 				exit 1;
 				;;
