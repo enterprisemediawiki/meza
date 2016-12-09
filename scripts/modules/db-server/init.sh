@@ -7,7 +7,7 @@
 # Setup storage of MySQL data in /opt/meza/data/mysql
 #
 chown mysql:mysql "$m_meza/data/mariadb"
-mv /etc/my.default.cnf
+mv /etc/my.cnf /etc/my.default.cnf
 cp "$m_config/template/my.cnf" /etc/my.cnf
 
 #
