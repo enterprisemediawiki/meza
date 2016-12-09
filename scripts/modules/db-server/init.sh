@@ -2,21 +2,43 @@
 #
 # Setup database
 
-
-#
-# Setup storage of MySQL data in /opt/meza/data/mysql
-#
-chcon -Rt mysqld_db_t "$m_meza/data/mariadb" # configure SELinux
-chcon -Ru system_u "$m_meza/data/mariadb" # configure SELinux
-chown mysql:mysql "$m_meza/data/mariadb"
-mv /etc/my.cnf /etc/my.default.cnf
-cp "$m_config/template/my.cnf" /etc/my.cnf
-
 #
 # Start MariaDB service
 #
 systemctl enable mariadb
 systemctl start mariadb
+
+# make sure mysql owns this directory
+chown mysql:mysql "$m_meza/data/mariadb"
+
+# move existing directory contents (which were created when doing
+# systemctl start mariadb above) so SELinux keeps same constraints
+mv /var/lib/mysql/* /opt/meza/data/mariadb
+rm /opt/meza/data/mariadb/mysql.sock # keeping this in standard location
+
+# Setup mariadb configuration
+# (e.g storage of data in /opt/meza/data/mysql)
+mv /etc/my.cnf /etc/my.default.cnf
+cp "$m_config/template/my.cnf" /etc/my.cnf
+
+# Restart mariadb with new config
+systemctl restart mariadb
+
+
+# configure SELinux
+# chcon -Rt mysqld_db_t "$m_meza/data/mariadb"
+# chcon -Ru system_u "$m_meza/data/mariadb"
+
+
+
+
+mount /database
+mkdir /database/db
+chcon -Rt mysqld_db_t /database/db
+chcon -Ru system_u /database/db
+chown -R mysql:mysql /database/db
+systemctl start mariadb
+
 
 
 #
