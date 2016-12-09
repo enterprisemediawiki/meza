@@ -28,7 +28,7 @@ m_apache="/etc/httpd"
 
 # files
 m_local_config_file="$m_config/local/config.local.sh"
-m_i18n="$m_config/i18n"
+m_i18n="$m_config/core/i18n"
 
 #
 # Installation configuration
