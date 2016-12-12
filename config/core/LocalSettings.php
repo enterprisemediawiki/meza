@@ -242,7 +242,7 @@ $wgDBname = isset( $mezaCustomDBname ) ? $mezaCustomDBname : "wiki_$wikiId";
 // master server gets no read loading (write only) if there are slave servers,
 // e.g. if there is more than one server. If no slaves, set master loading
 // ratio to 1.
-$tempServerLoad = count( $mezaDatabaseServers ) > 1 ) ? 0 ; 1;
+$tempServerLoad = count( $mezaDatabaseServers ) > 1 ? 0 : 1;
 
 // mezaDatabaseServers sourced from bash variable, which is space-delimited.
 // This is not an ideal data structure. FIXME. For now, explode on spaces.
