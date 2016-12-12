@@ -94,7 +94,7 @@ case "$1" in
 			"monolith")
 
 				# All modules, unmodified
-				modules="$mod_base thisisappserver $mod_app_initial $mod_db $mod_parsoid $mod_elastic $mod_app_final $mod_security"
+				modules="$mod_base thisisappserver $mod_app_initial $mod_memcached $mod_db $mod_parsoid $mod_elastic $mod_app_final $mod_security"
 				meza config modules "$modules"
 
 				# Don't prompt for list of app-server IP addresses, since the
@@ -111,7 +111,7 @@ case "$1" in
 
 				# Don't install the database server, just the client
 				mod_db="db-client"
-				modules="$mod_base thisisappserver $mod_app_initial $mod_db $mod_parsoid $mod_elastic $mod_app_final $mod_security"
+				modules="$mod_base thisisappserver $mod_app_initial $mod_memcached $mod_db $mod_parsoid $mod_elastic $mod_app_final $mod_security"
 				meza config modules "$modules"
 
 				# pseudo-monolithic setup
