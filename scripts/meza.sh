@@ -47,7 +47,7 @@ source "/opt/meza/config/core/config.sh"
 
 # meza requires a command parameter. No first param, no command. Display help
 if [ -z "$1" ]; then
-	cat "$m_meza/manual/meza-command-help.txt"
+	cat "$m_meza/manual/meza-cmd/base.txt"
 	exit 0;
 fi
 
@@ -94,7 +94,7 @@ case "$1" in
 			"monolith")
 
 				# All modules, unmodified
-				modules="base $mod_app_initial $mod_db $mod_parsoid $mod_elastic $mod_app_final $mod_security"
+				modules="base thisisappserver $mod_app_initial $mod_db $mod_parsoid $mod_elastic $mod_app_final $mod_security"
 				meza config modules "$modules"
 
 				# Don't prompt for list of app-server IP addresses, since the
@@ -111,7 +111,7 @@ case "$1" in
 
 				# Don't install the database server, just the client
 				mod_db="db-client"
-				modules="base $mod_app_initial $mod_db $mod_parsoid $mod_elastic $mod_app_final $mod_security"
+				modules="base thisisappserver $mod_app_initial $mod_db $mod_parsoid $mod_elastic $mod_app_final $mod_security"
 				meza config modules "$modules"
 
 				# pseudo-monolithic setup

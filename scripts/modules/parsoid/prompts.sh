@@ -1,3 +1,3 @@
 #!/bin/sh
 
-meza prompt mw_api_domain "Type domain or IP address of your wiki"
+meza prompt mw_api_domain "$MSG_prompt_mw_api_domain"
