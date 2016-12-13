@@ -7,7 +7,18 @@ sed -i "s/#bind-address/bind-address = $server_ip_address/" /etc/my.cnf
 
 # open up firewall for DB port
 # FIXME: make this only open to app servers
-firewall-cmd --permanent --add-service=mysql
+# firewall-cmd --permanent --add-service=mysql
+# firewall-cmd --reload
+
+for app_server_ip in $app_server_ips; do
+
+	firewall-cmd --permanent --zone=public --add-rich-rule='
+		rule family="ipv4"
+		source address="$app_server_ip/32"
+		service name="mysql" accept'
+
+done
+
 firewall-cmd --reload
 
 systemctl restart mariadb
