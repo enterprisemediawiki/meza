@@ -12,10 +12,10 @@ sed -i "s/#bind-address/bind-address = $server_ip_address/" /etc/my.cnf
 
 for app_server_ip in $app_server_ips; do
 
-	firewall-cmd --permanent --zone=public --add-rich-rule='
-		rule family="ipv4"
-		source address="$app_server_ip/32"
-		service name="mysql" accept'
+	firewall-cmd --permanent "--zone=$m_private_networking_zone" --add-rich-rule=" \
+		rule family=\"ipv4\" \
+		source address=\"$app_server_ip/32\" \
+		service name=\"mysql\" accept"
 
 done
 

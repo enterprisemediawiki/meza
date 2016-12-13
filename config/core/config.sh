@@ -64,3 +64,6 @@ fi
 
 m_wiki_app_user="wiki_app_user"
 m_language="en"
+
+# Users absolutely should override this. FIXME: should we not make this default?
+m_private_networking_zone="public"
