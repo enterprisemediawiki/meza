@@ -35,6 +35,15 @@ fi
 sed -r -i 's/ONBOOT=no/ONBOOT=yes/g;' "./$network_adapter1"
 sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' "./$network_adapter1"
 
+# Make adapter 1 public zone
+if grep "ZONE=" "./$network_adapter1"; then
+    # ZONE=xyz already present (though xyz could be empty)
+    sed -r -i 's/ZONE=.*$/ZONE=public/g;' "./$network_adapter1"
+else
+    # ZONE not present, append it
+    echo "ZONE=public" >> "./$network_adapter1"
+fi
+
 
 # note: prefix with \ removes root's alias in .bashrc to "cp -i" which forces cp
 # to ask the user if they want to overwrite existing. We do want to overwrite.
