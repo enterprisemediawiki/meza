@@ -118,7 +118,7 @@ do
 
 	# make directory to copy to
 	if [ ! -d "$local_wiki_backup/$wiki" ]; then
-	  mkdir "$local_wiki_backup/$wiki"
+		mkdir "$local_wiki_backup/$wiki"
 	fi
 
 	echo "  Getting files..."
