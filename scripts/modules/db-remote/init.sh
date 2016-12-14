@@ -12,6 +12,7 @@ sed -i "s/#bind-address/bind-address = $server_ip_address/" /etc/my.cnf
 
 for app_server_ip in $app_server_ips; do
 
+	echo "adding firewall rule for mysql for $app_server_ip"
 	firewall-cmd --permanent "--zone=$m_private_networking_zone" --add-rich-rule=" \
 		rule family=\"ipv4\" \
 		source address=\"$app_server_ip/32\" \

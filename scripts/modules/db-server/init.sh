@@ -56,6 +56,7 @@ mysql -u root "--password=$mysql_root_pass" -e"$query"
 #
 for app_server_ip in $app_server_ips; do
 
+	echo "Adding mysql privileges for $app_server_ip"
 	query=`cat <<EOF
 		CREATE USER '$m_wiki_app_user'@'$app_server_ip' IDENTIFIED BY '$db_password';
 		GRANT ALL PRIVILEGES ON *.* TO '$m_wiki_app_user'@'$app_server_ip';
