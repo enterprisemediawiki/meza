@@ -364,7 +364,10 @@ for d in */ ; do
 	if [ "$(ls -A $imports_dir/$wiki_id)" ]; then
 		complete_msg="$complete_msg\n\nImport directory $imports_dir/$wiki_id is not empty. Not deleting."
 	else
-		rm "$imports_dir/$wiki_id"
+		# FIXME: should really have checking for $imports_dir and $wiki_id here.
+		# what if $imports_dir == "" (blank) and $wiki_id = "opt"? would erase
+		# entire /opt directory.
+		rm -rf "$imports_dir/$wiki_id"
 	fi
 done
 
