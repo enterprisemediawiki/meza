@@ -317,13 +317,6 @@ for d in */ ; do
 		complete_msg="$complete_msg\nSemanticMediaWiki rebuildData exceptions:\n\n$(cat $rebuild_exception_log)"
 	fi
 
-	# Check if anything remains in $imports_dir/$wiki_id. If so don't delete, but report it.
-	if [ "$(ls -A $imports_dir/$wiki_id)" ]; then
-		complete_msg="$complete_msg\n\nImport directory $imports_dir/$wiki_id is not empty. Not deleting."
-	else
-		rm "$imports_dir/$wiki_id"
-	fi
-
 	echo -e "\n$complete_msg\n"
 	if [[ ! -z "$slackwebhook" ]]; then
 		bash "$m_meza/scripts/slack.sh" "$slackwebhook" "$complete_msg"
@@ -350,7 +343,7 @@ if [[ ! -z "$slackwebhook" ]]; then
 	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Building search indices for each wiki" ""
 fi
 
-cd $wikis_install_dir
+cd $imports_dir
 for d in */ ; do
 
 	# trim trailing slash from directory name
@@ -366,6 +359,13 @@ for d in */ ; do
 
 	echo "Building Elastic Search index for $wiki_id"
 	source "$m_meza/scripts/elastic-build-index.sh"
+
+	# Check if anything remains in $imports_dir/$wiki_id. If so don't delete, but report it.
+	if [ "$(ls -A $imports_dir/$wiki_id)" ]; then
+		complete_msg="$complete_msg\n\nImport directory $imports_dir/$wiki_id is not empty. Not deleting."
+	else
+		rm "$imports_dir/$wiki_id"
+	fi
 done
 
 
