@@ -20,7 +20,7 @@ originalslackwebhook="$slackwebhook"
 meza config slackwebhook "n"
 
 # Run import script
-source "$DIR/import-wikis.sh"
+source "$m_scripts/import-wikis.sh"
 
 # Reset slackwebhook to whatever it started as
 meza config slackwebhook "$originalslackwebhook"
