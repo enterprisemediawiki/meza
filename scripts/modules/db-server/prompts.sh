@@ -9,3 +9,6 @@ meza prompt         app_server_ips    "$MSG_prompt_app_server_ips"
 
 # this server's IP address
 meza prompt         server_ip_address "$MSG_prompt_server_ip_address"
+
+# FIXME: This shouldn't always be here...really it should be auto-generated I think.
+meza prompt         db_slave_password "FIXME i18n"

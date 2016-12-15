@@ -43,3 +43,13 @@ prompt_mysql_root_pass() {
 		read -s mysql_root_pass
 	done
 }
+
+# Count how many arguments a string breaks into, e.g. if you do:
+#     myvar="one two three"
+#     countargs $myvar
+# It will return 3. Note that you can't quote the variable.
+mf_countargs() { echo $#; }
+
+# Trim whitespace from an input
+mf_trimwhitespace() { echo -e "$*" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'; }
+

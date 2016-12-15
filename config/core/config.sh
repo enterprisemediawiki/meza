@@ -29,6 +29,9 @@ m_apache="/etc/httpd"
 # files
 m_local_config_file="$m_config/local/config.local.sh"
 m_i18n="$m_config/core/i18n"
+m_db_replication_dump_file="/opt/meza/data/db_master_for_replication.sql"
+m_db_replication_log_file="/opt/meza/data/db_master_log_file"
+m_db_replication_log_pos="/opt/meza/data/db_master_log_pos"
 
 #
 # Installation configuration
@@ -63,6 +66,7 @@ else
 fi
 
 m_wiki_app_user="wiki_app_user"
+m_db_slave_user="db_slave_user"
 m_language="en"
 
 # Users absolutely should override this. FIXME: should we not make this default?

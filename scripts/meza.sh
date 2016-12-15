@@ -131,9 +131,8 @@ case "$1" in
 				exit 1;
 				;;
 			"db-slave")
-				# do stuff
-				echo "This function not created yet"
-				exit 1;
+				meza config modules "base db-server db-remote db-slave"
+				"$m_scripts/install.sh"
 				;;
 			"search-node")
 				# do stuff
