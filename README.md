@@ -11,7 +11,7 @@ meza requires a minimal installation of Enterprise Linux. Attempting to install 
 
 ## Running the setup script
 
-Login to your server and run the following:
+Login to your server and run the following (should take 20-45 minutes):
 
 ```
 curl -LO https://raw.github.com/enterprisemediawiki/meza/master/scripts/install.sh
