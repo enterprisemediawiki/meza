@@ -1,6 +1,6 @@
 #!/bin/sh
 
-meza prompt        db_server_ips     "INSERT i18n 1"
-meza prompt_secure db_password       "INSERT i18n 2"
-meza prompt_secure db_slave_password "INSERT i18n 3"
-meza prompt        db_slave_id       "INSERT i18n 4"
+meza prompt        db_server_ips     "$MSG_prompt_db_server_ips"
+meza prompt_secure db_password       "$MSG_prompt_db_password"
+meza prompt_secure db_slave_password "$MSG_prompt_db_slave_password"
+meza prompt        db_slave_id       "$MSG_prompt_db_slave_id"
