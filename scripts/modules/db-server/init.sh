@@ -71,7 +71,8 @@ done
 # If $db_server_ips is more than one IP long, e.g. if this is the master server
 # and there ARE more servers to act as slaves, then setup for slaves.
 #
-if [ `mf_countargs $db_server_ips` -gt 1 ]; then
+master_server_ip=`echo "$db_server_ips" | awk '{print $1;}'`
+if [[ `mf_countargs $db_server_ips` -gt 1 && "$master_server_ip" = "$server_ip_address" ]]; then
 
 	echo
 	echo "More than one DB server specified, setting up slaves."
