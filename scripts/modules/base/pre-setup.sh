@@ -51,7 +51,7 @@ fi
 
 
 # Get EPEL repository
-source "$m_modules/base/epel.sh"
+yum install -y epel-release
 
 
 # set SELinux to permissive mode permanently and immediately
