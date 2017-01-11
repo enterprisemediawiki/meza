@@ -1,6 +1,4 @@
 .DS_Store
-sources/*
-!sources/README.md
 logs/*
 !logs/README.md
 config/local/*
