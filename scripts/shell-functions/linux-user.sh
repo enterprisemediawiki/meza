@@ -47,7 +47,7 @@ mf_add_public_user_with_public_key () {
 		echo "$2"
 		echo
 		exit 1;
-	else
+	fi
 
 	"$2" >> "/home/$1/.ssh/authorized_keys"
 	chmod 600 "/home/$1/.ssh/authorized_keys"
