@@ -1,0 +1,11 @@
+---
+- name: Install IUS (CentOS) repo.
+  yum: name=http://dl.iuscommunity.org/pub/ius/stable/CentOS/{{ ansible_distribution_major_version }}/{{ ansible_userspace_architecture }}/ius-release-1.0-13.ius.centos{{ ansible_distribution_major_version }}.noarch.rpm
+  when: ansible_distribution == "CentOS"
+
+- name: Install IUS (RHEL) repo.
+  yum: name=http://dl.iuscommunity.org/pub/ius/stable/Redhat/{{ ansible_distribution_major_version }}/{{ ansible_userspace_architecture }}/ius-release-1.0-13.ius.el{{ ansible_distribution_major_version }}.noarch.rpm
+  when: ansible_distribution == "Red Hat Enterprise Linux"
+
+- name: Import IUS Community Project GPG key
+  rpm_key: key=http://dl.iuscommunity.org/pub/ius/IUS-COMMUNITY-GPG-KEY state=present

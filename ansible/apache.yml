@@ -73,6 +73,9 @@
 
   # FIXME: apache.sh had commented-out SELinux commands for services
 
+- name: Install PHP
+  include: php.yml
+
   handlers:
     - name: restart apache
       service: name=httpd state=restarted
