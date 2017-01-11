@@ -1,8 +1,9 @@
 ---
 - hosts: all
-  include_vars: base.yml
   become: true
   tasks:
+  - name: Include base variables
+    include_vars: base.yml
   - name: Install apache packages
     yum: name={{item}} state=installed
     with_items:
