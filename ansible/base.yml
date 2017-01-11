@@ -17,8 +17,8 @@
     selinux:
       policy: targeted
       state: permissive # log actions that would be blocked if state=enforcing
-  - name: Install base of packages
-    apt: name={{item}} state=installed
+  - name: Install base packages
+    yum: name={{item}} state=installed
     with_items:
       - ntp
       - ntpdate
