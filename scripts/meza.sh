@@ -156,6 +156,15 @@ case "$1" in
 				echo "This function not created yet"
 				exit 1;
 				;;
+
+			"ansible")
+
+				modules="$mod_base ansible"
+				meza config modules "$modules"
+
+				"$m_scripts/install.sh"
+				exit 0;
+				;;
 			*)
 				echo "NOT A VALID INSTALL COMMAND"
 				exit 1;
