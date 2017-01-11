@@ -18,7 +18,7 @@ m_htdocs: /opt/meza/htdocs
 m_mediawiki: /opt/meza/htdocs/mediawiki
 m_cert_private: /etc/pki/tls/private/meza.key
 m_cert_public: /etc/pki/tls/certs/meza.crt
-m_cert_ca: /etc/pki/tls/certs/meza-ca.crt
+m_ca_cert: /etc/pki/tls/certs/meza-ca.crt
 
 
 # app locations
