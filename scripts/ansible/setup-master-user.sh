@@ -23,8 +23,6 @@ echo "User $ansible_user setup. Please copy the SSH public key below and use"
 echo "it when setting up minion servers. Usage:"
 echo "/opt/meza/scripts/ansible/setup-minion-user.sh <paste key here>"
 echo
-echo "key (don't copy this line):"
-echo
 cat "/home/$ansible_user/.ssh/id_rsa.pub"
 
 

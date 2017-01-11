@@ -37,10 +37,12 @@ mf_add_public_user_with_public_key () {
 		exit 1;
 	fi
 
-	# FIXME: use best practices to ensure file gets deleted
+	# FIXME: there are methods to gaurantee removal of this file even if script
+	#        aborts. Implement.
 	tmpfile=$(mktemp /tmp/pub.XXXXXX)
-	"$2" > "$tmpfile"
+	echo "$2" >> "$tmpfile"
 	importkey_check=`ssh-keygen -l -f "$tmpfile"`
+	rm -f "$tmpfile"
 	if [ "$importkey_check" = "$tmpfile is not a public key file." ]; then
 		echo "The following is not a valid public key:"
 		echo
@@ -49,7 +51,7 @@ mf_add_public_user_with_public_key () {
 		exit 1;
 	fi
 
-	"$2" >> "/home/$1/.ssh/authorized_keys"
+	echo "$2" >> "/home/$1/.ssh/authorized_keys"
 	chmod 600 "/home/$1/.ssh/authorized_keys"
 	chown "$1" "/home/$1/.ssh/authorized_keys"
 }
