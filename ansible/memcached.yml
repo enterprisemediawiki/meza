@@ -2,6 +2,8 @@
 - hosts: all
   become: true
   tasks:
+  - name: Include base variables
+    include_vars: base.yml
   - name: Install memcached package
     yum: name=memcached state=installed
   - name: write the memcached config file
