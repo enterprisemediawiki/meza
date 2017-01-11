@@ -25,6 +25,7 @@ m_ca_cert: /etc/pki/tls/certs/meza-ca.crt
 m_apache: /etc/httpd
 m_apache_conf: /etc/httpd/conf/httpd.conf
 m_php_ini: /etc/php.ini
+m_memcached_conf: /etc/sysconfig/memcached
 
 # files
 m_local_config_file: /opt/meza/config/local/config.local.sh

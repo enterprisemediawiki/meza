@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: true
+  tasks:
+  - name: Install memcached package
+    yum: name=memcached state=installed
+  - name: write the memcached config file
+    template: "src=memcached.j2 dest={{ m_memcached_conf }}"
+    notify:
+    - restart memcached
+  - name: ensure memcached is running (and enable it at boot)
+    service: name=memcached state=started enabled=yes
+
+  handlers:
+    - name: restart memcached
+      service: name=memcached state=restarted
