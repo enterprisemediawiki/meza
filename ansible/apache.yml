@@ -46,9 +46,6 @@
     notify:
     - restart apache
 
-  - name: ensure apache is running (and enable it at boot)
-    service: name=httpd state=started enabled=yes
-
   # FIXME: required?
   # create logrotate file
   # ln -s " $m_config/core/logrotated_httpd" /etc/logrotate.d/httpd
@@ -73,8 +70,13 @@
 
   # FIXME: apache.sh had commented-out SELinux commands for services
 
-- name: Install PHP
-  include: php.yml
+  - name: Install PHP
+    include: tasks/php.yml
+    static: yes
+
+  # Now that PHP is installed, start apache
+  - name: ensure apache is running (and enable it at boot)
+    service: name=httpd state=started enabled=yes
 
   handlers:
     - name: restart apache
