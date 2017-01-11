@@ -42,7 +42,7 @@
     notify: restart apache
 
   - name: write the apache config file
-    template: "src=/templates/httpd.conf.j2 dest={{ m_apache_conf }}"
+    template: "src=httpd.conf.j2 dest={{ m_apache_conf }}"
     notify:
     - restart apache
 
