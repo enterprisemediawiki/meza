@@ -1,0 +1,22 @@
+---
+- name: Ensure ghostscript installed
+  yum: name=ghostscript state=installed
+- name: Install Imagemagick from meza repo
+  yum: name=https://raw.github.com/enterprisemediawiki/meza-packages/master/RPMs/imagemagick_7.0.3_x86_64.rpm
+- name: Symlink xpdf bin64 files to /usr/local/bin
+  file:
+    src: /opt/meza/sources/xpdfbin-linux-3.04/bin64/{{ item }}
+    dest: /usr/local/bin/{{ item }}
+    state: link
+  with_items:
+    - pdfdetach
+    - pdfimages
+    - pdftohtml
+    - pdftoppm
+    - pdftotext
+    - pdffonts
+    - pdfinfo
+    - pdftopng
+    - pdftops
+    - xpdf
+

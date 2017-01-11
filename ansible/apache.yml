@@ -4,6 +4,11 @@
   tasks:
   - name: Include base variables
     include_vars: base.yml
+
+  - name: Install Imagemagick, etc
+    include: tasks/imagemagick.yml
+    static: yes
+
   - name: Install apache packages
     yum: name={{item}} state=installed
     with_items:
