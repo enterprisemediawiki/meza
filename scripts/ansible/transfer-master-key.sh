@@ -14,13 +14,15 @@ rootCheck
 
 source "$m_scripts/shell-functions/linux-user.sh"
 
-# Create $ansible_user user with a new private key
-mf_add_ssh_user_with_private_key "$ansible_user"
+echo "Type space-separated list of minions to copy SSH"
+read -e minions
 
-# echo
-# echo
-# echo "User $ansible_user setup. Please copy the SSH public key below and use"
-# echo "it when setting up minion servers. Usage:"
-# echo "/opt/meza/scripts/ansible/setup-minion-user.sh <paste key here>"
-# echo
-# cat "/home/$ansible_user/.ssh/id_rsa.pub"
+for minion in $minions; do
+
+	# Copy id_rsa.pub to each minion
+	ssh-copy-id "$ansible_user@$minion"
+
+	# Remove password-based authentication for $ansible_user
+	ssh "$ansible_user@$minion" "sudo passwd --delete $ansible_user"
+
+done

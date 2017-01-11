@@ -22,13 +22,20 @@ source "$m_local_config_file"
 # i18n message file
 source "$m_i18n/$m_language.sh"
 
-if [ -z "$1" ]; then
-	echo "Please add the desired SSH public key as the first argument to this command"
-	echo "example: ./setup-ansible-minion.sh <your public key here>"
-	exit 1;
-fi
+# if [ -z "$1" ]; then
+# 	echo "Please add the desired SSH public key as the first argument to this command"
+# 	echo "example: ./setup-ansible-minion.sh <your public key here>"
+# 	exit 1;
+# fi
 
-mf_add_public_user_with_public_key "$ansible_user" "$1"
+# mf_add_public_user_with_public_key "$ansible_user" "$1"
+mf_add_ssh_user "$ansible_user"
+
+echo
+echo "Add a temporary password for $ansible_user. This password can be deleted after"
+echo "SSH keys are setup. Script 'transfer-master-key.sh' will auto-delete password."
+echo
+passwd "$ansible_user"
 
 # Add $ansible_user to sudoers as a passwordless user
 bash -c "echo '$ansible_user ALL=(ALL) NOPASSWD: ALL' | (EDITOR='tee -a' visudo)"

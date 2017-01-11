@@ -20,13 +20,14 @@ mf_add_ssh_user() {
 	fi
 
 	mkdir -p "/home/$1/.ssh"
-	chown "$1" "/home/$1/.ssh"
+	chown -R "$1:$1" "/home/$1/.ssh"
 	chmod 700 "/home/$1/.ssh"
 }
 
 mf_add_ssh_user_with_private_key() {
 	mf_add_ssh_user "$1"
 	ssh-keygen -f "/home/$1/.ssh/id_rsa" -t rsa -N '' -C "$1@`hostname`"
+	chown -R "$1:$1" "/home/$1/.ssh"
 }
 
 mf_add_public_user_with_public_key () {
@@ -53,5 +54,5 @@ mf_add_public_user_with_public_key () {
 
 	echo "$2" >> "/home/$1/.ssh/authorized_keys"
 	chmod 600 "/home/$1/.ssh/authorized_keys"
-	chown "$1" "/home/$1/.ssh/authorized_keys"
+	chown -R "$1:$1" "/home/$1/.ssh"
 }
