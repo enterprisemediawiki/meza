@@ -34,7 +34,6 @@ mf_add_ssh_user "$ansible_user"
 echo
 echo "Add a temporary password for $ansible_user. This password can be deleted after"
 echo "SSH keys are setup. Script 'transfer-master-key.sh' will auto-delete password."
-echo
 passwd "$ansible_user"
 
 # Add $ansible_user to sudoers as a passwordless user

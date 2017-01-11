@@ -20,9 +20,9 @@ read -e minions
 for minion in $minions; do
 
 	# Copy id_rsa.pub to each minion
-	ssh-copy-id "$ansible_user@$minion"
+	sudo -u "$ansible_user" ssh-copy-id "$ansible_user@$minion"
 
 	# Remove password-based authentication for $ansible_user
-	ssh "$ansible_user@$minion" "sudo passwd --delete $ansible_user"
+	sudo -u "$ansible_user" ssh "$ansible_user@$minion" "sudo passwd --delete $ansible_user"
 
 done
