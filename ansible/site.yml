@@ -21,8 +21,10 @@
   vars_files:
     - vars/database.yml
   pre_tasks:
-    - debug:
-      msg: "Replication master = {{mysql_replication_master}}"
+    - debug: { msg: "Replication master = {{mysql_replication_master}}" }
+    - debug: { var: mysql_replication_role }
+    - debug: { var: mysql_replication_user }
+
   roles:
     - role: firewalld
       firewalld_service: mysql
@@ -39,8 +41,9 @@
   vars_files:
     - vars/database.yml
   pre_tasks:
-    - debug:
-      msg: "Replication master = {{mysql_replication_master}}"
+    - debug: { msg: "Replication master = {{mysql_replication_master}}" }
+    - debug: { var: mysql_replication_role }
+    - debug: { var: mysql_replication_user }
   roles:
     - role: firewalld
       firewalld_service: mysql
