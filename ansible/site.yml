@@ -20,6 +20,9 @@
   become: yes
   vars_files:
     - vars/database.yml
+  pre_tasks:
+    - debug:
+      msg: "Replication master = {{mysql_replication_master}}"
   roles:
     - role: firewalld
       firewalld_service: mysql
@@ -35,6 +38,9 @@
   become: yes
   vars_files:
     - vars/database.yml
+  pre_tasks:
+    - debug:
+      msg: "Replication master = {{mysql_replication_master}}"
   roles:
     - role: firewalld
       firewalld_service: mysql
