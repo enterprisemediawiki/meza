@@ -26,6 +26,17 @@
 - name: ensure firewalld is running (and enable it at boot)
   service: name=firewalld state=started enabled=yes
 
+# FIXME: These were not in non-ansible meza, but was present in the firewalld
+#        role I co-opted.
+# - name: set firewalld default zone
+#   command: /bin/firewall-cmd --set-default-zone={{default_zone|default('public')}}
+#   register: result
+#   changed_when: result.stdout == "success"
+# - name: set firewalld zone interface
+#   command: /bin/firewall-cmd --zone={{item.key}} --change-interface={{item.value}} --permanent
+#   with_dict: "{{firewalld_zone_interface|default({})}}"
+#   notify: restart firewalld
+
 # Replace the following shell commands:
 # chkconfig ntpd on # Activate service
 # ntpdate pool.ntp.org # Synchronize the system clock with 0.pool.ntp.org server

@@ -1,2 +1,3 @@
 ---
 mysql_replication_role: master
+mysql_replication_master: "{{ inventory_hostname }}"

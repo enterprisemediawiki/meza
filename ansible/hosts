@@ -1,0 +1,10 @@
+# Example hosts file
+
+[app-servers]
+192.168.56.60
+
+[db-master]
+192.168.56.60
+
+[db-slaves]
+192.168.56.63	mysql_server_id=2

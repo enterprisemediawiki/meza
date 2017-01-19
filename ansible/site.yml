@@ -1,4 +1,7 @@
 ---
+# run with:
+# cd /opt/meza/ansible
+# sudo -u meza-ansible ansible-playbook site.yml
 
 - hosts: all
   become: yes
@@ -13,25 +16,30 @@
     - apache-php
     - memcached # Note this should move to separate server(s)
 
-# - hosts: db-servers
-#   become: yes
-#   roles:
-#     - database
-
-
-
 - hosts: db-master
   become: yes
   vars_files:
     - vars/database.yml
   roles:
+    - role: firewalld
+      firewalld_service: mysql
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: public  # "{{ m_private_networking_zone }}"
+    - role: firewalld
+      firewalld_service: mysql
+      firewalld_servers: "{{ groups['db-slaves'] }}" }
+      firewalld_zone: public
     - database
 
-- hosts: db-slave
+- hosts: db-slaves
   become: yes
   vars_files:
     - vars/database.yml
   roles:
+    - role: firewalld
+      firewalld_service: mysql
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: public
     - database
 
 
