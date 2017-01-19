@@ -70,7 +70,3 @@ m_private_networking_zone: public
 # Ansible
 # Taken from config.sh, probably doesn't make sense here and could break things
 # ansible_user: meza-ansible
-
-# Get the one and only server that should be in the db-master group and set
-# it's IP address as replication master IP.
-mysql_replication_master: "{{ groups['db-master'][0] }}"

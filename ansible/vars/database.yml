@@ -27,5 +27,6 @@ mysql_replication_user:
 mysql_databases: []
 
 # Get the one and only server that should be in the db-master group and set
-# it's IP address as replication master IP.
+# it's IP address as replication master IP. Note that this can be left blank
+# or not included at all if no replication should be performed.
 mysql_replication_master: "{{ groups['db-master'][0] }}"
