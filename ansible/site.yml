@@ -7,37 +7,47 @@
     # FIXME: add "security" module here
 - hosts: app-servers
   become: yes
-  vars_files:
-    - vars/main.yml
   roles:
     - base-extras
     - imagemagick
     - apache-php
     - memcached # Note this should move to separate server(s)
+
 # - hosts: db-servers
 #   become: yes
-#   vars_files:
-#     - vars/main.yml # database.yml ??
 #   roles:
 #     - database
+
+
+
+- hosts: db-master
+  become: yes
+  vars_files:
+    - vars/database.yml
+  roles:
+    - database
+
+- hosts: db-slave
+  become: yes
+  vars_files:
+    - vars/database.yml
+  roles:
+    - database
+
+
+
 # - hosts: parsoid-servers
 #   become: yes
-#   vars_files:
-#     - vars/main.yml
 #   roles:
 #     - parsoid
 # - hosts: elastic-servers
 #   become: yes
-#   vars_files:
-#     - vars/main.yml
 #   roles:
 #     - elasticsearch
 
 # Note: this is app-servers again, but must be after everything else is setup
 # - hosts: app-servers
 #   become: yes
-#   vars_files:
-#     - vars/main.yml
 #   roles:
 #     - mediawiki
     # - extensions # any reason to separate MW and extensions?
