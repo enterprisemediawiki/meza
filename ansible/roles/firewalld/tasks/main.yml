@@ -55,7 +55,7 @@
 
 - name: set firewalld allow mysql for list of servers
   firewalld:
-    rich_rule: 'rule family="ipv4" source address="{{ item }}/32" service name="{{ firewalld_service }}" accept"'
+    rich_rule: 'rule family="ipv4" source address="{{ item }}/32" service name="{{ firewalld_service }}" accept'
     permanent: true
     immediate: true
     state: enabled

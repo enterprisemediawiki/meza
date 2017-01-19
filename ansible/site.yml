@@ -27,7 +27,7 @@
       firewalld_zone: public  # "{{ m_private_networking_zone }}"
     - role: firewalld
       firewalld_service: mysql
-      firewalld_servers: "{{ groups['db-slaves'] }}" }
+      firewalld_servers: "{{ groups['db-slaves'] }}"
       firewalld_zone: public
     - database
 

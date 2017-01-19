@@ -28,4 +28,4 @@ mysql_databases: []
 
 # Get the one and only server that should be in the db-master group and set
 # it's IP address as replication master IP.
-# mysql_replication_master: {{ hostvars[groups['db-master'][0]]['ansible_eth0']['ipv4']['address'] }}
+mysql_replication_master: "{{ groups['db-master'][0] }}"
