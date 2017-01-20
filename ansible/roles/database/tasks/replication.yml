@@ -19,14 +19,30 @@
     mysql_replication_role == 'slave'
     and (mysql_replication_master != '')
 
+- debug: { var: slave }
+
+- name: Check if slave needs configuration
+  command: /bin/true
+  register: slave_needs_configuration
+  when: >
+    (
+      (slave.Is_Slave is defined and not slave.Is_Slave)
+      or (slave.Is_Slave is not defined and slave|failed)
+      or (slave.Slave_IO_Running == 'No' and slave.Slave_SQL_Running == 'No')
+    )
+
+- debug: { var: slave_needs_configuration }
+
 - name: Check master replication status.
   mysql_replication: mode=getmaster
   delegate_to: "{{ mysql_replication_master }}"
   register: master
   when: >
-    ((slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed))
+    not slave_needs_configuration|skipped
     and (mysql_replication_role == 'slave')
     and (mysql_replication_master != '')
+
+- debug: { var: master }
 
 - name: Configure replication on the slave.
   mysql_replication:
@@ -38,7 +54,7 @@
     master_log_pos: "{{ master.Position }}"
   ignore_errors: True
   when: >
-    ((slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed))
+    not slave_needs_configuration|skipped
     and (mysql_replication_role == 'slave')
     and (mysql_replication_master != '')
     and mysql_replication_user
@@ -46,6 +62,6 @@
 - name: Start replication.
   mysql_replication: mode=startslave
   when: >
-    ((slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed))
+    not slave_needs_configuration|skipped
     and (mysql_replication_role == 'slave')
     and (mysql_replication_master != '')
