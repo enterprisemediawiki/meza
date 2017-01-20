@@ -83,13 +83,13 @@
 - name: fetch list of wikis on master
   command: mysql -NBe "SELECT DISTINCT(TABLE_SCHEMA) FROM information_schema.tables WHERE TABLE_SCHEMA NOT IN ('information_schema', 'performance_schema', 'mysql')"
   register: mysql_content_databases
-  delegate_to: master
+  delegate_to: "{{ mysql_replication_master }}"
   when: >
     not slave_needs_configuration|skipped
     and not role_is_valid_slave|skipped
 - name: export dump file on master
   shell: mysqldump --databases {{ mysql_content_databases }} | gzip > /tmp/mysqldump.sql.gz
-  delegate_to: master
+  delegate_to: "{{ mysql_replication_master }}"
   when: >
     not slave_needs_configuration|skipped
     and not role_is_valid_slave|skipped
@@ -98,7 +98,7 @@
     src=/tmp/mysqldump.sql.gz
     dest=tmp/mysqldump.sql.gz
     flat=yes
-  delegate_to: master
+  delegate_to: "{{ mysql_replication_master }}"
   when: >
     not slave_needs_configuration|skipped
     and not role_is_valid_slave|skipped
