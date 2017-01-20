@@ -93,22 +93,9 @@
   when: >
     not slave_needs_configuration|skipped
     and not role_is_valid_slave|skipped
-- name: fetch dump file from master
-  fetch:
-    src=/tmp/mysqldump.sql.gz
-    dest=tmp/mysqldump.sql.gz
-    flat=yes
+- name: Copy SQL file from master to slave
+  synchronize: src=/tmp/mysqldump.sql.gz dest=/tmp/mysqldump.sql.gz
   delegate_to: "{{ mysql_replication_master }}"
-  when: >
-    not slave_needs_configuration|skipped
-    and not role_is_valid_slave|skipped
-- name: put dump file onto slave(s)
-  copy:
-    src=tmp/mysqldump.sql.gz
-    dest=/tmp/mysqldump.sql.gz
-  when: >
-    not slave_needs_configuration|skipped
-    and not role_is_valid_slave|skipped
 - name: Import dump on slave(s)
   mysql_db:
     state: import
