@@ -1,4 +1,29 @@
 ---
+#
+# The following conditionals are reused many times in the tasks in this file.
+# As such, they've been encapsulated in these tasks and registered to vars.
+# FIXME: The logic to uses these, "not role_is_valid_slave|skipped" is very
+# awkward. Try to find a better way to do this.
+#
+- name: Check if valid slave
+  command: /bin/true
+  register: role_is_valid_slave
+  when: >
+    (mysql_replication_role == 'slave')
+    and mysql_replication_user
+    and (mysql_replication_master != '')
+- name: Check if valid master
+  command: /bin/true
+  register: role_is_valid_master
+  when: >
+    (mysql_replication_role == 'master')
+    and mysql_replication_user
+    and (mysql_replication_master != '')
+
+
+#
+# Make sure MySQL user for replication exists on master
+#
 - name: Ensure replication user exists on master.
   mysql_user:
     name: "{{ mysql_replication_user.name }}"
@@ -7,20 +32,22 @@
     priv: "{{ mysql_replication_user.priv | default('*.*:REPLICATION SLAVE') }}"
     state: present
   when: >
-    (mysql_replication_role == 'master')
-    and mysql_replication_user
-    and (mysql_replication_master != '')
+    not role_is_valid_master|skipped
 
+#
+# Get slave replication status
+#
 - name: Check slave replication status.
   mysql_replication: mode=getslave
   ignore_errors: true
   register: slave
   when: >
-    mysql_replication_role == 'slave'
-    and (mysql_replication_master != '')
-
+    not role_is_valid_slave|skipped
 - debug: { var: slave }
 
+#
+# Another commonly used conditional. Whether or not to configure a slave.
+#
 - name: Check if slave needs configuration
   command: /bin/true
   register: slave_needs_configuration
@@ -29,21 +56,76 @@
       (slave.Is_Slave is defined and not slave.Is_Slave)
       or (slave.Is_Slave is not defined and slave|failed)
       or (slave.Slave_IO_Running == 'No' and slave.Slave_SQL_Running == 'No')
+      or (mysql_force_slave_configuration)
     )
-
 - debug: { var: slave_needs_configuration }
 
+
+#
+# Get master replication status
+#
 - name: Check master replication status.
   mysql_replication: mode=getmaster
   delegate_to: "{{ mysql_replication_master }}"
   register: master
   when: >
     not slave_needs_configuration|skipped
-    and (mysql_replication_role == 'slave')
-    and (mysql_replication_master != '')
-
+    and not role_is_valid_slave|skipped
 - debug: { var: master }
 
+
+
+#
+# The following tasks are all related to getting a mysqldump from master and
+# putting it on the slave(s). Of course this is only done if replication needs
+# to be (re-)setup
+#
+- name: fetch list of wikis on master
+  command: mysql -NBe "SELECT DISTINCT(TABLE_SCHEMA) FROM information_schema.tables WHERE TABLE_SCHEMA NOT IN ('information_schema', 'performance_schema', 'mysql')"
+  register: mysql_content_databases
+  delegate_to: master
+  when: >
+    not slave_needs_configuration|skipped
+    and not role_is_valid_slave|skipped
+- name: export dump file on master
+  shell: mysqldump --databases {{ mysql_content_databases }} | gzip > /tmp/mysqldump.sql.gz
+  delegate_to: master
+  when: >
+    not slave_needs_configuration|skipped
+    and not role_is_valid_slave|skipped
+- name: fetch dump file from master
+  fetch:
+    src=/tmp/mysqldump.sql.gz
+    dest=tmp/mysqldump.sql.gz
+    flat=yes
+  delegate_to: master
+  when: >
+    not slave_needs_configuration|skipped
+    and not role_is_valid_slave|skipped
+- name: put dump file onto slave(s)
+  copy:
+    src=tmp/mysqldump.sql.gz
+    dest=/tmp/mysqldump.sql.gz
+  when: >
+    not slave_needs_configuration|skipped
+    and not role_is_valid_slave|skipped
+- name: Import dump on slave(s)
+  mysql_db:
+    state: import
+    name: all
+    target: /tmp/mysqldump.sql.gz
+  when: >
+    not slave_needs_configuration|skipped
+    and not role_is_valid_slave|skipped
+
+#
+# Stop slave, configure, start slave.
+#
+- mysql_replication:
+    mode: stopslave
+  when: >
+    not slave_needs_configuration|skipped
+    and not role_is_valid_slave|skipped
 - name: Configure replication on the slave.
   mysql_replication:
     mode: changemaster
@@ -55,13 +137,9 @@
   ignore_errors: True
   when: >
     not slave_needs_configuration|skipped
-    and (mysql_replication_role == 'slave')
-    and (mysql_replication_master != '')
-    and mysql_replication_user
-
+    and not role_is_valid_slave|skipped
 - name: Start replication.
   mysql_replication: mode=startslave
   when: >
     not slave_needs_configuration|skipped
-    and (mysql_replication_role == 'slave')
-    and (mysql_replication_master != '')
+    and not role_is_valid_slave|skipped
