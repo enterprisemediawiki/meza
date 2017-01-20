@@ -87,27 +87,48 @@
   when: >
     not slave_needs_configuration|skipped
     and not role_is_valid_slave|skipped
-- debug: { var: mysql_content_databases }
+
 - name: export dump file on master
-  shell: mysqldump --databases {{ mysql_content_databases }} | gzip > /tmp/mysqldump.sql.gz
+  shell: "mysqldump --databases {{ mysql_content_databases.stdout }} | gzip > /tmp/mysqldump-onmaster.sql.gz"
   delegate_to: "{{ mysql_replication_master }}"
   when: >
     not slave_needs_configuration|skipped
     and not role_is_valid_slave|skipped
-- name: Copy SQL file from master to slave
-  synchronize:
-    src: /tmp/mysqldump.sql.gz
-    dest: /tmp/mysqldump.sql.gz
-    mode: pull
+
+
+
+#
+# Copying SQL files from one server to another *appears* to be somewhat
+# complicated by the fact that the control server could *be* either the master
+# or slave server. To get around this, copy all files into /tmp directories
+# with different names. FIXME: clean up files when done with them.
+#
+- name: fetch dump file
+  fetch:
+    src=/tmp/mysqldump-onmaster.sql.gz
+    dest=/tmp/mysqldump-oncontrol.sql.gz
+    flat=yes
   delegate_to: "{{ mysql_replication_master }}"
   when: >
     not slave_needs_configuration|skipped
     and not role_is_valid_slave|skipped
+- name: put dump file
+  copy:
+    src=/tmp/mysqldump-oncontrol.sql.gz
+    dest=/tmp/mysqldump-onslave.sql.gz
+  when: >
+    not slave_needs_configuration|skipped
+    and not role_is_valid_slave|skipped
+# FIXME: cleanup SQL files after import?
+
+#
+# Import SQL file from above
+#
 - name: Import dump on slave(s)
   mysql_db:
     state: import
     name: all
-    target: /tmp/mysqldump.sql.gz
+    target: /tmp/mysqldump-onslave.sql.gz
   when: >
     not slave_needs_configuration|skipped
     and not role_is_valid_slave|skipped
