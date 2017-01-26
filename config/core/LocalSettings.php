@@ -516,6 +516,9 @@ else if ( $mezaAuthType === 'anon-read' ) {
     $wgGroupPermissions['*']['edit'] = false;
     $wgGroupPermissions['user']['edit'] = true;
 
+    // do allow anonymous to edit talk pages
+    $wgGroupPermissions['*']['talk'] = true;
+
 }
 
 else if ( $mezaAuthType === 'user-edit' ) {
@@ -536,9 +539,10 @@ else if ( $mezaAuthType === 'user-read' ) {
     $wgGroupPermissions['*']['read'] = false;
     $wgGroupPermissions['*']['edit'] = false;
 
-    // users read NOT write
+    // users read NOT write, but yes talk
     $wgGroupPermissions['user']['read'] = true;
     $wgGroupPermissions['user']['edit'] = false;
+    $wgGroupPermissions['user']['talk'] = true;
 
     $wgGroupPermissions['Contributor'] = $wgGroupPermissions['user'];
     $wgGroupPermissions['Contributor']['edit'] = true;
@@ -556,6 +560,7 @@ else if ( $mezaAuthType === 'viewer-read' ) {
     // create the Viewer group with read permissions
     $wgGroupPermissions['Viewer'] = $wgGroupPermissions['user'];
     $wgGroupPermissions['Viewer']['read'] = true;
+    $wgGroupPermissions['Viewer']['talk'] = true;
 
     // also explicitly give sysop read since you otherwise end up with
     // a chicken/egg situation prior to giving people Viewer
