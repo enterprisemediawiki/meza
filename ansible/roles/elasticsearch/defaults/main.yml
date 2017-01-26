@@ -1,0 +1,6 @@
+---
+elasticsearch_cluster_name: "meza_cluster1"
+elasticsearch_node_name: "meza_node_1"
+
+# Options: "2.x" or "1.6.x"
+elasticsearch_major_version: "1.6.x"

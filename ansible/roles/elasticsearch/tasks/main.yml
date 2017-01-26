@@ -1,0 +1,85 @@
+---
+
+# INSTALL JAVA
+#
+# FIXME: should this increase to java-1.8.0-openjdk.x86_64 ??
+- name: Ensure Java is installed.
+  yum:
+    name: java-1.7.0-openjdk
+    state: installed
+# Environment setup.
+- name: Set JAVA_HOME if configured.
+  template:
+    src: java_home.sh.j2
+    dest: /etc/profile.d/java_home.sh
+    mode: 0644
+
+# INSTALL ELASTICSEARCH
+- name: Add Elasticsearch GPG key.
+  rpm_key:
+    key: https://packages.elastic.co/GPG-KEY-elasticsearch
+    state: present
+- name: Add Elasticsearch repository.
+  template:
+    src: elasticsearch.repo.j2
+    dest: /etc/yum.repos.d/elasticsearch.repo
+    mode: 0644
+- name: Install Elasticsearch.
+  yum:
+    name: elasticsearch
+    state: installed
+
+# SETUP DIRECTORIES AND FILES
+# Add host name per https://github.com/elastic/elasticsearch/issues/6611
+- lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.0\.1'
+    line: '127.0.0.1 localhost meza'
+    owner: root
+    group: root
+    mode: 0644
+# Make directories called out in elasticsearch.yml if they don't exist
+# ref: http://elasticsearch-users.115913.n3.nabble.com/Elasticsearch-Not-Working-td4059398.html
+# Grant elasticsearch user ownership of these new directories
+- file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: elasticsearch
+    recurse: yes
+  with_items:
+    - "{{ m_meza_data }}/elasticsearch/data"
+    - "{{ m_meza_data }}/elasticsearch/work"
+    - "{{ m_meza_data }}/elasticsearch/plugins"
+
+
+# CONFIGURE AND START ELASTICSEARCH
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html
+- name: Configure Elasticsearch.
+  template:
+    src: elasticsearch.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+    owner: root
+    group: elasticsearch
+    mode: 0750
+  notify: restart elasticsearch
+- name: Start Elasticsearch.
+  service: name=elasticsearch state=started enabled=yes
+- name: Make sure Elasticsearch is running before proceeding.
+  wait_for: host={{ elasticsearch_network_host }} port={{ elasticsearch_http_port }} delay=3 timeout=300
+
+
+# INSTALL PLUGINS: kopf, head, bigdesk and inquisitor
+- elasticsearch_plugin:
+    state: present
+    name: lmenezes/elasticsearch-kopf
+    version: '1.0'
+- elasticsearch_plugin:
+    state: present
+    name: mobz/elasticsearch-head
+- elasticsearch_plugin:
+    state: present
+    name: lukas-vlcek/bigdesk
+- elasticsearch_plugin:
+    state: present
+    name: polyfractal/elasticsearch-inquisitor

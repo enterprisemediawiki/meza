@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * preLocalSettings.php is used to modify all wiki settings. This is where any
+ * any changes to the standard meza configuration should be kept. It also
+ * is where database user and password info is stored
+ **/
+
+
+/**
+ * Enables or disables wiki email capabilities for all wikis, regardless of
+ * of what their individual settings say.
+ *
+ **/
+// disabled by default for now, should be enabled later for
+$mezaEnableAllWikiEmail = {{ enable_email }};
+
+// https://www.mediawiki.org/wiki/Manual:$wgPasswordSender
+$wgPasswordSender = "{{ m_password_sending_email_addr | default('admin@example.com') }}";
+
+// https://www.mediawiki.org/wiki/Manual:$wgEmergencyContact
+$wgEmergencyContact = $wgPasswordSender;
+
+// set a default $mezaAuthType for all wikis that don't specify one
+{% if meza_auth_type is defined %}
+$mezaAuthType = '{{ meza_auth_type }}';
+{% else %}
+// $mezaAuthType = 'viewer-read';
+{% endif %}
+
+
+// All-wiki db user and password
+$wgDBuser = '{{ m_wiki_app_user }}';
+$wgDBpassword = '{{ m_wiki_app_user_password }}';
+
+
+// FIXME: How to handle SimpleSamlPhp inclusion?

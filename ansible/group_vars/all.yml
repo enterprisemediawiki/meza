@@ -13,6 +13,9 @@ m_modules: /opt/meza/scripts/modules
 # test dir
 m_test: /opt/meza/test"
 
+# data dir
+m_meza_data: /opt/meza/data
+
 # webserver variables
 m_htdocs: /opt/meza/htdocs
 m_mediawiki: /opt/meza/htdocs/mediawiki
@@ -55,12 +58,15 @@ usergithubtoken: e9191bc6d394d64011273d19f4c6be47eb10e25b
 #   tags/v0.4.1   (a tag name)
 #   master        (a branch name)
 # This commit is closest to MW 1.27 release date of 28 June 2016
-parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
+m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
 
 # Announce completion on Slack? Enter webhook URI.
 slackwebhook: n
 
 m_wiki_app_user: wiki_app_user
+# FIXME
+m_wiki_app_user_password: 12345678
+
 m_db_slave_user: db_slave_user
 m_language: en
 
@@ -70,3 +76,10 @@ m_private_networking_zone: public
 # Ansible
 # Taken from config.sh, probably doesn't make sense here and could break things
 # ansible_user: meza-ansible
+
+m_parsoid_path: /etc/parsoid
+
+# FIXME: this needs to be put in proper configuration location....
+#  m_password_sending_email_addr:
+enable_email: false
+# meza_auth_type: ???

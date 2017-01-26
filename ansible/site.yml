@@ -51,21 +51,22 @@
       firewalld_zone: public
     - database
 
+- hosts: parsoid-servers
+  become: yes
+  roles:
+    - nodejs
+    - parsoid
 
-
-# - hosts: parsoid-servers
-#   become: yes
-#   roles:
-#     - parsoid
-# - hosts: elastic-servers
-#   become: yes
-#   roles:
-#     - elasticsearch
+- hosts: elastic-servers
+  become: yes
+  roles:
+    - elasticsearch
 
 # Note: this is app-servers again, but must be after everything else is setup
-# - hosts: app-servers
-#   become: yes
-#   roles:
-#     - mediawiki
-    # - extensions # any reason to separate MW and extensions?
+- hosts: app-servers
+  become: yes
+  roles:
+    - composer
+    - mediawiki
+    - extensions # any reason to separate MW and extensions?
 
