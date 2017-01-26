@@ -197,10 +197,8 @@
       repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DataTransfer.git
       version: tags/0.6.2
 
-
-echo "******* Installing VE *******"
-cd "$m_mediawiki/extensions/VisualEditor"
-git submodule update --init
+- name: VisualEditor git submodule update --init
+  shell: git submodule update --init
 
 - name: Composer install Elastica dependencies
   composer:
