@@ -25,15 +25,16 @@
     group: parsoid
     append: yes
 
-- file:
+- name: Ensure parsoid directory permissions
+  file:
     path: "{{ m_parsoid_path }}"
     state: directory
     mode: 0755
-    user: parsoid
+    owner: parsoid
     group: parsoid
-    recurse: yes
+    recurse: no
 
-- name: Install Parsoid dependencies
+- name: Ensure Parsoid dependencies installed
   npm:
     path: "{{ m_parsoid_path }}"
     state: present
@@ -48,7 +49,7 @@
 - name: Copy localsettings.js
   template:
     src: localsettings.js.j2
-    dest: "{{ m_parsoid_path }}/api/localsettings.js"
+    dest: "{{ m_parsoid_path }}/localsettings.js"
 
 - name: Copy systemd service
   template:

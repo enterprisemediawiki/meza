@@ -11,3 +11,9 @@ MSG_prompt_app_server_ips="Type space-separated list of app-server IP addresses 
 MSG_prompt_db_server_ips="Type space-separated list of database-server IP addresses (or just 'localhost' if DB is on app server)"
 MSG_prompt_db_slave_password="Type the password used by replication (slave) servers"
 MSG_prompt_db_slave_id="Each replication (slave) server needs a unique ID greater than 1. Pick a number"
+
+# PROMPTS: DEV
+MSG_prompt_dev_users="Type space-separated list of this server's users to apply settings to"
+MSG_prompt_dev_git_user="Type full name of git user"
+MSG_prompt_dev_git_user_email="Type email address of git user"
+

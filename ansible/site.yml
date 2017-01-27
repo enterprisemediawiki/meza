@@ -19,6 +19,7 @@
 
 - hosts: db-master
   become: yes
+  tags: database
   vars_files:
     - vars/database.yml
   pre_tasks:
@@ -38,6 +39,7 @@
 
 - hosts: db-slaves
   become: yes
+  tags: database
   vars_files:
     - vars/database.yml
   pre_tasks:
@@ -53,17 +55,21 @@
 
 - hosts: parsoid-servers
   become: yes
+  tags: parsoid
   roles:
     - nodejs
     - parsoid
 
 - hosts: elastic-servers
   become: yes
+  tags: elasticsearch
   roles:
     - elasticsearch
 
 # Note: this is app-servers again, but must be after everything else is setup
 - hosts: app-servers
   become: yes
+  tags: mediawiki
   roles:
     - mediawiki
+

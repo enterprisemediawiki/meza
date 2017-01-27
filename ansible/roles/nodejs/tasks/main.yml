@@ -1,17 +1,32 @@
 ---
-- include: setup-RedHat.yml
-  when: ansible_os_family == 'RedHat'
+# - include: setup-RedHat.yml
+#   when: ansible_os_family == 'RedHat'
 
-- include: setup-Debian.yml
-  when: ansible_os_family == 'Debian'
+# - include: setup-Debian.yml
+#   when: ansible_os_family == 'Debian'
+
+- name: Ensure Node.js and npm are installed.
+  yum:
+    name: "{{ item }}"
+    state: present
+    enablerepo: epel
+  with_items:
+    - nodejs
+    - npm
 
 - name: Define nodejs_install_npm_user
   set_fact:
     nodejs_install_npm_user: "{{ ansible_user }}"
   when: nodejs_install_npm_user is not defined
 
+- name: "Add node.js/npm user group: {{ nodejs_install_npm_user }}"
+  group:
+    name: "{{ nodejs_install_npm_user }}"
+    state: present
+
 # append group if user already exists
-- user:
+- name: "Add node.js/npm user: {{ nodejs_install_npm_user }}"
+  user:
     name: "{{ nodejs_install_npm_user }}"
     group: "{{ nodejs_install_npm_user }}"
     append: yes
