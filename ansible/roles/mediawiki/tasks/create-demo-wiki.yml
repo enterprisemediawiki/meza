@@ -1,0 +1,33 @@
+---
+
+# Install Demo MW: create wiki directory, setup basic settings, create database
+- name: Create Demo Wiki if not exists
+  shell: |
+    imports_dir="new"
+    wiki_id="demo"
+    wiki_name="Demo Wiki"
+    slackwebhook="n"
+    source "{{ m_scripts }}/create-wiki.sh"
+  args:
+    creates: "{{ m_htdocs }}/wikis/demo/"
+
+# Import pages required for SemanticMeetingMinutes and rebuild indices
+- name: import pages for SemanticMeetingMinutes"
+  shell: >
+    WIKI=demo php {{ m_mediawiki }}/maintenance/importDump.php --report --debug < {{ m_mediawiki }}/extensions/SemanticMeetingMinutes/ImportFiles/import.xml
+
+- name: rebuildrecentchanges.php
+  shell: WIKI=demo php {{ m_mediawiki }}/maintenance/rebuildrecentchanges.php
+
+# FIXME: Can't this be put inside create-wiki.sh now?
+# Generate ES index, since it is skipped in the initial create-wiki.sh
+# Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
+- name: Running elastic-build-index.sh for demo wiki
+  shell: |
+    wiki_id=demo
+    source {{ m_scripts }}/elastic-build-index.sh
+
+# Create an admin user for this demo wiki
+- name: Create "Admin" user on Demo Wiki
+  shell: >
+    WIKI=demo php {{ m_mediawiki }}/maintenance/createAndPromote.php --force --custom-groups="sysop bureaucrat" Admin adminpass

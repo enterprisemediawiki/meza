@@ -224,63 +224,29 @@
 #       - mediawiki/semantic-maps:~3.2
 
 
+# Check if databases starting with "wiki_" exist
+#   if any wiki_* databases: wiki_databases.rc == 0
+#   if no wiki_* databases:  wiki_databases.rc == 1
+- name: check if wiki databases exist
+  shell: mysql -e 'SHOW DATABASES;' | grep "wiki_"
+  register: wiki_databases
+  ignore_errors: yes
+  delegate_to: "{{ groups['db-master'][0] }}"
+  when: inventory_hostname == groups['app-servers'][0]
 
+# Create Demo Wiki if there are no other wikis
+- include: create-demo-wiki.yml
+  when:
+    - inventory_hostname == groups['app-servers'][0]
+    - wiki_databases.rc == 1
 
-
-#
-# Install Demo MW: create wiki directory, setup basic settings, create database
-#
-echo -e "\n\nCreating new wiki called \"Demo Wiki\""
-imports_dir="new"
-wiki_id="demo"
-wiki_name="Demo Wiki"
-temp_slack="$slackwebhook" # don't notify when Demo Wiki is created.
-slackwebhook="n"
-source "$m_meza/scripts/create-wiki.sh"
-slackwebhook="$temp_slack"
-
-
-
-# FIXME
-# FIXME
-# FIXME
-# FIXME
-# FIXME
-# FIXME: doesn't exist
-- name: Run update.php on all wikis
-  shell: php DOBACKUP.php
-- name: Run update.php on all wikis
-  shell: php /opt/meza/scripts/allwikis-update.php
-
-
-# Import pages required for SemanticMeetingMinutes and rebuild indices
-echo -e "\n\n## meza: import pages for SemanticMeetingMinutes"
-WIKI=demo php maintenance/importDump.php --report --debug < ./extensions/SemanticMeetingMinutes/ImportFiles/import.xml
-echo -e "\n\n## meza: rebuildrecentchanges.php"
-WIKI=demo php maintenance/rebuildrecentchanges.php
-
-#
-# Create "Admin" user on Demo Wiki
-# This is sort of strange in this location, but it cannot be done much prior to
-# this due to the fact that everything defined in our pre-built LocalSettings.php
-# must be available prior to running any maintenance scripts. Thus, it must be
-# after SMW install due to the `enableSemantics()` function in LocalSettings.php.
-# Other extensions could cause similar issues, so it's best that this go after
-# loading extensions.
-#
-WIKI=demo php "$m_mediawiki/maintenance/createAndPromote.php" --force --custom-groups="sysop bureaucrat" Admin adminpass
-
-#
-# Generate ES index, since it is skipped in the initial create-wiki.sh
-#
-# Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
-#
-#
-echo "******* Running elastic-build-index.sh *******"
-wiki_id=demo
-source "$m_meza/scripts/elastic-build-index.sh"
-
-
-# NOTE: I think this can be in LocalSettings.php to start. Don't think it needs to be added later.
-# Add "$wgSearchType = 'CirrusSearch';" to LocalSettings.php to funnel queries to ElasticSearch
-
+# If there were other wikis, update the databases of all of them
+# FIXME: This would be better if it only ran when MediaWiki core or extensions
+#        were update such that database update may be required. But that may be
+#        hard to determine when it's required, and it may be better to just do
+#        it all the time (as done below). update.php won't hurt anything (but
+#        just in case we take a backup beforehand)
+- include: update-db-all-wikis.yml
+  when:
+    - inventory_hostname == groups['app-servers'][0]
+    - wiki_databases.rc == 0

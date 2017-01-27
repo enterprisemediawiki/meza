@@ -14,6 +14,7 @@
     - base-extras
     - imagemagick
     - apache-php
+    - composer
     - memcached # Note this should move to separate server(s)
 
 - hosts: db-master
@@ -24,7 +25,6 @@
     - debug: { msg: "Replication master = {{mysql_replication_master}}" }
     - debug: { var: mysql_replication_role }
     - debug: { var: mysql_replication_user }
-
   roles:
     - role: firewalld
       firewalld_service: mysql
@@ -66,7 +66,4 @@
 - hosts: app-servers
   become: yes
   roles:
-    - composer
     - mediawiki
-    - extensions # any reason to separate MW and extensions?
-
