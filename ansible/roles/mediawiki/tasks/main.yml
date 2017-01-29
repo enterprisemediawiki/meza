@@ -50,6 +50,8 @@
   composer:
     command: install
     working_dir: "{{ m_mediawiki }}"
+  # FIXME: need ignore_errors because composer throws an error when running as root.
+  ignore_errors: yes
 
 - name: Ensure proper Vector skin git version installed
   git:
@@ -198,17 +200,23 @@
       version: tags/0.6.2
 
 - name: VisualEditor git submodule update --init
-  shell: git submodule update --init
+  shell: |
+    cd "{{ m_mediawiki }}/extensions/VisualEditor"
+    git submodule update --init
 
 - name: Composer install Elastica dependencies
   composer:
     command: install
     working_dir: "{{ m_mediawiki }}/extensions/Elastica"
+  # FIXME: need ignore_errors because composer throws an error when running as root.
+  ignore_errors: yes
 
 - name: Composer install SyntaxHighlight_GeSHi dependencies
   composer:
     command: install
     working_dir: "{{ m_mediawiki }}/extensions/SyntaxHighlight_GeSHi"
+  # FIXME: need ignore_errors because composer throws an error when running as root.
+  ignore_errors: yes
 
 # Handle this with MediaWiki's "install" command?
 # - name: Install composer-supported extensions

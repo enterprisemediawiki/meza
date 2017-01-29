@@ -1,15 +1,17 @@
 ---
 
+    # imports_dir="new"
+    # wiki_id="demo"
+    # wiki_name="Demo Wiki"
+    # slackwebhook="n"
+    # source "{{ m_scripts }}/create-wiki.sh"
+
 # Install Demo MW: create wiki directory, setup basic settings, create database
 - name: Create Demo Wiki if not exists
   shell: |
-    imports_dir="new"
-    wiki_id="demo"
-    wiki_name="Demo Wiki"
-    slackwebhook="n"
-    source "{{ m_scripts }}/create-wiki.sh"
-  args:
-    creates: "{{ m_htdocs }}/wikis/demo/"
+    imports_dir="new" wiki_id="demo" wiki_name="Demo Wiki" slackwebhook="n" bash "{{ m_scripts }}/create-wiki.sh"
+  # args:
+  #   creates: "{{ m_htdocs }}/wikis/demo"
 
 # Import pages required for SemanticMeetingMinutes and rebuild indices
 - name: import pages for SemanticMeetingMinutes"

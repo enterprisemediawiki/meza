@@ -3,13 +3,25 @@
 # cd /opt/meza/ansible
 # sudo -u meza-ansible ansible-playbook site.yml
 
+  var_files:
+    - "config/{{ environment }}/local/local.yml"
+    - "config/{{ environment }}/secure/secure.yml"
+
+
 - hosts: all
   become: yes
+  vars_files:
+    - local/config.sh
+    - secure/secure.sh
+    # - vars/database.yml
   roles:
     - base
     # FIXME: add "security" module here
+
 - hosts: app-servers
   become: yes
+  vars_files:
+    - local/config.sh
   roles:
     - base-extras
     - imagemagick
@@ -21,7 +33,9 @@
   become: yes
   tags: database
   vars_files:
-    - vars/database.yml
+    - local/config.sh
+    - secure/secure.sh
+    # - vars/database.yml
   pre_tasks:
     - debug: { msg: "Replication master = {{mysql_replication_master}}" }
     - debug: { var: mysql_replication_role }
@@ -41,7 +55,9 @@
   become: yes
   tags: database
   vars_files:
-    - vars/database.yml
+    - local/config.sh
+    - secure/secure.sh
+    # - vars/database.yml
   pre_tasks:
     - debug: { msg: "Replication master = {{mysql_replication_master}}" }
     - debug: { var: mysql_replication_role }
@@ -55,6 +71,8 @@
 
 - hosts: parsoid-servers
   become: yes
+  vars_files:
+    - local/config.sh
   tags: parsoid
   roles:
     - nodejs
@@ -62,6 +80,8 @@
 
 - hosts: elastic-servers
   become: yes
+  vars_files:
+    - local/config.sh
   tags: elasticsearch
   roles:
     - elasticsearch
@@ -69,7 +89,11 @@
 # Note: this is app-servers again, but must be after everything else is setup
 - hosts: app-servers
   become: yes
+  vars_files:
+    - local/config.sh
+    - secure/secure.sh
   tags: mediawiki
   roles:
+    - composer
     - mediawiki
 

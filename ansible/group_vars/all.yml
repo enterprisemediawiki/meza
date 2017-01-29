@@ -63,11 +63,12 @@ m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
 # Announce completion on Slack? Enter webhook URI.
 slackwebhook: n
 
-m_wiki_app_user: wiki_app_user
-# FIXME
-m_wiki_app_user_password: 12345678
+# Set in secure/secure.yml on an instance basis
+# m_wiki_app_user: wiki_app_user
+# m_wiki_app_user_password: 12345678
+# m_db_slave_user: db_slave_user
+# m_db_slave_user_password: 12345678
 
-m_db_slave_user: db_slave_user
 m_language: en
 
 # Users absolutely should override this. FIXME: should we not make this default?
@@ -83,3 +84,13 @@ m_parsoid_path: /etc/parsoid
 #  m_password_sending_email_addr:
 enable_email: false
 # meza_auth_type: ???
+
+
+# No default databases at this time. This may be replaced by some monitoring
+# databases or something. Or perhaps each wiki's database will get listed here.
+mysql_databases: []
+
+# Get the one and only server that should be in the db-master group and set
+# it's IP address as replication master IP. Note that this can be left blank
+# or not included at all if no replication should be performed.
+mysql_replication_master: "{{ groups['db-master'][0] }}"

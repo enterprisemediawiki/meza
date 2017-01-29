@@ -1,0 +1,21 @@
+---
+
+# Password for mysql root user
+mysql_root_password: 4321
+
+# List of users. Currently only wiki_app_user is required. This should perhaps
+# be handled in such a way that it's not possible to remove wiki_app_user, and
+# then this mysql_users list would just be for additional users (e.g. humans
+# who want to query the database). Alternatively, this would be easy to create
+# separate users for each wiki (which I've heard can have performance benefits)
+mysql_users:
+  - name: "wiki_app_user"
+    host: "%"
+    password: "wiki_app_user_password"
+    priv: "*.*:ALL"
+
+# User on database master that slaves use perform replication
+mysql_replication_user:
+  name: "db_slave_user"
+  password: "db_slave_user_password"
+

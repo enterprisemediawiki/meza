@@ -32,16 +32,15 @@
 # SETUP DIRECTORIES AND FILES
 # Add host name per https://github.com/elastic/elasticsearch/issues/6611
 - lineinfile:
-    path: /etc/hosts
+    dest: /etc/hosts
     regexp: '^127\.0\.0\.1'
     line: '127.0.0.1 localhost meza'
     owner: root
     group: root
     mode: 0644
-# Make directories called out in elasticsearch.yml if they don't exist
 # ref: http://elasticsearch-users.115913.n3.nabble.com/Elasticsearch-Not-Working-td4059398.html
-# Grant elasticsearch user ownership of these new directories
-- file:
+- name: Ensure dirs from elasticsearch.yml exist and set ownership
+  file:
     path: "{{ item }}"
     state: directory
     mode: 0755
@@ -69,17 +68,31 @@
   wait_for: host={{ elasticsearch_network_host }} port={{ elasticsearch_http_port }} delay=3 timeout=300
 
 
-# INSTALL PLUGINS: kopf, head, bigdesk and inquisitor
-- elasticsearch_plugin:
+# INSTALL PLUGINS: kopf, head, bigdesk
+# FIXME: need to put ignore_errors here because otherwise on subsequent running
+#        of this play you get errors like:
+#        >> plugin directory /opt/meza/data/elasticsearch/plugins/head already
+#           exists. To update the plugin, uninstall it first using --remove
+#           mobz/elasticsearch-head command"
+#        Need to make it check for that directory and only run if the directory
+#        doesn't exist. Also need a "force_update_es_plugins" variable to force
+#        update
+- name: Install elasticsearch plugin Kopf
+  elasticsearch_plugin:
     state: present
     name: lmenezes/elasticsearch-kopf
     version: '1.0'
-- elasticsearch_plugin:
+  ignore_errors: yes
+- name: Install elasticsearch plugin Head
+  elasticsearch_plugin:
     state: present
     name: mobz/elasticsearch-head
-- elasticsearch_plugin:
+  ignore_errors: yes
+- name: Install elasticsearch plugin Bigdesk
+  elasticsearch_plugin:
     state: present
     name: lukas-vlcek/bigdesk
-- elasticsearch_plugin:
-    state: present
-    name: polyfractal/elasticsearch-inquisitor
+  ignore_errors: yes
+# removed "polyfractal/elasticsearch-inquisitor" because it was failing and
+# we need to downselect anyway
+
