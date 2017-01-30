@@ -3,17 +3,11 @@
 # cd /opt/meza/ansible
 # sudo -u meza-ansible ansible-playbook site.yml
 
-  var_files:
-    - "config/{{ environment }}/local/local.yml"
-    - "config/{{ environment }}/secure/secure.yml"
-
 
 - hosts: all
   become: yes
   vars_files:
-    - local/config.sh
-    - secure/secure.sh
-    # - vars/database.yml
+    - "env/{{ env }}/secure/secure.yml"
   roles:
     - base
     # FIXME: add "security" module here
@@ -21,7 +15,7 @@
 - hosts: app-servers
   become: yes
   vars_files:
-    - local/config.sh
+    - "env/{{ env }}/secure/secure.yml"
   roles:
     - base-extras
     - imagemagick
@@ -33,13 +27,7 @@
   become: yes
   tags: database
   vars_files:
-    - local/config.sh
-    - secure/secure.sh
-    # - vars/database.yml
-  pre_tasks:
-    - debug: { msg: "Replication master = {{mysql_replication_master}}" }
-    - debug: { var: mysql_replication_role }
-    - debug: { var: mysql_replication_user }
+    - "env/{{ env }}/secure/secure.yml"
   roles:
     - role: firewalld
       firewalld_service: mysql
@@ -49,39 +37,54 @@
       firewalld_service: mysql
       firewalld_servers: "{{ groups['db-slaves'] }}"
       firewalld_zone: public
-    - database
+    - role: database
+      # Get the one and only server that should be in the db-master group and set
+      # it's IP address as replication master IP. Note that this can be left blank
+      # or not included at all if no replication should be performed.
+      mysql_replication_master: "{{ groups['db-master'][0] }}"
+      mysql_replication_role: master
+
 
 - hosts: db-slaves
   become: yes
   tags: database
   vars_files:
-    - local/config.sh
-    - secure/secure.sh
-    # - vars/database.yml
-  pre_tasks:
-    - debug: { msg: "Replication master = {{mysql_replication_master}}" }
-    - debug: { var: mysql_replication_role }
-    - debug: { var: mysql_replication_user }
+    - "env/{{ env }}/secure/secure.yml"
   roles:
     - role: firewalld
       firewalld_service: mysql
       firewalld_servers: "{{ groups['app-servers'] }}"
       firewalld_zone: public
-    - database
+    - role: database
+      # Get the one and only server that should be in the db-master group and set
+      # it's IP address as replication master IP. Note that this can be left blank
+      # or not included at all if no replication should be performed.
+      mysql_replication_master: "{{ groups['db-master'][0] }}"
+      mysql_replication_role: slave
+
 
 - hosts: parsoid-servers
   become: yes
   vars_files:
-    - local/config.sh
+    - "env/{{ env }}/secure/secure.yml"
   tags: parsoid
   roles:
     - nodejs
-    - parsoid
+    - role: parsoid
+      nodejs_install_npm_user: "nodejs"
+      nodejs_version: "0.12"
+      nodejs_npm_global_packages: []
+        # - name: example-global-package
+        # - name: jslint
+        #   version: 0.9.3
+        # # latest version
+        # - name: node-sass
+
 
 - hosts: elastic-servers
   become: yes
   vars_files:
-    - local/config.sh
+    - "env/{{ env }}/secure/secure.yml"
   tags: elasticsearch
   roles:
     - elasticsearch
@@ -90,10 +93,12 @@
 - hosts: app-servers
   become: yes
   vars_files:
-    - local/config.sh
-    - secure/secure.sh
+    - "env/{{ env }}/secure/secure.yml"
   tags: mediawiki
   roles:
     - composer
     - mediawiki
+
+# Write wiki configs like:
+#  "env/{{ env }}/wikis/eva/preLocalSettings.php.j2"
 

@@ -1,9 +1,0 @@
----
-nodejs_install_npm_user: "nodejs"
-nodejs_version: "0.12"
-nodejs_npm_global_packages: []
-  # - name: example-global-package
-  # - name: jslint
-  #   version: 0.9.3
-  # # latest version
-  # - name: node-sass

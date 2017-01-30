@@ -1,6 +1,6 @@
 ---
 composer_path: /usr/local/bin/composer
-composer_keep_updated: false
+composer_keep_updated: true
 composer_version: ''
 
 # The directory where global packages will be installed.
@@ -17,4 +17,10 @@ composer_global_packages: []
 composer_add_to_path: true
 
 # GitHub OAuth token (used to help overcome API rate limits).
-composer_github_oauth_token: ''
+# GitHub API personal access token for Oscar Rogers
+# If you run this script multiple times from one IP address, you might exceed
+# GitHub's API rate limit. Below is enterprisemediawiki/meza's generic token
+# for general use. However, if this project gets used a lot by any people it
+# the rate limit for it could be overriden as well. Setup your own token at
+# https://github.com/settings/tokens to generate a new token.
+composer_github_oauth_token: 'e9191bc6d394d64011273d19f4c6be47eb10e25b'

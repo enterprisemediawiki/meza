@@ -19,3 +19,9 @@ mysql_replication_user:
   name: "db_slave_user"
   password: "db_slave_user_password"
 
+# Set in secure/secure.yml on an instance basis
+# m_wiki_app_user: wiki_app_user
+# m_wiki_app_user_password: 12345678
+# m_db_slave_user: db_slave_user
+# m_db_slave_user_password: 12345678
+

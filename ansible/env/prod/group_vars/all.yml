@@ -1,0 +1,29 @@
+---
+
+env: prod
+
+# Set Parsoid version.
+# This commit is closest to MW 1.27 release date of 28 June 2016
+# Default = "master"
+m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
+
+
+# Users absolutely should override this. FIXME: should we not make this default?
+m_private_networking_zone: public
+
+# Ansible
+# Taken from config.sh, probably doesn't make sense here and could break things
+# ansible_user: meza-ansible
+
+
+# FIXME: this needs to be put in proper configuration location....
+#  m_password_sending_email_addr:
+enable_email: false
+# meza_auth_type: ???
+
+
+# Domain that the wiki server is accessed from. This is used by Apache's config
+# to do HTTP-->HTTPS redirect and by Parsoid to communicate with the MediaWiki
+# PHP API via Apache httpd over port 9000. Note: protocol was $mw_api_protocol,
+# but was changed to hard-coded http when Parsoid was given it's own port.
+mw_api_domain: 192.168.56.63
