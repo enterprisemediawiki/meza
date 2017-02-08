@@ -143,7 +143,10 @@
   when: inventory_hostname == groups['app-servers'][0]
 
 # Create Demo Wiki if there are no other wikis
-- include: create-demo-wiki.yml
+- include: create-wiki.yml
+  vars:
+    wiki_id: demo
+    wiki_site_name: Demo Wiki
   when:
     - inventory_hostname == groups['app-servers'][0]
     - wiki_databases.rc == 1

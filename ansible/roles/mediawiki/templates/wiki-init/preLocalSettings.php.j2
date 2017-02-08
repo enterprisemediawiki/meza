@@ -16,7 +16,7 @@
  *  - https://www.mediawiki.org/wiki/Manual:$wgSitename
  *  - https://www.mediawiki.org/wiki/Manual:$wgMetaNamespace
  **/
-$wgSitename = 'placeholder';
+$wgSitename = '{{ wiki_site_name }}';
 
 /**
  * meza uses an authentication system with a few default types. See LocalSettings.php
@@ -34,10 +34,4 @@ $mezaDebug = false;
  * $wgEnableEmail to true, and enable email. See:
  *  - https://www.mediawiki.org/wiki/Manual:$wgEnableEmail
  **/
-$mezaEnableWikiEmail = true;
-
-/**
- * It is possible to override the standard database naming used by the meza
- * system. Simply uncomment this line and enter your custom name.
- **/
-// $mezaCustomDBname = '';
+$mezaEnableWikiEmail = {{ enable_wiki_emails }};

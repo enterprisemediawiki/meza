@@ -49,3 +49,4 @@ mysql_replication_user:
 # m_db_slave_user: db_slave_user
 # m_db_slave_user_password: 12345678
 
+enable_wiki_emails: true
