@@ -1,0 +1,5 @@
+---
+more-extensions:
+  - name: CollapsibleSections
+    repo: https://github.com/emanspeaks/CollapsibleSections.git
+    version: master

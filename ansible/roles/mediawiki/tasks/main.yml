@@ -22,24 +22,11 @@
 
 
 
-- name: Ensure proper Vector skin git version installed
+- name: Ensure Vector skin installed
   git:
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git
     dest: "{{ m_mediawiki }}/skins/Vector"
     version: "REL1_27"
-
-- name: Ensure LocalSettings.php in place
-  template:
-    src: LocalSettings.php.j2
-    dest: "{{ m_mediawiki }}/LocalSettings.php"
-    backup: yes
-
-# FIXME: that's not where this should be...
-- name: Ensure preLocalSettings_allWikis.php in place
-  template:
-    src: preLocalSettings_allWikis.php.j2
-    dest: "{{ m_mediawiki }}/preLocalSettings_allWikis.php"
-    backup: yes
 
 - name: Put composer.local.json in place to load composer-supported extensions
   template:
@@ -53,17 +40,11 @@
   # FIXME: need ignore_errors because composer throws an error when running as root.
   ignore_errors: yes
 
-- name: Ensure proper Vector skin git version installed
+- name: Ensure WikiBlender installed
   git:
     repo: https://github.com/jamesmontalvo3/WikiBlender.git
     dest: "{{ m_htdocs }}/WikiBlender"
     version: "master"
-
-- name: Ensure BlenderSettings.php in place
-  template:
-    src: BlenderSettings.php.j2
-    dest: "{{ m_htdocs }}/WikiBlender/BlenderSettings.php"
-    backup: yes
 
 - name: Ensure extensions installed
   git:
@@ -218,18 +199,65 @@
   # FIXME: need ignore_errors because composer throws an error when running as root.
   ignore_errors: yes
 
-# Handle this with MediaWiki's "install" command?
-# - name: Install composer-supported extensions
-#   composer:
-#     command: require
-#     arguments: "{{ item }}"
-#     working_dir: "{{ m_mediawiki }}"
-#     with_items:
-#       - mediawiki/semantic-media-wiki:~2.4
-#       - mediawiki/semantic-result-formats:~2.0
-#       - mediawiki/sub-page-list:~1.1
-#       - mediawiki/semantic-meeting-minutes:~0.3
-#       - mediawiki/semantic-maps:~3.2
+#
+# Load meza-instance-specific stuff
+#   1. Load all-wiki more-extensions.yml
+#   1. Load more-extensions.yml for each wiki
+#   1. Put pre/postLocalSettings_allWiki.php files in place
+#   1. Put pre/postLocalSettings.php for each wiki in place
+#   1. Put LandingPage.php in place
+#   1. Put SAML stuff in place (if exists)
+
+
+
+- name: Ensure LocalSettings.php in place
+  template:
+    src: LocalSettings.php.j2
+    dest: "{{ m_mediawiki }}/LocalSettings.php"
+    backup: yes
+
+#
+# This is sort of odd, but we need localhost, e.g. the controlling machine, to
+# have local config information. local-config.yml will get meza-installation-
+# specific repositories to configure the installation. That data needs to be
+# on the controller as well as the app servers. It may even be required on
+# other servers at some point, if meza-installations need to do reconfigs... (i
+# think i trailed off here)
+#
+- include: local-config.yml
+  delegate_to: localhost
+
+# Now include it for the app-servers
+- include: local-config.yml
+
+
+
+
+#
+# Get meza-installation-specific extensions, both for all-wikis and for
+# specific wikis
+#
+- name: install installation-specific extensions
+  include: load-extension-from-file.yml
+  vars:
+    extfile: "{{ m_local }}/all-wiki-more-extensions.yml"
+
+- name: Get individual wikis dirs
+  find:
+    paths: "{{ m_local }}/wikis/"
+    file_type: directory
+  register: wikis_dirs
+
+- name: loop over wikis, install wiki-specific extensions
+  include: load-extension-from-file.yml
+  vars:
+    extfile: "{{ item.path }}/this-wiki-more-extensions.yml"
+  with_items: "{{ wikis_dirs.files }}"
+
+
+
+
+
 
 
 # Check if databases starting with "wiki_" exist

@@ -2,7 +2,7 @@
 
 env: prod
 
-# Set Parsoid version.
+# Set Parsoid version. Not really a secure item but easiest to set here.
 # This commit is closest to MW 1.27 release date of 28 June 2016
 # Default = "master"
 m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
@@ -16,14 +16,36 @@ m_private_networking_zone: public
 # ansible_user: meza-ansible
 
 
-# FIXME: this needs to be put in proper configuration location....
-#  m_password_sending_email_addr:
-enable_email: false
-# meza_auth_type: ???
-
-
 # Domain that the wiki server is accessed from. This is used by Apache's config
 # to do HTTP-->HTTPS redirect and by Parsoid to communicate with the MediaWiki
 # PHP API via Apache httpd over port 9000. Note: protocol was $mw_api_protocol,
 # but was changed to hard-coded http when Parsoid was given it's own port.
 mw_api_domain: 192.168.56.63
+
+
+
+# Password for mysql root user
+mysql_root_password: 4321
+
+# List of users. Currently only wiki_app_user is required. This should perhaps
+# be handled in such a way that it's not possible to remove wiki_app_user, and
+# then this mysql_users list would just be for additional users (e.g. humans
+# who want to query the database). Alternatively, this would be easy to create
+# separate users for each wiki (which I've heard can have performance benefits)
+mysql_users:
+  - name: "wiki_app_user"
+    host: "%"
+    password: "wiki_app_user_password"
+    priv: "*.*:ALL"
+
+# User on database master that slaves use perform replication
+mysql_replication_user:
+  name: "db_slave_user"
+  password: "db_slave_user_password"
+
+# Set in secure/secure.yml on an instance basis
+# m_wiki_app_user: wiki_app_user
+# m_wiki_app_user_password: 12345678
+# m_db_slave_user: db_slave_user
+# m_db_slave_user_password: 12345678
+

@@ -38,3 +38,34 @@ YYYYMMDDHHIISS ansible-playbook site.yml --limit db-master
 	their Logo
 	generic localsettings
 	specific localsettings
+
+
+/opt/meza
+	.git/
+	.github/
+	data/
+	htdocs/
+	logs/
+	manual/
+	test/
+
+	ansible/   # or "server/" ???
+		roles/
+		playlists/
+		env/
+
+	--config/--
+	local/
+		preLocalSettings_allWikis.php
+		postLocalSettings_allWikis.php
+		wikis/
+			eva/
+				preLocalSettings.php
+				postLocalSettings.php
+				Logo.png
+				favicon.ico
+			hsg/
+				...
+
+	scripts/
+

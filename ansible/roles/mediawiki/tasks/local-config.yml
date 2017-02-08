@@ -1,0 +1,35 @@
+---
+
+# get the local config repo if it is defined
+- name: Get local config repo if set
+  git:
+    repo: "{{ local_config_repo.repo }}"
+    dest: "{{ m_local }}"
+    version: "{{ local_config_repo.version | default('master') }}"
+  when: local_config_repo.repo is defined
+
+# make sure local config directory exists and set permissions
+- name: Ensure local config directory configured
+  file:
+    path: "{{ m_local }}"
+    state: directory
+    mode: 0755 # FIXME is this right?
+
+- name: Ensure wikis directory configured
+  file:
+    path: "{{ m_local }}/wikis"
+    state: directory
+    mode: 0755 # FIXME is this right?
+
+- name: If required config files not in place, use baseline files
+  copy:
+    src: "local_baseline/{{ item }}"
+    dest: "{{ m_local }}/{{ item }}"
+    mode: 0755 # FIXME is this right?
+    force: no
+  with_items:
+    - all-wiki-more-extensions.yml
+    - LandingPage.php
+    - preLocalSettings_allWikis.php
+    - postLocalSettings_allWikis.php
+

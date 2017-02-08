@@ -23,3 +23,5 @@ blender_admins: []
 # - { email: jamesmontalvo3@gmail.com, name: "James Montalvo" }
 # - email: sally@example.com
 #   name: Sally Example
+
+local_config_repo: {}

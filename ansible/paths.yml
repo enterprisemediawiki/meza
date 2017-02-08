@@ -1,0 +1,40 @@
+---
+
+# meza install location
+m_install: /opt
+m_meza: /opt/meza
+
+# config dir
+m_config: /opt/meza/config
+m_local: /oipt/meza/local  # new ansible local config directory
+
+# scripts dir
+m_scripts: /opt/meza/scripts
+m_modules: /opt/meza/scripts/modules
+
+# test dir
+m_test: /opt/meza/test"
+
+# data dir
+m_meza_data: /opt/meza/data
+
+# webserver variables
+m_htdocs: /opt/meza/htdocs
+m_mediawiki: /opt/meza/htdocs/mediawiki
+m_cert_private: /etc/pki/tls/private/meza.key
+m_cert_public: /etc/pki/tls/certs/meza.crt
+m_ca_cert: /etc/pki/tls/certs/meza-ca.crt
+
+
+# app locations
+m_apache: /etc/httpd
+m_apache_conf: /etc/httpd/conf/httpd.conf
+m_php_ini: /etc/php.ini
+m_memcached_conf: /etc/sysconfig/memcached
+
+# files
+m_local_config_file: /opt/meza/config/local/config.local.sh
+m_i18n: /opt/meza/config/core/i18n
+m_db_replication_dump_file: /opt/meza/data/db_master_for_replication.sql
+m_db_replication_log_file: /opt/meza/data/db_master_log_file
+m_db_replication_log_pos: /opt/meza/data/db_master_log_pos
