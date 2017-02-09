@@ -71,15 +71,6 @@
   # FIXME: need ignore_errors because composer throws an error when running as root.
   ignore_errors: yes
 
-#
-# Load meza-instance-specific stuff
-#   1. Load all-wiki more-extensions.yml
-#   1. Load more-extensions.yml for each wiki
-#   1. Put pre/postLocalSettings_allWiki.php files in place
-#   1. Put pre/postLocalSettings.php for each wiki in place
-#   1. Put LandingPage.php in place
-#   1. Put SAML stuff in place (if exists)
-
 
 
 - name: Ensure LocalSettings.php in place

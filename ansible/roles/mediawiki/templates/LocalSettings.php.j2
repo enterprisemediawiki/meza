@@ -63,7 +63,7 @@ if ( ! in_array( $wikiId, $wikis ) ) {
 }
 
 // Load all-wikis preLocalSettings_allWikis.php first, then allow wiki-specific preLocalSettings.php to modify
-require_once "$m_config/local/preLocalSettings_allWikis.php";
+require_once "$m_meza/local/preLocalSettings_allWikis.php";
 
 // Gets wiki-specific config variables like:
 // $wgSitename, $mezaAuthType, $mezaDebug, $mezaEnableWikiEmail
@@ -670,7 +670,7 @@ wfLoadExtensions(
 	'Elastica',
 	'Thanks',
 	'CollapsibleVector',
-	'Math',
+	'Math'
 );
 
 
@@ -935,8 +935,8 @@ $wgUploadWizardConfig = array(
  *
  *
  **/
-if ( file_exists( "$m_config/local/postLocalSettings_allWikis.php" ) ) {
-	require_once "$m_config/local/postLocalSettings_allWikis.php";
+if ( file_exists( "$m_meza/local/postLocalSettings_allWikis.php" ) ) {
+	require_once "$m_meza/local/postLocalSettings_allWikis.php";
 }
 if ( file_exists( "$m_htdocs/wikis/$wikiId/config/postLocalSettings.php" ) ) {
 	require_once "$m_htdocs/wikis/$wikiId/config/postLocalSettings.php";

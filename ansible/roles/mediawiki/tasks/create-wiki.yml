@@ -47,50 +47,59 @@
 
 - name: Ensure wiki pre and post local settings files in place
   template:
-    src: "templates/wiki-init/{{ item }}"
+    src: "templates/wiki-init/{{ item }}.j2"
     dest: "{{ m_htdocs }}/wikis/{{ wiki_id }}/config/{{ item }}"
     mode: 0755
     owner: apache # FIXME not really necessary except on /images
     group: apache
     force: no
   with_items:
-    - "preLocalSettings.php.j2"
-    - "postLocalSettings.php.j2"
+    - "preLocalSettings.php"
+    - "postLocalSettings.php"
+
+
+- name: Copy mediawiki-tables.sql to master database
+  copy:
+    src: files/mediawiki-tables.sql
+    dest: /tmp/mediawiki-tables.sql
+    mode: 0755
+    force: yes
 
 
 - name: Initiate database
   mysql_db:
     name: "wiki_{{ wiki_id }}"
     state: import
-    target: files/mediawiki-tables.sql
+    target: /tmp/mediawiki-tables.sql
   delegate_to: "{{ groups['db-master'][0] }}"
 
 
 - name: Run update.php
   shell: >
-    WIKI={{ wiki_id }} php {{ m_mediawiki }}/maintenance/update.php --quick
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/update.php" --quick
   notify: restart parsoid
 
 
 # Import pages required for SemanticMeetingMinutes and rebuild indices
-- name: import pages for SemanticMeetingMinutes"
+- name: import pages for SemanticMeetingMinutes
   shell: >
-    WIKI=demo php {{ m_mediawiki }}/maintenance/importDump.php --report --debug < {{ m_mediawiki }}/extensions/SemanticMeetingMinutes/ImportFiles/import.xml
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/importDump.php" --report --debug < {{ m_mediawiki }}/extensions/SemanticMeetingMinutes/ImportFiles/import.xml
 
 
 - name: rebuildrecentchanges.php
-  shell: WIKI=demo php {{ m_mediawiki }}/maintenance/rebuildrecentchanges.php
+  shell: >
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/rebuildrecentchanges.php"
 
 
 # Create an admin user for this demo wiki
 - name: Create "Admin" user on Demo Wiki
   shell: >
-    WIKI=demo php {{ m_mediawiki }}/maintenance/createAndPromote.php --force --custom-groups="sysop bureaucrat" Admin adminpass
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/createAndPromote.php" --force --custom-groups="sysop bureaucrat" Admin adminpass
 
 
 - name: Run SMW's rebuildData.php
   shell: >
-    WIKI={{ wiki_id }} php "{{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/rebuildData.php"
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/rebuildData.php"
     -d 5 -v --ignore-exceptions --exception-log="{{ m_meza }}/logs/rebuilddata-exceptions-{{ wiki_id }}-.log"
 
 
@@ -98,7 +107,7 @@
 # echo "\$wgDisableSearchUpdate = true;" >> "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
 - name: Run runJobs.php
   shell: >
-    WIKI={{ wiki_id }} php "{{ m_mediawiki }}/maintenance/runJobs.php" --quick
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/runJobs.php" --quick
 # sed -r -i 's/\$wgDisableSearchUpdate = true;//g;' "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
 
 
@@ -106,5 +115,5 @@
 # Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
 - name: Running elastic-build-index.sh for demo wiki
   shell: |
-    wiki_id={{ wiki_id }}
-    source {{ m_scripts }}/elastic-build-index.sh
+    wiki_id="{{ wiki_id }}"
+    source "{{ m_scripts }}/elastic-build-index.sh"
