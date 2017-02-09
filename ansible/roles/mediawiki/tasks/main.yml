@@ -33,9 +33,16 @@
     src: composer.local.json.j2
     dest: "{{ m_mediawiki }}/composer.local.json"
 
-- name: Run composer install on MediaWiki for dependencies and composer-supported extensions
+- name: Run composer install on MediaWiki for dependencies
   composer:
     command: install
+    working_dir: "{{ m_mediawiki }}"
+  # FIXME: need ignore_errors because composer throws an error when running as root.
+  ignore_errors: yes
+
+- name: Run composer update on MediaWiki for extensions
+  composer:
+    command: update
     working_dir: "{{ m_mediawiki }}"
   # FIXME: need ignore_errors because composer throws an error when running as root.
   ignore_errors: yes

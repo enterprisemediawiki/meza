@@ -234,6 +234,14 @@ $wgEmailAuthentication = $wgEnableEmail;
  *
  *
  **/
+$mezaDatabaseServers = array( '{{ groups['db-master'][0] }}' );
+
+{% for host in groups['db-slaves'] %}
+    $mezaDatabaseServers[] = '{{ host }}';
+{% endfor %}
+
+$mezaDatabasePassword = '{{ mysql_users[0].password }}';
+$mezaDatabaseUser = '{{ mysql_users[0].name }}';
 
 // even though using $wgDBservers method below, keep $wgDBname per warning in:
 // https://www.mediawiki.org/wiki/Manual:$wgDBservers
@@ -244,15 +252,12 @@ $wgDBname = isset( $mezaCustomDBname ) ? $mezaCustomDBname : "wiki_$wikiId";
 // ratio to 1.
 $tempServerLoad = count( $mezaDatabaseServers ) > 1 ? 0 : 1;
 
-// mezaDatabaseServers sourced from bash variable, which is space-delimited.
-// This is not an ideal data structure. FIXME. For now, explode on spaces.
-$mezaDatabaseServers = explode( ' ', $mezaDatabaseServers );
 $wgDBservers = array();
 foreach( $mezaDatabaseServers as $databaseServer ) {
 	$wgDBservers[] = array(
 		'host' => $databaseServer,
 		'dbname' => $wgDBname,
-		'user' => 'wiki_app_user',
+		'user' => $mezaDatabaseUser,
 		'password' => $mezaDatabasePassword,
 		'type' => "mysql",
 		'flags' => DBO_DEFAULT,
