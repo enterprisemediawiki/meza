@@ -89,7 +89,7 @@ To transfer files to your server you can use SCP (or PSCP on Windows):
 
 ### Using an import config file
 
-If you don't want to enter prompts during import (e.g. if you're scripting your import), you'll want to use a config file. That file needs to be located at `/opt/meza/config/local/local-import-config.sh`. An example file can be found at [config/template/local-import-config.sh](../config/template/local-import-config.sh). Moving that file to `config/local` and modifying the values is all that is required. Then running `sudo bash /opt/meza/scripts/import-wikis.sh` will recognize the config file and use your values.
+If you don't want to enter prompts during import (e.g. if you're scripting your import), you'll want to use a config file. That file needs to be located at `/opt/meza/config/local/import-config.sh`. An example file can be found at [config/template/import-config.sh](../config/template/import-config.sh). Moving that file to `config/local` and modifying the values is all that is required. Then running `sudo bash /opt/meza/scripts/import-wikis.sh` will recognize the config file and use your values.
 
 
 ## Importing wikis directly from another server
@@ -97,11 +97,11 @@ If you don't want to enter prompts during import (e.g. if you're scripting your 
 This process can be used to import wikis from some types of servers. The authors of this script have only tested it where the remote server is running Windows.
 
 1. `cd /opt/meza/config/local`
-2. Create `config/local/remote-wiki-config.sh` by doing one of the following:
-  1. `sudo cp /opt/meza/config/template/remote-wiki-config.example.sh ./remote-wiki-config.sh` and editing the file
-  2. `sudo vi remote-wiki-config.sh` and pasting in your pre-built config
+2. Create `config/local/import-config.sh` by doing one of the following:
+  1. `sudo cp /opt/meza/config/template/import-config.example.sh ./import-config.sh` and editing the file
+  2. `sudo vi import-config.sh` and pasting in your pre-built config
 3. `cd /opt/meza/scripts`
-4. `sudo bash import-remote-wikis.sh`. You should only need to enter your username and password for the remote server if you filled `remote-wiki-config.sh`
+4. `sudo bash import-remote-wikis.sh`. You should only need to enter your username and password for the remote server if you filled `import-config.sh`
 
 
 ## Making a wiki the "primary" wiki

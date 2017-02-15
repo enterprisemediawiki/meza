@@ -10,35 +10,10 @@ if [ "$(whoami)" != "root" ]; then
 	exit 1
 fi
 
-
-# Get ImageMagick
-echo "Downloading and ImageMagick"
-cd ~/mezadownloads
-wget http://www.imagemagick.org/download/ImageMagick.tar.gz
-tar xvzf ImageMagick.tar.gz
-
-# Different versions may be downloaded, * to catch whatever version
-mv ImageMagick-* "$m_meza/sources/ImageMagick"
-cd "$m_meza/sources/ImageMagick"
-
-cmd_profile "START build ImageMagick"
-echo "Configure ImageMagick"
-./configure
-echo "Make ImageMagick"
-make
-echo "Make install ImageMagick"
-make install
-cmd_profile "END build ImageMagick"
-
-
-# According to http://www.imagemagick.org/script/install-source.php:
-# "You may need to configure the dynamic linker run-time bindings"
-echo "Configure dynamic linker"
-ldconfig /usr/local/lib
-
-# Add to policy.xml to prevent remote code execution. See
-# imagick-secure-policy.xml for more details
-sed -i -e "/<policymap>/r $m_config/template/imagick-secure-policy.xml" /usr/local/etc/ImageMagick-6/policy.xml
+cd "$m_meza/sources"
+git clone https://github.com/enterprisemediawiki/meza-packages
+cd meza-packages/RPMs
+yum install -y ./imagemagick_7.0.3_x86_64.rpm
 
 
 # For testing should run: `make check`
