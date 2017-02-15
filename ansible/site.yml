@@ -69,6 +69,12 @@
     - "paths.yml"
   tags: parsoid
   roles:
+    # Allow app servers to get to parsoid server(s) on port 8000
+    - role: firewalld
+      firewalld_port: 8000
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: public
     - nodejs
     - role: parsoid
       nodejs_install_npm_user: "nodejs"
@@ -87,6 +93,26 @@
     - "paths.yml"
   tags: elasticsearch
   roles:
+    - role: firewalld
+      firewalld_port: 9200
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: public
+    - role: firewalld
+      firewalld_port: 9300
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: public
+    - role: firewalld
+      firewalld_port: 9200
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['elastic-servers'] }}"
+      firewalld_zone: public
+    - role: firewalld
+      firewalld_port: 9300
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['elastic-servers'] }}"
+      firewalld_zone: public
     - elasticsearch
 
 # Note: this is app-servers again, but must be after everything else is setup
@@ -96,6 +122,12 @@
     - "paths.yml"
   tags: mediawiki
   roles:
+    # Allow parsoid servers to have http (non-SSL) backdoor into app servers
+    - role: firewalld
+      firewalld_port: 9000
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['parsoid-servers'] }}"
+      firewalld_zone: public
     - composer
     - mediawiki
 

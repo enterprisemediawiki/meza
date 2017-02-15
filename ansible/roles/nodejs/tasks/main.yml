@@ -16,7 +16,8 @@
 
 - name: Define nodejs_install_npm_user
   set_fact:
-    nodejs_install_npm_user: "{{ ansible_user }}"
+    # not working: "{{ ansible_user }}"
+    nodejs_install_npm_user: nodeuser
   when: nodejs_install_npm_user is not defined
 
 - name: "Add node.js/npm user group: {{ nodejs_install_npm_user }}"

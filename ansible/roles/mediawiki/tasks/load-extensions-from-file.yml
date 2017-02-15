@@ -23,7 +23,7 @@
 - name: Reading extensions file at {{ extfile }}
   include_vars:
     file: "{{ extfile }}"
-    name: extensions_to_load
+    name: extensions_file
   when: extfile_status.stat.isreg is defined and extfile_status.stat.isreg
 
 # This is a repeat of the same extensions thing above. need to abstract it.
@@ -32,5 +32,5 @@
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
     version: "{{ item.version }}"
-  with_items: "{{ extensions_to_load }}"
-  when: extensions_to_load is defined and extensions_to_load[0] is defined
+  with_items: "{{ extensions_file.list }}"
+  when: extensions_file is defined and extensions_file.list is defined and extensions_file.list[0] is defined

@@ -1,0 +1,98 @@
+---
+# FIXME: Eventually add the ability to get SSL cert from letsencrypt
+#     ref: https://www.digitalocean.com/community/tutorials/how-to-secure-haproxy-with-let-s-encrypt-on-centos-7
+
+- name: Install haproxy packages
+  yum: name={{item}} state=installed
+  with_items:
+    - haproxy
+    # - keepalived ?
+
+# Generate self-signed cert if one doesn't exist (note: trusting an article
+# on the internet on this one, that it'll only generate if one doesn't exist)
+- name: Ensure haproxy certs directory exists
+  file:
+    path: /etc/haproxy/certs
+    state: directory
+
+- name: Check if SSL cert exists
+  stat:
+    path: "/etc/haproxy/certs/meza.pem"
+  register: ssl_cert_stat_result
+- name: create self-signed SSL cert
+  command: |
+    openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
+      -subj "/C=US/ST=TX/L=Houston/O=EnterpriseMediaWiki/CN=${ansible_fqdn}" \
+      -keyout /etc/haproxy/certs/meza.key -out /etc/haproxy/certs/meza.crt
+    cat /etc/haproxy/certs/meza.crt /etc/haproxy/certs/meza.key > /etc/haproxy/certs/meza.pem
+    rm /etc/haproxy/certs/meza.crt
+    rm /etc/haproxy/certs/meza.key
+  when: ssl_cert_stat_result.stat.exists == False
+  notify:
+    - restart haproxy
+
+# Generate self-signed cert if one doesn't exist (note: trusting an article
+# on the internet on this one, that it'll only generate if one doesn't exist)
+- name: Ensure haproxy certs have secure permissions
+  file:
+    path: /etc/haproxy/certs
+    state: directory
+    recurse: yes
+    owner: root
+    group: root
+    mode: 0600
+
+- name: write the haproxy config file
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+  notify:
+    - restart haproxy
+
+- name: Ensure firewalld haproxy service files in place
+  template:
+    src: "haproxy-{{ item }}.firewalld.xml.j2"
+    dest: "/etc/firewalld/services/haproxy-{{ item }}.xml"
+    owner: root
+    group: root
+    mode: 0640
+  with_items:
+    - http
+    - https
+
+- name: Ensure SELinux context for firewalld haproxy service files
+  shell: restorecon /etc/firewalld/services/haproxy-{{ item }}.xml
+  with_items:
+    - http
+    - https
+
+# Allow firewall to accesp
+- name: Configure firewalld for haproxy via https
+  firewalld:
+    service: haproxy-https
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: public
+- name: Configure firewalld for haproxy via http
+  firewalld:
+    service: haproxy-http
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: public
+
+# FIXME: haproxy will need to handle reverse proxy for Elasticsearch plugins
+# - name: Configure firewalld for Elasticsearch reverse proxy
+#   firewalld:
+#     port: 8008/tcp
+#     permanent: true
+#     immediate: true
+#     state: enabled
+#     zone: public
+
+- name: ensure haproxy is running (and enable it at boot)
+  service:
+    name: haproxy
+    state: started
+    enabled: yes

@@ -57,7 +57,7 @@
 - name: Ensure base meza extensions installed
   include: load-extensions-from-file.yml
   vars:
-    extfile: "base-extensions.yml"
+    extfile: "{{ m_meza }}/ansible/roles/mediawiki/files/base-extensions.yml"
 
 - name: VisualEditor git submodule update --init
   shell: |
@@ -85,6 +85,13 @@
     src: LocalSettings.php.j2
     dest: "{{ m_mediawiki }}/LocalSettings.php"
     backup: yes
+
+- name: Ensure BlenderSettings.php in place
+  template:
+    src: BlenderSettings.php.j2
+    dest: "{{ m_htdocs }}/WikiBlender/BlenderSettings.php"
+
+
 
 #
 # This is sort of odd, but we need localhost, e.g. the controlling machine, to

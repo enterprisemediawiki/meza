@@ -18,10 +18,7 @@
     file_type: directory
   register: wiki_dirs
 
-- name: what is wiki_dirs
-  debug: { var: "{{ wiki_dirs }}" }
-
 - name: Run update.php on all wikis
   shell: >
     WIKI="{{ item.path | basename }}" php "{{ m_mediawiki }}/maintenance/update.php" --quick
-  with_items: wiki_dirs
+  with_items: "{{ wiki_dirs.files }}"

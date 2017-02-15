@@ -116,4 +116,5 @@
 - name: Running elastic-build-index.sh for demo wiki
   shell: |
     wiki_id="{{ wiki_id }}"
+    source "/opt/meza/config/core/config.sh"
     source "{{ m_scripts }}/elastic-build-index.sh"

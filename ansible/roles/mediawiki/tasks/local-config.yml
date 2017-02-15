@@ -29,7 +29,6 @@
     force: no
   with_items:
     - all-wiki-more-extensions.yml
-    - LandingPage.php
     - preLocalSettings_allWikis.php
     - postLocalSettings_allWikis.php
 

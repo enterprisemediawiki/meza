@@ -12,11 +12,16 @@
 #	============
 #	install
 #		dev-networking
-#		monolith
+#		monolith  --> does `meza setup env local-monolith` for all-localhost, plus `meza deploy`
 #		mw-app
 #		db-master/slave
 #		search-node
 #		parsoid
+#	setup
+#		env
+#		dev-networking --> alias for `meza install dev-networking`
+#   deploy
+#       optional tag
 #	create
 #		wiki
 #		user
@@ -167,6 +172,58 @@ case "$1" in
 				;;
 			*)
 				echo "NOT A VALID INSTALL COMMAND"
+				exit 1;
+				;;
+		esac
+		;;
+
+	deploy)
+		# FIXME: this should be dynamic
+		env_dir="/opt/meza/ansible/env"
+		ansible_env="$2"
+		if [ ! -d "$env_dir/$ansible_env" ]; then
+			echo
+			echo "\"$ansible_env\" is not a valid environment."
+			echo "Please choose one of the following:"
+			echo
+			for d in $env_dir/*/ ; do echo "`basename $d`"; done;
+			exit 1;
+		fi
+
+		host_file="$env_dir/$ansible_env/hosts"
+		if [ ! -f "$host_file" ]; then
+			echo
+			echo "$host_file not a valid file"
+			exit 1;
+		fi
+
+		echo
+		echo "You are about to deploy to the $ansible_env environment"
+		read -p "Do you want to proceed? " -n 1 -r
+		echo
+		if [[ $REPLY =~ ^[Yy]$ ]]
+		then
+			# do dangerous stuff
+
+			# Get errors with user meza-ansible trying to write to the calling-user's
+			# home directory if don't cd to a neutral location. FIXME.
+			starting_wd=`pwd`
+			cd /opt
+
+			sudo -u meza-ansible ansible-playbook /opt/meza/ansible/site.yml -i "$host_file" ${@:3}
+
+			cd "$starting_wd"
+
+		fi
+		;;
+
+	setup)
+		case "$2" in
+			"env")
+				echo "nope, not yet"
+				;;
+			*)
+				echo "NOT A VALID SETUP COMMAND"
 				exit 1;
 				;;
 		esac

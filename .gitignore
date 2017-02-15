@@ -17,5 +17,7 @@ htdocs/WikiBlender
 htdocs/mediawiki
 htdocs/wikis/*
 
+ansible/env/*
+
 simplesamlphp/
 

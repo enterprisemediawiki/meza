@@ -53,7 +53,7 @@
 #     zone: "{{item.value.zone|default('public')}}"
 #   with_dict: "{{firewalld_rich_rules|default({})}}"
 
-- name: set firewalld allow mysql for list of servers
+- name: set firewalld allow {{ firewalld_service }} for list of servers
   firewalld:
     rich_rule: 'rule family="ipv4" source address="{{ item }}/32" service name="{{ firewalld_service }}" accept'
     permanent: true
@@ -61,3 +61,14 @@
     state: enabled
     zone: "{{firewalld_zone|default('public')}}"
   with_items: "{{ firewalld_servers }}"
+  when: firewalld_service is defined
+
+- name: set firewalld allow port {{ firewalld_port }} for list of servers
+  firewalld:
+    rich_rule: 'rule family="ipv4" source address="{{ item }}/32" port port="{{ firewalld_port }}" protocol="{{ firewalld_protocol }}" accept'
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{firewalld_zone|default('public')}}"
+  with_items: "{{ firewalld_servers }}"
+  when: firewalld_port is defined and firewalld_protocol is defined

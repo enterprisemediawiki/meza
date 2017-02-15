@@ -17,6 +17,13 @@ source "$m_scripts/shell-functions/linux-user.sh"
 # Create $ansible_user user with a new private key
 mf_add_ssh_user_with_private_key "$ansible_user"
 
+# Also add the public key to user's authorized_keys, such that they are able to
+# SSH into this server. This is sort of weird, but it enables ansible to
+# cleanly allow the master server to also fill one or more minion roles
+cat "/home/$ansible_user/.ssh/id_rsa.pub" >> "/home/$ansible_user/.ssh/authorized_keys"
+chmod 600 "/home/$ansible_user/.ssh/authorized_keys"
+chown -R "$ansible_user:$ansible_user" "/home/$ansible_user/.ssh"
+
 # echo
 # echo
 # echo "User $ansible_user setup. Please copy the SSH public key below and use"

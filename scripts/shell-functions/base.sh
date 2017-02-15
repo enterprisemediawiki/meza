@@ -52,4 +52,3 @@ mf_countargs() { echo $#; }
 
 # Trim whitespace from an input
 mf_trimwhitespace() { echo -e "$*" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'; }
-

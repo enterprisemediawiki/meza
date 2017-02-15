@@ -6,35 +6,65 @@
 #   3. Make user a passwordless sudoer
 
 
-# Load config constants. Unfortunately right now have to write out full path to
-# meza since we can't be certain of consistent method of accessing install.sh.
-source "/opt/meza/config/core/config.sh"
+#
+# The following function is from shell-functions/base.sh and is included here
+# because:
+#   [1]: To make it possible to just download this script without the rest of
+#        the meza repository. This script will be run on minion servers that
+#        don't necessarily require the whole repo, and if they do they will be
+#        controlled by the master.
+#
+rootCheck() {
+	# must be root or sudoer
+	if [ "$(whoami)" != "root" ]; then
+		echo "Root required: Run this script preceded by 'sudo' command"
+		exit 1
+	fi
 
-source "$m_scripts/shell-functions/base.sh"
+	# If /usr/local/bin is not in PATH then add it
+	# Ref enterprisemediawiki/meza#68 "Run install.sh with non-root user"
+	if [[ $PATH != *"/usr/local/bin"* ]]; then
+		PATH="/usr/local/bin:$PATH"
+	fi
+}
+
+#
+# The following functions are from shell-functions/linux-user.sh and are
+# included here due to [1] above.
+#
+mf_add_ssh_user() {
+	if ! mf_user_exists "$1"; then
+		useradd "$1"
+	fi
+
+	mkdir -p "/home/$1/.ssh"
+	chown -R "$1:$1" "/home/$1/.ssh"
+	chmod 700 "/home/$1/.ssh"
+}
+mf_user_exists() {
+	ret=false
+	getent passwd $1 >/dev/null 2>&1 && ret=true
+
+	if $ret; then
+	    # user exists (bash 0 for true, yuck)
+	    return 0
+	else
+	    return 1
+	fi
+}
+
 rootCheck
 
-source "$m_scripts/shell-functions/linux-user.sh"
+# i18n message file not included here due to [1] above.
+# source "$m_i18n/$m_language.sh"
 
-# This will be re-sourced after prompts to get modified config, but needs to be
-# here mostly to get $modules variable
-source "$m_local_config_file"
-
-# i18n message file
-source "$m_i18n/$m_language.sh"
-
-# if [ -z "$1" ]; then
-# 	echo "Please add the desired SSH public key as the first argument to this command"
-# 	echo "example: ./setup-ansible-minion.sh <your public key here>"
-# 	exit 1;
-# fi
-
-# mf_add_public_user_with_public_key "$ansible_user" "$1"
-mf_add_ssh_user "$ansible_user"
+# Was `mf_add_ssh_user "$ansible_user"` but hard-coding user due to [1] above
+mf_add_ssh_user "meza-ansible"
 
 echo
-echo "Add a temporary password for $ansible_user. This password can be deleted after"
+echo "Add a temporary password for meza-ansible. This password can be deleted after"
 echo "SSH keys are setup. Script 'transfer-master-key.sh' will auto-delete password."
-passwd "$ansible_user"
+passwd "meza-ansible"
 
 # Add $ansible_user to sudoers as a passwordless user
-bash -c "echo '$ansible_user ALL=(ALL) NOPASSWD: ALL' | (EDITOR='tee -a' visudo)"
+bash -c "echo 'meza-ansible ALL=(ALL) NOPASSWD: ALL' | (EDITOR='tee -a' visudo)"
