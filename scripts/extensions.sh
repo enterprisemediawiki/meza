@@ -30,7 +30,7 @@ echo -e "\n\n## meza: Install ExtensionLoader and apply changes to MW settings"
 cd "$m_mediawiki/extensions"
 git clone https://github.com/jamesmontalvo3/ExtensionLoader.git
 cd ./ExtensionLoader
-git checkout tags/v0.3.0
+git checkout tags/v0.3.1
 cd "$m_mediawiki"
 
 
@@ -51,7 +51,9 @@ cd "$m_mediawiki/extensions/Elastica"
 composer install
 
 
-
+# Install SyntaxHighlight dependencies
+cd "$m_mediawiki/extensions/SyntaxHighlight_GeSHi"
+composer install
 
 
 # Install extensions installed via Composer
@@ -89,7 +91,7 @@ WIKI=demo php extensions/TitleKey/rebuildTitleKeys.php
 # Other extensions could cause similar issues, so it's best that this go after
 # loading extensions.
 #
-WIKI=demo php "$m_meza/scripts/mezaCreateUser.php" --username=Admin --password=1234 --groups=sysop,bureaucrat
+WIKI=demo php "$m_meza/scripts/mezaCreateUser.php" --username=Admin --password=adminpass --groups=sysop,bureaucrat
 
 #
 # Generate ES index, since it is skipped in the initial create-wiki.sh

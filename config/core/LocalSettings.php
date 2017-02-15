@@ -319,16 +319,22 @@ if ( file_exists( "$m_config/local/primewiki" ) ) {
  **/
 // memcached settings
 $wgMainCacheType = CACHE_MEMCACHED;
-$wgParserCacheType = CACHE_NONE; // optional; if set to CACHE_MEMCACHED, templates used to format query results in generic footer don't work
-$wgMessageCacheType = CACHE_MEMCACHED; // optional
+// If parser cache set to CACHE_MEMCACHED, templates used to format SMW query
+// results in generic footer don't work. This is a limitation of
+// Extension:HeaderFooter which may or may not be able to be worked around.
+$wgParserCacheType = CACHE_NONE;
+$wgMessageCacheType = CACHE_MEMCACHED;
 $wgMemCachedServers = array( "127.0.0.1:11211" );
 
 // memcached is setup and will work for sessions with meza, unless you use
-// SimpleSamlPhp. For that reason memcached is disabled for sessions. This will
-// be fixed in a later version.
-$wgSessionsInObjectCache = false; // optional
-$wgSessionCacheType = CACHE_NONE; // optional
-
+// SimpleSamlPhp. Previous versions of meza had this set to CACHE_NONE, but
+// MW 1.27 requires a session cache. Setting this to CACHE_MEMCACHED as it
+// is the ultimate goal. A separate branch contains pulling PHP from the
+// IUS repository, which should simplify integrating PHP and memcached in a
+// way that SimpleSamlPhp likes. So this may be temporarily breaking for
+// SAML, but MW 1.27 may be breaking for SAML anyway due to changes in
+// AuthPlugin/AuthManager.
+$wgSessionCacheType = CACHE_MEMCACHED;
 
 ## To enable image uploads, make sure the 'images' directory
 ## is writable, then set this to true:
@@ -631,13 +637,6 @@ $smwgNamespacesWithSemanticLinks[NS_TALK] = true;
 require_once "$IP/extensions/ExtensionLoader/ExtensionLoader.php";
 $egExtensionLoader = new ExtensionLoader();
 
-/**
- * May want to include ParserFunctionHelper in order to extension-ify templates
- */
-// 'ParserFunctionHelper' => array(
-// 	'git' => 'https://github.com/enterprisemediawiki/ParserFunctionHelper.git',
-// 	'branch' => 'master',
-// ),
 
 /**
  * ImportUsers is not in wikimedia git, now in github/kghbln. Also, it seems it
@@ -658,51 +657,52 @@ $egExtensionLoader = new ExtensionLoader();
 #
 # Extension:ParserFunctions
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"ParserFunctions",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/ParserFunctions.git",
-	"REL1_25"
+	"REL1_27"
 );
 $wgPFEnableStringFunctions = true;
 
 
 #
 # Extension:StringFunctionsEscaped
+# No extension.json
 #
 require_once $egExtensionLoader->registerLegacyExtension(
 	"StringFunctionsEscaped",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/StringFunctionsEscaped.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
 #
 # Extension:ExternalData
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"ExternalData",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/ExternalData.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
 #
 # Extension:LabeledSectionTransclusion
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"LabeledSectionTransclusion",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/LabeledSectionTransclusion.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
 #
 # Extension:Cite
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"Cite",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Cite.git",
-	"REL1_25"
+	"REL1_27"
 );
 $wgCiteEnablePopups = true;
 
@@ -718,12 +718,22 @@ $wgCiteEnablePopups = true;
 
 
 #
+# Extension:ParserFunctionHelper
+#
+$egExtensionLoader->load(
+	'ParserFunctionHelper',
+	'https://github.com/enterprisemediawiki/ParserFunctionHelper.git',
+	'master'
+);
+
+
+#
 # Extension:WhoIsWatching
 #
 require_once $egExtensionLoader->registerLegacyExtension(
 	"WhoIsWatching",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/WhoIsWatching.git",
-	"REL1_25"
+	"REL1_27"
 );
 $wgPageShowWatchingUsers = true;
 
@@ -731,17 +741,17 @@ $wgPageShowWatchingUsers = true;
 #
 # Extension:CharInsert
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"CharInsert",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/CharInsert.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
 #
 # Extension:SemanticForms
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"SemanticForms",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticForms.git",
 	"tags/3.5"
@@ -750,41 +760,34 @@ require_once $egExtensionLoader->registerLegacyExtension(
 
 #
 # Extension:SemanticInternalObjects
+# No extension.json
 #
 require_once $egExtensionLoader->registerLegacyExtension(
 	"SemanticInternalObjects",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticInternalObjects.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
 #
 # Extension:SemanticCompoundQueries
+# No extension.json
 #
 require_once $egExtensionLoader->registerLegacyExtension(
 	"SemanticCompoundQueries",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticCompoundQueries.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
 #
 # Extension:Arrays
+# No extension.json
 #
 require_once $egExtensionLoader->registerLegacyExtension(
 	"Arrays",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Arrays.git",
-	"REL1_25"
-);
-
-
-#
-# Extension:TitleKey
-#
-require_once $egExtensionLoader->registerLegacyExtension(
-	"TitleKey",
-	"https://gerrit.wikimedia.org/r/mediawiki/extensions/TitleKey.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
@@ -794,17 +797,18 @@ require_once $egExtensionLoader->registerLegacyExtension(
 require_once $egExtensionLoader->registerLegacyExtension(
 	"TalkRight",
 	"https://github.com/enterprisemediawiki/TalkRight.git",
-	"master"
+	"extreg"
 );
 
 
 #
 # Extension:AdminLinks
+# No extension.json
 #
 require_once $egExtensionLoader->registerLegacyExtension(
 	"AdminLinks",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/AdminLinks.git",
-	"REL1_25"
+	"REL1_27"
 );
 $wgGroupPermissions['sysop']['adminlinks'] = true;
 
@@ -812,30 +816,31 @@ $wgGroupPermissions['sysop']['adminlinks'] = true;
 #
 # Extension:DismissableSiteNotice
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"DismissableSiteNotice",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/DismissableSiteNotice.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
 #
 # Extension:BatchUserRights
+# No extension.json
 #
 require_once $egExtensionLoader->registerLegacyExtension(
 	"BatchUserRights",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/BatchUserRights.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
 #
 # Extension:HeaderTabs
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"HeaderTabs",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/HeaderTabs.git",
-	"REL1_25"
+	"REL1_27"
 );
 $htEditTabLink = false;
 $htRenderSingleTab = true;
@@ -844,10 +849,10 @@ $htRenderSingleTab = true;
 #
 # Extension:WikiEditor
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"WikiEditor",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/WikiEditor.git",
-	"REL1_25"
+	"REL1_27"
 );
 $wgDefaultUserOptions['usebetatoolbar'] = 1;
 $wgDefaultUserOptions['usebetatoolbar-cgd'] = 1;
@@ -865,7 +870,7 @@ $wgDefaultUserOptions['wikieditor-preview'] = 1;
 require_once $egExtensionLoader->registerLegacyExtension(
 	"CopyWatchers",
 	"https://github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git",
-	"master"
+	"extreg"
 );
 
 
@@ -875,10 +880,10 @@ require_once $egExtensionLoader->registerLegacyExtension(
 # consider replacing with SyntaxHighlight_Pygments
 # https://gerrit.wikimedia.org/r/mediawiki/extensions/SyntaxHighlight_Pygments.git
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"SyntaxHighlight_GeSHi",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/SyntaxHighlight_GeSHi.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
@@ -888,12 +893,13 @@ require_once $egExtensionLoader->registerLegacyExtension(
 require_once $egExtensionLoader->registerLegacyExtension(
 	"Wiretap",
 	"https://github.com/enterprisemediawiki/Wiretap.git",
-	"master"
+	"extreg"
 );
 
 
 #
 # Extension:ApprovedRevs
+# No extension.json
 #
 require_once $egExtensionLoader->registerLegacyExtension(
 	"ApprovedRevs",
@@ -906,30 +912,30 @@ $egApprovedRevsAutomaticApprovals = false;
 #
 # Extension:InputBox
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"InputBox",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/InputBox.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
 #
 # Extension:ReplaceText
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"ReplaceText",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/ReplaceText.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
 #
 # Extension:Interwiki
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"Interwiki",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Interwiki.git",
-	"REL1_25"
+	"REL1_27"
 );
 $wgGroupPermissions['sysop']['interwiki'] = true;
 
@@ -940,7 +946,7 @@ $wgGroupPermissions['sysop']['interwiki'] = true;
 require_once $egExtensionLoader->registerLegacyExtension(
 	"MasonryMainPage",
 	"https://github.com/enterprisemediawiki/MasonryMainPage.git",
-	"master"
+	"extreg"
 );
 
 
@@ -969,31 +975,32 @@ $egPendingReviewsEmphasizeDays = 10;
 
 #
 # Extension:Variables
+# No extension.json
 #
 require_once $egExtensionLoader->registerLegacyExtension(
 	"Variables",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Variables.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
 #
 # Extension:YouTube
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"YouTube",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/YouTube.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
 #
 # Extension:ContributionScores
-#
+# No extension.json
 require_once $egExtensionLoader->registerLegacyExtension(
 	"ContributionScores",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/ContributionScores.git",
-	"REL1_25"
+	"REL1_27"
 );
 // Exclude Bots from the reporting - Can be omitted.
 $wgContribScoreIgnoreBots = true;
@@ -1026,17 +1033,17 @@ $wgContribScoreReports = array(
 require_once $egExtensionLoader->registerLegacyExtension(
 	"PipeEscape",
 	"https://github.com/jamesmontalvo3/MediaWiki-PipeEscape.git",
-	"master"
+	"extreg"
 );
 
 
 #
 # Extension:PdfHandler
 #
-// require_once $egExtensionLoader->registerLegacyExtension(
+// $egExtensionLoader->load(
 // 	"PdfHandler",
 // 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler",
-// 	"REL1_25"
+// 	"REL1_27"
 // );
 // Location of PdfHandler dependencies
 // $wgPdfProcessor = '/usr/bin/gs'; // installed via yum
@@ -1047,20 +1054,20 @@ require_once $egExtensionLoader->registerLegacyExtension(
 #
 # Extension:UniversalLanguageSelector
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"UniversalLanguageSelector",
 	"https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UniversalLanguageSelector.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
 #
 # Extension:VisualEditor
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"VisualEditor",
 	"https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git",
-	"REL1_25"
+	"REL1_27"
 );
 // Allow read and edit permission for requests from the server (e.g. Parsoid)
 // Ref: https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
@@ -1082,13 +1089,18 @@ $wgHiddenPrefs[] = 'visualeditor-enable';
 // OPTIONAL: Enable VisualEditor's experimental code features
 #$wgDefaultUserOptions['visualeditor-enable-experimental'] = 1;
 
-// URL to the Parsoid instance
-// MUST NOT end in a slash due to Parsoid bug
-$wgVisualEditorParsoidURL = 'http://127.0.0.1:8000';
+// URL to the Parsoid instance MUST NOT end in a slash due to Parsoid bug
+$wgVirtualRestConfig['modules']['parsoid'] = array(
+	'url' => 'http://127.0.0.1:8000',
 
-// Interwiki prefix to pass to the Parsoid instance
-// Parsoid will be called as $url/$prefix/$pagename
-$wgVisualEditorParsoidPrefix = $wikiId;
+	// domain here is not really the domain. It needs to be unique to each wiki
+	// and both domain and prefix must match settings in Parsoid's settings in
+	// /opt/meza/config/core/localsettings.js
+	// ref:
+	// https://www.mediawiki.org/wiki/Parsoid/Setup#Multiple_wikis_sharing_the_same_parsoid_service
+	'domain' => $wikiId,
+	'prefix' => $wikiId
+);
 
 // Define which namespaces will use VE
 $wgVisualEditorNamespaces = array_merge(
@@ -1102,10 +1114,10 @@ $wgVisualEditorNamespaces = array_merge(
 #
 # Extension:Elastica
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"Elastica",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Elastica.git",
-	"REL1_25"
+	"REL1_27"
 );
 
 
@@ -1115,7 +1127,7 @@ require_once $egExtensionLoader->registerLegacyExtension(
 require_once $egExtensionLoader->registerLegacyExtension(
 	"CirrusSearch",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/CirrusSearch.git",
-	"REL1_25"
+	"REL1_27"
 );
 $wgSearchType = 'CirrusSearch';
 //$wgCirrusSearchServers = array( 'search01', 'search02' );
@@ -1127,7 +1139,7 @@ $wgSearchType = 'CirrusSearch';
 require_once $egExtensionLoader->registerLegacyExtension(
 	"Echo",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Echo.git",
-	"REL1_25"
+	"REL1_27"
 );
 $wgEchoEmailFooterAddress = $wgPasswordSender;
 
@@ -1135,10 +1147,10 @@ $wgEchoEmailFooterAddress = $wgPasswordSender;
 #
 # Extension:Thanks
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	"Thanks",
 	"https://gerrit.wikimedia.org/r/mediawiki/extensions/Thanks.git",
-	"REL1_25"
+	"REL1_27"
 );
 $wgThanksConfirmationRequired = false;
 
@@ -1149,7 +1161,7 @@ $wgThanksConfirmationRequired = false;
 require_once $egExtensionLoader->registerLegacyExtension(
 	'UploadWizard',
 	'https://gerrit.wikimedia.org/r/mediawiki/extensions/UploadWizard',
-	'REL1_25'
+	'REL1_27'
 );
 
 // Needed to make UploadWizard work in IE, see bug 39877
@@ -1200,25 +1212,25 @@ $wgUploadWizardConfig = array(
 #
 # Extension:CollapsibleVector
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	'CollapsibleVector',
 	'https://gerrit.wikimedia.org/r/mediawiki/extensions/CollapsibleVector',
-	'REL1_25'
+	'REL1_27'
 );
 
 
 #
 # Extension:Math
 #
-require_once $egExtensionLoader->registerLegacyExtension(
+$egExtensionLoader->load(
 	'Math',
 	'https://gerrit.wikimedia.org/r/mediawiki/extensions/Math.git',
-	'REL1_25'
+	'REL1_27'
 );
 
-$wgMathValidModes[] = MW_MATH_MATHJAX; // Define MathJax as one of the valid math rendering modes
+$wgMathValidModes[] = 'MW_MATH_MATHJAX'; // Define MathJax as one of the valid math rendering modes
 $wgUseMathJax = true; // Enable MathJax as a math rendering option for users to pick
-$wgDefaultUserOptions['math'] = MW_MATH_MATHJAX; // Set MathJax as the default rendering option for all users (optional)
+$wgDefaultUserOptions['math'] = 'MW_MATH_MATHJAX'; // Set MathJax as the default rendering option for all users (optional)
 $wgMathDisableTexFilter = true; // or compile "texvccheck"
 $wgDefaultUserOptions['mathJax'] = true; // Enable the MathJax checkbox option
 
@@ -1230,10 +1242,10 @@ $wgDefaultUserOptions['mathJax'] = true; // Enable the MathJax checkbox option
 # improved interface is great, it's useless if we can't search our old content.
 # See issues #272.
 #
-// require_once $egExtensionLoader->registerLegacyExtension(
+// $egExtensionLoader->load(
 // 	'Flow',
 // 	'https://gerrit.wikimedia.org/r/mediawiki/extensions/Flow.git',
-// 	'REL1_25'
+// 	'REL1_27'
 // );
 
 // // only allow sysops to create new flow boards
@@ -1265,6 +1277,7 @@ $wgDefaultUserOptions['mathJax'] = true; // Enable the MathJax checkbox option
 
 #
 # Extension:Data Transfer
+# No extension.json
 #
 require_once $egExtensionLoader->registerLegacyExtension(
 	'DataTransfer',
