@@ -307,7 +307,7 @@ cd "$m_meza/scripts"
 cmd_tee "source memcached.sh"
 
 cd "$m_meza/scripts"
-cmd_tee "source mysql.sh"
+cmd_tee "source mariadb.sh"
 
 cd "$m_meza/scripts"
 cmd_tee "source VE.sh"
