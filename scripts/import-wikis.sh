@@ -2,26 +2,23 @@
 #
 # import one or more wikis
 
-# must be root or sudoer
-if [ "$(whoami)" != "root" ]; then
-	echo "Try running this script with sudo: \"sudo bash import-wiki.sh\""
-	exit 1
-fi
-
-
-# If /usr/local/bin is not in PATH then add it
-# Ref enterprisemediawiki/meza#68 "Run install.sh with non-root user"
-if [[ $PATH != *"/usr/local/bin"* ]]; then
-	PATH="/usr/local/bin:$PATH"
-fi
-
-
-# meza core config info
+# Load config constants. Unfortunately right now have to write out full path to
+# meza since we can't be certain of consistent method of accessing install.sh.
 source "/opt/meza/config/core/config.sh"
 
+source "$m_scripts/shell-functions/base.sh"
+rootCheck
+
+# source "$m_scripts/shell-functions/logging.sh"
+
+# This will be re-sourced after prompts to get modified config
+source "$m_local_config_file"
+
+# i18n message file
+source "$m_i18n/$m_language.sh"
 
 # print title of script
-bash printTitle.sh "Begin import-wikis.sh"
+printTitle "Begin import-wikis.sh"
 
 
 # INITIALIZE DEFAULTS. These can be overridden in import-config.sh (sourced below).
@@ -74,12 +71,12 @@ read imports_dir
 done
 
 
-# prompt user for MySQL root password
-while [ -z "$mysql_root_pass" ]
-do
-echo -e "\nEnter MySQL root password and press [ENTER]: "
-read -s mysql_root_pass
-done
+meza prompt        db_server_ips   "$MSG_prompt_db_server_ips"
+meza prompt_secure db_password     "$MSG_prompt_db_password"
+
+# Need to re-source after prompts
+source "$m_local_config_file"
+
 
 
 if [ "$imports_dir" = "new" ]; then
@@ -262,7 +259,19 @@ for d in */ ; do
 	echo " * dropping if exists"
 	echo " * (re)creating"
 	echo " * importing file at $import_sql_file"
-	mysql -u root "--password=$mysql_root_pass" -e"DROP DATABASE IF EXISTS $wiki_db_name; CREATE DATABASE $wiki_db_name; use $wiki_db_name; SOURCE $import_sql_file;"
+	# FIXME: use more secure password method
+	# ref: http://dev.mysql.com/doc/refman/5.7/en/password-security-user.html
+	db_server_ip=`echo "$db_server_ips" | head -n1 | cut -d " " -f1`
+
+	query=`cat <<EOF
+		DROP DATABASE IF EXISTS $wiki_db_name;
+		CREATE DATABASE $wiki_db_name;
+		USE $wiki_db_name;
+		SOURCE $import_sql_file;
+EOF`
+	echo "Performing queries, mysql -u \"$m_wiki_app_user\" -h \"$db_server_ip\" ...:"
+	echo "$query"
+	mysql -u "$m_wiki_app_user" -h "$db_server_ip" "--password=$db_password" -e"$query"
 
 	# Remove the SQL file unless directed to keep it
 	if [ "$keep_imports_directories" = "false" ]; then
@@ -343,6 +352,9 @@ if [[ ! -z "$slackwebhook" ]]; then
 	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Building search indices for each wiki" ""
 fi
 
+# We haven't removed $wiki_id directories from $imports_dir yet so that we can
+# use them as an array of all the wikis we've imported, and build each search
+# index. Then delete the directories if they're empty.
 cd $imports_dir
 for d in */ ; do
 
@@ -354,7 +366,6 @@ for d in */ ; do
 	# Announce building search indices on Slack if a slack webhook provided
 	if [[ ! -z "$slackwebhook" ]]; then
 		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Starting $wiki_id search index" ""
-
 	fi
 
 	echo "Building Elastic Search index for $wiki_id"
@@ -371,6 +382,7 @@ for d in */ ; do
 	fi
 done
 
+done
 
 
 # Announce completion of backup on Slack if a slack webhook provided

@@ -27,7 +27,10 @@ exports.setup = function(parsoidConfig) {
 	for ( var i = 0; i < wikis.length; i++ ) {
 		parsoidConfig.setMwApi( {
 			prefix: wikis[i],
-			uri: domain + wikis[i] + '/api.php'
+			uri: domain + wikis[i] + '/api.php',
+
+			// not really the domain, needs to be specific to each wiki
+			domain: wikis[i]
 		} );
 	}
 

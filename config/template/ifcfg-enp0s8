@@ -17,3 +17,4 @@ NAME=enp0s8
 UUID=2b28f238-3251-4fd3-a74a-488bd588a86f
 DEVICE=enp0s8
 ONBOOT="yes"
+ZONE=public

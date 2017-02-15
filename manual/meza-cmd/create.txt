@@ -1,0 +1,7 @@
+Mediawiki EZ Admin
+
+Usage: meza create [directives]
+
+List of directives:
+
+wiki   create a wiki

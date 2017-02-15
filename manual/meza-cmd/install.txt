@@ -1,0 +1,10 @@
+Mediawiki EZ Admin
+
+Usage: meza install [directives]
+
+List of directives:
+
+dev-networking       Setup a VirtualBox VM networking
+monolith             Install meza on a single machine
+app-with-remote-db   Install meza on a single machine, but with remote database
+remote-db-master     Install a remote database for use as a master
