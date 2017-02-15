@@ -1,0 +1,3 @@
+Mediawiki EZ Admin
+
+TBD manual for `meza` command

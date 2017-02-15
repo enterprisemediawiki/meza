@@ -5,44 +5,6 @@
 
 print_title "Starting script yums.sh"
 
-cd ~/mezadownloads
-
-#
-# Set architecture to 32 or 64 (bit)
-#
-if [ $(uname -m | grep -c 64) -eq 1 ]; then
-architecture=64
-else
-architecture=32
-fi
-
-
-if [ "$architecture" = "32" ]; then
-    echo "Downloading EPEL for 32-bit"
-    epel_version="6/i386/epel-release-6-8.noarch.rpm"
-elif [ "$architecture" = "64" ]; then
-
-	if [ "$enterprise_linux_version" = "6" ]; then
-	    echo "Downloading EPEL for 64-bit Enterprise Linux v6"
-	    epel_version="6/x86_64/epel-release-6-8.noarch.rpm"
-	else
-		echo "Downloading EPEL for 64-bit Enterprise Linux v7"
-		# First determine what the latest version of EPEL is. Meza kept breaking
-		# each time EPEL got a new version. See #375 and #401
-		epel_version=`curl -v --silent http://dl.fedoraproject.org/pub/epel/7/x86_64/e/ 2>&1 | grep -oh 'epel-release-7-[0-9]\+.noarch.rpm' | head -1`
-		epel_version="7/x86_64/e/$epel_version"
-	fi
-
-else
-    echo -e "There was an error in choosing architecture."
-    exit 1
-fi
-
-
-# Get EPEL based on version chosen above
-curl -LO "http://dl.fedoraproject.org/pub/epel/$epel_version"
-
-
 #
 # Make sure deltarpm is installed
 # CentOS 7 minimal install removed the deltarpm package, which handles the
@@ -83,15 +45,13 @@ fi
 #
 # Get development tools
 #
-cmd_profile "START yum groupinstall development"
-yum groupinstall -y development
-cmd_profile "END yum groupinstall development"
+# cmd_profile "START yum groupinstall development"
+# yum groupinstall -y development
+# cmd_profile "END yum groupinstall development"
 
 
-#
-# Import EPEL repo so libmcrypt-devel can be installed (not in default repo)
-#
-rpm -ivh epel-release-*.noarch.rpm
+# Get EPEL repository
+source "$m_scripts/epel.sh"
 
 
 #

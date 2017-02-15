@@ -21,14 +21,15 @@ yum install -y ./imagemagick_7.0.3_x86_64.rpm
 
 # Get xpdf-utils
 echo "Download xpdf-utils"
-cd ~/mezadownloads
+cd /tmp
 wget http://mirror.unl.edu/ctan/support/xpdf/xpdfbin-linux-3.04.tar.gz
 tar xvzf xpdfbin-linux-3.04.tar.gz
 
 cd xpdfbin-linux-3.04
 
 # Copy correct-architecture executables to /usr/local/bin
-if [ $(uname -m | grep -c 64) -eq 1 ]; then
+
+if [ $architecture = 64 ]; then
 	echo "Move 64-bit executables to /usr/local/bin"
 	cp -a ./bin64/. /usr/local/bin/
 else
@@ -43,3 +44,4 @@ fi
 # cp ./doc/*.5 /usr/local/man/man5
 # cp ./doc/sample-xpdfrc /usr/local/etc/xpdfrc
 
+rm -rf /tmp/xpdfbin-linux-3.04

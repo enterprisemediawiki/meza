@@ -30,7 +30,7 @@ done
 #
 # Install Composer
 #
-cd ~/mezadownloads
+cd /tmp
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 
@@ -116,6 +116,9 @@ cp "$m_config/template/preLocalSettings_allWikis.php" "$m_config/local/preLocalS
 echo -e "\n\n"                              >> "$m_config/local/preLocalSettings_allWikis.php"
 echo "// All-wiki db user and password"     >> "$m_config/local/preLocalSettings_allWikis.php"
 echo "\$wgDBuser = 'root';"                 >> "$m_config/local/preLocalSettings_allWikis.php"
+if [ "$setup_database_server" != true ]; then
+	echo "\$wgDBserver = '$db_server';" >> "$m_config/local/preLocalSettings_allWikis.php"
+fi
 echo "\$wgDBpassword = '$mysql_root_pass';" >> "$m_config/local/preLocalSettings_allWikis.php"
 echo -e "\n\n"                              >> "$m_config/local/preLocalSettings_allWikis.php"
 
