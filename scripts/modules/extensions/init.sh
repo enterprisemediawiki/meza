@@ -57,12 +57,8 @@ composer install
 echo -e "\n\n## meza: Install composer-supported extensions"
 cd "$m_mediawiki"
 cmd_profile "START extensions composer require"
-composer require \
-	mediawiki/semantic-media-wiki:~2.4 \
-	mediawiki/semantic-result-formats:~2.0 \
-	mediawiki/sub-page-list:~1.1 \
-	mediawiki/semantic-meeting-minutes:~0.3 \
-	mediawiki/semantic-maps:~3.2
+cp "$m_config/template/composer.local.json" "$m_mediawiki/composer.local.json"
+composer update
 cmd_profile "END extensions composer require"
 
 

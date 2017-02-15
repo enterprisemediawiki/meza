@@ -371,13 +371,16 @@ for d in */ ; do
 	echo "Building Elastic Search index for $wiki_id"
 	source "$m_meza/scripts/elastic-build-index.sh"
 
-
 	# Check if anything remains in $imports_dir/$wiki_id. If so don't delete, but report it.
-	if [ "$(ls -A $1)" ]; then
+	if [ "$(ls -A $imports_dir/$wiki_id)" ]; then
 		complete_msg="$complete_msg\n\nImport directory $imports_dir/$wiki_id is not empty. Not deleting."
 	else
-		rm "$imports_dir/$wiki_id"
+		# FIXME: should really have checking for $imports_dir and $wiki_id here.
+		# what if $imports_dir == "" (blank) and $wiki_id = "opt"? would erase
+		# entire /opt directory.
+		rm -rf "$imports_dir/$wiki_id"
 	fi
+done
 
 done
 
@@ -392,5 +395,4 @@ if [[ ! -z "$slackwebhook" ]]; then
 	# 	announce_log=`cat $cronlog`
 	# 	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "$announce_log" "$cmd_times"
 	# fi
-
 fi
