@@ -48,7 +48,7 @@ sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' "$net_scripts/$network_adapt
 curl -L "https://raw.githubusercontent.com/enterprisemediawiki/meza/master/config/template/$network_adapter2" > "$net_scripts/$network_adapter2"
 
 # modify IP address as required:
-sed -r -i "s/IPADDR=192.168.56.56/IPADDR=$ipaddr/g;" "./$network_adapter2"
+sed -r -i "s/IPADDR=192.168.56.56/IPADDR=$ipaddr/g;" "$net_scripts/$network_adapter2"
 
 
 # get eth1 HWADDR from ifconfig, insert into ifcfg-eth1
