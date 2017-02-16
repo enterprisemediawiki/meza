@@ -3,22 +3,19 @@
 # Setup network configuration for a CentOS 6.6 virtual machine on VirtualBox
 # Please see directions at https://github.com/enterprisemediawiki/meza
 
-
 # Get host-only IP address
-while [ -z "$server_ip_address" ]; do
-    echo -e "Enter your desired IP address (follow meza VirtualBox Networking steps)"
-    read -e -i "192.168.56.56" server_ip_address
+while [ -z "$ipaddr" ]; do
+	echo -e "Enter your desired IP address (follow meza VirtualBox Networking steps)"
+	read -e -i "192.168.56.56" ipaddr
 done
 
-yum install -y \
-	openssh-server \
-	openssh-clients
 
-
+#
 # Modify network scripts in /etc/sysconfig/network-scripts,
 # ifcfg-eth0 (for NAT network adapter) and ifcfg-eth1 (for host-only)
 #
-cd /etc/sysconfig/network-scripts
+net_scripts="/etc/sysconfig/network-scripts"
+
 
 
 # CentOS/RHEL Version?
@@ -42,44 +39,36 @@ fi
 
 
 # modify ifcfg-eth0 (NAT)
-sed -r -i 's/ONBOOT=no/ONBOOT=yes/g;' "./$network_adapter1"
-sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' "./$network_adapter1"
-
-# Make adapter 1 public zone
-if grep "ZONE=" "./$network_adapter1"; then
-	# ZONE=xyz already present (though xyz could be empty)
-	sed -r -i 's/ZONE=.*$/ZONE=public/g;' "./$network_adapter1"
-else
-	# ZONE not present, append it
-	echo "ZONE=public" >> "./$network_adapter1"
-fi
+sed -r -i 's/ONBOOT=no/ONBOOT=yes/g;' "$net_scripts/$network_adapter1"
+sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' "$net_scripts/$network_adapter1"
 
 
 # note: prefix with \ removes root's alias in .bashrc to "cp -i" which forces cp
 # to ask the user if they want to overwrite existing. We do want to overwrite.
-\cp "$m_config/template/$network_adapter2" "./$network_adapter2"
+curl -L "https://raw.githubusercontent.com/enterprisemediawiki/meza/master/config/template/$network_adapter2" > "$net_scripts/$network_adapter2"
 
 # modify IP address as required:
-sed -r -i "s/IPADDR=192.168.56.56/IPADDR=$server_ip_address/g;" "./$network_adapter2"
+sed -r -i "s/IPADDR=192.168.56.56/IPADDR=$ipaddr/g;" "./$network_adapter2"
 
 
 # get eth1 HWADDR from ifconfig, insert into ifcfg-eth1
 # Note: not required for CentOS 7 (ifcfg-enp0s8 does not have HWADDR)
 if [ "$enterprise_linux_version" = "6" ]; then
 	eth1_hwaddr="$(ifconfig eth1 | grep '[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}:[a-zA-Z0-9]{2}' -o -P)"
-	sed -r -i "s/HWADDR=.*$/HWADDR=$eth1_hwaddr/g;" ./ifcfg-eth1
+	sed -r -i "s/HWADDR=.*$/HWADDR=$eth1_hwaddr/g;" "$net_scripts/ifcfg-eth1"
 fi
 
 
 # restart networking
-service network restart
+systemctl restart network
 
 
 #
 # Setup SSH
 #
-chkconfig sshd on
-service sshd start
+yum install -y openssh-server openssh-clients
+systemctl enable sshd
+systemctl start sshd
 
 
-echo -e "Network and SSH setup complete\n\n\n\n\n\nPlease login via SSH from your host machine, by doing:\n	ssh root@$server_ip_address\n\nEnter your root password when prompted"
+echo -e "Network and SSH setup complete\n\n\n\n\n\nPlease login via SSH from your host machine, by doing:\n	ssh root@$ipaddr\n\nEnter your root password when prompted"

@@ -32,6 +32,17 @@
     - imagemagick
     - apache-php
     - composer
+
+- hosts: memcached-servers
+  become: yes
+  vars_files:
+    - "paths.yml"
+  roles:
+    - role: firewalld
+      firewalld_port: 11211
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: public
     - memcached # Note this should move to separate server(s)
 
 - hosts: db-master
