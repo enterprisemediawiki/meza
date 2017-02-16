@@ -22,7 +22,7 @@ global
 
 
 	# Apache httpd.conf settings regarding SSL which we should verify if they
-	# need to be included here.
+	# need to be included somehow here.
 	#
 	# SSLProtocol             all -SSLv3 -TLSv1
 	# SSLCipherSuite          ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256
@@ -63,6 +63,7 @@ frontend www-http
 frontend www-https
 	bind {{ inventory_hostname }}:443 ssl crt /etc/haproxy/certs/meza.pem
 	reqadd X-Forwarded-Proto:\ https
+	# Keep letsencrypt stuff here for now. Probably add it back later.
 	# acl letsencrypt-acl path_beg /.well-known/acme-challenge/
 	# use_backend letsencrypt-backend if letsencrypt-acl
 	default_backend www-backend
@@ -70,7 +71,11 @@ frontend www-https
 backend www-backend
 	redirect scheme https if !{ ssl_fc }
 	{% for host in groups['app-servers'] %}
-	server apache{{ loop.index }} {{ host }}:80 check
+	{% if host == inventory_hostname %}
+	server apache{{ loop.index }} 127.0.0.1:8080 check
+	{% else %}
+	server apache{{ loop.index }} {{ host }}:8080 check
+	{% endif %}
 	{% endfor %}
 
 # backend letsencrypt-backend

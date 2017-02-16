@@ -92,8 +92,7 @@ case "$1" in
 		# parsoid
 		case "$2" in
 			"dev-networking")
-				meza config modules "dev-networking"
-				"$m_scripts/install.sh"
+				source "$m_scripts/dev-networking.sh"
 				exit 0;
 				;;
 			"monolith")

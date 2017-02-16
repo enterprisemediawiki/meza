@@ -385,45 +385,9 @@ SSLRandomSeed connect builtin
 #</IfModule>
 
 
-
-# http redirect to https
-# UNFORTUNATELY this is not playing nicely with Elasticsearch and is
-# disabled for now.
-# Listen 80
-# <VirtualHost *:80>
-#	  ServerName MezaHttpRedirect
-#	  Redirect "/" "https://{{ inventory_hostname }}/"
-# </VirtualHost>
-
-
-
-
-# modern configuration
-SSLProtocol             all -SSLv3 -TLSv1
-SSLCipherSuite          ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256
-SSLHonorCipherOrder     on
-SSLCompression          off
-#SSLSessionTickets       off # not available until httpd 2.4.11
-
-# OCSP Stapling
-SSLUseStapling          on
-SSLStaplingResponderTimeout 5
-SSLStaplingReturnResponderErrors off
-SSLStaplingCache        shmcb:/var/run/ocsp(128000)
-
-# main handling via https
-Listen 443
-<VirtualHost *:443>
-	SSLEngine on
-	SSLCertificateFile     /etc/pki/tls/certs/meza.crt
-	SSLCertificateKeyFile  /etc/pki/tls/private/meza.key
-
-	# 443.conf should contain the following directive for production HTTPS:
-	# SSLCACertificateFile /etc/pki/tls/certs/meza-ca.crt
-	# For development it is blank
-	# Include /opt/meza/config/local/httpd/443.conf
-	# Above method was used pre-ansible. Now playbook sets var below as req'd.
-	{{ httpd_conf_ca_cert_directive }}
+# main handling via http
+Listen 8080
+<VirtualHost *:8080>
 
 	<Directory /opt/meza/htdocs>
 
@@ -445,63 +409,6 @@ Listen 443
 
 	# ADD SPECIAL CONFIG BELOW
 
-</VirtualHost>
-
-# Allow non-https access via port 9000. This port is NOT accessible
-# externally (e.g. 9000 is not opened in the firewall). This port
-# is to be used by Parsoid for non-SSL traffic internally.
-Listen 9000
-<VirtualHost *:9000>
-	<Directory /opt/meza/htdocs>
-
-		#
-		AllowOverride All
-
-		#
-		Options Indexes FollowSymLinks
-
-		# Controls who can get stuff from this server.
-		Require all granted
-
-		# Disable directory browsing
-		Options All -Indexes
-	</Directory>
-
-	DocumentRoot /opt/meza/htdocs
-	ServerName MezaParsoidEntryPoint
-</VirtualHost>
-
-# Open port for reverse proxy for elasticsearch read-only
-Listen 8008
-<VirtualHost *:8008>
-	ServerName ElasticsearchExternal
-
-	<Proxy balancer://main>
-		BalancerMember http://127.0.0.1:9200 max=1 retry=5
-
-		<Limit GET POST PUT DELETE>
-			Order Allow,Deny
-			Allow from all
-			AuthType Basic
-			AuthName "Authenticated proxy"
-			AuthUserFile  /etc/httpd/.htpasswd
-			Require valid-user
-		</Limit>
-
-		# ES plugins kopf and head won't allow queries with request bodies in
-		# GET requests, which means it's impossible to do more complex queries.
-		# I'm not sure if it's a good idea to have POST/PUT/DELETE available in
-		# production, but for pre-v1.0 it's good to be able to easily access
-		# the ES API.
-		#<Limit POST PUT DELETE>
-		#	order deny,allow
-		#	deny from all
-		#</Limit>
-
-	</Proxy>
-
-	ProxyPass / balancer://main/
-	ProxyPassReverse / balancer://main/
 </VirtualHost>
 
 

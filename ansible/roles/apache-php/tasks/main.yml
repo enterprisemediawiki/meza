@@ -50,29 +50,6 @@
 # create logrotate file
 # ln -s " $m_config/core/logrotated_httpd" /etc/logrotate.d/httpd
 
-# webserver access via https
-- name: Configure firewalld for https
-  firewalld:
-    service: https
-    permanent: true
-    immediate: true
-    state: enabled
-    zone: public
-# HTTP forwarded to HTTPS in httpd.conf
-- name: Configure firewalld for http
-  firewalld:
-    service: https
-    permanent: true
-    immediate: true
-    state: enabled
-    zone: public
-- name: Configure firewalld for Elasticsearch reverse proxy
-  firewalld:
-    port: 8008/tcp
-    permanent: true
-    immediate: true
-    state: enabled
-    zone: public
 
 # FIXME: apache.sh had commented-out SELinux commands for services
 

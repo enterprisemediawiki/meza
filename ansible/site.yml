@@ -12,11 +12,22 @@
     - base
     # FIXME: add "security" module here
 
+- hosts: load-balancers
+  become: yes
+  vars_files:
+    - "paths.yml"
+  roles:
+    - haproxy
+
 - hosts: app-servers
   become: yes
   vars_files:
     - "paths.yml"
   roles:
+    - role: firewalld
+      firewalld_service: http
+      firewalld_servers: "{{ groups['load-balancers'] }}"
+      firewalld_zone: public  # "{{ m_private_networking_zone }}"
     - base-extras
     - imagemagick
     - apache-php
@@ -41,6 +52,7 @@
       # Get the one and only server that should be in the db-master group and set
       # it's IP address as replication master IP. Note that this can be left blank
       # or not included at all if no replication should be performed.
+      # FIXME: add condition for "if slaves.length > 0, set replication master, else leave blank"?
       mysql_replication_master: "{{ groups['db-master'][0] }}"
       mysql_replication_role: master
 
@@ -131,6 +143,6 @@
     - composer
     - mediawiki
 
-# Write wiki configs like:
+# ?: Write wiki configs like:
 #  "env/{{ env }}/wikis/eva/preLocalSettings.php.j2"
 

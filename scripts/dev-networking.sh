@@ -4,7 +4,17 @@
 # Please see directions at https://github.com/enterprisemediawiki/meza
 
 
-#
+# Get host-only IP address
+while [ -z "$server_ip_address" ]; do
+    echo -e "Enter your desired IP address (follow meza VirtualBox Networking steps)"
+    read -e -i "192.168.56.56" server_ip_address
+done
+
+yum install -y \
+	openssh-server \
+	openssh-clients
+
+
 # Modify network scripts in /etc/sysconfig/network-scripts,
 # ifcfg-eth0 (for NAT network adapter) and ifcfg-eth1 (for host-only)
 #
@@ -14,20 +24,20 @@ cd /etc/sysconfig/network-scripts
 # CentOS/RHEL Version?
 if grep -Fxq "VERSION_ID=\"7\"" /etc/os-release
 then
-    echo "Enterprise Linux version 7."
-    enterprise_linux_version="7"
+	echo "Enterprise Linux version 7."
+	enterprise_linux_version="7"
 
-    # CentOS 7 (and presumably later) use ifcfg-enp0s3 and ifcfg-enp0s8 files
-    network_adapter1="ifcfg-enp0s3"
+	# CentOS 7 (and presumably later) use ifcfg-enp0s3 and ifcfg-enp0s8 files
+	network_adapter1="ifcfg-enp0s3"
 	network_adapter2="ifcfg-enp0s8"
 
 else
-    echo "Enterprise Linux version 6."
-    enterprise_linux_version="6"
+	echo "Enterprise Linux version 6."
+	enterprise_linux_version="6"
 
-    # CentOS 6 (and presumably earlier) used ifcfg-eth0 and ifcfg-eth1 files
-    network_adapter1="ifcfg-eth0"
-    network_adapter2="ifcfg-eth1"
+	# CentOS 6 (and presumably earlier) used ifcfg-eth0 and ifcfg-eth1 files
+	network_adapter1="ifcfg-eth0"
+	network_adapter2="ifcfg-eth1"
 fi
 
 
@@ -37,11 +47,11 @@ sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' "./$network_adapter1"
 
 # Make adapter 1 public zone
 if grep "ZONE=" "./$network_adapter1"; then
-    # ZONE=xyz already present (though xyz could be empty)
-    sed -r -i 's/ZONE=.*$/ZONE=public/g;' "./$network_adapter1"
+	# ZONE=xyz already present (though xyz could be empty)
+	sed -r -i 's/ZONE=.*$/ZONE=public/g;' "./$network_adapter1"
 else
-    # ZONE not present, append it
-    echo "ZONE=public" >> "./$network_adapter1"
+	# ZONE not present, append it
+	echo "ZONE=public" >> "./$network_adapter1"
 fi
 
 
@@ -72,4 +82,4 @@ chkconfig sshd on
 service sshd start
 
 
-echo -e "Network and SSH setup complete\n\n\n\n\n\nPlease login via SSH from your host machine, by doing:\n    ssh root@$server_ip_address\n\nEnter your root password when prompted"
+echo -e "Network and SSH setup complete\n\n\n\n\n\nPlease login via SSH from your host machine, by doing:\n	ssh root@$server_ip_address\n\nEnter your root password when prompted"

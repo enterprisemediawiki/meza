@@ -1,7 +1,0 @@
-ntp
-ntpdate
-ntp-doc
-openssh-server
-openssh-clients
-vim
-net-tools
