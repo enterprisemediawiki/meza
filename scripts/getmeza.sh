@@ -24,7 +24,7 @@ ln -s "/opt/meza/scripts/meza.sh" "/usr/bin/meza"
 
 echo
 echo "Add ansible master user"
-source /opt/meza/scripts/ansible/setup-master-user.sh
+source "/opt/meza/scripts/ssh-users/setup-master-user.sh"
 
 echo "meza command installed. Use it:"
 echo "  sudo meza install monolith"
