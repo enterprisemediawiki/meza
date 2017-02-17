@@ -24,6 +24,10 @@ cat "/home/$ansible_user/.ssh/id_rsa.pub" >> "/home/$ansible_user/.ssh/authorize
 chmod 600 "/home/$ansible_user/.ssh/authorized_keys"
 chown -R "$ansible_user:$ansible_user" "/home/$ansible_user/.ssh"
 
+# Add $ansible_user to sudoers as a passwordless user
+bash -c "echo '$ansible_user ALL=(ALL) NOPASSWD: ALL' | (EDITOR='tee -a' visudo)"
+
+
 # echo
 # echo
 # echo "User $ansible_user setup. Please copy the SSH public key below and use"
