@@ -24,12 +24,19 @@
     openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
       -subj "/C=US/ST=TX/L=Houston/O=EnterpriseMediaWiki/CN=${ansible_fqdn}" \
       -keyout /etc/haproxy/certs/meza.key -out /etc/haproxy/certs/meza.crt
-    cat /etc/haproxy/certs/meza.crt /etc/haproxy/certs/meza.key > /etc/haproxy/certs/meza.pem
-    rm /etc/haproxy/certs/meza.crt
-    rm /etc/haproxy/certs/meza.key
+  #cat /etc/haproxy/certs/meza.crt /etc/haproxy/certs/meza.key > /etc/haproxy/certs/meza.pem
+  #rm /etc/haproxy/certs/meza.crt
+  #rm /etc/haproxy/certs/meza.key
   when: ssl_cert_stat_result.stat.exists == False
   notify:
     - restart haproxy
+- name: Concatenate cert and key into pem file
+  shell: |
+    cat /etc/haproxy/certs/meza.crt /etc/haproxy/certs/meza.key > /etc/haproxy/certs/meza.pem
+  when: ssl_cert_stat_result.stat.exists == False
+  notify:
+    - restart haproxy
+
 
 # Generate self-signed cert if one doesn't exist (note: trusting an article
 # on the internet on this one, that it'll only generate if one doesn't exist)
@@ -49,13 +56,21 @@
   notify:
     - restart haproxy
 
+- name: Ensure haproxy socket directory exists
+  file:
+    path: /run/haproxy
+    state: directory
+    owner: root
+    group: root
+    mode: 0660
+
 - name: Ensure firewalld haproxy service files in place
   template:
     src: "haproxy-{{ item }}.firewalld.xml.j2"
     dest: "/etc/firewalld/services/haproxy-{{ item }}.xml"
     owner: root
     group: root
-    mode: 0640
+    mode: 0644
   with_items:
     - http
     - https
@@ -66,21 +81,28 @@
     - http
     - https
 
-# Allow firewall to accesp
-- name: Configure firewalld for haproxy via https
+# Allow http and https through firewall
+#- name: Configure firewalld for haproxy via {{ item }}
+#  firewalld:
+#    service: "haproxy-{{ item }}"
+#    permanent: true
+#    immediate: true
+#    state: enabled
+#    zone: public
+#  with_items:
+#    - http
+#    - https
+
+- name: Configure firewalld for haproxy via port 80 and 443
   firewalld:
-    service: haproxy-https
+    port: "{{ item }}/tcp"
     permanent: true
     immediate: true
     state: enabled
     zone: public
-- name: Configure firewalld for haproxy via http
-  firewalld:
-    service: haproxy-http
-    permanent: true
-    immediate: true
-    state: enabled
-    zone: public
+  with_items:
+    - 80
+    - 443
 
 # FIXME: haproxy will need to handle reverse proxy for Elasticsearch plugins
 # - name: Configure firewalld for Elasticsearch reverse proxy
@@ -90,6 +112,31 @@
 #     immediate: true
 #     state: enabled
 #     zone: public
+
+
+- name: Uncomment '$ModLoad imudp' in /etc/rsyslog.conf
+  replace:
+    dest: /etc/rsyslog.conf
+    regexp: '^#\$ModLoad imudp'
+    replace: '$ModLoad imudp'
+  notify:
+    - restart rsyslog
+
+- name: Uncomment '$UDPServerRun 514' in /etc/rsyslog.conf
+  replace:
+    dest: /etc/rsyslog.conf
+    regexp: '^#\$UDPServerRun 514'
+    replace: '$UDPServerRun 514'
+  notify:
+    - restart rsyslog
+
+- name: Ensure /etc/rsyslog.d/haproxy.conf configured
+  template:
+    src: haproxy.rsyslog.conf.j2
+    dest: /etc/rsyslog.d/haproxy.conf
+  notify:
+    - restart rsyslog
+
 
 - name: ensure haproxy is running (and enable it at boot)
   service:

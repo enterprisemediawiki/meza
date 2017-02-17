@@ -16,6 +16,7 @@
   become: yes
   vars_files:
     - "paths.yml"
+  tags: load-balancer
   roles:
     - haproxy
 

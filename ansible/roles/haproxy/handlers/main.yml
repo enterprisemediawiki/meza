@@ -1,9 +1,12 @@
 ---
-# handlers file for parsoid
-- name: reload systemd
-  command: systemctl daemon-reload
 
-- name: restart parsoid
+- name: restart haproxy
   service:
-    name: parsoid
+    name: haproxy
     state: restarted
+
+- name: restart rsyslog
+  service:
+    name: rsyslog
+    state: restarted
+
