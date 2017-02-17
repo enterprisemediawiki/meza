@@ -68,6 +68,14 @@
     group: root
     mode: 0660
 
+
+- name: Ensure error files directory in place
+  file:
+    path: /etc/haproxy/errors
+    state: directory
+    # FIXME: permissions?
+
+
 - name: Ensure error pages in place
   template:
     src: "errors/{{ item }}.http.j2"

@@ -814,7 +814,7 @@ $mezaValidParsoidServers = [];
 	$mezaValidParsoidServers[] = '{{ host }}';
 {% endfor %}
 if ( isset( $_SERVER['REMOTE_ADDR'] ) && in_array( $_SERVER['REMOTE_ADDR'], $mezaValidParsoidServers ) ) {
-	$wgServer = preg_replace( '/^http:\/\/([a-zA-Z\d-\.]+):9000/', 'https://$1', $wgServer );
+	$wgServer = preg_replace( '/^http:\/\/([a-zA-Z\d-\.]+):8080/', 'https://$1', $wgServer );
 	$wgGroupPermissions['*']['read'] = true;
 	$wgGroupPermissions['*']['edit'] = true;
 }

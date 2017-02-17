@@ -18,7 +18,7 @@ exports.setup = function(parsoidConfig) {
 	var wikis = fs.readdirSync( '/opt/meza/htdocs/wikis' );
 
 	// Domain, which will be setup by the meza installer
-	var domain = "http://{{ groups['app-servers'][0] }}:9000/";  // was mw_api_domain
+	var domain = "http://{{ groups['app-servers'][0] }}:8080/";  // was mw_api_domain
 
 	// loop through all wiki IDs and do setMwApi
 	for ( var i = 0; i < wikis.length; i++ ) {
