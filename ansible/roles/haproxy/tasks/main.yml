@@ -1,6 +1,10 @@
 ---
 # FIXME: Eventually add the ability to get SSL cert from letsencrypt
 #     ref: https://www.digitalocean.com/community/tutorials/how-to-secure-haproxy-with-let-s-encrypt-on-centos-7
+# Other refs:
+#     https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Load_Balancer_Administration/install_haproxy_example1.html
+#     https://gist.github.com/thisismitch/7c91e9b2b63f837a0c4b
+#     https://www.unixmen.com/configure-high-available-load-balancer-haproxy-keepalived/
 
 - name: Install haproxy packages
   yum: name={{item}} state=installed
@@ -63,6 +67,20 @@
     owner: root
     group: root
     mode: 0660
+
+- name: Ensure error pages in place
+  template:
+    src: "errors/{{ item }}.http.j2"
+    dest: "/etc/haproxy/errors/{{ item }}.http"
+  with_items:
+    # FIXME: add the others, make the 500 error one good
+    # - 400
+    # - 403
+    # - 408
+    - 500
+    # - 502
+    # - 503
+    # - 504
 
 - name: Ensure firewalld haproxy service files in place
   template:
