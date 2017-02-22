@@ -60,13 +60,13 @@
   notify:
     - restart haproxy
 
-- name: Ensure haproxy socket directory exists
-  file:
-    path: /run/haproxy
-    state: directory
-    owner: root
-    group: root
-    mode: 0660
+# - name: Ensure haproxy socket directory exists
+#   file:
+#     path: /run/haproxy
+#     state: directory
+#     owner: root
+#     group: root
+#     mode: 0660
 
 
 - name: Ensure error files directory in place
