@@ -64,8 +64,8 @@ source "$m_config/local/import-config.sh"
 
 
 # Create user
-source "$m_scripts/shell-functions/add-user.sh"
-add_ssh_user "$backup_user_name"
+source "$m_scripts/shell-functions/linux-user.sh"
+mf_add_ssh_user "$backup_user_name"
 
 # generate SSH key for backup_user_name
 ssh-keygen -t rsa -N "" -f "/home/$backup_user_name/.ssh/id_rsa"

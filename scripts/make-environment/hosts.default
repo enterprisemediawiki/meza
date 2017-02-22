@@ -1,0 +1,16 @@
+# Hosts for {{ env }} environment
+
+[app-servers]
+APP_SERVERS
+
+[db-master]
+DB_MASTER
+
+[db-slaves]
+DB_SLAVES
+
+[parsoid-servers]
+PARSOID_SERVERS
+
+[elastic-servers]
+ELASTIC_SERVERS

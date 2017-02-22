@@ -1,0 +1,67 @@
+---
+# Setup paroid user
+
+# Get Parsoid
+#
+# Notes:
+#   "Force: no" will make it so changes to working directory will not be
+#   overwritten. Long-term we may want this, but right now we have to modify
+#   Parsoid for it to display external images.
+- name: Get Parsoid repository
+  git:
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/services/parsoid
+    dest: "{{ m_parsoid_path }}"
+    version: "{{ m_parsoid_version }}"
+    force: no
+
+- name: Ensure parsoid group exists
+  group:
+    name: parsoid
+    state: present
+
+- name: Ensure parsoid user exists
+  user:
+    name: parsoid
+    group: parsoid
+    append: yes
+
+- name: Ensure parsoid directory permissions
+  file:
+    path: "{{ m_parsoid_path }}"
+    state: directory
+    mode: 0755
+    owner: parsoid
+    group: parsoid
+    recurse: no
+
+- name: Ensure Parsoid dependencies installed
+  npm:
+    path: "{{ m_parsoid_path }}"
+    state: present
+
+# I think I read somewhere that there was a bug in Ansible that made it so you
+# had to separate "present" and "latest" states...couldn't just put "latest"
+- name: Ensure Parsoid dependencies are latest
+  npm:
+    path: "{{ m_parsoid_path }}"
+    state: latest
+
+- name: Copy localsettings.js
+  template:
+    src: localsettings.js.j2
+    dest: "{{ m_parsoid_path }}/localsettings.js"
+
+- name: Copy systemd service
+  template:
+    src: parsoid.initd.sh.j2
+    dest: /etc/init.d/parsoid
+    mode: 0755
+  notify:
+    - reload systemd
+    - restart parsoid
+
+- name: Enable parsoid service
+  service:
+    name: parsoid
+    state: started
+    enabled: yes

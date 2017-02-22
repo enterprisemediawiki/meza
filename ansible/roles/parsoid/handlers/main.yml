@@ -1,0 +1,9 @@
+---
+# handlers file for parsoid
+- name: reload systemd
+  command: systemctl daemon-reload
+
+- name: restart parsoid
+  service:
+    name: parsoid
+    state: restarted

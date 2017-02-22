@@ -71,3 +71,6 @@ m_language="en"
 
 # Users absolutely should override this. FIXME: should we not make this default?
 m_private_networking_zone="public"
+
+# Ansible
+ansible_user="meza-ansible"

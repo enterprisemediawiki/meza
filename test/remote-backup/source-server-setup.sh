@@ -13,8 +13,8 @@ source "$m_test/$test_name/import-config.sh"
 
 
 # Create user for backup
-source "$m_scripts/shell-functions/add-user.sh"
-add_ssh_user "$backup_user_name"
+source "$m_scripts/shell-functions/linux-user.sh"
+mf_add_ssh_user "$backup_user_name"
 
 # Apply public key (which was transferred from backup server) to authorized_keys
 cat "$temp_pub_key_path" >> "/home/$backup_user_name/.ssh/authorized_keys"

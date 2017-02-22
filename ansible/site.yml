@@ -1,0 +1,161 @@
+---
+# run with:
+# cd /opt/meza/ansible
+# sudo -u meza-ansible ansible-playbook site.yml
+
+
+- hosts: all
+  become: yes
+  vars_files:
+    - "paths.yml"
+  roles:
+    - base
+    # FIXME: add "security" module here
+
+- hosts: load-balancers
+  become: yes
+  vars_files:
+    - "paths.yml"
+  tags: load-balancer
+  roles:
+    - haproxy
+
+- hosts: app-servers
+  become: yes
+  vars_files:
+    - "paths.yml"
+  roles:
+    - role: firewalld
+      # firewalld_service: http
+      firewalld_port: 8080
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['load-balancers'] }}"
+      firewalld_zone: public  # "{{ m_private_networking_zone }}"
+    - role: firewalld
+      firewalld_port: 8080
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['parsoid-servers'] }}"
+      firewalld_zone: public
+    - base-extras
+    - imagemagick
+    - apache-php
+    - composer
+
+- hosts: memcached-servers
+  become: yes
+  vars_files:
+    - "paths.yml"
+  roles:
+    - role: firewalld
+      firewalld_port: 11211
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: public
+    - memcached # Note this should move to separate server(s)
+
+- hosts: db-master
+  become: yes
+  tags: database
+  vars_files:
+    - "paths.yml"
+  roles:
+    - role: firewalld
+      firewalld_service: mysql
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: public  # "{{ m_private_networking_zone }}"
+    - role: firewalld
+      firewalld_service: mysql
+      firewalld_servers: "{{ groups['db-slaves'] }}"
+      firewalld_zone: public
+    - role: database
+      # Get the one and only server that should be in the db-master group and set
+      # it's IP address as replication master IP. Note that this can be left blank
+      # or not included at all if no replication should be performed.
+      # FIXME: add condition for "if slaves.length > 0, set replication master, else leave blank"?
+      mysql_replication_master: "{{ groups['db-master'][0] }}"
+      mysql_replication_role: master
+
+
+- hosts: db-slaves
+  become: yes
+  tags: database
+  vars_files:
+    - "paths.yml"
+  roles:
+    - role: firewalld
+      firewalld_service: mysql
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: public
+    - role: database
+      # Get the one and only server that should be in the db-master group and set
+      # it's IP address as replication master IP. Note that this can be left blank
+      # or not included at all if no replication should be performed.
+      mysql_replication_master: "{{ groups['db-master'][0] }}"
+      mysql_replication_role: slave
+
+
+- hosts: parsoid-servers
+  become: yes
+  vars_files:
+    - "paths.yml"
+  tags: parsoid
+  roles:
+    # Allow app servers to get to parsoid server(s) on port 8000
+    - role: firewalld
+      firewalld_port: 8000
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: public
+    - nodejs
+    - role: parsoid
+      nodejs_install_npm_user: "nodejs"
+      nodejs_version: "0.12"
+      nodejs_npm_global_packages: []
+        # - name: example-global-package
+        # - name: jslint
+        #   version: 0.9.3
+        # # latest version
+        # - name: node-sass
+
+
+- hosts: elastic-servers
+  become: yes
+  vars_files:
+    - "paths.yml"
+  tags: elasticsearch
+  roles:
+    - role: firewalld
+      firewalld_port: 9200
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: public
+    - role: firewalld
+      firewalld_port: 9300
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: public
+    - role: firewalld
+      firewalld_port: 9200
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['elastic-servers'] }}"
+      firewalld_zone: public
+    - role: firewalld
+      firewalld_port: 9300
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['elastic-servers'] }}"
+      firewalld_zone: public
+    - elasticsearch
+
+# Note: this is app-servers again, but must be after everything else is setup
+- hosts: app-servers
+  become: yes
+  vars_files:
+    - "paths.yml"
+  tags: mediawiki
+  roles:
+    - composer
+    - mediawiki
+
+# ?: Write wiki configs like:
+#  "env/{{ env }}/wikis/eva/preLocalSettings.php.j2"
+

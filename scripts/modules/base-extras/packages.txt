@@ -1,6 +1,0 @@
-expect
-expectk
-perl
-wget
-gcc
-cifs-utils

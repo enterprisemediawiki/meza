@@ -1,0 +1,36 @@
+---
+#
+# Loads MediaWiki extensions as defined in a YAML file.
+#
+# requires `{{ extfile }}` to be set to either:
+#   1) A path to a valid YAML file with extension definitions like
+#     - name: CollapsibleVector
+#       repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CollapsibleVector
+#       version: REL1_27
+#     - name: Another extension ...
+#   2) A path to a non-existent file
+#
+- name: Fail if `extfile` param not passed
+  fail:
+    msg: "Using load-extension-from-file.yml without passing 'extfile' param"
+  when: extfile is not defined
+
+- name: Get status of `extfile` (to determine if it's a file)
+  stat:
+    path: "{{ extfile }}"
+  register: extfile_status
+
+- name: Reading extensions file at {{ extfile }}
+  include_vars:
+    file: "{{ extfile }}"
+    name: extensions_file
+  when: extfile_status.stat.isreg is defined and extfile_status.stat.isreg
+
+# This is a repeat of the same extensions thing above. need to abstract it.
+- name: Ensure extensions installed from {{ extfile }}
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
+    version: "{{ item.version }}"
+  with_items: "{{ extensions_file.list }}"
+  when: extensions_file is defined and extensions_file.list is defined and extensions_file.list[0] is defined
