@@ -36,16 +36,10 @@ script:
   - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm bash /etc/ansible/roles/role_under_test/scripts/getmeza.sh'
   - 'docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$(cat ${container_id})")'
 
-  # Accept key for this server to SSH into itself
-  # (yes, this should instead use an ansible local connection)
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ssh-keyscan -H ${docker_ip} >> /home/meza-ansible/.ssh/known_hosts'
-
-  # Change the ip address in env/example/hosts to this IP address
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm sed -r -i "s/IP_ADDR/${docker_ip}/g;" /opt/meza/ansible/env/example/hosts'
 
   # - 'echo "IP address = ${docker_ip}"'
   # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza create env local ${docker_ip}'
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza deploy example'
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza install monolith "$(docker_ip)"'
 
   # TEST: role.
   # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml'
@@ -60,14 +54,16 @@ script:
   #   || (echo 'Idempotence test: fail' && exit 1)
 
 
-  # # Ensure Node.js is installed.
-  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm which node'
-  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm node -v'
+  # Ensure Node.js is installed.
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm which node'
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm node -v'
 
-  # # Ensure PHP is installed.
-  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm which php'
-  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm php --version'
+  # Ensure PHP is installed.
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm which php'
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm php --version'
 
+  # See if demo wiki is installed
+  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm curl https://${docker_ip}/demo/api.php?action=query&meta=siteinfo | grep "Demo Wiki"'
 
 # notifications:
 #   webhooks: https://galaxy.ansible.com/api/v1/notifications/
