@@ -103,21 +103,21 @@ case "$1" in
 				# Create a "monolith" environment
 				cp -r "$m_meza/ansible/env/example" "$m_meza/ansible/env/monolith"
 
-				# get domain from third arg if available, else prompt
-				if [ ! -z "$3" ]; then
-					monolith_ip="$3"
-				else
-					# Prompt for IP/domain
-					meza prompt monolith_ip "Type the domain or IP address for this server"
+				# # get domain from third arg if available, else prompt
+				# if [ ! -z "$3" ]; then
+				# 	monolith_ip="$3"
+				# else
+				# 	# Prompt for IP/domain
+				# 	meza prompt monolith_ip "Type the domain or IP address for this server"
 
-					# Re-source after prompt
-					source "$m_local_config_file"
-				fi
+				# 	# Re-source after prompt
+				# 	source "$m_local_config_file"
+				# fi
 
-				ssh-keyscan -H "$monolith_ip" >> /home/meza-ansible/.ssh/known_hosts
+				# ssh-keyscan -H "$monolith_ip" >> /home/meza-ansible/.ssh/known_hosts
 
 				# Make the IP/domain for every part of meza be the monolith IP
-				sed -r -i "s/IP_ADDR/${monolith_ip}/g;" "$m_meza/ansible/env/monolith/hosts"
+				sed -r -i "s/IP_ADDR/localhost/g;" "$m_meza/ansible/env/monolith/hosts"
 
 				meza deploy monolith
 
