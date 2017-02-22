@@ -26,9 +26,16 @@
     - "paths.yml"
   roles:
     - role: firewalld
-      firewalld_service: http
+      # firewalld_service: http
+      firewalld_port: 8080
+      firewalld_protocol: tcp
       firewalld_servers: "{{ groups['load-balancers'] }}"
       firewalld_zone: public  # "{{ m_private_networking_zone }}"
+    - role: firewalld
+      firewalld_port: 8080
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['parsoid-servers'] }}"
+      firewalld_zone: public
     - base-extras
     - imagemagick
     - apache-php
@@ -146,12 +153,6 @@
     - "paths.yml"
   tags: mediawiki
   roles:
-    # Allow parsoid servers to have http (non-SSL) backdoor into app servers
-    - role: firewalld
-      firewalld_port: 9000
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['parsoid-servers'] }}"
-      firewalld_zone: public
     - composer
     - mediawiki
 
