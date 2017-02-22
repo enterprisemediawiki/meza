@@ -1,22 +1,22 @@
 # Example hosts file
 
 [load-balancers]
-192.168.56.80
+IP_ADDR
 
 [app-servers]
-192.168.56.80
+IP_ADDR
 
 [memcached-servers]
-192.168.56.80
+IP_ADDR
 
 [db-master]
-192.168.56.80
+IP_ADDR
 
 [db-slaves]
-# 192.168.56.60   mysql_server_id=2
+# IP_ADDR   mysql_server_id=2
 
 [parsoid-servers]
-192.168.56.80
+IP_ADDR
 
 [elastic-servers]
-192.168.56.80
+IP_ADDR
