@@ -39,7 +39,7 @@ script:
 
   # - 'echo "IP address = ${docker_ip}"'
   # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza create env local ${docker_ip}'
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza install monolith "$(docker_ip)"'
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza install monolith "${docker_ip}"'
 
   # TEST: role.
   # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml'
