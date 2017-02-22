@@ -1,0 +1,10 @@
+---
+elasticsearch_cluster_name: "meza_cluster1"
+elasticsearch_node_name: "meza_node_1"
+
+# Options: "2.x" or "1.6.x"
+elasticsearch_major_version: "1.6"
+
+# How to connect to elasticsearch
+elasticsearch_network_host: 127.0.0.1
+elasticsearch_http_port: 9200

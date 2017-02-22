@@ -13,18 +13,12 @@ meza requires a minimal installation of Enterprise Linux. Attempting to install 
 
 Login to your server and run the following (should take 20-45 minutes):
 
+```bash
+curl -L getmeza.org > doit
+sudo bash doit
+sudo vi /opt/meza/ansible/env/example/hosts # make IP addresses match your server
+sudo meza deploy example
 ```
-curl -LO https://raw.github.com/enterprisemediawiki/meza/master/scripts/install.sh
-sudo bash install.sh
-```
-
-This script will retrieve a script from the meza repository, which will subsequently retrieve the entire meza repository. The script will ask you several questions regarding how to setup your MediaWiki environment. The parameters requested are:
-
-* **Git branch**: The branch of meza to use. This is mostly for testing. Type "master" in most cases.
-* **GitHub Token**: This allows you to download more things from GitHub than you would normally. Using the default is fine.
-* **MySQL password**: Pick a good, secure password for MySQL root user
-* **domain or IP address**: If you'll access your wiki at http://example.com, your type `example.com`. If you'll access it at http://192.168.56.56, type `192.168.56.56`.
-* **Install with git**: Type `y`. You want to install with git.
 
 ## See Also
 

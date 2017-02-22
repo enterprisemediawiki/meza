@@ -1,6 +1,4 @@
 .DS_Store
-sources/*
-!sources/README.md
 logs/*
 !logs/README.md
 config/local/*
@@ -18,6 +16,8 @@ htdocs/WikiBlender
 
 htdocs/mediawiki
 htdocs/wikis/*
+
+ansible/env/*
 
 simplesamlphp/
 

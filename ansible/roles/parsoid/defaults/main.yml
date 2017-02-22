@@ -1,0 +1,8 @@
+---
+m_parsoid_version: master
+m_parsoid_path: /etc/parsoid
+
+# Set Parsoid version.
+# This commit is closest to MW 1.27 release date of 28 June 2016
+# Default = "master"
+m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8

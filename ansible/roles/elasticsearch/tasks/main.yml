@@ -1,0 +1,98 @@
+---
+
+# INSTALL JAVA
+#
+# FIXME: should this increase to java-1.8.0-openjdk.x86_64 ??
+- name: Ensure Java is installed.
+  yum:
+    name: java-1.7.0-openjdk
+    state: installed
+# Environment setup.
+- name: Set JAVA_HOME if configured.
+  template:
+    src: java_home.sh.j2
+    dest: /etc/profile.d/java_home.sh
+    mode: 0644
+
+# INSTALL ELASTICSEARCH
+- name: Add Elasticsearch GPG key.
+  rpm_key:
+    key: https://packages.elastic.co/GPG-KEY-elasticsearch
+    state: present
+- name: Add Elasticsearch repository.
+  template:
+    src: elasticsearch.repo.j2
+    dest: /etc/yum.repos.d/elasticsearch.repo
+    mode: 0644
+- name: Install Elasticsearch.
+  yum:
+    name: elasticsearch
+    state: installed
+
+# SETUP DIRECTORIES AND FILES
+# Add host name per https://github.com/elastic/elasticsearch/issues/6611
+- lineinfile:
+    dest: /etc/hosts
+    regexp: '^127\.0\.0\.1'
+    line: '127.0.0.1 localhost meza'
+    owner: root
+    group: root
+    mode: 0644
+# ref: http://elasticsearch-users.115913.n3.nabble.com/Elasticsearch-Not-Working-td4059398.html
+- name: Ensure dirs from elasticsearch.yml exist and set ownership
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: elasticsearch
+    recurse: yes
+  with_items:
+    - "{{ m_meza_data }}/elasticsearch/data"
+    - "{{ m_meza_data }}/elasticsearch/work"
+    - "{{ m_meza_data }}/elasticsearch/plugins"
+
+
+# CONFIGURE AND START ELASTICSEARCH
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html
+- name: Configure Elasticsearch.
+  template:
+    src: elasticsearch.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+    owner: root
+    group: elasticsearch
+    mode: 0750
+  notify: restart elasticsearch
+- name: Start Elasticsearch.
+  service: name=elasticsearch state=started enabled=yes
+- name: Make sure Elasticsearch is running before proceeding.
+  wait_for: host={{ elasticsearch_network_host }} port={{ elasticsearch_http_port }} delay=3 timeout=300
+
+
+# INSTALL PLUGINS: kopf, head, bigdesk
+# FIXME: need to put ignore_errors here because otherwise on subsequent running
+#        of this play you get errors like:
+#        >> plugin directory /opt/meza/data/elasticsearch/plugins/head already
+#           exists. To update the plugin, uninstall it first using --remove
+#           mobz/elasticsearch-head command"
+#        Need to make it check for that directory and only run if the directory
+#        doesn't exist. Also need a "force_update_es_plugins" variable to force
+#        update
+- name: Install elasticsearch plugin Kopf
+  elasticsearch_plugin:
+    state: present
+    name: lmenezes/elasticsearch-kopf
+    version: '1.0'
+  ignore_errors: yes
+- name: Install elasticsearch plugin Head
+  elasticsearch_plugin:
+    state: present
+    name: mobz/elasticsearch-head
+  ignore_errors: yes
+- name: Install elasticsearch plugin Bigdesk
+  elasticsearch_plugin:
+    state: present
+    name: lukas-vlcek/bigdesk
+  ignore_errors: yes
+# removed "polyfractal/elasticsearch-inquisitor" because it was failing and
+# we need to downselect anyway
+
