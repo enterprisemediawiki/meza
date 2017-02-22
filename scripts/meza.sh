@@ -97,18 +97,20 @@ case "$1" in
 				;;
 			"monolith")
 
-				# All modules, unmodified
-				modules="$mod_base thisisappserver $mod_app_initial $mod_memcached $mod_db $mod_parsoid $mod_elastic $mod_app_final $mod_security"
-				meza config modules "$modules"
+				# Create a "monolith" environment
+				cp -r "$m_meza/ansible/env/example" "$m_meza/ansible/env/monolith"
 
-				# Don't prompt for list of app-server IP addresses, since the
-				# monolith is the only server.
-				meza config app_server_ips "localhost"
+				# Prompt for IP/domain
+				meza prompt monolith_ip "Type the domain or IP address for this server"
 
-				# Don't prompt for a list of db-server IP addresses, either
-				meza config db_server_ips "localhost"
+				# Re-source after prompt
+				source "$m_local_config_file"
 
-				"$m_scripts/install.sh"
+				# Make the IP/domain for every part of meza be the monolith IP
+				sed -r -i "s/IP_ADDR/${monolith_ip}/g;" "$m_meza/ansible/env/monolith/hosts"
+
+				meza deploy monolith
+
 				exit 0;
 				;;
 			"app-with-remote-db")
