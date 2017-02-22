@@ -208,9 +208,10 @@ case "$1" in
 			exit 1;
 		fi
 
-		echo
-		echo "You are about to deploy to the $ansible_env environment"
-		read -p "Do you want to proceed? " -n 1 -r
+		# This breaks continuous integration. FIXME to get it back.
+		# echo
+		# echo "You are about to deploy to the $ansible_env environment"
+		# read -p "Do you want to proceed? " -n 1 -r
 		echo
 		if [[ $REPLY =~ ^[Yy]$ ]]
 		then
