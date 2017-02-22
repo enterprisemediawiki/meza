@@ -16,8 +16,7 @@ Login to your server and run the following (should take 20-45 minutes):
 ```bash
 curl -L getmeza.org > doit
 sudo bash doit
-sudo vi /opt/meza/ansible/env/example/hosts # make IP addresses match your server
-sudo meza deploy example
+sudo meza install monolith
 ```
 
 ## See Also

@@ -50,6 +50,9 @@
 
 source "/opt/meza/config/core/config.sh"
 
+# Make sure this file exists
+touch "$m_local_config_file"
+
 # meza requires a command parameter. No first param, no command. Display help
 if [ -z "$1" ]; then
 	cat "$m_meza/manual/meza-cmd/base.txt"
@@ -97,18 +100,27 @@ case "$1" in
 				;;
 			"monolith")
 
-				# All modules, unmodified
-				modules="$mod_base thisisappserver $mod_app_initial $mod_memcached $mod_db $mod_parsoid $mod_elastic $mod_app_final $mod_security"
-				meza config modules "$modules"
+				# Create a "monolith" environment
+				cp -r "$m_meza/ansible/env/example" "$m_meza/ansible/env/monolith"
 
-				# Don't prompt for list of app-server IP addresses, since the
-				# monolith is the only server.
-				meza config app_server_ips "localhost"
+				# get domain from third arg if available, else prompt
+				if [ ! -z "$3" ]; then
+					monolith_ip="$3"
+				else
+					# Prompt for IP/domain
+					meza prompt monolith_ip "Type the domain or IP address for this server"
 
-				# Don't prompt for a list of db-server IP addresses, either
-				meza config db_server_ips "localhost"
+					# Re-source after prompt
+					source "$m_local_config_file"
+				fi
 
-				"$m_scripts/install.sh"
+				ssh-keyscan -H "$monolith_ip" >> /home/meza-ansible/.ssh/known_hosts
+
+				# Make the IP/domain for every part of meza be the monolith IP
+				sed -r -i "s/IP_ADDR/${monolith_ip}/g;" "$m_meza/ansible/env/monolith/hosts"
+
+				meza deploy monolith
+
 				exit 0;
 				;;
 			"app-with-remote-db")
@@ -196,24 +208,28 @@ case "$1" in
 			exit 1;
 		fi
 
-		echo
-		echo "You are about to deploy to the $ansible_env environment"
-		read -p "Do you want to proceed? " -n 1 -r
-		echo
-		if [[ $REPLY =~ ^[Yy]$ ]]
-		then
+		# This breaks continuous integration. FIXME to get it back.
+		# echo
+		# echo "You are about to deploy to the $ansible_env environment"
+		# read -p "Do you want to proceed? " -n 1 -r
+		# echo
+		# if [[ $REPLY =~ ^[Yy]$ ]]
+		# then
 			# do dangerous stuff
 
-			# Get errors with user meza-ansible trying to write to the calling-user's
-			# home directory if don't cd to a neutral location. FIXME.
-			starting_wd=`pwd`
-			cd /opt
+			# stuff below was in here
+		# fi
 
-			sudo -u meza-ansible ansible-playbook /opt/meza/ansible/site.yml -i "$host_file" ${@:3}
 
-			cd "$starting_wd"
+		# Get errors with user meza-ansible trying to write to the calling-user's
+		# home directory if don't cd to a neutral location. FIXME.
+		starting_wd=`pwd`
+		cd /opt
 
-		fi
+		sudo -u meza-ansible ansible-playbook /opt/meza/ansible/site.yml -i "$host_file" ${@:3}
+
+		cd "$starting_wd"
+
 		;;
 
 	setup)

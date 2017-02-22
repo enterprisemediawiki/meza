@@ -27,11 +27,14 @@ m_mediawiki="$m_htdocs/mediawiki"
 m_apache="/etc/httpd"
 
 # files
-m_local_config_file="$m_config/local/config.local.sh"
 m_i18n="$m_config/core/i18n"
 m_db_replication_dump_file="/opt/meza/data/db_master_for_replication.sql"
 m_db_replication_log_file="/opt/meza/data/db_master_log_file"
 m_db_replication_log_pos="/opt/meza/data/db_master_log_pos"
+
+# FIXME: This needs to be handled another way
+m_local_config_file="$m_config/config.local.sh"
+
 
 #
 # Installation configuration
