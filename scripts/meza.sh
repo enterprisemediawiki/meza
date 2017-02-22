@@ -50,6 +50,9 @@
 
 source "/opt/meza/config/core/config.sh"
 
+# Make sure this file exists
+touch "$m_local_config_file"
+
 # meza requires a command parameter. No first param, no command. Display help
 if [ -z "$1" ]; then
 	cat "$m_meza/manual/meza-cmd/base.txt"
