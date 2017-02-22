@@ -212,21 +212,24 @@ case "$1" in
 		# echo
 		# echo "You are about to deploy to the $ansible_env environment"
 		# read -p "Do you want to proceed? " -n 1 -r
-		echo
-		if [[ $REPLY =~ ^[Yy]$ ]]
-		then
+		# echo
+		# if [[ $REPLY =~ ^[Yy]$ ]]
+		# then
 			# do dangerous stuff
 
-			# Get errors with user meza-ansible trying to write to the calling-user's
-			# home directory if don't cd to a neutral location. FIXME.
-			starting_wd=`pwd`
-			cd /opt
+			# stuff below was in here
+		# fi
 
-			sudo -u meza-ansible ansible-playbook /opt/meza/ansible/site.yml -i "$host_file" ${@:3}
 
-			cd "$starting_wd"
+		# Get errors with user meza-ansible trying to write to the calling-user's
+		# home directory if don't cd to a neutral location. FIXME.
+		starting_wd=`pwd`
+		cd /opt
 
-		fi
+		sudo -u meza-ansible ansible-playbook /opt/meza/ansible/site.yml -i "$host_file" ${@:3}
+
+		cd "$starting_wd"
+
 		;;
 
 	setup)
