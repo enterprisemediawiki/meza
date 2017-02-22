@@ -1,0 +1,64 @@
+---
+# Copied, with great appreciation, from geerlingguy/ansible-role-nodejs
+
+services: docker
+
+env:
+  - distro: centos7
+    init: /usr/lib/systemd/systemd
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  # - distro: centos6
+  #   init: /sbin/init
+  #   run_opts: ""
+  # - distro: ubuntu1604
+  #   init: /lib/systemd/systemd
+  #   run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  # - distro: ubuntu1404
+  #   init: /sbin/init
+  #   run_opts: ""
+  # - distro: ubuntu1204
+  #   init: /sbin/init
+  #   run_opts: ""
+
+before_install:
+  # Pull container.
+  - 'docker pull geerlingguy/docker-${distro}-ansible:latest'
+
+script:
+  - container_id=$(mktemp)
+  # Run container in detached state.
+  - 'docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} geerlingguy/docker-${distro}-ansible:latest "${init}" > "${container_id}"'
+
+  # TEST: Ansible syntax.
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/role_under_test/ansible/site.yml --syntax-check'
+
+  # Install meza command
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm bash /etc/ansible/roles/role_under_test/scripts/getmeza.sh'
+  - 'docker_ip=$(docker-machine ip "$(cat ${container_id})")'
+
+  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza create env local ${docker_ip}'
+
+  # TEST: role.
+  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml'
+
+  # Test role idempotence.
+  # - idempotence=$(mktemp)
+  # - docker exec "$(cat ${container_id})" ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml | tee -a ${idempotence}
+  # - >
+  #   tail ${idempotence}
+  #   | grep -q 'changed=0.*failed=0'
+  #   && (echo 'Idempotence test: pass' && exit 0)
+  #   || (echo 'Idempotence test: fail' && exit 1)
+
+
+  # # Ensure Node.js is installed.
+  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm which node'
+  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm node -v'
+
+  # # Ensure PHP is installed.
+  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm which php'
+  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm php --version'
+
+
+# notifications:
+#   webhooks: https://galaxy.ansible.com/api/v1/notifications/
