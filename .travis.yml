@@ -36,6 +36,10 @@ script:
   - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm bash /etc/ansible/roles/role_under_test/scripts/getmeza.sh'
   - 'docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$(cat ${container_id})")'
 
+  # Make sure ssh installed, enabled, and firewall allows it
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm yum install -y openssh-server openssh-clients'
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm systemctl enable sshd && systemctl start sshd'
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm firewall-cmd --enable --service=ssh'
 
   # - 'echo "IP address = ${docker_ip}"'
   # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza create env local ${docker_ip}'
