@@ -29,15 +29,26 @@
     name: elasticsearch
     state: installed
 
-# SETUP DIRECTORIES AND FILES
+# Need to perform this check so `lineinfile` doesn't run in Docker. /etc/hosts
+# is special in Docker.
+# ref: https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/#updating-the-etchosts-file
+# ref: http://stackoverflow.com/questions/28327458/how-to-add-my-containers-hostname-to-etc-hosts
+- name: Check whether /etc/hosts contains "127.0.0.1"
+  command: awk /^127.0.0.1$/ /etc/hosts
+  register: checkhostsfile
+  changed_when: False
+
 # Add host name per https://github.com/elastic/elasticsearch/issues/6611
-- lineinfile:
+- name: Add localhost to /etc/hosts if needed
+  lineinfile:
     dest: /etc/hosts
     regexp: '^127\.0\.0\.1'
     line: '127.0.0.1 localhost meza'
     owner: root
     group: root
     mode: 0644
+  when: '"127.0.0.1" not in checkhostsfile.stdout'
+
 # ref: http://elasticsearch-users.115913.n3.nabble.com/Elasticsearch-Not-Working-td4059398.html
 - name: Ensure dirs from elasticsearch.yml exist and set ownership
   file:

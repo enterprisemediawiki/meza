@@ -27,7 +27,7 @@ before_install:
 script:
   - container_id=$(mktemp)
   # Run container in detached state.
-  - 'docker run --detach --volume="${PWD}":/opt/meza ${run_opts} geerlingguy/docker-${distro}-ansible:latest "${init}" > "${container_id}"'
+  - 'docker run --detach --volume="${PWD}":/opt/meza --add-host="127.0.0.1 localhost meza" ${run_opts} geerlingguy/docker-${distro}-ansible:latest "${init}" > "${container_id}"'
 
   # TEST: Ansible syntax.
   - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /opt/meza/ansible/site.yml --syntax-check'
