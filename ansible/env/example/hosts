@@ -1,5 +1,7 @@
 # Example hosts file
 
+localhost ansible_connection=local
+
 [load-balancers]
 IP_ADDR
 
