@@ -66,21 +66,21 @@ script:
 
   # HAProxy 302 redirect test
   - >
-    docker exec -tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1
+    docker exec --tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1
     | grep -q '302'
     && (echo 'HAProxy 302 redirect test: pass' && exit 0)
     || (echo 'HAProxy 302 redirect test: fail' && exit 1)
 
   # Apache (over port 8080) 200 OK test
   - >
-    docker exec -tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1:8080
+    docker exec --tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1:8080
     | grep -q '200'
     && (echo 'Apache 200 test: pass' && exit 0)
     || (echo 'Apache 200 test: fail' && exit 1)
 
   # Demo Wiki API test
   - >
-    docker exec -tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1:8080/demo/api.php
+    docker exec --tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1:8080/demo/api.php
     | grep -q '200'
     && (echo 'Demo Wiki API test: pass' && exit 0)
     || (echo 'Demo Wiki API test: fail' && exit 1)
