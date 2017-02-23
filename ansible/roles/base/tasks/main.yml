@@ -20,10 +20,10 @@
     - net-tools
     - firewalld
     - selinux-policy
-- name: put SELinux in permissive mode
-  selinux:
-    policy: targeted
-    state: permissive # log actions that would be blocked if state=enforcing
+# - name: put SELinux in permissive mode
+#   selinux:
+#     policy: targeted
+#     state: permissive # log actions that would be blocked if state=enforcing
 - name: ensure firewalld is running (and enable it at boot)
   service: name=firewalld state=started enabled=yes
 
