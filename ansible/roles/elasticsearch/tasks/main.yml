@@ -34,7 +34,7 @@
 # ref: https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/#updating-the-etchosts-file
 # ref: http://stackoverflow.com/questions/28327458/how-to-add-my-containers-hostname-to-etc-hosts
 - name: Check whether /etc/hosts contains "127.0.0.1"
-  command: awk /^127.0.0.1$/ /etc/hosts
+  command: awk /127.0.0.1/ /etc/hosts
   register: checkhostsfile
   changed_when: False
 
