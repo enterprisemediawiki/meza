@@ -100,74 +100,25 @@ case "$1" in
 				;;
 			"monolith")
 
-				# Create a "monolith" environment
-				cp -r "$m_meza/ansible/env/example" "$m_meza/ansible/env/monolith"
+				# If a "monolith" environment doesn't already exist, create one
+				if [ ! -d "$m_meza/ansible/env/monolith" ]; then
 
-				# Make the IP/domain for every part of meza be localhost
-				sed -r -i "s/IP_ADDR/localhost/g;" "$m_meza/ansible/env/monolith/hosts"
+					# Prompt for domain, DB password, whether to enable email
+					# Skip prompts for private net zone (no need in monolith)
+					private_net_zone=public meza setup env monolith
+
+				fi
 
 				meza deploy monolith
 
 				exit 0;
 				;;
-			"app-with-remote-db")
 
-				# Don't install the database server, just the client
-				mod_db="db-client"
-				modules="$mod_base thisisappserver $mod_app_initial $mod_memcached $mod_db $mod_parsoid $mod_elastic $mod_app_final $mod_security"
-				meza config modules "$modules"
-
-				# pseudo-monolithic setup
-				meza config app_server_ips "localhost"
-
-				"$m_scripts/install.sh"
-				exit 0;
-				;;
-			"mw-app")
-				# install just the mediawiki app server (PHP and like such as)
-				echo "This function not created yet"
-				exit 1;
-				;;
-			"db-master")
-				meza config modules "base db-server db-remote"
-				"$m_scripts/install.sh"
-				exit 1;
-				;;
-			"db-slave")
-				meza config modules "base db-server db-remote db-slave"
-				"$m_scripts/install.sh"
-				;;
-			"search-node")
-				# do stuff
-				echo "This function not created yet"
-				exit 1;
-				;;
-			"parsoid")
-				# do stuff
-				echo "This function not created yet"
-				exit 1;
-				;;
-			"modules")
-				if [ -z "$3" ]; then
-					cat "$m_meza/manual/meza-cmd/$1-$2.txt"
-					exit 1;
-				fi
-
-				# Install list of modules
-				#             $1      $2      $3
-				# (sudo) meza install modules "list of space-separated modules"
-				echo "This function not created yet"
-				exit 1;
-				;;
-
-			"ansible")
-
-				modules="$mod_base ansible"
-				meza config modules "$modules"
-
-				"$m_scripts/install.sh"
-				exit 0;
-				;;
+			# Perhaps consider common setups like:
+			# "monolith-with-remote-db-master")
+			# "monolith-with-remote-db-slave")
+			# "duolith" <-- two mega servers, identical, except one has slave DB
+			# "triolith" <-- three mega servers, identical, two with slave DBs
 			*)
 				echo "NOT A VALID INSTALL COMMAND"
 				exit 1;
@@ -222,7 +173,85 @@ case "$1" in
 	setup)
 		case "$2" in
 			"env")
-				echo "nope, not yet"
+
+				if [ -z "$3" ]; then
+					echo
+					echo "Please include a valid environment name"
+					exit 1;
+				fi
+
+				# If environment doesn't already exist, create it
+				if [ ! -d "$m_meza/ansible/env/$3" ]; then
+
+					# Copy the template environment
+					cp -r "$m_meza/ansible/template-env/blank" "$m_meza/ansible/env/$3"
+
+					# allow setting required params (and other params) with a file
+					if [ -f "$4" ]; then
+						source "$4"
+
+					# If required params somehow already set, use them
+					# Could be done like:
+					#   fqdn=enterprisemediawiki.org \
+					#   db_pass=1234 \
+					#   email=false \
+					#   private_net_zone=public \
+					#   meza setup env test-env
+					# This will put the DB password on the command line, so
+					# should only be done in testing cases
+					elif [ ! -z "$fqdn" ] && [ ! -z "$db_pass" ] && [ ! -z "$email" ] && [ ! -z "$private_net_zone" ]; then
+						echo "All required params defined, skipping prompts."
+					else
+						fqdn=`meza prompt_no_store "$MSG_prompt_fqdn"`
+						db_pass=`meza prompt_no_store "$MSG_prompt_db_password"`
+						email=`meza prompt_no_store "$MSG_prompt_enable_email"`
+						if [ "$3" = "monolith" ]; then
+							private_net_zone="public"
+						else
+							private_net_zone=`meza prompt_no_store "$MSG_prompt_private_net_zone" "public"`
+						fi
+					fi
+
+					# Make sure required params are present, or exit.
+					if [ -z "$fqdn" ]; then             echo "Missing fqdn param";             exit 1; fi;
+					if [ -z "$db_pass" ]; then          echo "Missing db_pass param";          exit 1; fi;
+					if [ -z "$email" ]; then            echo "Missing email param";            exit 1; fi;
+					if [ -z "$private_net_zone" ]; then echo "Missing private_net_zone param"; exit 1; fi;
+
+					sed -r -i "s/INSERT_FQDN/$fqdn/g;"                         "$m_meza/ansible/env/$3/group_vars/all.yml"
+					sed -r -i "s/INSERT_PRIVATE_ZONE/$private_net_zone/g;"     "$m_meza/ansible/env/$3/group_vars/all.yml"
+					sed -r -i "s/INSERT_ENABLE_EMAIL/$email/g;"                "$m_meza/ansible/env/$3/group_vars/all.yml"
+
+					# All DB users used by the application (root, app, slave)
+					# have the same password. Update as required.
+					sed -r -i "s/INSERT_MYSQL_ROOT_PASS/$db_pass/g;"           "$m_meza/ansible/env/$3/group_vars/all.yml"
+					sed -r -i "s/INSERT_WIKI_APP_DB_USER_PASSWORD/$db_pass/g;" "$m_meza/ansible/env/$3/group_vars/all.yml"
+					sed -r -i "s/INSERT_SLAVE_PASSWORD/$db_pass/g;"            "$m_meza/ansible/env/$3/group_vars/all.yml"
+
+					# For monolith, make the IP/domain for every part of meza
+					# be localhost. All other cases make user edit inventory
+					# (AKA "hosts") file
+					if [ "$3" = "monolith" ]; then
+						for part in INSERT_LB INSERT_APP INSERT_MEM INSERT_MASTER INSERT_SLAVE INSERT_PARSOID INSERT_ES; do
+							sed -r -i "s/# $part/localhost/g;" "$m_meza/ansible/env/$3/hosts"
+						done
+					else
+						# If any of these variables are defined, put them into inventory file
+						if [ ! -z "$INSERT_LB" ]; then      sed -r -i "s/# INSERT_LB/$INSERT_LB/g;"           "$m_meza/ansible/env/$3/hosts"; fi;
+						if [ ! -z "$INSERT_APP" ]; then     sed -r -i "s/# INSERT_APP/$INSERT_APP/g;"         "$m_meza/ansible/env/$3/hosts"; fi;
+						if [ ! -z "$INSERT_MEM" ]; then     sed -r -i "s/# INSERT_MEM/$INSERT_MEM/g;"         "$m_meza/ansible/env/$3/hosts"; fi;
+						if [ ! -z "$INSERT_MASTER" ]; then  sed -r -i "s/# INSERT_MASTER/$INSERT_MASTER/g;"   "$m_meza/ansible/env/$3/hosts"; fi;
+						if [ ! -z "$INSERT_SLAVE" ]; then   sed -r -i "s/# INSERT_SLAVE/$INSERT_SLAVE/g;"     "$m_meza/ansible/env/$3/hosts"; fi;
+						if [ ! -z "$INSERT_PARSOID" ]; then sed -r -i "s/# INSERT_PARSOID/$INSERT_PARSOID/g;" "$m_meza/ansible/env/$3/hosts"; fi;
+						if [ ! -z "$INSERT_ES" ]; then      sed -r -i "s/# INSERT_ES/$INSERT_ES/g;"           "$m_meza/ansible/env/$3/hosts"; fi;
+
+						echo "Please edit your inventory file to add or confirm the proper servers."
+						echo "Run command:  sudo vi $m_meza/ansible/env/$3/hosts"
+					fi
+
+				fi
+
+
 				;;
 			*)
 				echo "NOT A VALID SETUP COMMAND"
@@ -316,6 +345,33 @@ case "$1" in
 			fi
 
 		fi
+		;;
+
+	prompt_no_store)
+
+		# $1 = prompt
+		prompt_description="$2 and press [ENTER]:"
+		prompt_prefill="$3"
+
+		while [ -z "$prompt_value" ]; do
+
+			echo -e "\n$prompt_description"
+
+			# If $prompt_prefill not null/empty/""
+			if [ -n "$prompt_prefill" ]; then
+
+				# If prefill suggestion given, display it and prompt user for changes
+				read -e -i "$prompt_prefill" prompt_value
+
+			else
+				# no prefill, force user to enter
+				read -e prompt_value
+			fi
+
+		done
+
+		printf "$s" $prompt_value
+		exit 0;
 		;;
 
 	prompt)

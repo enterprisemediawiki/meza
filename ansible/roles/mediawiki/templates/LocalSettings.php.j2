@@ -163,6 +163,17 @@ else {
  *
  **/
 
+// ref: https://www.mediawiki.org/wiki/Manual:$wgServer
+//   From section #Autodetection:
+//     "When $wgServer is not set, the default value is calculated
+//     automatically. Some web servers end up returning silly defaults or
+//     internal names which aren't what you want..."
+//
+// Depending on proxy setup (particularly for Varnish/Squid caching) may need
+// to set $wgInternalServer:
+// ref: https://www.mediawiki.org/wiki/Manual:$wgInternalServer
+$wgServer = 'https://{{ wiki_app_fqdn }}';
+
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
 $wgScriptPath = "/$wikiId";
 
@@ -814,7 +825,6 @@ $mezaValidParsoidServers = [];
 	$mezaValidParsoidServers[] = '{{ host }}';
 {% endfor %}
 if ( isset( $_SERVER['REMOTE_ADDR'] ) && in_array( $_SERVER['REMOTE_ADDR'], $mezaValidParsoidServers ) ) {
-	$wgServer = preg_replace( '/^http:\/\/([a-zA-Z\d-\.]+):8080/', 'https://$1', $wgServer );
 	$wgGroupPermissions['*']['read'] = true;
 	$wgGroupPermissions['*']['edit'] = true;
 }

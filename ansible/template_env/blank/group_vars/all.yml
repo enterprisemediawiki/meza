@@ -1,14 +1,15 @@
 ---
 
-# Users absolutely should override this. FIXME: should we not make this default?
-m_private_networking_zone: public
+wiki_app_fqdn: INSERT_FQDN
+
+m_private_networking_zone: INSERT_PRIVATE_ZONE
 
 # Password for mysql root user
-mysql_root_password: 4321
+mysql_root_password: INSERT_MYSQL_ROOT_PASS
 
 wiki_app_db_user:
   name: "wiki_app_user"
-  password: "wiki_app_user_password"
+  password: "INSERT_WIKI_APP_DB_USER_PASSWORD"
   priv: "*.*:ALL"
 
 # List of users. Currently only wiki_app_user is required. This should perhaps
@@ -25,6 +26,10 @@ mysql_users: []
 # User on database master that slaves use perform replication
 mysql_replication_user:
   name: "db_slave_user"
-  password: "db_slave_user_password"
+  password: "INSERT_SLAVE_PASSWORD"
 
-enable_wiki_emails: true
+# Do you want your wiki to be able to email?
+# must be either:
+#   true
+#   false
+enable_wiki_emails: INSERT_ENABLE_EMAIL
