@@ -20,6 +20,7 @@
     - net-tools
     - firewalld
     - selinux-policy
+    - rsyslog
 # - name: put SELinux in permissive mode
 #   selinux:
 #     policy: targeted
