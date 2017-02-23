@@ -23,3 +23,13 @@ $wgEmergencyContact = $wgPasswordSender;
 
 // set a default $mezaAuthType for all wikis that don't specify one
 // $mezaAuthType = 'viewer-read';
+
+// Creating custom namespace
+/*
+	define("NS_TCHB", 3000);
+	define("NS_TCHB_TALK", 3001);
+	$wgExtraNamespaces[NS_TCHB] = "TCHB";
+	$wgExtraNamespaces[NS_TCHB_TALK] = "TCHB_talk";
+	$wgContentNamespaces[] = NS_TCHB;
+*/
+	
