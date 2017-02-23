@@ -66,6 +66,69 @@ if [ -z "$2" ]; then
 	exit 1;
 fi
 
+source "$m_i18n/$m_language.sh"
+
+
+prompt () {
+
+	prompt_var="$1"
+	prompt_description="$2 and press [ENTER]:"
+	prompt_prefill="$3"
+
+	# FIXME: test escaping. See `printf -v ...` at bottom of function
+	eval prompt_value=\$$prompt_var
+
+	while [ -z "$prompt_value" ]; do
+
+		echo -e "\n$prompt_description"
+
+		# If $prompt_prefill not null/empty/""
+		if [ -n "$prompt_prefill" ]; then
+
+			# If prefill suggestion given, display it and prompt user for changes
+			read -e -i "$prompt_prefill" prompt_value
+
+		else
+			# no prefill, force user to enter
+			read -e prompt_value
+		fi
+
+	done
+
+	# Escaping $prompt_value is important. Both eval and typeset/declare
+	# methods can fail. printf to a variable seems mroe robust.
+	# eval $prompt_var=$prompt_value
+	# typeset $prompt_var="$gen_password"
+	printf -v "${prompt_var}" '%s' "${prompt_value}"
+}
+
+# $1 = prompt variable (the var you want set)
+# $2 = prompt description
+# $3 = auto-generated password length (number of characters)
+# $4 = acceptable characters for auto-generated password
+prompt_secure () {
+
+	prompt_var="$1"
+
+	# Generate a password
+	gen_password_length=${3:-32} # get password length from $4 or use default 32
+	def_chars="a-zA-Z0-9\!@#\$%^&*"
+	gen_password_chars=${4:-$def_chars} # get allowable chars from $5 or use default
+	gen_password=`cat /dev/urandom | tr -dc "$gen_password_chars" | fold -w $gen_password_length | head -n 1`
+
+	prompt_description="$2 and press [ENTER]:\n(or leave blank to generate $gen_password_length-character password)"
+
+	echo -e "\n$prompt_description"
+	read -s prompt_value
+
+	if [ -z "$prompt_value" ]; then
+		printf -v "${prompt_var}" '%s' "${gen_password}"
+	else
+		printf -v "${prompt_var}" '%s' "${prompt_value}"
+	fi
+
+}
+
 case "$1" in
 	install)
 
@@ -202,13 +265,13 @@ case "$1" in
 					elif [ ! -z "$fqdn" ] && [ ! -z "$db_pass" ] && [ ! -z "$email" ] && [ ! -z "$private_net_zone" ]; then
 						echo "All required params defined, skipping prompts."
 					else
-						fqdn=`meza prompt_no_store "$MSG_prompt_fqdn"`
-						db_pass=`meza prompt_no_store "$MSG_prompt_db_password"`
-						email=`meza prompt_no_store "$MSG_prompt_enable_email"`
+						prompt "fqdn" "$MSG_prompt_fqdn"
+						prompt_secure "db_pass" "$MSG_prompt_db_password"
+						prompt "email" "$MSG_prompt_enable_email" "true"
 						if [ "$3" = "monolith" ]; then
 							private_net_zone="public"
 						else
-							private_net_zone=`meza prompt_no_store "$MSG_prompt_private_net_zone" "public"`
+							prompt "private_net_zone" "$MSG_prompt_private_net_zone" "public"
 						fi
 					fi
 
@@ -217,6 +280,12 @@ case "$1" in
 					if [ -z "$db_pass" ]; then          echo "Missing db_pass param";          exit 1; fi;
 					if [ -z "$email" ]; then            echo "Missing email param";            exit 1; fi;
 					if [ -z "$private_net_zone" ]; then echo "Missing private_net_zone param"; exit 1; fi;
+
+					# escape vars prior to sed
+					fqdn=$(echo "$fqdn" | sed -e 's/[\/&]/\\&/g')
+					db_pass=$(echo "$db_pass" | sed -e 's/[\/&]/\\&/g')
+					email=$(echo "$email" | sed -e 's/[\/&]/\\&/g')
+					private_net_zone=$(echo "$private_net_zone" | sed -e 's/[\/&]/\\&/g')
 
 					sed -r -i "s/INSERT_FQDN/$fqdn/g;"                         "$m_meza/ansible/env/$3/group_vars/all.yml"
 					sed -r -i "s/INSERT_PRIVATE_ZONE/$private_net_zone/g;"     "$m_meza/ansible/env/$3/group_vars/all.yml"
@@ -231,20 +300,29 @@ case "$1" in
 					# For monolith, make the IP/domain for every part of meza
 					# be localhost. All other cases make user edit inventory
 					# (AKA "hosts") file
+					# NOTE: "INSERT_SLAVE" not in monolith list, so as not to
+					#       configure the monolith as DB master _and_ slave
 					if [ "$3" = "monolith" ]; then
-						for part in INSERT_LB INSERT_APP INSERT_MEM INSERT_MASTER INSERT_SLAVE INSERT_PARSOID INSERT_ES; do
+						for part in INSERT_LB INSERT_APP INSERT_MEM INSERT_MASTER INSERT_PARSOID INSERT_ES; do
 							sed -r -i "s/# $part/localhost/g;" "$m_meza/ansible/env/$3/hosts"
 						done
 					else
-						# If any of these variables are defined, put them into inventory file
-						if [ ! -z "$INSERT_LB" ]; then      sed -r -i "s/# INSERT_LB/$INSERT_LB/g;"           "$m_meza/ansible/env/$3/hosts"; fi;
-						if [ ! -z "$INSERT_APP" ]; then     sed -r -i "s/# INSERT_APP/$INSERT_APP/g;"         "$m_meza/ansible/env/$3/hosts"; fi;
-						if [ ! -z "$INSERT_MEM" ]; then     sed -r -i "s/# INSERT_MEM/$INSERT_MEM/g;"         "$m_meza/ansible/env/$3/hosts"; fi;
-						if [ ! -z "$INSERT_MASTER" ]; then  sed -r -i "s/# INSERT_MASTER/$INSERT_MASTER/g;"   "$m_meza/ansible/env/$3/hosts"; fi;
-						if [ ! -z "$INSERT_SLAVE" ]; then   sed -r -i "s/# INSERT_SLAVE/$INSERT_SLAVE/g;"     "$m_meza/ansible/env/$3/hosts"; fi;
-						if [ ! -z "$INSERT_PARSOID" ]; then sed -r -i "s/# INSERT_PARSOID/$INSERT_PARSOID/g;" "$m_meza/ansible/env/$3/hosts"; fi;
-						if [ ! -z "$INSERT_ES" ]; then      sed -r -i "s/# INSERT_ES/$INSERT_ES/g;"           "$m_meza/ansible/env/$3/hosts"; fi;
 
+						# If any of these variables are defined, put them into inventory file
+						for INVENTORY_VARNAME in INSERT_LB INSERT_APP INSERT_MEM INSERT_MASTER INSERT_SLAVE INSERT_PARSOID INSERT_ES; do
+
+							# Make INVENTORY_VALUE be the value of a variable with the name in INVENTORY_VARNAME
+							# printf -v "${INVENTORY_VARNAME}" '%s' "${INVENTORY_VARNAME}"
+							eval INVENTORY_VALUE="\$$INVENTORY_VARNAME"
+
+							if [ ! -z "$INVENTORY_VALUE" ]; then
+								# Excape value before doing sed-insertion
+								INVENTORY_VALUE=$(echo "$INVENTORY_VALUE" | sed -e 's/[\/&]/\\&/g')
+								sed -r -i "s/# $INVENTORY_VARNAME/$INVENTORY_VALUE/g;" "$m_meza/ansible/env/$3/hosts"
+							fi
+						done
+
+						echo
 						echo "Please edit your inventory file to add or confirm the proper servers."
 						echo "Run command:  sudo vi $m_meza/ansible/env/$3/hosts"
 					fi
@@ -345,33 +423,6 @@ case "$1" in
 			fi
 
 		fi
-		;;
-
-	prompt_no_store)
-
-		# $1 = prompt
-		prompt_description="$2 and press [ENTER]:"
-		prompt_prefill="$3"
-
-		while [ -z "$prompt_value" ]; do
-
-			echo -e "\n$prompt_description"
-
-			# If $prompt_prefill not null/empty/""
-			if [ -n "$prompt_prefill" ]; then
-
-				# If prefill suggestion given, display it and prompt user for changes
-				read -e -i "$prompt_prefill" prompt_value
-
-			else
-				# no prefill, force user to enter
-				read -e prompt_value
-			fi
-
-		done
-
-		printf "$s" $prompt_value
-		exit 0;
 		;;
 
 	prompt)
@@ -484,5 +535,6 @@ case "$1" in
 	*)
 		cat "/opt/meza/manual/meza-command-help.txt"
 		exit 1;
+		;;
 
 esac
