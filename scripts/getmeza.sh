@@ -29,7 +29,7 @@ if [ ! -f "/usr/bin/meza" ]; then
 fi
 
 ret=false
-getent passwd $1 >/dev/null 2>&1 && ret=true
+getent passwd meza-ansible >/dev/null 2>&1 && ret=true
 
 if $ret; then
     echo "meza-ansible already exists"
