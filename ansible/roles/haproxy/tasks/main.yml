@@ -10,6 +10,7 @@
   yum: name={{item}} state=installed
   with_items:
     - haproxy
+    - openssl
     # - keepalived ?
 
 # Generate self-signed cert if one doesn't exist (note: trusting an article

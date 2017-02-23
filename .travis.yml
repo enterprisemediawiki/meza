@@ -34,11 +34,11 @@ script:
 
   # Install meza command
   - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm bash /opt/meza/scripts/getmeza.sh'
-  - 'docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$(cat ${container_id})")'
+  #- 'docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$(cat ${container_id})")'
 
   # - 'echo "IP address = ${docker_ip}"'
   # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza create env local ${docker_ip}'
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza install monolith'
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza install monolith -vvv'
 
   # TEST: role.
   # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml'
