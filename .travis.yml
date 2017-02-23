@@ -38,7 +38,7 @@ script:
 
   # - 'echo "IP address = ${docker_ip}"'
   # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza create env local ${docker_ip}'
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza install monolith -vvv'
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza install monolith -vv'
 
   # TEST: role.
   # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml'
@@ -63,6 +63,27 @@ script:
 
   # See if demo wiki is installed
   # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm curl https://${docker_ip}/demo/api.php?action=query&meta=siteinfo | grep "Demo Wiki"'
+
+  # HAProxy 302 redirect test
+  - >
+    docker exec -tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1
+    | grep -q '302'
+    && (echo 'HAProxy 302 redirect test: pass' && exit 0)
+    || (echo 'HAProxy 302 redirect test: fail' && exit 1)
+
+  # Apache (over port 8080) 200 OK test
+  - >
+    docker exec -tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1:8080
+    | grep -q '200'
+    && (echo 'Apache 200 test: pass' && exit 0)
+    || (echo 'Apache 200 test: fail' && exit 1)
+
+  # Demo Wiki API test
+  - >
+    docker exec -tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1:8080/demo/api.php
+    | grep -q '200'
+    && (echo 'Demo Wiki API test: pass' && exit 0)
+    || (echo 'Demo Wiki API test: fail' && exit 1)
 
 # notifications:
 #   webhooks: https://galaxy.ansible.com/api/v1/notifications/
