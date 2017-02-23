@@ -60,12 +60,9 @@
     immediate: true
     state: enabled
     zone: "{{firewalld_zone|default('public')}}"
-  with_items: "{{ firewalld_servers }}"
-  when: firewalld_service is defined and item != inventory_hostname
-  # FIXME: add condtional like "and item != inventory_hostname". Not 100% certain
-  # that works with with_items. Also need to make sure the required logic in place
-  # such that when item==inventory_hostname, it gets converted to localhost or
-  # 127.0.0.1 wherever it's used.
+  # strip "localhost" or inventory_hostname from list of servers to configure
+  with_items: "{{ firewalld_servers | difference([ 'localhost', inventory_hostname ]) }}"
+  when: firewalld_service is defined
 
 - name: set firewalld allow port {{ firewalld_port }} for list of servers
   firewalld:
@@ -74,6 +71,6 @@
     immediate: true
     state: enabled
     zone: "{{firewalld_zone|default('public')}}"
-  with_items: "{{ firewalld_servers }}"
+  # strip "localhost" or inventory_hostname from list of servers to configure
+  with_items: "{{ firewalld_servers | difference([ 'localhost', inventory_hostname ]) }}"
   when: firewalld_port is defined and firewalld_protocol is defined
-  # FIXME: add condtional like "and item != inventory_hostname". see same comment above.
