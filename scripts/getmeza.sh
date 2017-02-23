@@ -12,19 +12,34 @@ fi
 yum install -y epel-release
 yum install -y git ansible
 
-# Get meza
-cd /opt
-git clone https://github.com/enterprisemediawiki/meza.git
+if [ ! -d "/opt/meza" ]; then
 
-# For now, use the dev branch
-cd /opt/meza
-git checkout dev
+	# Get meza
+	cd /opt
+	git clone https://github.com/enterprisemediawiki/meza.git
 
-ln -s "/opt/meza/scripts/meza.sh" "/usr/bin/meza"
+	# For now, use the dev branch
+	cd /opt/meza
+	git checkout dev
 
-echo
-echo "Add ansible master user"
-source "/opt/meza/scripts/ssh-users/setup-master-user.sh"
+fi
+
+if [ ! -f "/usr/bin/meza" ]; then
+	ln -s "/opt/meza/scripts/meza.sh" "/usr/bin/meza"
+fi
+
+ret=false
+getent passwd $1 >/dev/null 2>&1 && ret=true
+
+if $ret; then
+    echo "meza-ansible already exists"
+else
+	echo
+	echo "Add ansible master user"
+	source "/opt/meza/scripts/ssh-users/setup-master-user.sh"
+fi
+
+
 
 echo "meza command installed. Use it:"
 echo "  sudo meza install monolith"
