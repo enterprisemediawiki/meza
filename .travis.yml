@@ -89,5 +89,9 @@ script:
     && (echo 'Demo Wiki API test: pass' && exit 0)
     || (echo 'Demo Wiki API test: fail' && exit 1)
 
-# notifications:
-#   webhooks: https://galaxy.ansible.com/api/v1/notifications/
+notifications:
+  slack:
+    secure: sUr/+pppuLP/swz3ujxJEtOotS8dnTLuJpYkxKuvtw+1popACzrd4TQB9I/WtZq4K5IMNVRLJ250Y3DlXkm/1TrVQemvcseunGpxsB
+    on_success: always
+    on_failure: always
+    on_pull_requests: true
