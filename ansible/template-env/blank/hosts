@@ -1,0 +1,31 @@
+# Ansible inventory (AKA "hosts") file
+#
+# http://docs.ansible.com/ansible/intro_inventory.html
+
+# Tell Ansible to use a local connection for localhost
+localhost ansible_connection=local
+
+[load-balancers]
+# INSERT_LB
+
+[app-servers]
+# INSERT_APP
+
+[memcached-servers]
+# INSERT_MEM
+
+[db-master]
+# INSERT_MASTER
+
+# Note: db-slaves needs to be in the form:
+# 1.2.3.4   mysql_server_id=2
+# 1.2.3.5   mysql_server_id=3
+# 1.2.3.6   mysql_server_id=4
+[db-slaves]
+# INSERT_SLAVE
+
+[parsoid-servers]
+# INSERT_PARSOID
+
+[elastic-servers]
+# INSERT_ES
