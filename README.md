@@ -1,4 +1,6 @@
-# meza v0.9
+# meza
+
+[![Build Status](https://travis-ci.org/enterprisemediawiki/meza.svg?branch=dev)](https://travis-ci.org/enterprisemediawiki/meza)
 
 meza configures a CentOS/RedHat server with a complete enterprise MediaWiki installation.
 

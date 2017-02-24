@@ -175,7 +175,7 @@ case "$1" in
 
 				fi
 
-				meza deploy monolith
+				meza deploy monolith ${@:3}
 
 				exit 0;
 				;;

@@ -1,0 +1,93 @@
+---
+# Copied, with great appreciation, from geerlingguy/ansible-role-nodejs
+
+services: docker
+
+env:
+  - distro: centos7
+    init: /usr/lib/systemd/systemd
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  # - distro: centos6
+  #   init: /sbin/init
+  #   run_opts: ""
+  # - distro: ubuntu1604
+  #   init: /lib/systemd/systemd
+  #   run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  # - distro: ubuntu1404
+  #   init: /sbin/init
+  #   run_opts: ""
+  # - distro: ubuntu1204
+  #   init: /sbin/init
+  #   run_opts: ""
+
+before_install:
+  # Pull container.
+  - 'docker pull geerlingguy/docker-${distro}-ansible:latest'
+
+script:
+  - container_id=$(mktemp)
+  # Run container in detached state.
+  - 'docker run --detach --volume="${PWD}":/opt/meza --add-host="localhost:127.0.0.1" ${run_opts} geerlingguy/docker-${distro}-ansible:latest "${init}" > "${container_id}"'
+
+  # TEST: Ansible syntax.
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /opt/meza/ansible/site.yml --syntax-check'
+
+  # Install meza command
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm bash /opt/meza/scripts/getmeza.sh'
+  - 'docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$(cat ${container_id})")'
+
+  # Since we want to make the monolith environment without prompts, need to do
+  # `meza setup env monolith` with values for required args included (fqdn,
+  # db_pass, email, private_net_zone).
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm fqdn=${docker_ip} db_pass=1234 email=false private_net_zone=public meza setup env monolith'
+
+  # Now that environment monolith is setup, deploy/install it
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza install monolith -vv'
+
+  # TEST: role.
+  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml'
+
+  # Test role idempotence.
+  # - idempotence=$(mktemp)
+  # - docker exec "$(cat ${container_id})" ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml | tee -a ${idempotence}
+  # - >
+  #   tail ${idempotence}
+  #   | grep -q 'changed=0.*failed=0'
+  #   && (echo 'Idempotence test: pass' && exit 0)
+  #   || (echo 'Idempotence test: fail' && exit 1)
+
+
+  # Ensure Node.js is installed.
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm which node'
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm node -v'
+
+  # Ensure PHP is installed.
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm which php'
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm php --version'
+
+  # See if demo wiki is installed
+  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm curl https://${docker_ip}/demo/api.php?action=query&meta=siteinfo | grep "Demo Wiki"'
+
+  # HAProxy 302 redirect test
+  - >
+    docker exec --tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1
+    | grep -q '302'
+    && (echo 'HAProxy 302 redirect test: pass' && exit 0)
+    || (echo 'HAProxy 302 redirect test: fail' && exit 1)
+
+  # Apache (over port 8080) 200 OK test
+  - >
+    docker exec --tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1:8080
+    | grep -q '200'
+    && (echo 'Apache 200 test: pass' && exit 0)
+    || (echo 'Apache 200 test: fail' && exit 1)
+
+  # Demo Wiki API test
+  - >
+    docker exec --tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1:8080/demo/api.php
+    | grep -q '200'
+    && (echo 'Demo Wiki API test: pass' && exit 0)
+    || (echo 'Demo Wiki API test: fail' && exit 1)
+
+# notifications:
+#   webhooks: https://galaxy.ansible.com/api/v1/notifications/
