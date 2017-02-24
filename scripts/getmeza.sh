@@ -25,7 +25,7 @@ ret=false
 getent passwd meza-ansible >/dev/null 2>&1 && ret=true
 
 if $ret; then
-    echo "meza-ansible already exists"
+	echo "meza-ansible already exists"
 else
 	echo
 	echo "Add ansible master user"
