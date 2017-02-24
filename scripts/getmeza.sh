@@ -12,16 +12,9 @@ fi
 yum install -y epel-release
 yum install -y git ansible
 
+# if /opt/meza doesn't exist, clone into and switch to dev branch (for now)
 if [ ! -d "/opt/meza" ]; then
-
-	# Get meza
-	cd /opt
-	git clone https://github.com/enterprisemediawiki/meza.git
-
-	# For now, use the dev branch
-	cd /opt/meza
-	git checkout dev
-
+	git clone https://github.com/enterprisemediawiki/meza.git /opt/meza --branch dev
 fi
 
 if [ ! -f "/usr/bin/meza" ]; then
