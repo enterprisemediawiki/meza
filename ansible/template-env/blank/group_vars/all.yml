@@ -5,7 +5,7 @@ wiki_app_fqdn: INSERT_FQDN
 m_private_networking_zone: INSERT_PRIVATE_ZONE
 
 # Password for mysql root user
-mysql_root_password: INSERT_MYSQL_ROOT_PASS
+mysql_root_password: "INSERT_MYSQL_ROOT_PASS"
 
 wiki_app_db_user:
   name: "wiki_app_user"
