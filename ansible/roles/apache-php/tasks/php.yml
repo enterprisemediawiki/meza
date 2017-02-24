@@ -27,6 +27,7 @@
     - sendmail-cf
     - m4
     - xz-libs
+    - mariadb-libs
 - name: Get IUS repository
   include: ius.yml
 - name: Ensure PHP IUS packages installed
