@@ -112,7 +112,10 @@ prompt_secure () {
 
 	# Generate a password
 	gen_password_length=${3:-32} # get password length from $4 or use default 32
-	def_chars="a-zA-Z0-9\!@#\$%^&*"
+
+	# Ansible doesn't like characters with @ signs
+	def_chars="a-zA-Z0-9\!#\$%^&*"
+
 	gen_password_chars=${4:-$def_chars} # get allowable chars from $5 or use default
 	gen_password=`cat /dev/urandom | tr -dc "$gen_password_chars" | fold -w $gen_password_length | head -n 1`
 
