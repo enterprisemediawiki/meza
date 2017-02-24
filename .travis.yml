@@ -34,10 +34,14 @@ script:
 
   # Install meza command
   - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm bash /opt/meza/scripts/getmeza.sh'
-  #- 'docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$(cat ${container_id})")'
+  - 'docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$(cat ${container_id})")'
 
-  # - 'echo "IP address = ${docker_ip}"'
-  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza create env local ${docker_ip}'
+  # Since we want to make the monolith environment without prompts, need to do
+  # `meza setup env monolith` with values for required args included (fqdn,
+  # db_pass, email, private_net_zone).
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm fqdn=${docker_ip} db_pass=1234 email=false private_net_zone=public meza setup env monolith'
+
+  # Now that environment monolith is setup, deploy/install it
   - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza install monolith -vv'
 
   # TEST: role.
