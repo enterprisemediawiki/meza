@@ -21,8 +21,3 @@
 - name: Use verify-wiki to make sure new wiki is setup
   include_role:
     name: verify-wiki
-
-- name: Update database
-  include_role:
-    name: update.php
-

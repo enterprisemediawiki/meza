@@ -149,3 +149,8 @@
     mode: 0755
     owner: apache
     group: apache
+
+
+- name: Include init-wiki.yml only when a new wiki was created
+  include: init-wiki.yml
+  when: wiki_exists is defined and wiki_exists.rc == 1
