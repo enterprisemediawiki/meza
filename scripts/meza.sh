@@ -132,6 +132,30 @@ prompt_secure () {
 
 }
 
+check_environment () {
+
+	ansible_env="$1"
+
+	# FIXME: this should be dynamic
+	env_dir="/opt/meza/ansible/env"
+	if [ ! -d "$env_dir/$ansible_env" ]; then
+		echo
+		echo "\"$ansible_env\" is not a valid environment."
+		echo "Please choose one of the following:"
+		echo
+		for d in $env_dir/*/ ; do echo "`basename $d`"; done;
+		exit 1;
+	fi
+
+	host_file="$env_dir/$ansible_env/hosts"
+	if [ ! -f "$host_file" ]; then
+		echo
+		echo "$host_file not a valid file"
+		exit 1;
+	fi
+
+}
+
 case "$1" in
 	install)
 
@@ -177,7 +201,7 @@ case "$1" in
 
 				meza deploy monolith ${@:3}
 
-				exit 0;
+				exit $?;
 				;;
 
 			# Perhaps consider common setups like:
@@ -193,24 +217,9 @@ case "$1" in
 		;;
 
 	deploy)
-		# FIXME: this should be dynamic
-		env_dir="/opt/meza/ansible/env"
-		ansible_env="$2"
-		if [ ! -d "$env_dir/$ansible_env" ]; then
-			echo
-			echo "\"$ansible_env\" is not a valid environment."
-			echo "Please choose one of the following:"
-			echo
-			for d in $env_dir/*/ ; do echo "`basename $d`"; done;
-			exit 1;
-		fi
 
-		host_file="$env_dir/$ansible_env/hosts"
-		if [ ! -f "$host_file" ]; then
-			echo
-			echo "$host_file not a valid file"
-			exit 1;
-		fi
+		check_environment "$2"
+		host_file="/opt/meza/ansible/env/$2/hosts"
 
 		# This breaks continuous integration. FIXME to get it back.
 		# echo
@@ -233,6 +242,7 @@ case "$1" in
 		sudo -u meza-ansible ansible-playbook /opt/meza/ansible/site.yml -i "$host_file" ${@:3}
 
 		cd "$starting_wd"
+		exit $?;
 
 		;;
 
@@ -344,9 +354,37 @@ case "$1" in
 	create)
 
 		case "$2" in
-			"wiki")
-				"$m_scripts/create-wiki.sh"
+			"wiki" | "wiki-promptless")
+
+				if [ ! -z "$3" ]; then
+					environment="$3"
+				else
+					echo
+					echo "You must specify an environment: 'meza create wiki ENV'"
+					exit 1;
+				fi
+
+				check_environment "$environment"
+				host_file="/opt/meza/ansible/env/$environment/hosts"
+
+				# Get errors with user meza-ansible trying to write to the calling-user's
+				# home directory if don't cd to a neutral location. FIXME.
+				starting_wd=`pwd`
+				cd /opt
+
+				if [ "$2" == "wiki-promptless" ]; then
+					if [ -z "$4" ]; then echo "Please specify a wiki ID"; exit 1; fi
+					if [ -z "$5" ]; then echo "Please specify a wiki name"; exit 1; fi
+					playbook="create-wiki-promptless.yml"
+					sudo -u meza-ansible ansible-playbook "/opt/meza/ansible/$playbook" -i "$host_file" --extra-vars  "wiki_id=$4 wiki_name='$5'" ${@:6}
+				else
+					playbook="create-wiki.yml"
+					sudo -u meza-ansible ansible-playbook "/opt/meza/ansible/$playbook" -i "$host_file" ${@:4}
+				fi
+
+				cd "$starting_wd"
 				exit 0;
+
 				;;
 
 			*)
