@@ -36,6 +36,7 @@ script:
   - 'docker run --detach --volume="${PWD}":/opt/meza --add-host="localhost:127.0.0.1" ${run_opts} geerlingguy/docker-${distro}-ansible:latest "${init}" > "${container_id}"'
 
   # Wrap all the `docker exec ...` in an array for clarity
+  - 'docker_exec_lite=( docker exec "$(cat ${container_id})" )'
   - 'docker_exec=( docker exec --tty "$(cat ${container_id})" env TERM=xterm )'
 
   # Capture args for cURLing for status codes
@@ -125,9 +126,9 @@ script:
   #
 
   # Remove demo wiki configuration
-  - '${docker_exec[@]} rm -rf /opt/meza/config/local_control'
-  - '${docker_exec[@]} rm -rf /opt/meza/config/local_app'
-  - '${docker_exec[@]} rm -rf /opt/meza/htdocs/wikis/demo'
+  - '${docker_exec_lite[@]} rm -rf /opt/meza/config/local_control'
+  - '${docker_exec_lite[@]} rm -rf /opt/meza/config/local_app'
+  - '${docker_exec_lite[@]} rm -rf /opt/meza/htdocs/wikis/demo'
 
   # Get test config
   - '${docker_exec[@]} git clone https://github.com/enterprisemediawiki/meza-test-config.git /opt/meza/config/local_control'
