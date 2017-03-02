@@ -1,0 +1,156 @@
+---
+#
+# Things that need to be done just once:
+#   1. Create database if not exists
+#      - If present, do nothing
+#      - If possible, use SQL files from controller:/opt/backups/WIKI-ID
+#      - else: just use MediaWiki tables.sql
+#
+# Things that need to be done on all app servers:
+#   2. Make sure htdocs/wikis/WIKI-ID/config symlinks to local/wikis/WIKI-ID
+#   3. Make sure htdocs/wikis/WIKI-ID/images exists
+#      - if possible: get from controller:/opt/backups/WIKI-ID/images
+#      - else: just create dir
+#      - eventually need method to force-rsync from backup
+
+
+# Check if databases starting with "wiki_" exist
+#   if database exists: wiki_database.rc == 0
+#   if no database:  wiki_database.rc == 1
+- name: check if wiki database exists
+  shell: 'mysqlshow "wiki_{{ wiki_id }}" | grep -v Wildcard | grep -o wiki_{{ wiki_id }}'
+  register: wiki_exists
+  delegate_to: "{{ groups['db-master'][0] }}"
+  ignore_errors: yes
+  run_once: true
+
+- debug: { msg: "Database wiki_{{ wiki_id }} DOES exist" }
+  when: wiki_exists is defined and wiki_exists.rc == 0
+
+- debug: { msg: "Database wiki_{{ wiki_id }} DOES NOT exist" }
+  when: wiki_exists is defined and wiki_exists.rc == 1
+
+#
+# If wiki database does not exist
+#
+
+- name: Check if backups dir exists
+  stat:
+    path: "/opt/meza/backups/{{ wiki_id }}"
+  register: backups_dir
+  when: wiki_exists is defined and wiki_exists.rc == 1
+  delegate_to: localhost
+
+
+# This will find the latest sql file by name, or wiki.sql over any timestamped one
+# assuming timestamp-named files like 20170220000002_wiki.sql
+- name: Find SQL file if it exists
+  shell: 'find /opt/meza/backups/{{ wiki_id }} -maxdepth 1 -type f -iname "*.sql" | sort -r | head -n +1'
+  register: wiki_sql_file
+  delegate_to: localhost
+  run_once: true
+  when:
+    wiki_exists is defined
+    and wiki_exists.rc == 1
+    and backups_dir.stat.exists == true
+
+- name: If wiki_sql_file defined, send file to master db
+  copy:
+    src: "{{ wiki_sql_file.stdout }}"
+    dest: /tmp/wiki.sql
+    force: yes
+  run_once: true
+  delegate_to: "{{ groups['db-master'][0] }}"
+  when:
+    wiki_sql_file is defined
+    and wiki_sql_file.rc == 0
+
+- name: If wiki_sql_file NOT defined, send generic file to master db
+  copy:
+    src: templates/mediawiki-tables.sql
+    dest: /tmp/wiki.sql
+    force: yes
+  run_once: true
+  delegate_to: "{{ groups['db-master'][0] }}"
+  when:
+    wiki_sql_file is not defined
+    or wiki_sql_file.rc != 0
+
+- name: Import SQL file
+  mysql_db:
+    name: "wiki_{{ wiki_id }}"
+    state: import
+    target: /tmp/wiki.sql
+  run_once: true
+  delegate_to: "{{ groups['db-master'][0] }}"
+  when: wiki_exists is defined and wiki_exists.rc == 1
+
+
+#
+# Make sure wiki's htdocs directory in place
+#
+- name: Ensure wiki htdocs directory in place
+  file:
+    path: "{{ m_htdocs }}/wikis/{{ wiki_id }}"
+    state: directory
+    owner: apache
+    group: apache
+    mode: 0755
+
+
+
+
+#
+# Make sure wiki's config directory is properly symlinked
+#
+- name: Ensure wiki config symlink in place
+  file:
+    # dest = symlink, src = dir linked to
+    src: "{{ m_local_app }}/wikis/{{ wiki_id }}"
+    dest: "{{ m_htdocs }}/wikis/{{ wiki_id }}/config"
+    state: link
+    owner: apache
+    group: apache
+    mode: 0755
+
+
+
+#
+# Make sure wiki's images directory is properly setup
+#
+- name: Check if wiki's images dir exists ON APP SERVER
+  stat:
+    path: "{{ m_htdocs }}/wikis/{{ wiki_id }}/images"
+  register: images_dir
+
+- name: Check if wiki's images backup dir exists ON CONTROLLER
+  stat:
+    path: "/opt/meza/backups/{{ wiki_id }}/images"
+  register: images_backup_dir
+  delegate_to: localhost
+
+
+- name: If no images dir, but there is a backup dir
+  copy:
+    src: "/opt/meza/backups/{{ wiki_id }}/images"
+    dest: "{{ m_htdocs }}/wikis/{{ wiki_id }}/images"
+    mode: 0755
+    owner: apache
+    group: apache
+  when:
+    not images_dir.stat.exists
+    and images_backup_dir.stat.exists
+
+# Either way (existing backup or no) make sure images dir is configured
+- name: Ensure wiki's images dir is configured
+  file:
+    path: "{{ m_htdocs }}/wikis/{{ wiki_id }}/images"
+    state: directory
+    mode: 0755
+    owner: apache
+    group: apache
+
+
+- name: Include init-wiki.yml only when a new wiki was created
+  include: init-wiki.yml
+  when: wiki_exists is defined and wiki_exists.rc == 1

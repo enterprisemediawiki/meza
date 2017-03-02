@@ -55,7 +55,8 @@
 
 
 - name: Ensure base meza extensions installed
-  include: load-extensions-from-file.yml
+  include_role:
+    name: load-extensions-from-file
   vars:
     extfile: "{{ m_meza }}/ansible/roles/mediawiki/files/base-extensions.yml"
 
@@ -92,77 +93,83 @@
     dest: "{{ m_htdocs }}/WikiBlender/BlenderSettings.php"
 
 
+#
+# 1. Sync configurations
+# 2. Check if wikis exist
+# 3. Create Demo Wiki if they don't (create-wiki will re-sync configs)
+#
+- name: Sync configuration between controller and app servers
+  include_role:
+    name: sync-configs
 
-#
-# This is sort of odd, but we need localhost, e.g. the controlling machine, to
-# have local config information. local-config.yml will get meza-installation-
-# specific repositories to configure the installation. That data needs to be
-# on the controller as well as the app servers. It may even be required on
-# other servers at some point, if meza-installations need to do reconfigs... (i
-# think i trailed off here)
-#
-- include: local-config.yml
+- name: Check if any wikis exist
+  find:
+    paths: "{{ m_local_control }}/wikis"
+    file_type: directory
   delegate_to: localhost
+  register: initial_wikis_dirs_check
+  run_once: true
 
-# Now include it for the app-servers
-- include: local-config.yml
+- name: Add Demo Wiki to config if no wikis exist
+  include_role:
+    name: configure-wiki
+  vars:
+    wiki_id: demo
+    wiki_name: Demo Wiki
+  when: "initial_wikis_dirs_check.files|length == 0"
 
-
-
+- name: Re-sync configuration between controller and app servers if Demo just configured
+  include_role:
+    name: sync-configs
+  when: "initial_wikis_dirs_check.files|length == 0"
 
 #
 # Get meza-installation-specific extensions, both for all-wikis and for
 # specific wikis
 #
 - name: install installation-specific extensions
-  include: load-extensions-from-file.yml
+  include_role:
+    name: load-extensions-from-file
   vars:
-    extfile: "{{ m_local }}/all-wiki-more-extensions.yml"
+    extfile: "{{ m_local_control }}/all-wiki-more-extensions.yml"
 
 - name: Get individual wikis dirs
   find:
-    paths: "{{ m_local }}/wikis/"
+    paths: "{{ m_local_control }}/wikis/"
     file_type: directory
   register: wikis_dirs
+  delegate_to: localhost
 
 - name: loop over wikis, install wiki-specific extensions
-  include: load-extensions-from-file.yml
+  include_role:
+    name: load-extensions-from-file
   vars:
     extfile: "{{ item.path }}/this-wiki-more-extensions.yml"
   with_items: "{{ wikis_dirs.files }}"
 
 
 
-
-
-
-
-# Check if databases starting with "wiki_" exist
-#   if any wiki_* databases: wiki_databases.rc == 0
-#   if no wiki_* databases:  wiki_databases.rc == 1
-- name: check if wiki databases exist
-  shell: mysql -e 'SHOW DATABASES;' | grep "wiki_"
-  register: wiki_databases
-  ignore_errors: yes
-  delegate_to: "{{ groups['db-master'][0] }}"
-  when: inventory_hostname == groups['app-servers'][0]
-
-# Create Demo Wiki if there are no other wikis
-- include: create-wiki.yml
+#
+# Check that all wikis in config are present on app and DB servers
+#
+- name: Ensure defined wikis exist
+  include_role:
+    name: verify-wiki
   vars:
-    wiki_id: demo
-    wiki_site_name: Demo Wiki
-  when:
-    - inventory_hostname == groups['app-servers'][0]
-    - wiki_databases.rc == 1
+    wiki_id: "{{ item }}"
+  # with initial wikis list of file info objects:
+  #   filter 1: reduce list items to just the path
+  #   filter 2: then reduce to just the last part of the path
+  #   filter 3: convert map object back to an Ansible-friendly list
+  with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
 
-# If there were other wikis, update the databases of all of them
-# FIXME: This would be better if it only ran when MediaWiki core or extensions
-#        were update such that database update may be required. But that may be
-#        hard to determine when it's required, and it may be better to just do
-#        it all the time (as done below). update.php won't hurt anything (but
-#        just in case we take a backup beforehand)
-- include: update-db-all-wikis.yml
-  when:
-    - inventory_hostname == groups['app-servers'][0]
-    - wiki_databases.rc == 0
+
+# Run update.php (MediaWiki's database update script) against all wikis. This
+# only needs to be done once, since the first app server that runs it will
+# update the master database.
+- include_role:
+    name: update.php
+  vars:
+    wiki_id: "{{ item }}"
+  with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+  run_once: true

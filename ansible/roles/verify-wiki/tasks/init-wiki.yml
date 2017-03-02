@@ -1,0 +1,48 @@
+---
+
+- name: Update database
+  include_role:
+    name: update.php
+
+# Import pages required for SemanticMeetingMinutes and rebuild indices
+- name: import pages for SemanticMeetingMinutes
+  shell: >
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/importDump.php" --report --debug < {{ m_mediawiki }}/extensions/SemanticMeetingMinutes/ImportFiles/import.xml
+  run_once: true
+  notify:
+    - restart parsoid
+
+- name: rebuildrecentchanges.php
+  shell: >
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/rebuildrecentchanges.php"
+  run_once: true
+
+# Create an admin user for this demo wiki
+- name: Create "Admin" user on Demo Wiki
+  shell: >
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/createAndPromote.php" --force --custom-groups="sysop bureaucrat" Admin adminpass
+  run_once: true
+  when: wiki_id == "demo"
+
+- name: Run SMW's rebuildData.php
+  shell: >
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/rebuildData.php"
+    -d 5 -v --ignore-exceptions --exception-log="{{ m_meza }}/logs/rebuilddata-exceptions-{{ wiki_id }}-.log"
+  run_once: true
+
+# Is this "disable search update" required at this point? I'm not sure why we'd do this
+# echo "\$wgDisableSearchUpdate = true;" >> "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
+- name: Run runJobs.php
+  shell: >
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/runJobs.php" --quick
+  run_once: true
+# sed -r -i 's/\$wgDisableSearchUpdate = true;//g;' "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
+
+# Generate ES index, since it is skipped in the initial create-wiki.sh
+# Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
+- name: Running elastic-build-index.sh for demo wiki
+  shell: |
+    wiki_id="{{ wiki_id }}"
+    source "/opt/meza/config/core/config.sh"
+    source "{{ m_scripts }}/elastic-build-index.sh"
+  run_once: true
