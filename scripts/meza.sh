@@ -20,6 +20,7 @@
 #	setup
 #		env
 #		dev-networking --> alias for `meza install dev-networking`
+#		dev --> setup ftp, git
 #   deploy
 #       optional tag
 #	create
@@ -343,6 +344,9 @@ case "$1" in
 				fi
 
 
+				;;
+			"dev")
+				/opt/meza/scripts/setup-dev.sh
 				;;
 			*)
 				echo "NOT A VALID SETUP COMMAND"
