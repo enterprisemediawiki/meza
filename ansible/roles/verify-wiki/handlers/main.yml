@@ -1,0 +1,6 @@
+---
+# FIXME: this is a duplicate from what's in the parsoid role
+- name: restart parsoid
+  service:
+    name: parsoid
+    state: restarted

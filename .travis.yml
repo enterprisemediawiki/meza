@@ -25,29 +25,93 @@ before_install:
   - 'docker pull geerlingguy/docker-${distro}-ansible:latest'
 
 script:
+
+  #
+  # SETUP CONTAINER
+  #
+
   - container_id=$(mktemp)
+
   # Run container in detached state.
   - 'docker run --detach --volume="${PWD}":/opt/meza --add-host="localhost:127.0.0.1" ${run_opts} geerlingguy/docker-${distro}-ansible:latest "${init}" > "${container_id}"'
 
-  # TEST: Ansible syntax.
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /opt/meza/ansible/site.yml --syntax-check'
+  # Wrap all the `docker exec ...` in an array for clarity
+  - 'docker_exec_lite=( docker exec "$(cat ${container_id})" )'
+  - 'docker_exec=( docker exec --tty "$(cat ${container_id})" env TERM=xterm )'
+
+  # Capture args for cURLing for status codes
+  - 'curl_args=( curl --write-out %{http_code} --silent --output /dev/null )'
+
+  #
+  # TEST ANSIBLE SYNTAX
+  #
+
+  - '${docker_exec[@]} ansible-playbook /opt/meza/ansible/site.yml --syntax-check'
+
+
+  #
+  # INSTALL MONOLITH
+  #
 
   # Install meza command
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm bash /opt/meza/scripts/getmeza.sh'
+  - '${docker_exec[@]} bash /opt/meza/scripts/getmeza.sh'
   - 'docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$(cat ${container_id})")'
 
   # Since we want to make the monolith environment without prompts, need to do
   # `meza setup env monolith` with values for required args included (fqdn,
   # db_pass, email, private_net_zone).
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm fqdn=${docker_ip} db_pass=1234 email=false private_net_zone=public meza setup env monolith'
+  - '${docker_exec[@]} fqdn=${docker_ip} db_pass=1234 email=false private_net_zone=public meza setup env monolith'
 
   # Now that environment monolith is setup, deploy/install it
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm meza install monolith -vv'
+  - '${docker_exec[@]} meza install monolith'
 
-  # TEST: role.
-  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml'
 
-  # Test role idempotence.
+  #
+  # TEST BASIC SYSTEM FUNCTIONALITY
+  #
+
+  # Ensure Node.js and PHP installed.
+  - '${docker_exec[@]} which node'
+  - '${docker_exec[@]} node -v'
+  - '${docker_exec[@]} which php'
+  - '${docker_exec[@]} php --version'
+  - '${docker_exec[@]} which mysql'
+  - '${docker_exec[@]} mysql --version'
+
+
+  #
+  # RUN TESTS AGAINST WEBSERVER AND "Demo Wiki"
+  #
+
+  # HAProxy 302 redirect test
+  - '${docker_exec[@]} ${curl_args[@]} http://127.0.0.1'
+  - >
+    ${docker_exec[@]} ${curl_args[@]} http://127.0.0.1
+    | grep -q '302'
+    && (echo 'HAProxy 302 redirect test: pass' && exit 0)
+    || (echo 'HAProxy 302 redirect test: fail' && exit 1)
+
+  # Apache (over port 8080) 200 OK test
+  - '${docker_exec[@]} ${curl_args[@]} http://127.0.0.1:8080'
+  - >
+    ${docker_exec[@]} ${curl_args[@]} http://127.0.0.1:8080
+    | grep -q '200'
+    && (echo 'Apache 200 test: pass' && exit 0)
+    || (echo 'Apache 200 test: fail' && exit 1)
+
+  # Demo Wiki API test
+  - '${docker_exec[@]} curl -L "http://127.0.0.1:8080/demo/api.php?action=query&meta=siteinfo&format=json"'
+  - >
+    ${docker_exec[@]} curl -L "http://127.0.0.1:8080/demo/api.php?action=query&meta=siteinfo&format=json"
+    | grep -q '"sitename":"Demo Wiki",'
+    && (echo 'Demo Wiki API test: pass' && exit 0)
+    || (echo 'Demo Wiki API test: fail' && exit 1)
+
+
+  #
+  # TEST FOR IDEMPOTENCE. THIS WILL FAIL CURRENTLY.
+  #
+
   # - idempotence=$(mktemp)
   # - docker exec "$(cat ${container_id})" ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml | tee -a ${idempotence}
   # - >
@@ -57,37 +121,66 @@ script:
   #   || (echo 'Idempotence test: fail' && exit 1)
 
 
-  # Ensure Node.js is installed.
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm which node'
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm node -v'
+  #
+  # REDEPLOY MONOLITH FROM REPO (MULTIPLE WIKIS)
+  #
 
-  # Ensure PHP is installed.
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm which php'
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm php --version'
+  # Remove demo wiki configuration
+  - '${docker_exec_lite[@]} rm -rf /opt/meza/config/local_control'
+  - '${docker_exec_lite[@]} rm -rf /opt/meza/config/local_app'
+  - '${docker_exec_lite[@]} rm -rf /opt/meza/htdocs/wikis/demo'
 
-  # See if demo wiki is installed
-  # - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm curl https://${docker_ip}/demo/api.php?action=query&meta=siteinfo | grep "Demo Wiki"'
+  # Get test config
+  - '${docker_exec[@]} git clone https://github.com/enterprisemediawiki/meza-test-config.git /opt/meza/config/local_control'
+
+  # Docker container restart required for some reason prior to re-running
+  # deploy. This is not required on standard VMs, just in Docker.
+  - 'docker restart "$(cat ${container_id})"'
+
+  # Redeploy with new config
+  - '${docker_exec[@]} meza install monolith'
+
+
+  #
+  # RUN TESTS AGAINST WEBSERVER AND "Top Wiki"
+  #
 
   # HAProxy 302 redirect test
+  - '${docker_exec[@]} ${curl_args[@]} http://127.0.0.1'
   - >
-    docker exec --tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1
+    ${docker_exec[@]} ${curl_args[@]} http://127.0.0.1
     | grep -q '302'
     && (echo 'HAProxy 302 redirect test: pass' && exit 0)
     || (echo 'HAProxy 302 redirect test: fail' && exit 1)
 
   # Apache (over port 8080) 200 OK test
+  - '${docker_exec[@]} ${curl_args[@]} http://127.0.0.1:8080'
   - >
-    docker exec --tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1:8080
+    ${docker_exec[@]} ${curl_args[@]} http://127.0.0.1:8080
     | grep -q '200'
     && (echo 'Apache 200 test: pass' && exit 0)
     || (echo 'Apache 200 test: fail' && exit 1)
 
-  # Demo Wiki API test
+  # Top Wiki API test
   - >
-    docker exec --tty "$(cat ${container_id})" env TERM=xterm curl --write-out %{http_code} --silent --output /dev/null http://127.0.0.1:8080/demo/api.php
-    | grep -q '200'
-    && (echo 'Demo Wiki API test: pass' && exit 0)
-    || (echo 'Demo Wiki API test: fail' && exit 1)
+    ${docker_exec[@]} curl -L "http://127.0.0.1:8080/top/api.php?action=query&meta=siteinfo&format=json"
+    | grep -q '"sitename":"Top Wiki",'
+    && (echo 'Top Wiki API test: pass' && exit 0)
+    || (echo 'Top Wiki API test: fail' && exit 1)
+
+
+  #
+  # CREATE WIKI AND TEST
+  #
+  - '${docker_exec[@]} meza create wiki-promptless monolith created "Created Wiki"'
+
+  # Created Wiki API test
+  - >
+    ${docker_exec[@]} curl -L "http://127.0.0.1:8080/created/api.php?action=query&meta=siteinfo&format=json"
+    | grep -q '"sitename":"Created Wiki",'
+    && (echo 'Created Wiki API test: pass' && exit 0)
+    || (echo 'Created Wiki API test: fail' && exit 1)
+
 
 notifications:
   slack:

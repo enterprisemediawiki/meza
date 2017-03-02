@@ -6,7 +6,8 @@ m_meza: /opt/meza
 
 # config dir
 m_config: /opt/meza/config
-m_local: /opt/meza/local  # new ansible local config directory
+m_local_control: /opt/meza/config/local_control
+m_local_app: /opt/meza/config/local_app
 
 # scripts dir
 m_scripts: /opt/meza/scripts

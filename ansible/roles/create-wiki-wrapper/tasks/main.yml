@@ -1,0 +1,23 @@
+---
+
+# Perform checks on user input
+# FIXME: Checks for wiki_name? Any others for wiki_id? Length requirements?
+- assert:
+    that: 'wiki_id is search("[a-zA-Z0-9_]")'
+    msg: "Your wiki ID may only include letters, numbers and underscores"
+
+- name: Sync configurations (FIXME do we need this)
+  include_role:
+    name: sync-configs
+
+- name: Add wiki to configuration
+  include_role:
+    name: configure-wiki
+
+- name: Re-sync config to app servers
+  include_role:
+    name: sync-configs
+
+- name: Use verify-wiki to make sure new wiki is setup
+  include_role:
+    name: verify-wiki
