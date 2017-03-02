@@ -12,6 +12,8 @@ config/local_app
 # have been explicitly added to the repo.
 data/*
 
+# backups directory
+backups/*
 
 # ignore wiki blender landing page
 htdocs/WikiBlender

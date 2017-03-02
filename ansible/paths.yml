@@ -19,6 +19,22 @@ m_test: /opt/meza/test"
 # data dir
 m_meza_data: /opt/meza/data
 
+# uploads dir. This currently also keeps config info sort of, in
+# /opt/meza/htdocs/wikis/{{ wiki_id }}/config [1], and uploads in
+# /opt/meza/htdocs/wikis/{{ wiki_id }}/images [2]. Ultimately [2] should be
+# moved to something like /opt/meza/data/uploads/{{ wiki_id }} (no specific
+# dir inside each wiki's dir for uploads). In order to support app-server-based
+# uploads and GlusterFS-based uploads (or other alternatives) it may be
+# necessary to be able to specify this path, with options like:
+#   - /opt/meza/data/uploads    (app-server based)
+#   - /opt/meza/data/glusterfs  (GlusterFS based)
+#   - /opt/meza/data/other-alts (something really cool that I don't even know about)
+m_uploads_dir: /opt/meza/htdocs/wikis
+
+# Location where backups will go, specified by environment, e.g.
+# /opt/meza/backups/prod for "prod" environment
+m_backups: /opt/meza/backups
+
 # webserver variables
 m_htdocs: /opt/meza/htdocs
 m_mediawiki: /opt/meza/htdocs/mediawiki
