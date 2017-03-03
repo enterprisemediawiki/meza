@@ -39,7 +39,7 @@
     path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}"
   register: backups_dir
   when: wiki_exists is defined and wiki_exists.rc == 1
-  delegate_to: localhost
+  delegate_to: "{{ groups['backup-servers'][0] }}"
 
 
 # This will find the latest sql file by name, or wiki.sql over any timestamped one
@@ -47,16 +47,46 @@
 - name: Find SQL file if it exists
   shell: 'find {{ m_backups }}/{{ env }}/{{ wiki_id }} -maxdepth 1 -type f -iname "*.sql" | sort -r | head -n +1'
   register: wiki_sql_file
-  delegate_to: localhost
+  delegate_to: "{{ groups['backup-servers'][0] }}"
   run_once: true
   when:
     wiki_exists is defined
     and wiki_exists.rc == 1
     and backups_dir.stat.exists == true
 
-- name: If wiki_sql_file defined, send file to master db
-  copy:
+
+  #
+  # Since backup-servers[0], master-db[0] and controller (localhost) are three
+  # different servers, and the current Ansible play is being run against app-
+  # servers, there's no way to send from backup-servers[0] to master-db[0]
+  # directly. Instead, pass to controller, then form controller to master-db
+  #
+- name: if wiki_sql_file defined, FIRST remove preexisting SQL file from controller
+  file:
+    path: /tmp/controller-wiki.sql
+    state: absent
+  run_once: true
+  delegate_to: localhost
+  when:
+    wiki_sql_file is defined
+    and wiki_sql_file.rc == 0
+- name: if wiki_sql_file defined, NEXT send SQL file to controller
+  fetch:
     src: "{{ wiki_sql_file.stdout }}"
+    dest: /tmp/controller-wiki.sql
+    fail_on_missing: yes
+    flat: yes
+  # note: don't run fetch with become on large files. ref bottom of this page:
+  # http://docs.ansible.com/ansible/fetch_module.html
+  become: no
+  run_once: true
+  delegate_to: "{{ groups['backup-servers'][0] }}"
+  when:
+    wiki_sql_file is defined
+    and wiki_sql_file.rc == 0
+- name: if wiki_sql_file defined, NEXT send file from controller to master-db
+  copy:
+    src: /tmp/controller-wiki.sql
     dest: /tmp/wiki.sql
     force: yes
   run_once: true
@@ -64,6 +94,8 @@
   when:
     wiki_sql_file is defined
     and wiki_sql_file.rc == 0
+
+
 
 - name: If wiki_sql_file NOT defined, send generic file to master db
   copy:
