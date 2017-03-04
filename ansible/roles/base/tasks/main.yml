@@ -21,6 +21,7 @@
     - firewalld
     - selinux-policy
     - rsyslog
+    - jq
 - name: put SELinux in permissive mode
   selinux:
     policy: targeted
