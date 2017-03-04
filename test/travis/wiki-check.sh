@@ -24,7 +24,7 @@ else
 	container_id="$3"
 fi
 
-source "/opt/meza/test/travis/variables.sh"
+source "$(dirname $0)/variables.sh"
 
 # Wiki API test
 api_url="http://127.0.0.1:8080/$wiki_id/api.php?action=query&meta=siteinfo&format=json"

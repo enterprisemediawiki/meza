@@ -10,7 +10,7 @@ docker run --detach --volume="${PWD}":/opt/meza \
 	geerlingguy/docker-${distro}-ansible:latest "${init}" > "${container_id}"
 container_id=$(cat ${container_id})
 
-source "/opt/meza/test/travis/variables.sh"
+source "$(dirname $0)/variables.sh"
 
 # Get IP of docker image
 docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$container_id")

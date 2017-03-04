@@ -3,7 +3,7 @@
 #
 
 # SETUP CONTAINER
-source /opt/meza/test/travis/setup-container.sh
+source "$(dirname $0)/setup-container.sh"
 
 # Install meza command
 ${docker_exec[@]} bash /opt/meza/scripts/getmeza.sh
@@ -22,10 +22,11 @@ if [ "$test_type" == "monolith_from_scratch" ]; then
 	${docker_exec[@]} meza install monolith
 
 	# TEST BASIC SYSTEM FUNCTIONALITY
-	source /opt/meza/test/server-check.sh
+	source "$(dirname $0)/server-check.sh"
+
 
 	# Demo Wiki API test
-	bash /opt/meza/test/wiki-check.sh "demo" "Demo Wiki" "$container_id"
+	bash "$(dirname $0)/wiki-check.sh" "demo" "Demo Wiki" "$container_id"
 
 	# FIXME: TEST FOR IDEMPOTENCE. THIS WILL FAIL CURRENTLY.
 
@@ -33,7 +34,7 @@ if [ "$test_type" == "monolith_from_scratch" ]; then
 	${docker_exec[@]} meza create wiki-promptless monolith created "Created Wiki"
 
 	# Created Wiki API test
-	bash /opt/meza/test/wiki-check.sh "created" "Created Wiki" "$container_id"
+	bash "$(dirname $0)/wiki-check.sh" "created" "Created Wiki" "$container_id"
 
 elif [ "$test_type" == "monolith_from_import" ]; then
 
@@ -53,10 +54,10 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	${docker_exec[@]} meza install imported
 
 	# Basic system check
-	source /opt/meza/test/server-check.sh
+	source "$(dirname $0)/server-check.sh"
 
 	# Top Wiki API test
-	bash /opt/meza/test/wiki-check.sh "top" "Top Wiki" "$container_id"
+	bash "$(dirname $0)/wiki-check.sh" "top" "Top Wiki" "$container_id"
 
 else
 	echo "Bad test type: $test_type"
