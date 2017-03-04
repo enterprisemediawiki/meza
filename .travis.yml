@@ -8,10 +8,10 @@ env:
     init: /usr/lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
     test_type: monolith_from_scratch
-  - distro: centos7
-    init: /usr/lib/systemd/systemd
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-    test_type: monolith_from_import
+  # - distro: centos7
+  #   init: /usr/lib/systemd/systemd
+  #   run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  #   test_type: monolith_from_import
   # - distro: centos6
   #   init: /sbin/init
   #   run_opts: ""
