@@ -91,7 +91,7 @@ script:
 
   # Write the docker containers IP as the FQDN for the test config (the only
   # config setting we can't know ahead of time)
-  - 'if [ "$test_type" == "monolith_from_import" ]; then sed -r -i "s/INSERT_FQDN/$docker_ip/g;" "/opt/meza/ansible/env/monolith/group_vars/all.yml"; fi'
+  - 'if [ "$test_type" == "monolith_from_import" ]; then ${docker_exec[@]} sed -r -i "s/INSERT_FQDN/$docker_ip/g;" "/opt/meza/ansible/env/monolith/group_vars/all.yml"; fi'
 
   # Get test non-secret config
   - 'if [ "$test_type" == "monolith_from_import" ]; then ${docker_exec[@]} git clone https://github.com/enterprisemediawiki/meza-test-config.git /opt/meza/config/local_control; fi'
