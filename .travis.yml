@@ -57,6 +57,9 @@ script:
 
   - '${docker_exec[@]} ansible-playbook /opt/meza/ansible/site.yml --syntax-check'
 
+  - 'echo "IFCONFIG"'
+  - '${docker_exec[@]} ifconfig'
+
 
   #
   # INSTALL MONOLITH
