@@ -51,25 +51,10 @@ script:
   # Capture args for cURLing for status codes
   - 'curl_args=( curl --write-out %{http_code} --silent --output /dev/null )'
 
-  #
-  # TEST ANSIBLE SYNTAX
-  #
-
+  # Make sure firewalld installed and docker0 interface is in zone public
   - '${docker_exec[@]} yum -y install firewalld'
   - '${docker_exec[@]} systemctl start firewalld'
-
-  - '${docker_exec[@]} nmcli connection modify docker0 connection.zone public'
-  - '${docker_exec[@]} systemctl stop NetworkManager.service'
   - '${docker_exec[@]} firewall-cmd --permanent --zone=public --change-interface=docker0'
-  - '${docker_exec[@]} systemctl start NetworkManager.service'
-  - '${docker_exec[@]} nmcli connection modify docker0 connection.zone public'
-  - '${docker_exec[@]} systemctl restart docker.service'
-
-
-  - '${docker_exec[@]} ansible-playbook /opt/meza/ansible/site.yml --syntax-check'
-
-  - 'echo "IFCONFIG"'
-  - '${docker_exec[@]} ifconfig'
 
 
   #
@@ -79,6 +64,13 @@ script:
   # Install meza command
   - '${docker_exec[@]} bash /opt/meza/scripts/getmeza.sh'
   - 'docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$(cat ${container_id})")'
+
+
+  #
+  # TEST ANSIBLE SYNTAX
+  #
+  - '${docker_exec[@]} ansible-playbook /opt/meza/ansible/site.yml --syntax-check'
+
 
   #
   # IF monolith_from_scratch
