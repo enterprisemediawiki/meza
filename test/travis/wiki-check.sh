@@ -40,6 +40,6 @@ api_url="http://127.0.0.1:8080/$wiki_id/api.php?action=query&meta=siteinfo&forma
 ${docker_exec[@]} curl -L "$api_url"
 
 ${docker_exec[@]} curl -L "$api_url" \
-    | grep -q '"sitename":"$wiki_name",' \
-    && (echo '$wiki_name API test: pass' && exit 0) \
-    || (echo '$wiki_name API test: fail' && exit 1)
+    | grep -q "\"sitename\":\"$wiki_name\"," \
+    && (echo "$wiki_name API test: pass" && exit 0) \
+    || (echo "$wiki_name API test: fail" && exit 1)
