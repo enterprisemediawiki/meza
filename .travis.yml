@@ -33,7 +33,6 @@ script:
 
   # Report docker and server versions
   - 'docker -v'
-  - 'cat /etc/*release'
 
   #
   # SETUP CONTAINER
@@ -52,6 +51,7 @@ script:
   - 'curl_args=( curl --write-out %{http_code} --silent --output /dev/null )'
 
   # Make sure firewalld installed and docker0 interface is in zone public
+  # Discovered thanks to https://github.com/docker/docker/issues/16137
   - '${docker_exec[@]} yum -y install firewalld'
   - '${docker_exec[@]} systemctl start firewalld'
   - '${docker_exec[@]} firewall-cmd --permanent --zone=public --change-interface=docker0'
@@ -91,7 +91,7 @@ script:
 
   # Write the docker containers IP as the FQDN for the test config (the only
   # config setting we can't know ahead of time)
-  - 'if [ "$test_type" == "monolith_from_import" ]; then sed -r -i "s/INSERT_FQDN/$docker_ip/g;" "$m_meza/ansible/env/monolith/group_vars/all.yml"; fi'
+  - 'if [ "$test_type" == "monolith_from_import" ]; then sed -r -i "s/INSERT_FQDN/$docker_ip/g;" "/opt/meza/ansible/env/monolith/group_vars/all.yml"; fi'
 
   # Get test non-secret config
   - 'if [ "$test_type" == "monolith_from_import" ]; then ${docker_exec[@]} git clone https://github.com/enterprisemediawiki/meza-test-config.git /opt/meza/config/local_control; fi'
@@ -146,8 +146,8 @@ script:
   - 'if [ "$test_type" == "monolith_from_import" ]; then bash ./test/travis/wiki-check.sh top "Top Wiki" "$(cat ${container_id})"; fi'
 
   # CREATE WIKI AND TEST
-  - '${docker_exec[@]} meza create wiki-promptless monolith created "Created Wiki"'
-  - 'bash ./test/travis/wiki-check.sh created "Created Wiki" "$(cat ${container_id})"'
+  - 'if [ "$test_type" == "monolith_from_scratch" ]; then ${docker_exec[@]} meza create wiki-promptless monolith created "Created Wiki"; fi'
+  - 'if [ "$test_type" == "monolith_from_scratch" ]; then bash ./test/travis/wiki-check.sh created "Created Wiki" "$(cat ${container_id})"; fi'
 
 notifications:
   slack:
