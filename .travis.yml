@@ -31,6 +31,10 @@ before_install:
 
 script:
 
+  # Report docker and server versions
+  - 'docker -v'
+  - 'cat /etc/*release'
+
   #
   # SETUP CONTAINER
   #
