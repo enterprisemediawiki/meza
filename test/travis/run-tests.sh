@@ -99,7 +99,7 @@ if [ "$test_type" == "monolith_from_scratch" ]; then
 	${docker_exec[@]} fqdn="${docker_ip}" db_pass=1234 email=false private_net_zone=public meza setup env monolith
 
 	# Now that environment monolith is setup, deploy/install it
-	${docker_exec_lite[@]} meza install monolith
+	${docker_exec[@]} meza install monolith
 
 	# TEST BASIC SYSTEM FUNCTIONALITY
 	server_check

@@ -8,10 +8,10 @@ env:
     init: /usr/lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
     test_type: monolith_from_scratch
-  # - docker_repo: jamesmontalvo3/meza-docker-base:latest
-  #   init: /usr/lib/systemd/systemd
-  #   run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-  #   test_type: monolith_from_import
+  - docker_repo: jamesmontalvo3/meza-docker-test-max:latest
+    init: /usr/lib/systemd/systemd
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    test_type: monolith_from_import
   # - distro: centos6
   #   init: /sbin/init
   #   run_opts: ""
