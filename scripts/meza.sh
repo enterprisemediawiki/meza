@@ -238,7 +238,7 @@ case "$1" in
 		# Get errors with user meza-ansible trying to write to the calling-user's
 		# home directory if don't cd to a neutral location. FIXME.
 		starting_wd=`pwd`
-		cd /opt
+		cd /opt/meza/config
 
 		sudo -u meza-ansible ansible-playbook /opt/meza/ansible/site.yml -i "$host_file" ${@:3}
 
@@ -374,7 +374,7 @@ case "$1" in
 				# Get errors with user meza-ansible trying to write to the calling-user's
 				# home directory if don't cd to a neutral location. FIXME.
 				starting_wd=`pwd`
-				cd /opt
+				cd /opt/meza/config
 
 				if [ "$2" == "wiki-promptless" ]; then
 					if [ -z "$4" ]; then echo "Please specify a wiki ID"; exit 1; fi
