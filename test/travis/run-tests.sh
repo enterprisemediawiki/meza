@@ -38,19 +38,22 @@ wiki_check () {
 	${docker_exec[@]} curl -L "$api_url"
 
 	${docker_exec[@]} curl -L "$api_url" \
-	    | grep -q '"sitename":"$wiki_name",' \
+	    | grep -q "\"sitename\":\"$wiki_name\"," \
 	    && (echo '$wiki_name API test: pass' && exit 0) \
 	    || (echo '$wiki_name API test: fail' && exit 1)
 
 }
 
+# Report docker version just in case we run into issues in the future, and we
+# want to be able to track how things have changed
+docker -v
 
 # SETUP CONTAINER
 # Run container in detached state, capture container ID
 container_id=$(mktemp)
 docker run --detach --volume="${PWD}":/opt/meza \
 	--add-host="localhost:127.0.0.1" ${run_opts} \
-	geerlingguy/docker-${distro}-ansible:latest "${init}" > "${container_id}"
+	"${docker_repo}" "${init}" > "${container_id}"
 container_id=$(cat ${container_id})
 
 # Wrap all the `docker exec ...` in an array for clarity
@@ -60,35 +63,43 @@ docker_exec=( docker exec --tty "$container_id" env TERM=xterm )
 # Capture args for cURLing for status codes
 curl_args=( curl --write-out %{http_code} --silent --output /dev/null )
 
+
+# Make sure firewalld installed and docker0 interface is in zone public
+# Discovered thanks to https://github.com/docker/docker/issues/16137
+# Note this was only observed on Docker on Travis CI, not on Docker on a CentOS
+# or Ubuntu 14.04 host. Only tested on new version of Docker (docker-ce version
+# 17.something), whereas Travis is on 1.12.something.
+${docker_exec[@]} yum -y install firewalld
+${docker_exec[@]} systemctl start firewalld
+${docker_exec[@]} firewall-cmd --permanent --zone=public --change-interface=docker0
+
+# Docker image "jamesmontalvo3/meza-docker-test-max:latest" has mediawiki and
+# several extensions pre-cloned, but not in the correct location. Move them
+# into place. For some reason gives exit code 129 on Travis sometimes. Force
+# non-failing exit code.
+${docker_exec[@]} mv /opt/mediawiki /opt/meza/htdocs/mediawiki || true
+
+# Install meza command
+${docker_exec[@]} bash /opt/meza/scripts/getmeza.sh
+
 # Get IP of docker image
 docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$container_id")
 
-# Install meza command
-echo "RUNNING getmeza.sh"
-${docker_exec[@]} bash /opt/meza/scripts/getmeza.sh
-
 if [ "$test_type" == "monolith_from_scratch" ]; then
-	echo "RUNNING test_type = monolith_from_scratch"
-
-	# TEST ANSIBLE SYNTAX. FIXME: syntax check all playbooks
-	${docker_exec[@]} ansible-playbook /opt/meza/ansible/site.yml --syntax-check
+	echo "TEST TYPE = monolith_from_scratch"
 
 	# Since we want to make the monolith environment without prompts, need to do
 	# `meza setup env monolith` with values for required args included (fqdn,
 	# db_pass, email, private_net_zone).
-	echo "RUNNING meza setup env monolith"
 	${docker_exec[@]} fqdn="${docker_ip}" db_pass=1234 email=false private_net_zone=public meza setup env monolith
 
 	# Now that environment monolith is setup, deploy/install it
-	echo "RUNNING meza install monolith"
 	${docker_exec_lite[@]} meza install monolith
 
 	# TEST BASIC SYSTEM FUNCTIONALITY
-	echo "RUNNING server_check"
 	server_check
 
 	# Demo Wiki API test
-	echo "RUNNING wiki_check for Demo Wiki"
 	wiki_id="demo"
 	wiki_name="Demo Wiki"
 	wiki_check
@@ -96,18 +107,19 @@ if [ "$test_type" == "monolith_from_scratch" ]; then
 	# FIXME: TEST FOR IDEMPOTENCE. THIS WILL FAIL CURRENTLY.
 
 	# CREATE WIKI AND TEST
-	echo "RUNNING meza create wiki-promptless monolith created 'Created Wiki'"
 	${docker_exec[@]} meza create wiki-promptless monolith created "Created Wiki"
 
 	# Created Wiki API test
-	echo "RUNNING wiki_check for Created Wiki"
 	wiki_id="created"
 	wiki_name="Created Wiki"
 	wiki_check
 
 elif [ "$test_type" == "monolith_from_import" ]; then
 
-	echo "RUNNING test_type = monolith_from_import"
+	echo "TEST TYPE = monolith_from_import"
+
+	# TEST ANSIBLE SYNTAX. FIXME: syntax check all playbooks
+	${docker_exec[@]} ansible-playbook /opt/meza/ansible/site.yml --syntax-check
 
 	# Get test "secret" config
 	${docker_exec[@]} git clone https://github.com/enterprisemediawiki/meza-test-config-secret.git /opt/meza/ansible/env/imported
