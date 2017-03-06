@@ -58,8 +58,9 @@ script:
 
   # Docker image "jamesmontalvo3/meza-docker-test-max:latest" has mediawiki and
   # several extensions pre-cloned, but not in the correct location. Move them
-  # into place.
-  - '${docker_exec[@]} mv /opt/mediawiki /opt/meza/htdocs/mediawiki'
+  # into place. For some reason gives exit code 129 on Travis sometimes. Force
+  # non-failing exit code.
+  - '${docker_exec[@]} mv /opt/mediawiki /opt/meza/htdocs/mediawiki || true'
 
   #
   # INSTALL MONOLITH
