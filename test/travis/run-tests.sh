@@ -131,7 +131,7 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 
 	# Write the docker containers IP as the FQDN for the test config (the only
 	# config setting we can't know ahead of time)
-	sed -r -i "s/INSERT_FQDN/$docker_ip/g;" "$m_meza/ansible/env/imported/group_vars/all.yml"
+	${docker_exec[@]} sed -r -i "s/INSERT_FQDN/$docker_ip/g;" "/opt/meza/ansible/env/imported/group_vars/all.yml"
 
 	# Get test non-secret config
 	${docker_exec[@]} git clone https://github.com/enterprisemediawiki/meza-test-config.git /opt/meza/config/local_control
@@ -139,7 +139,7 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	# FIXME: get backup files for test
 
 	# Deploy "imported" environment with test config
-	${docker_exec[@]} meza install imported
+	${docker_exec[@]} meza deploy imported
 
 	# Basic system check
 	server_check
