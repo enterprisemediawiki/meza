@@ -4,7 +4,7 @@
 services: docker
 
 env:
-  - docker_repo: jamesmontalvo3/meza-docker-base:latest
+  - docker_repo: jamesmontalvo3/meza-docker-test-max:latest
     init: /usr/lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
     test_type: monolith_from_scratch
@@ -56,6 +56,10 @@ script:
   - '${docker_exec[@]} systemctl start firewalld'
   - '${docker_exec[@]} firewall-cmd --permanent --zone=public --change-interface=docker0'
 
+  # Docker image "jamesmontalvo3/meza-docker-test-max:latest" has mediawiki and
+  # several extensions pre-cloned, but not in the correct location. Move them
+  # into place.
+  - '${docker_exec[@]} mv /opt/mediawiki /opt/meza/htdocs/mediawiki'
 
   #
   # INSTALL MONOLITH
