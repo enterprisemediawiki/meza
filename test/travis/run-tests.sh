@@ -2,6 +2,11 @@
 #
 #
 
+# -e: kill script if anything fails
+# -u: don't allow undefined variables
+# -x: debug mode; print executed commands
+set -eux
+
 server_check () {
 
 	# Ensure Node.js, PHP, MariaDB installed
