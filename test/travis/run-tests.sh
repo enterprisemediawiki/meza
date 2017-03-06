@@ -122,6 +122,14 @@ if [ "$test_type" == "monolith_from_scratch" ]; then
 	wiki_name="Demo Wiki"
 	wiki_check
 
+	# CREATE WIKI AND TEST
+	${docker_exec[@]} meza create wiki-promptless monolith created "Created Wiki"
+
+	# Created Wiki API test
+	wiki_id="created"
+	wiki_name="Created Wiki"
+	wiki_check
+
 elif [ "$test_type" == "monolith_from_import" ]; then
 
 	echo "TEST TYPE = monolith_from_import"
@@ -153,14 +161,6 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	wiki_check
 
 	# FIXME: TEST FOR IDEMPOTENCE. THIS WILL FAIL CURRENTLY.
-
-	# CREATE WIKI AND TEST
-	${docker_exec[@]} meza create wiki-promptless imported created "Created Wiki"
-
-	# Created Wiki API test
-	wiki_id="created"
-	wiki_name="Created Wiki"
-	wiki_check
 
 else
 	echo "Bad test type: $test_type"
