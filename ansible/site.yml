@@ -40,12 +40,12 @@
       firewalld_port: 8080
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['load-balancers'] }}"
-      firewalld_zone: public  # "{{ m_private_networking_zone }}"
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewalld
       firewalld_port: 8080
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['parsoid-servers'] }}"
-      firewalld_zone: public
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
     - base-extras
     - imagemagick
     - apache-php
@@ -60,7 +60,7 @@
       firewalld_port: 11211
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: public
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
     - memcached # Note this should move to separate server(s)
 
 - hosts: db-master
@@ -72,7 +72,7 @@
     - role: firewalld
       firewalld_service: mysql
       firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: public  # "{{ m_private_networking_zone }}"
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewalld
       firewalld_service: mysql
       firewalld_servers: "{{ groups['db-slaves'] }}"
@@ -95,7 +95,7 @@
     - role: firewalld
       firewalld_service: mysql
       firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: public
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
     - role: database
       # Get the one and only server that should be in the db-master group and set
       # it's IP address as replication master IP. Note that this can be left blank
@@ -115,7 +115,7 @@
       firewalld_port: 8000
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: public
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
     - nodejs
     - role: parsoid
       nodejs_install_npm_user: "nodejs"
@@ -138,22 +138,22 @@
       firewalld_port: 9200
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: public
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewalld
       firewalld_port: 9300
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: public
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewalld
       firewalld_port: 9200
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['elastic-servers'] }}"
-      firewalld_zone: public
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewalld
       firewalld_port: 9300
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['elastic-servers'] }}"
-      firewalld_zone: public
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
     - elasticsearch
 
 # Note: this is app-servers again, but must be after everything else is setup
