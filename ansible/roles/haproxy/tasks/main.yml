@@ -126,7 +126,7 @@
     permanent: true
     immediate: true
     state: enabled
-    zone: public
+    zone: "{{m_public_networking_zone|default('public')}}"
   with_items:
     - 80
     - 443

@@ -34,13 +34,14 @@
     group: parsoid
     recurse: no
 
-- name: Ensure Parsoid dependencies installed
-  npm:
-    path: "{{ m_parsoid_path }}"
-    state: present
-
 # I think I read somewhere that there was a bug in Ansible that made it so you
-# had to separate "present" and "latest" states...couldn't just put "latest"
+# had to separate "present" and "latest" states...couldn't just put "latest",
+# but running both takes a lot of time.
+# - name: Ensure Parsoid dependencies installed
+#   npm:
+#     path: "{{ m_parsoid_path }}"
+#     state: present
+
 - name: Ensure Parsoid dependencies are latest
   npm:
     path: "{{ m_parsoid_path }}"
