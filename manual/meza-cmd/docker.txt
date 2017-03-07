@@ -1,0 +1,7 @@
+Mediawiki EZ Admin
+
+Usage: meza docker [directives]
+
+List of directives:
+
+run   run a particular docker image and install meza

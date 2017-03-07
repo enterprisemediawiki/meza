@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+# Script to setup meza in a docker container
+
+docker_repo="$1"
+
+echo "pulling image $docker_repo"
+docker pull ${docker_repo}
+
+
+container_id=$(mktemp)
+docker run --detach --volume=/opt/meza:/opt/meza \
+	--add-host="localhost:127.0.0.1" ${run_opts} \
+	"${docker_repo}" "${init}" > "${container_id}"
+container_id=$(cat ${container_id})
+
+# Wrap all the `docker exec ...` in an array for clarity
+docker_exec_lite=( docker exec "$container_id" )
+docker_exec=( docker exec --tty "$container_id" env TERM=xterm )
+
+# Capture args for cURLing for status codes
+curl_args=( curl --write-out %{http_code} --silent --output /dev/null )
+
+${docker_exec[@]} bash /opt/meza/scripts/getmeza.sh
+
+# Get IP of docker image
+docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$container_id")
+
+${docker_exec[@]} fqdn="${docker_ip}" db_pass=1234 email=false private_net_zone=public meza setup env monolith
+
+# Now that environment monolith is setup, deploy/install it
+${docker_exec[@]} meza install monolith
+
+echo "Container setup with id ="
+echo "$container_id"

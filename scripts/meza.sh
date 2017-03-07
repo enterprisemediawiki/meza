@@ -348,6 +348,10 @@ case "$1" in
 			"dev")
 				/opt/meza/scripts/setup-dev.sh
 				;;
+			"docker")
+				# Local playbook only, doesn't need to be run by meza-ansible user
+				ansible-playbook /opt/meza/ansible/getdocker.yml
+				;;
 			*)
 				echo "NOT A VALID SETUP COMMAND"
 				exit 1;
@@ -574,6 +578,24 @@ case "$1" in
 	import)
 		echo "This function not created yet"
 		exit 1;
+		;;
+
+	docker)
+		case "$2" in
+			"run")
+				if [ -z "$3" ]; then
+					docker_repo="jamesmontalvo3/jamesmontalvo3/meza-docker-test-max:latest"
+				else
+					docker_repo="$3"
+				fi
+				bash /opt/meza/scripts/build-docker-container.sh "$docker_repo"
+				exit 0;
+				;;
+			*)
+				echo "$2 not a valid command"
+				exit 1;
+				;;
+		esac
 		;;
 
 	# not a valid command, show help and exit with error code

@@ -58,13 +58,13 @@
         enabled: yes
 
 
-# http://docs.ansible.com/ansible/docker_module.html
+    # http://docs.ansible.com/ansible/docker_module.html
 
-# sudo git clone meza
-# cd meza
-# docker build -t meza-docker .
+    # sudo git clone meza
+    # cd meza
+    # docker build -t meza-docker .
 
-    - name: Test docker
-      shell: docker run hello-world
+    # - name: Test docker
+    #   shell: docker run hello-world
 
 
