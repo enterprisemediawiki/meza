@@ -205,6 +205,11 @@ case "$1" in
 				exit $?;
 				;;
 
+			"docker")
+				# Local playbook only, doesn't need to be run by meza-ansible user
+				ansible-playbook /opt/meza/ansible/getdocker.yml
+				;;
+
 			# Perhaps consider common setups like:
 			# "monolith-with-remote-db-master")
 			# "monolith-with-remote-db-slave")
@@ -347,10 +352,6 @@ case "$1" in
 				;;
 			"dev")
 				/opt/meza/scripts/setup-dev.sh
-				;;
-			"docker")
-				# Local playbook only, doesn't need to be run by meza-ansible user
-				ansible-playbook /opt/meza/ansible/getdocker.yml
 				;;
 			*)
 				echo "NOT A VALID SETUP COMMAND"
