@@ -205,6 +205,11 @@ case "$1" in
 				exit $?;
 				;;
 
+			"docker")
+				# Local playbook only, doesn't need to be run by meza-ansible user
+				ansible-playbook /opt/meza/ansible/getdocker.yml
+				;;
+
 			# Perhaps consider common setups like:
 			# "monolith-with-remote-db-master")
 			# "monolith-with-remote-db-slave")
@@ -574,6 +579,41 @@ case "$1" in
 	import)
 		echo "This function not created yet"
 		exit 1;
+		;;
+
+	docker)
+		case "$2" in
+			"run")
+				if [ -z "$3" ]; then
+					docker_repo="jamesmontalvo3/meza-docker-test-max:latest"
+				else
+					docker_repo="$3"
+				fi
+				bash /opt/meza/scripts/build-docker-container.sh "$docker_repo"
+				exit 0;
+				;;
+			"exec")
+				if [ -z "$3" ]; then
+					echo "Please provide docker container id"
+					docker ps
+					exit 1;
+				else
+					container_id="$3"
+				fi
+
+				if [ -z "$4" ]; then
+					echo "Please supply a command for your container"
+					exit 1;
+				fi
+
+				docker_exec=( docker exec --tty "$container_id" env TERM=xterm )
+				${docker_exec[@]} ${@:4}
+				;;
+			*)
+				echo "$2 not a valid command"
+				exit 1;
+				;;
+		esac
 		;;
 
 	# not a valid command, show help and exit with error code
