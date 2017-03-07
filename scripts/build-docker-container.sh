@@ -4,8 +4,14 @@
 
 docker_repo="$1"
 
-echo "pulling image $docker_repo"
-docker pull ${docker_repo}
+if [[ "$(docker images -q $docker_repo 2> /dev/null)" == "" ]]; then
+	echo "pulling image $docker_repo"
+	docker pull ${docker_repo}
+fi
+
+
+init=/usr/lib/systemd/systemd
+run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
 
 
 container_id=$(mktemp)
@@ -22,6 +28,8 @@ docker_exec=( docker exec --tty "$container_id" env TERM=xterm )
 curl_args=( curl --write-out %{http_code} --silent --output /dev/null )
 
 ${docker_exec[@]} bash /opt/meza/scripts/getmeza.sh
+
+${docker_exec[@]} mv /opt/mediawiki /opt/meza/htdocs/mediawiki || true
 
 # Get IP of docker image
 docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$container_id")

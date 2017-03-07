@@ -584,12 +584,29 @@ case "$1" in
 		case "$2" in
 			"run")
 				if [ -z "$3" ]; then
-					docker_repo="jamesmontalvo3/jamesmontalvo3/meza-docker-test-max:latest"
+					docker_repo="jamesmontalvo3/meza-docker-test-max:latest"
 				else
 					docker_repo="$3"
 				fi
 				bash /opt/meza/scripts/build-docker-container.sh "$docker_repo"
 				exit 0;
+				;;
+			"exec")
+				if [ -z "$3" ]; then
+					echo "Please provide docker container id"
+					docker ps
+					exit 1;
+				else
+					container_id="$3"
+				fi
+
+				if [ -z "$4" ]; then
+					echo "Please supply a command for your container"
+					exit 1;
+				fi
+
+				docker_exec=( docker exec --tty "$container_id" env TERM=xterm )
+				${docker_exec[@]} ${@:4}
 				;;
 			*)
 				echo "$2 not a valid command"
