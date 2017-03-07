@@ -130,6 +130,11 @@ if [ "$test_type" == "monolith_from_scratch" ]; then
 	wiki_name="Created Wiki"
 	wiki_check
 
+	${docker_exec[@]} meza backup monolith
+
+	${docker_exec[@]} ls /opt/meza/backups/monolith/demo
+	${docker_exec[@]} ls /opt/meza/backups/monolith/demo/*_wiki.sql
+
 elif [ "$test_type" == "monolith_from_import" ]; then
 
 	echo "TEST TYPE = monolith_from_import"
