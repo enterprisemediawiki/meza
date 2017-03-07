@@ -1,0 +1,70 @@
+---
+# Setup docker-engine on CentOS 7
+#
+# ref: https://docs.docker.com/engine/installation/linux/centos/
+
+- hosts: localhost
+  become: yes
+
+  handlers:
+    - name: Restart Docker
+      service:
+        name: docker
+        state: restarted
+
+  tasks:
+    - name: Ensure CentOS-provided Docker repos are removed
+      yum:
+        name: "{{ item }}"
+        state: absent
+      with_items:
+        - docker
+        - docker-common
+        - container-selinux
+        - docker-selinux
+        - docker-engine
+
+    - name: Ensure yum-utils present
+      yum:
+        name: yum-utils
+        state: present
+
+    - name: Get docker-ce repo
+      shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+    # - name: Add docker repo
+    #   yum_repository:
+    #     name: docker-ce
+    #     description: Docker repository
+    #     baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+    #     gpgkey: https://download.docker.com/linux/centos/gpg
+    #     gpgcheck: yes
+
+
+    - name: yum makecache fast
+      shell: yum makecache fast
+
+    # or specify docker-ce-{{ docker_version }}
+    - name: Ensure docker-ce package installed
+      yum:
+        name: "docker-ce"
+        state: latest
+      notify: Restart Docker
+
+    - name: Ensure Docker is running (and enable it at boot)
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+
+    # http://docs.ansible.com/ansible/docker_module.html
+
+    # sudo git clone meza
+    # cd meza
+    # docker build -t meza-docker .
+
+    # - name: Test docker
+    #   shell: docker run hello-world
+
+
