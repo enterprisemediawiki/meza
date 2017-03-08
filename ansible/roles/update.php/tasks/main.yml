@@ -1,12 +1,13 @@
 ---
 
-# Tell database master to update all databases
+- debug: { msg: "Running role:update.php for {{ wiki_id }}" }
+
 # FIXME: This shouldn't go to /tmp. Also it should be pushed to a backup server
 #        and maybe we should use incremental backups (patches) to limit size.
-- name: Backup all databases prior to running update.php
+- name: Backup wiki database prior to running update.php
   mysql_db:
     state: dump
-    name: all
+    name: "wiki_{{ wiki_id }}"
     target: "/tmp/backup_{{ wiki_id }}_{{ ansible_date_time.iso8601 }}.sql"
   delegate_to: "{{ groups['db-master'][0] }}"
 
@@ -14,7 +15,7 @@
   #     but just in case we'll add it here, too. Apply to all tasks
   run_once: true
 
-- name: Run update.php on all wikis
+- name: Run update.php on this wiki
   shell: >
     WIKI="{{ wiki_id }}" php "/opt/meza/htdocs/mediawiki/maintenance/update.php" --quick
   # run_once see [1]

@@ -36,27 +36,57 @@
 
 - name: Check if backups dir exists
   stat:
-    path: "/opt/meza/backups/{{ wiki_id }}"
+    path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}"
   register: backups_dir
   when: wiki_exists is defined and wiki_exists.rc == 1
-  delegate_to: localhost
+  delegate_to: "{{ groups['backup-servers'][0] }}"
 
 
 # This will find the latest sql file by name, or wiki.sql over any timestamped one
 # assuming timestamp-named files like 20170220000002_wiki.sql
 - name: Find SQL file if it exists
-  shell: 'find /opt/meza/backups/{{ wiki_id }} -maxdepth 1 -type f -iname "*.sql" | sort -r | head -n +1'
+  shell: 'find {{ m_backups }}/{{ env }}/{{ wiki_id }} -maxdepth 1 -type f -iname "*.sql" | sort -r | head -n +1'
   register: wiki_sql_file
-  delegate_to: localhost
+  delegate_to: "{{ groups['backup-servers'][0] }}"
   run_once: true
   when:
     wiki_exists is defined
     and wiki_exists.rc == 1
     and backups_dir.stat.exists == true
 
-- name: If wiki_sql_file defined, send file to master db
-  copy:
+
+  #
+  # Since backup-servers[0], master-db[0] and controller (localhost) are three
+  # different servers, and the current Ansible play is being run against app-
+  # servers, there's no way to send from backup-servers[0] to master-db[0]
+  # directly. Instead, pass to controller, then form controller to master-db
+  #
+- name: if wiki_sql_file defined, FIRST remove preexisting SQL file from controller
+  file:
+    path: /tmp/controller-wiki.sql
+    state: absent
+  run_once: true
+  delegate_to: localhost
+  when:
+    wiki_sql_file is defined
+    and wiki_sql_file.rc == 0
+- name: if wiki_sql_file defined, NEXT send SQL file to controller
+  fetch:
     src: "{{ wiki_sql_file.stdout }}"
+    dest: /tmp/controller-wiki.sql
+    fail_on_missing: yes
+    flat: yes
+  # note: don't run fetch with become on large files. ref bottom of this page:
+  # http://docs.ansible.com/ansible/fetch_module.html
+  become: no
+  run_once: true
+  delegate_to: "{{ groups['backup-servers'][0] }}"
+  when:
+    wiki_sql_file is defined
+    and wiki_sql_file.rc == 0
+- name: if wiki_sql_file defined, NEXT send file from controller to master-db
+  copy:
+    src: /tmp/controller-wiki.sql
     dest: /tmp/wiki.sql
     force: yes
   run_once: true
@@ -64,6 +94,8 @@
   when:
     wiki_sql_file is defined
     and wiki_sql_file.rc == 0
+
+
 
 - name: If wiki_sql_file NOT defined, send generic file to master db
   copy:
@@ -85,9 +117,19 @@
   delegate_to: "{{ groups['db-master'][0] }}"
   when: wiki_exists is defined and wiki_exists.rc == 1
 
+- name: Remove SQL file from master DB
+  file:
+    path: /tmp/wiki.sql
+    state: absent
+  run_once: true
+  delegate_to: "{{ groups['db-master'][0] }}"
+  when: wiki_exists is defined and wiki_exists.rc == 1
+
 
 #
-# Make sure wiki's htdocs directory in place
+# Make sure wiki's htdocs directory in place, and symlink to config. Symlink
+# required so logo and favicon accessible via HTTP. Consider creating other
+# method to allow HTTP access to these files (HAProxy rule? httpd rule? PHP?)
 #
 - name: Ensure wiki htdocs directory in place
   file:
@@ -96,13 +138,6 @@
     owner: apache
     group: apache
     mode: 0755
-
-
-
-
-#
-# Make sure wiki's config directory is properly symlinked
-#
 - name: Ensure wiki config symlink in place
   file:
     # dest = symlink, src = dir linked to
@@ -116,35 +151,35 @@
 
 
 #
-# Make sure wiki's images directory is properly setup
+# Make sure wiki's uploads directory is properly setup
 #
-- name: Check if wiki's images dir exists ON APP SERVER
+- name: Check if wiki's uploads dir exists ON APP SERVER
   stat:
-    path: "{{ m_htdocs }}/wikis/{{ wiki_id }}/images"
-  register: images_dir
+    path: "{{ m_uploads_dir }}/{{ wiki_id }}"
+  register: uploads_dir
 
-- name: Check if wiki's images backup dir exists ON CONTROLLER
+- name: Check if wiki's uploads backup dir exists ON CONTROLLER
   stat:
-    path: "/opt/meza/backups/{{ wiki_id }}/images"
+    path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}/uploads"
   register: images_backup_dir
   delegate_to: localhost
 
 
-- name: If no images dir, but there is a backup dir
+- name: If no uploads dir, but there is a backup dir
   copy:
-    src: "/opt/meza/backups/{{ wiki_id }}/images"
-    dest: "{{ m_htdocs }}/wikis/{{ wiki_id }}/images"
+    src: "{{ m_backups }}/{{ env }}/{{ wiki_id }}/uploads/"
+    dest: "{{ m_uploads_dir }}/{{ wiki_id }}"
     mode: 0755
     owner: apache
     group: apache
   when:
-    not images_dir.stat.exists
+    not uploads_dir.stat.exists
     and images_backup_dir.stat.exists
 
-# Either way (existing backup or no) make sure images dir is configured
-- name: Ensure wiki's images dir is configured
+# Either way (existing backup or no) make sure uploads dir is configured
+- name: Ensure wiki's uploads dir is configured
   file:
-    path: "{{ m_htdocs }}/wikis/{{ wiki_id }}/images"
+    path: "{{ m_uploads_dir }}/{{ wiki_id }}"
     state: directory
     mode: 0755
     owner: apache

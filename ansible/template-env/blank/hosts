@@ -29,3 +29,6 @@ localhost ansible_connection=local
 
 [elastic-servers]
 # INSERT_ES
+
+[backup-servers]
+# INSERT_BACKUP

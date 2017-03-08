@@ -130,6 +130,14 @@ if [ "$test_type" == "monolith_from_scratch" ]; then
 	wiki_name="Created Wiki"
 	wiki_check
 
+	${docker_exec[@]} meza backup monolith
+
+	${docker_exec[@]} ls /opt/meza/backups/monolith/demo
+
+	# find any files matching *_wiki.sql in demo backups. egrep command will
+	# exit-0 if something found, exit-1 (fail) if nothing found.
+	${docker_exec[@]} find /opt/meza/backups/monolith/demo -name "*_wiki.sql" | egrep '.*'
+
 elif [ "$test_type" == "monolith_from_import" ]; then
 
 	echo "TEST TYPE = monolith_from_import"
@@ -144,10 +152,8 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	# config setting we can't know ahead of time)
 	${docker_exec[@]} sed -r -i "s/INSERT_FQDN/$docker_ip/g;" "/opt/meza/ansible/env/imported/group_vars/all.yml"
 
-	# Get test non-secret config
-	${docker_exec[@]} git clone https://github.com/enterprisemediawiki/meza-test-config.git /opt/meza/config/local_control
-
-	# FIXME: get backup files for test
+	# get backup files
+	${docker_exec[@]} git clone https://github.com/jamesmontalvo3/meza-test-backups.git /opt/meza/backups/imported
 
 	# Deploy "imported" environment with test config
 	${docker_exec[@]} meza deploy imported
@@ -159,6 +165,22 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	wiki_id="top"
 	wiki_name="Top Wiki"
 	wiki_check
+
+
+	# Check if title of "Test image" exists
+	url_base="http://127.0.0.1/top/api.php"
+	${docker_exec[@]} curl --insecure -L "$url_base?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq '.query.pages[].title'
+
+	# Get image url, get sha1 according to database (via API)
+	img_url=$( ${docker_exec[@]} curl --insecure -L "$url_base/api.php?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq --raw-output '.query.pages[].imageinfo[0].url' )
+	img_url=$( echo $img_url | sed 's/https:\/\/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\///' )
+	img_url="http://127.0.0.1:8080/$img_url"
+
+	# Retrieve image
+	${docker_exec[@]} curl --write-out %{http_code} --silent --output /dev/null "$img_url" \
+		| grep -q '200' \
+		&& (echo 'Imported image test: pass' && exit 0) \
+		|| (echo 'Imported image test: fail' && exit 1)
 
 	# FIXME: TEST FOR IDEMPOTENCE. THIS WILL FAIL CURRENTLY.
 
