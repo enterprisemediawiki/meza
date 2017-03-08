@@ -416,7 +416,14 @@ case "$1" in
 		check_environment "$environment"
 		host_file="/opt/meza/ansible/env/$environment/hosts"
 
+		# Get errors with user meza-ansible trying to write to the calling-user's
+		# home directory if don't cd to a neutral location. FIXME.
+		starting_wd=`pwd`
+		cd /opt/meza/config
 		sudo -u meza-ansible ansible-playbook "/opt/meza/ansible/backup.yml" -i "$host_file" --extra-vars "env=$environment" ${@:3}
+		cd "$starting_wd"
+		exit 0;
+
 		;;
 
 	destroy)
