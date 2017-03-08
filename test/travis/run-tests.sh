@@ -152,7 +152,8 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	# config setting we can't know ahead of time)
 	${docker_exec[@]} sed -r -i "s/INSERT_FQDN/$docker_ip/g;" "/opt/meza/ansible/env/imported/group_vars/all.yml"
 
-	# FIXME: get backup files for test
+	# get backup files
+	${docker_exec[@]} git clone https://github.com/jamesmontalvo3/meza-test-backups.git /opt/meza/backups/imported
 
 	# Deploy "imported" environment with test config
 	${docker_exec[@]} meza deploy imported
@@ -164,6 +165,26 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	wiki_id="top"
 	wiki_name="Top Wiki"
 	wiki_check
+
+
+	# Check if title of "Test image" exists
+	url_base="http://127.0.0.1/top/api.php"
+	${docker_exec[@]} curl --insecure -L "$url_base?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq '.query.pages[].title'
+
+	# Get image url, get sha1 according to database (via API)
+	img_url=$( ${docker_exec[@]} curl --insecure -L "$url_base/api.php?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq '.query.pages[].imageinfo[0].url' )
+	img_sha1=$( ${docker_exec[@]} curl --insecure -L "$url_base/api.php?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq '.query.pages[].imageinfo[0].sha1' )
+
+	# Retrieve image, get sha1 of file
+	file_sha1=$( ${docker_exec[@]} curl --insecure -L "$img_url" | sha1sum )
+
+	if [ "$img_sha1" == "$file_sha1" ]; then
+		echo "sha1 match"
+		exit 0
+	else
+		echo "sha1 mismatch"
+		exit 1
+	fi
 
 	# FIXME: TEST FOR IDEMPOTENCE. THIS WILL FAIL CURRENTLY.
 
