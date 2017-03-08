@@ -133,7 +133,10 @@ if [ "$test_type" == "monolith_from_scratch" ]; then
 	${docker_exec[@]} meza backup monolith
 
 	${docker_exec[@]} ls /opt/meza/backups/monolith/demo
-	${docker_exec[@]} ls /opt/meza/backups/monolith/demo/*_wiki.sql
+
+	# find any files matching *_wiki.sql in demo backups. egrep command will
+	# exit-0 if something found, exit-1 (fail) if nothing found.
+	${docker_exec[@]} find /opt/meza/backups/monolith/demo -name "*_wiki.sql" | egrep '.*'
 
 elif [ "$test_type" == "monolith_from_import" ]; then
 
