@@ -172,19 +172,15 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	${docker_exec[@]} curl --insecure -L "$url_base?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq '.query.pages[].title'
 
 	# Get image url, get sha1 according to database (via API)
-	img_url=$( ${docker_exec[@]} curl --insecure -L "$url_base/api.php?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq '.query.pages[].imageinfo[0].url' )
-	img_sha1=$( ${docker_exec[@]} curl --insecure -L "$url_base/api.php?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq '.query.pages[].imageinfo[0].sha1' )
+	img_url=$( ${docker_exec[@]} curl --insecure -L "$url_base/api.php?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq --raw-output '.query.pages[].imageinfo[0].url' )
+	img_url=$( echo $img_url | sed 's/https:\/\/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\///' )
+	img_url="http://127.0.0.1:8080/$img_url"
 
-	# Retrieve image, get sha1 of file
-	file_sha1=$( ${docker_exec[@]} curl --insecure -L "$img_url" | sha1sum )
-
-	if [ "$img_sha1" == "$file_sha1" ]; then
-		echo "sha1 match"
-		exit 0
-	else
-		echo "sha1 mismatch"
-		exit 1
-	fi
+	# Retrieve image
+	${docker_exec[@]} curl --write-out %{http_code} --silent --output /dev/null "$img_url" \
+		| grep -q '200' \
+		&& (echo 'Imported image test: pass' && exit 0) \
+		|| (echo 'Imported image test: fail' && exit 1)
 
 	# FIXME: TEST FOR IDEMPOTENCE. THIS WILL FAIL CURRENTLY.
 
