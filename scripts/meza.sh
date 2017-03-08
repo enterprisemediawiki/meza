@@ -245,7 +245,7 @@ case "$1" in
 		starting_wd=`pwd`
 		cd /opt/meza/config
 
-		sudo -u meza-ansible ansible-playbook /opt/meza/ansible/site.yml -i "$host_file" ${@:3}
+		sudo -u meza-ansible ansible-playbook /opt/meza/ansible/site.yml -i "$host_file" --extra-vars "env=$2" ${@:3}
 
 		cd "$starting_wd"
 		exit $?;
@@ -322,13 +322,13 @@ case "$1" in
 					# NOTE: "INSERT_SLAVE" not in monolith list, so as not to
 					#       configure the monolith as DB master _and_ slave
 					if [ "$3" = "monolith" ]; then
-						for part in INSERT_LB INSERT_APP INSERT_MEM INSERT_MASTER INSERT_PARSOID INSERT_ES; do
+						for part in INSERT_LB INSERT_APP INSERT_MEM INSERT_MASTER INSERT_PARSOID INSERT_ES INSERT_BACKUP; do
 							sed -r -i "s/# $part/localhost/g;" "$m_meza/ansible/env/$3/hosts"
 						done
 					else
 
 						# If any of these variables are defined, put them into inventory file
-						for INVENTORY_VARNAME in INSERT_LB INSERT_APP INSERT_MEM INSERT_MASTER INSERT_SLAVE INSERT_PARSOID INSERT_ES; do
+						for INVENTORY_VARNAME in INSERT_LB INSERT_APP INSERT_MEM INSERT_MASTER INSERT_SLAVE INSERT_PARSOID INSERT_ES INSERT_BACKUP; do
 
 							# Make INVENTORY_VALUE be the value of a variable with the name in INVENTORY_VARNAME
 							# printf -v "${INVENTORY_VARNAME}" '%s' "${INVENTORY_VARNAME}"
@@ -385,10 +385,10 @@ case "$1" in
 					if [ -z "$4" ]; then echo "Please specify a wiki ID"; exit 1; fi
 					if [ -z "$5" ]; then echo "Please specify a wiki name"; exit 1; fi
 					playbook="create-wiki-promptless.yml"
-					sudo -u meza-ansible ansible-playbook "/opt/meza/ansible/$playbook" -i "$host_file" --extra-vars  "wiki_id=$4 wiki_name='$5'" ${@:6}
+					sudo -u meza-ansible ansible-playbook "/opt/meza/ansible/$playbook" -i "$host_file" --extra-vars "env=$environment wiki_id=$4 wiki_name='$5'" ${@:6}
 				else
 					playbook="create-wiki.yml"
-					sudo -u meza-ansible ansible-playbook "/opt/meza/ansible/$playbook" -i "$host_file" ${@:4}
+					sudo -u meza-ansible ansible-playbook "/opt/meza/ansible/$playbook" -i "$host_file" --extra-vars "env=$environment" ${@:4}
 				fi
 
 				cd "$starting_wd"
@@ -401,6 +401,29 @@ case "$1" in
 				exit 1;
 				;;
 		esac
+		;;
+
+	backup)
+
+		if [ ! -z "$2" ]; then
+			environment="$2"
+		else
+			echo
+			echo "You must specify an environment: 'meza backup ENV'"
+			exit 1;
+		fi
+
+		check_environment "$environment"
+		host_file="/opt/meza/ansible/env/$environment/hosts"
+
+		# Get errors with user meza-ansible trying to write to the calling-user's
+		# home directory if don't cd to a neutral location. FIXME.
+		starting_wd=`pwd`
+		cd /opt/meza/config
+		sudo -u meza-ansible ansible-playbook "/opt/meza/ansible/backup.yml" -i "$host_file" --extra-vars "env=$environment" ${@:3}
+		cd "$starting_wd"
+		exit 0;
+
 		;;
 
 	destroy)

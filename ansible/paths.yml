@@ -19,6 +19,18 @@ m_test: /opt/meza/test"
 # data dir
 m_meza_data: /opt/meza/data
 
+# uploads dir. In order to support both app-server-based uploads and
+# GlusterFS-based uploads (or other alternatives) it may be necessary to be
+# able to specify this path, with options like:
+#   - /opt/meza/data/uploads    (app-server based)
+#   - /opt/meza/data/glusterfs  (GlusterFS based)
+#   - /opt/meza/data/other (something really cool that I don't even know about)
+m_uploads_dir: /opt/meza/data/uploads
+
+# Location where backups will go, specified by environment, e.g.
+# /opt/meza/backups/prod for "prod" environment
+m_backups: /opt/meza/backups
+
 # webserver variables
 m_htdocs: /opt/meza/htdocs
 m_mediawiki: /opt/meza/htdocs/mediawiki
