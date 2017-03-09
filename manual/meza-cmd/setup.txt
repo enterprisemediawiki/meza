@@ -1,0 +1,11 @@
+Mediawiki EZ Admin
+
+Usage: meza setup [directives]
+
+List of directives:
+
+Directive   Description
+---------------------------------------------------------------
+env         Setup an environment, like "production" or "test"
+            Usage: meza setup env <environment name>
+dev         Setup Git user and FTP to make dev easier
