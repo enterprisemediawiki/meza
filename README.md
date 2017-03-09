@@ -5,7 +5,7 @@
 
 <img src="https://raw.githubusercontent.com/enterprisemediawiki/meza/master/manual/commands.gif">
 
-Setup an enterprise MediaWiki server with **simple commands**. Put all components on a single monolithic server or split load balancer, web server, memcached, master and replica databases, Parsoid, Elasticsearch and backups all onto separate servers. Deploy to multiple environments. Run backups. Just use the `meza` command. `meza --help` for more info.
+Setup an enterprise MediaWiki server with **simple commands**. Put all components on a single monolithic server or split load balancer, web server, memcached, master and replica databases, Parsoid, Elasticsearch and backups all onto separate servers. Deploy to multiple environments. Run backups. Do it all using the `meza` command. Run `meza --help` for more info.
 
 ## Table of contents
 
@@ -20,11 +20,12 @@ Setup an enterprise MediaWiki server with **simple commands**. Put all component
 
 ## Why meza?
 
-Standard MediaWiki is very easy to install, but increasingly it's newer and better features are contained within extensions that are more complicated. Additionally, they may be particularly difficult to install on Enterprise Linux derivatives. This project aims to make these features (VisualEditor, CirrusSearch, etc) easy to install in a robust and well-tested way.
+Standard MediaWiki is easy to install, but increasingly its newer and better features are contained within extensions that are more complicated. Additionally, they may be particularly difficult to install on Enterprise Linux derivatives. This project aims to make these features (VisualEditor, CirrusSearch, etc) easy to install in a robust and well-tested way.
 
 ## Requirements
 
-Install meza on CentOS 7 or RHEL 7 minimal install. Attempting to install it on a server with many other things already installed may not work properly due to conflicts.
+1. CentOS 7 or RHEL 7 (for now)
+2. Minimal install: Attempting to install it on a server with many other things already installed may not work properly due to conflicts.
 
 ## Install
 
