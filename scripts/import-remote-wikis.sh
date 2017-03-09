@@ -4,8 +4,8 @@
 # application and database servers).
 #
 
-if [ -f "/opt/meza/config/local/remote-wiki-config.sh" ]; then
-	source "/opt/meza/config/local/remote-wiki-config.sh"
+if [ -f "/opt/meza/config/local/import-config.sh" ]; then
+	source "/opt/meza/config/local/import-config.sh"
 fi
 
 
@@ -40,16 +40,16 @@ mkdir "/mnt/$mount_name"
 mount.cifs "$remote_share" "/mnt/$mount_name" -o "user=$remote_username"
 
 
-# if not set by remote-wiki-config.sh, then put the wiki data in /opt/mezawikis
+# if not set by import-config.sh, then put the wiki data in /opt/mezawikis
 # Chose to put in /opt since most likely this directory has lots of space
 # regardless of partitioning, since it's where all the wiki data will end up
 # anyway.
-if [[ -z "$local_wiki_tmp" ]]; then
-	local_wiki_tmp="/opt/mezawikis"
+if [[ -z "$imports_dir" ]]; then
+	imports_dir="/opt/mezawikis"
 fi
 
 # make directory to copy to
-mkdir "$local_wiki_tmp"
+mkdir "$imports_dir"
 
 
 # list directory of mount point
@@ -81,7 +81,7 @@ for d in */ ; do
 	default_which_wikis="$default_which_wikis $d"
 done
 
-# check if already set (via remote-wiki-config.sh file)
+# check if already set (via import-config.sh file)
 if [ -z "$which_wikis" ]; then
 	# Prompt user for which wikis to import
 	echo -e "\nType which wikis you would like to import, separated by spaces"
@@ -90,7 +90,7 @@ if [ -z "$which_wikis" ]; then
 fi
 which_wikis=${which_wikis:-$default_which_wikis}
 
-# remote-wiki-config.sh method for getting all wikis is to set which_wikis to IMPORT_ALL
+# import-config.sh method for getting all wikis is to set which_wikis to IMPORT_ALL
 if [ "$which_wikis" = "IMPORT_ALL" ]; then
 	which_wikis="$default_which_wikis"
 fi
@@ -153,7 +153,7 @@ do
 	echo "Starting import of wiki '$wiki'"
 
 	echo "  Getting files..."
-	rsync -rva "./$wiki/" "$local_wiki_tmp/$wiki"
+	rsync -rva "./$wiki/" "$imports_dir/$wiki"
 
 	wiki_pre_localsettings="$full_remote_wikis_path/$wiki/config/preLocalSettings.php"
 	if [ ! -f "$wiki_pre_localsettings" ]; then
@@ -168,10 +168,9 @@ do
 	fi
 
 	echo "  Getting database..."
-	mysqldump -v -h $remote_db_server -u $remote_db_username -p$remote_db_password $wiki_db > "$local_wiki_tmp/$wiki/wiki.sql"
+	mysqldump -v -h $remote_db_server -u $remote_db_username -p$remote_db_password $wiki_db > "$imports_dir/$wiki/wiki.sql"
 
 done
 
-imports_dir="$local_wiki_tmp"
 source /opt/meza/scripts/import-wikis.sh
 

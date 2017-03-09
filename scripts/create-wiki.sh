@@ -4,31 +4,23 @@
 # variable it overrides the import script's mechanism for finding the source for
 # new wikis and instead installs a new wiki.
 
-
-# must be root or sudoer
-if [ "$(whoami)" != "root" ]; then
-	echo "Try running this script with sudo: \"sudo bash import-wiki.sh\""
-	exit 1
-fi
-
-
-# If /usr/local/bin is not in PATH then add it
-# Ref enterprisemediawiki/meza#68 "Run install.sh with non-root user"
-if [[ $PATH != *"/usr/local/bin"* ]]; then
-	PATH="/usr/local/bin:$PATH"
-fi
-
-
-#
-# For now this script is not called within the same shell as install.sh
-# and thus it needs to know how to get to the config.sh script on it's own
-#
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source "/opt/meza/config/core/config.sh"
+
+source "$m_scripts/shell-functions/base.sh"
+rootCheck
+
+source "$m_local_config_file"
 
 
 # Set $imports_dir to "new", so import-wikis.sh won't attempt to import existing wikis
 imports_dir="new"
 
+# For creating a wiki, don't announce on Slack. Creating a wiki is quick.
+originalslackwebhook="$slackwebhook"
+meza config slackwebhook "n"
+
 # Run import script
-source "$DIR/import-wikis.sh"
+source "$m_scripts/import-wikis.sh"
+
+# Reset slackwebhook to whatever it started as
+meza config slackwebhook "$originalslackwebhook"

@@ -1,0 +1,7 @@
+Mediawiki EZ Admin
+
+Usage: meza maint [directives]
+
+List of directives:
+
+jobs   Run all jobs on all wikis

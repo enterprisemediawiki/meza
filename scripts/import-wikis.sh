@@ -2,35 +2,65 @@
 #
 # import one or more wikis
 
-# must be root or sudoer
-if [ "$(whoami)" != "root" ]; then
-	echo "Try running this script with sudo: \"sudo bash import-wiki.sh\""
-	exit 1
-fi
+# Load config constants. Unfortunately right now have to write out full path to
+# meza since we can't be certain of consistent method of accessing install.sh.
+source "/opt/meza/config/core/config.sh"
 
+source "$m_scripts/shell-functions/base.sh"
+rootCheck
 
-if [ -f "/opt/meza/config/local/local-import-config.sh" ]; then
-	source "/opt/meza/config/local/local-import-config.sh"
-fi
+# source "$m_scripts/shell-functions/logging.sh"
 
+# This will be re-sourced after prompts to get modified config
+source "$m_local_config_file"
+
+# i18n message file
+source "$m_i18n/$m_language.sh"
 
 # print title of script
-bash printTitle.sh "Begin import-wikis.sh"
+printTitle "Begin import-wikis.sh"
 
 
-# If /usr/local/bin is not in PATH then add it
-# Ref enterprisemediawiki/meza#68 "Run install.sh with non-root user"
-if [[ $PATH != *"/usr/local/bin"* ]]; then
-	PATH="/usr/local/bin:$PATH"
+# INITIALIZE DEFAULTS. These can be overridden in import-config.sh (sourced below).
+
+# Default: Don't wipe out existing wikis
+overwrite_existing_wikis=false
+
+# Default: Move files to final locations and don't duplicate on file system
+keep_imports_directories=false
+
+# Default: Run update.php after import
+# (may not be required for imports from identical meza systems)
+skip_database_update=false
+
+# Default: Rebuild SMW data after import
+# (may not be required for imports from identical meza systems)
+skip_smw_rebuild=false
+
+
+if [ -f "/opt/meza/config/local/import-config.sh" ]; then
+	source "/opt/meza/config/local/import-config.sh"
 fi
 
 
+# setup configuration variables
+wikis_install_dir="$m_htdocs/wikis"
+skipped_wikis=""
+
 #
-# For now this script is not called within the same shell as install.sh
-# and thus it needs to know how to get to the config.sh script on it's own
+# Logging info
 #
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-source "/opt/meza/config/core/config.sh"
+timestamp=$(date "+%Y%m%d%H%M%S")
+# default_backup_logpath="~/logs"
+# if [ -z "$backup_logpath" ]; then
+# 	# Prompt user for place to store backup logs
+# 	echo -e "\nType the path to store log files"
+# 	echo -e "or leave blank to use your user directory and press [ENTER]:"
+# 	read backup_logpath
+# fi
+# backup_logpath=${backup_logpath:-$default_backup_logpath}
+# # backup_logpath="/home/root/logs"
+# cronlog="$backup_logpath/${timestamp}_cron.log"
 
 
 # Prompt user for locations of wiki data
@@ -41,12 +71,11 @@ read imports_dir
 done
 
 
-# prompt user for MySQL root password
-while [ -z "$mysql_root_pass" ]
-do
-echo -e "\nEnter MySQL root password and press [ENTER]: "
-read -s mysql_root_pass
-done
+meza prompt        db_server_ips   "$MSG_prompt_db_server_ips"
+meza prompt_secure db_password     "$MSG_prompt_db_password"
+
+# Need to re-source after prompts
+source "$m_local_config_file"
 
 
 
@@ -101,10 +130,6 @@ if [[ -z "$slackwebhook" ]]; then
 fi
 
 
-# setup configuration variables
-wikis_install_dir="$m_htdocs/wikis"
-skipped_wikis=""
-
 # Intended location of $imports_dir (if not creating new wiki): /home/your-user-name/wikis
 #
 # $imports_dir structured like:
@@ -121,7 +146,6 @@ skipped_wikis=""
 cd $imports_dir
 for d in */ ; do
 
-
 	# trim trailing slash from directory name
 	# ref: http://stackoverflow.com/questions/1848415/remove-slash-from-the-end-of-a-variable
 	# ref: http://www.network-theory.co.uk/docs/bashref/ShellParameterExpansion.html
@@ -132,12 +156,41 @@ for d in */ ; do
 	wiki_install_path="$wikis_install_dir/$wiki_id"
 
 	if [ -d "$wiki_install_path" ]; then
-		echo "$wiki_id directory already exists. Skipping."
-		skipped_wikis="$skipped_wikis\n$wiki_id"
-		continue
+
+		if [ "$overwrite_existing_wikis" = "true" ]; then
+			echo "$wiki_id directory already exists. Removing."
+			rm -rf $wiki_install_path
+		else
+			echo "$wiki_id directory already exists. Skipping."
+			skipped_wikis="$skipped_wikis\n$wiki_id"
+			continue
+		fi
 	fi
 
-	mv "$imports_dir/$wiki_id" "$wiki_install_path"
+	# new-backups-import
+	# This assumes we only need to copy the /config and /images directories from the backup set (to excluse sql files)
+	# We may need to modify this later if the architecture changes
+
+
+	# Create directory for wiki. We do not simply move the $imports_dir/$wiki_id
+	# directory because this may also include several additional files (namely
+	# SQL files) which are not required
+	mkdir "$wiki_install_path"
+
+
+	if [ "$keep_imports_directories" = "true" ]; then
+
+		cp -r "$imports_dir/$wiki_id/config" "$wiki_install_path/config"
+		cp -r "$imports_dir/$wiki_id/images" "$wiki_install_path/images"
+
+	else
+
+		mv "$imports_dir/$wiki_id/config" "$wiki_install_path/config"
+		mv "$imports_dir/$wiki_id/images" "$wiki_install_path/images"
+		# Note: we'll remove the $imports_dir/$wiki_id directory at the end of the loop
+
+	fi
+
 	chmod 755 "$wiki_install_path"
 
 	# Configure images folder
@@ -185,26 +238,62 @@ for d in */ ; do
 	# This command just comments out the old database name
 	sed -i "s/\$mezaCustomDBname/\/\/ \$mezaCustomDBname/g;" "$wiki_install_path/config/preLocalSettings.php"
 
+	# if a file exists called wiki.sql, use that. Else use the latest timestamped
+	import_sql_file="$wiki_install_path/wiki.sql"
+	if [ ! -f "$import_sql_file" ]; then
+		# wiki.sql does not exist. Determine and use most-recent sql file
+		# Ref: http://stackoverflow.com/a/4447795/5103312
+		import_sql_file="$(find $imports_dir/$wiki_id -maxdepth 1 -type f -iname "*.sql" | sort -r | head -n +1)"
+	fi
+
+	# If SQL file still not found we can't complete this import. Skip this wiki
+	# FIXME: perhaps this should be performed earlier before files are moved
+	if [ ! -f "$import_sql_file" ]; then
+		continue;
+	fi
+
 	# import SQL file
 	# Import database - Ref: https://www.mediawiki.org/wiki/Manual:Restoring_a_wiki_from_backup
-	import_sql_file="$wiki_install_path/wiki.sql"
 	wiki_db_name="wiki_$wiki_id"
 	echo "For $wiki_db_name: "
 	echo " * dropping if exists"
 	echo " * (re)creating"
 	echo " * importing file at $import_sql_file"
-	mysql -u root "--password=$mysql_root_pass" -e"DROP DATABASE IF EXISTS $wiki_db_name; CREATE DATABASE $wiki_db_name; use $wiki_db_name; SOURCE $import_sql_file;"
-	rm -rf "$import_sql_file"
+	# FIXME: use more secure password method
+	# ref: http://dev.mysql.com/doc/refman/5.7/en/password-security-user.html
+	db_server_ip=`echo "$db_server_ips" | head -n1 | cut -d " " -f1`
 
+	query=`cat <<EOF
+		DROP DATABASE IF EXISTS $wiki_db_name;
+		CREATE DATABASE $wiki_db_name;
+		USE $wiki_db_name;
+		SOURCE $import_sql_file;
+EOF`
+	echo "Performing queries, mysql -u \"$m_wiki_app_user\" -h \"$db_server_ip\" ...:"
+	echo "$query"
+	mysql -u "$m_wiki_app_user" -h "$db_server_ip" "--password=$db_password" -e"$query"
+
+	# Remove the SQL file unless directed to keep it
+	if [ "$keep_imports_directories" = "false" ]; then
+		rm -rf "$import_sql_file"
+	fi
 
 	# Run update.php. The database you imported may not be up to the same version
-	# as meza, and thus you must update it.
-	echo "Running MediaWiki maintenance script \"update.php\""
-	WIKI="$wiki_id" php "$m_mediawiki/maintenance/update.php" --quick
+	# of meza, and then you must update it. If you know the database is for the
+	# same version of meza you can choose not to run this for time-savings. If
+	# you're not sure you should run it.
+	if [ "$skip_database_update" = "false" ]; then
+		echo "Running MediaWiki maintenance script \"update.php\""
+		WIKI="$wiki_id" php "$m_mediawiki/maintenance/update.php" --quick
+	fi
 
+	if [ "$skip_smw_rebuild" = "true" ]; then
+
+		echo
+		echo "SKIPPING SemanticMediaWiki rebuildData.php and runjobs.php per user direction"
 
 	# if SMW set up yet. On the very first install it will not be.
-	if [ -d "$m_mediawiki/extensions/SemanticMediaWiki" ]; then
+	elif [ -d "$m_mediawiki/extensions/SemanticMediaWiki" ]; then
 		# Run SMW rebuildData.php
 		# Some documenation says to run this in increments of ~3000 pages, but the most
 		# recent version of http://semantic-mediawiki.org/wiki/Help:RebuildData.php
@@ -221,23 +310,22 @@ for d in */ ; do
 		echo "\$wgDisableSearchUpdate = true;" >> "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
 		WIKI="$wiki_id" php "$m_mediawiki/maintenance/runJobs.php" --quick
 		sed -r -i 's/\$wgDisableSearchUpdate = true;//g;' "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
+
+	# SMW not set up yet (for new installations). Skip it.
 	else
-		echo -e "\nSKIPPING SemanticMediaWiki rebuildData.php and runjobs.php (no SMW)"
+		echo
+		echo "SKIPPING SemanticMediaWiki rebuildData.php and runjobs.php (no SMW)"
 	fi
 
-	# @FIXME: This has changed. CirrusSearch exists from the beginning now
-	# if CirrusSearch extension exists. On first install it will not yet.
-	if [ -d "$m_mediawiki/extensions/CirrusSearch" ]; then
-		echo "Building Elastic Search index"
-		source "$m_meza/scripts/elastic-build-index.sh"
-	else
-		echo -e "\nSKIPPING elastic-build-index.sh (no CirrusSearch)"
-	fi
 
+	#
+	# Completion of import (not search index, yet)
+	#
 	complete_msg="Wiki '$wiki_id' has been imported"
 	if [[ -f "$rebuild_exception_log" ]]; then
 		complete_msg="$complete_msg\nSemanticMediaWiki rebuildData exceptions:\n\n$(cat $rebuild_exception_log)"
 	fi
+
 	echo -e "\n$complete_msg\n"
 	if [[ ! -z "$slackwebhook" ]]; then
 		bash "$m_meza/scripts/slack.sh" "$slackwebhook" "$complete_msg"
@@ -257,3 +345,54 @@ if [ "$skipped_wikis" != "" ]; then
 	echo "$skipped_wikis"
 fi
 
+
+echo -e "\nBuilding search indices"
+# Announce building search indices on Slack if a slack webhook provided
+if [[ ! -z "$slackwebhook" ]]; then
+	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Building search indices for each wiki" ""
+fi
+
+# We haven't removed $wiki_id directories from $imports_dir yet so that we can
+# use them as an array of all the wikis we've imported, and build each search
+# index. Then delete the directories if they're empty.
+cd $imports_dir
+for d in */ ; do
+
+	# trim trailing slash from directory name
+	# ref: http://stackoverflow.com/questions/1848415/remove-slash-from-the-end-of-a-variable
+	# ref: http://www.network-theory.co.uk/docs/bashref/ShellParameterExpansion.html
+	wiki_id=${d%/}
+
+	# Announce building search indices on Slack if a slack webhook provided
+	if [[ ! -z "$slackwebhook" ]]; then
+		bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Starting $wiki_id search index" ""
+	fi
+
+	echo "Building Elastic Search index for $wiki_id"
+	source "$m_meza/scripts/elastic-build-index.sh"
+
+	# Check if anything remains in $imports_dir/$wiki_id. If so don't delete, but report it.
+	if [ "$(ls -A $imports_dir/$wiki_id)" ]; then
+		complete_msg="$complete_msg\n\nImport directory $imports_dir/$wiki_id is not empty. Not deleting."
+	else
+		# FIXME: should really have checking for $imports_dir and $wiki_id here.
+		# what if $imports_dir == "" (blank) and $wiki_id = "opt"? would erase
+		# entire /opt directory.
+		rm -rf "$imports_dir/$wiki_id"
+	fi
+done
+
+done
+
+
+# Announce completion of backup on Slack if a slack webhook provided
+if [[ ! -z "$slackwebhook" ]]; then
+	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "Your meza import and indexing is complete!" ""
+
+	# Announce errors on Slack if any were logged
+	# Commented out because it's broken it doesn't work someone should lose their job
+	# if [ ! -e "$cronlog" ]; then
+	# 	announce_log=`cat $cronlog`
+	# 	bash "/opt/meza/scripts/slack.sh" "$slackwebhook" "$announce_log" "$cmd_times"
+	# fi
+fi
