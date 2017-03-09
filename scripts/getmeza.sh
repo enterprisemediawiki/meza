@@ -12,9 +12,10 @@ fi
 yum install -y epel-release
 yum install -y git ansible
 
-# if /opt/meza doesn't exist, clone into and switch to dev branch (for now)
+# if /opt/meza doesn't exist, clone into and use master branch (which is the
+# default, but should we make this configurable?)
 if [ ! -d "/opt/meza" ]; then
-	git clone https://github.com/enterprisemediawiki/meza.git /opt/meza --branch dev
+	git clone https://github.com/enterprisemediawiki/meza.git /opt/meza --branch master
 fi
 
 if [ ! -f "/usr/bin/meza" ]; then
