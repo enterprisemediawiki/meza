@@ -2,15 +2,28 @@ Mediawiki EZ Admin
 
 Usage: meza COMMAND [directives]
 
-List of commands:
+To setup a multi-server environment, do:
 
-install                   Used to install meza or portions of meza
-create                    Used to create new things, like wikis and users
-config                    Get or set config items
-prompt                    (dev only) Create a prompt for user input
-prompt_default_on_blank   (dev only) Create a prompt for user input
-prompt_secure             (dev only) Create a password prompt for user input
-maint                     Perform maintenance activities like running jobs
+$ meza setup env # Setup the environment, following prompts
+# Edit config as required:
+$ sudo vi /opt/meza/ansible/<env-name>/hosts
+$ sudo vi /opt/meza/ansible/<env-name>/group_vars/all.yml
+$ sudo meza deploy <env-name>
 
-Every command has directives. If you run any command without directives it will
-provide help for that command.
+Commands    Directives           Description
+---------------------------------------------------------------
+install     dev-networking       Setup networking on VM
+            monolith             Install server on this machine
+            docker               Install Docker (CentOS only)
+deploy      <environment name>   Deploy your server
+setup       env                  Setup an environment
+            dev                  Setup dev features (Git, FTP)
+create      wiki                 Create a wiki
+            wiki-promptless      Create a wiki without prompts
+backup      <environment name>   Create a backup of an env
+docker      run                  (experimental) Start container
+            exec                 Execute command on container
+
+Every command has directives. If you run any command without
+directives it will provide help for that command.
+

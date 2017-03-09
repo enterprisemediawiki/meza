@@ -2,6 +2,14 @@
 #
 # meza command
 #
+###############################################################################
+#                                                                             #
+# WARNING: THIS SCRIPT WAS INTENDED AS A PROTOTYPE OF THE meza COMMAND PRIOR  #
+#          TO REWRITING IN PYTHON. THE DOCUMENTATION AND NOTES MAY NOT BE     #
+#          PERFECT.                                                           #
+#                                                                             #
+###############################################################################
+#
 # Call like:
 # sudo meza install dev-networking
 # sudo meza install
@@ -51,11 +59,8 @@
 
 source "/opt/meza/config/core/config.sh"
 
-# Make sure this file exists
-touch "$m_local_config_file"
-
 # meza requires a command parameter. No first param, no command. Display help
-if [ -z "$1" ]; then
+if [ -z "$1" ] || [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
 	cat "$m_meza/manual/meza-cmd/base.txt"
 	exit 0;
 fi
@@ -68,6 +73,9 @@ if [ -z "$2" ]; then
 fi
 
 source "$m_i18n/$m_language.sh"
+
+# Make sure this file exists
+touch "$m_local_config_file"
 
 
 prompt () {
@@ -160,30 +168,6 @@ check_environment () {
 case "$1" in
 	install)
 
-		# base requirements for all meza installs
-		mod_base="base base-extras"
-
-		# mediawiki app server
-		mod_app_initial="imagemagick apache php"
-
-		# services
-		mod_memcached="memcached"
-		mod_db="db-server"
-		mod_parsoid="parsoid"
-		mod_elastic="elasticsearch"
-
-		# more mediawiki app server stuff
-		mod_app_final="mediawiki extensions"
-
-		# security. @todo: FIXME can this be rolled into base module?
-		mod_security="security"
-
-		# dev-networking
-		# monolith
-		# mw-app
-		# db-master/slave
-		# search-node
-		# parsoid
 		case "$2" in
 			"dev-networking")
 				source "$m_scripts/dev-networking.sh"
@@ -438,6 +422,11 @@ case "$1" in
 
 	config)
 
+		#
+		# WARNING: THIS FUNCTION IS NOT USED ANYMORE AFAIK. IT WILL BE REMOVED
+		# WHEN THAT IS CONFIRMED. FIXME.
+		#
+
 		# $2 is key
 		# $3 is optional, and is value to set to key
 		if [ ! -f "$m_local_config_file" ]; then
@@ -500,6 +489,11 @@ case "$1" in
 
 	prompt)
 
+		#
+		# WARNING: THIS FUNCTION IS NOT USED ANYMORE AFAIK. IT WILL BE REMOVED
+		# WHEN THAT IS CONFIRMED. FIXME.
+		#
+
 		# $1 = prompt
 		prompt_var="$2"
 		prompt_description="$3 and press [ENTER]:"
@@ -531,6 +525,11 @@ case "$1" in
 
 	prompt_default_on_blank)
 
+		#
+		# WARNING: THIS FUNCTION IS NOT USED ANYMORE AFAIK. IT WILL BE REMOVED
+		# WHEN THAT IS CONFIRMED. FIXME.
+		#
+
 		# $1 = prompt
 		prompt_var="$2"
 		prompt_description="$3 and press [ENTER]:"
@@ -551,6 +550,11 @@ case "$1" in
 		;;
 
 	prompt_secure)
+
+		#
+		# WARNING: THIS FUNCTION IS NOT USED ANYMORE AFAIK. IT WILL BE REMOVED
+		# WHEN THAT IS CONFIRMED. FIXME.
+		#
 
 		# $1 = prompt
 		prompt_var="$2"
@@ -580,6 +584,12 @@ case "$1" in
 
 	maint)
 
+		#
+		# WARNING: THIS FUNCTION SHOULD STILL WORK ON MONOLITHS, BUT HAS NOT BE
+		#          RE-TESTED SINCE MOVING TO ANSIBLE. FOR NON-MONOLITHS IT WILL
+		#          NOT WORK AND NEEDS TO BE ANSIBLE-IZED. FIXME.
+		#
+
 		case "$2" in
 			"jobs")
 				anywiki=`ls -d /opt/meza/htdocs/wikis/*/ | tail -1`
@@ -597,11 +607,6 @@ case "$1" in
 				exit 1;
 				;;
 		esac
-		;;
-
-	import)
-		echo "This function not created yet"
-		exit 1;
 		;;
 
 	docker)

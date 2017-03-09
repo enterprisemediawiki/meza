@@ -1,0 +1,17 @@
+Mediawiki EZ Admin
+
+Usage: meza deploy <environment name> [options]
+
+Example: Backup production, load data onto test
+$ meza backup production
+$ meza deploy test --data-from=production --force
+
+List of options:
+
+Options                     Description
+---------------------------------------------------------------
+NOT YET IMPLEMENTED
+--data-from=<another env>   Get data from backup of another env
+
+NOT YET IMPLEMENTED
+--force                     Overwrite with data from backups
