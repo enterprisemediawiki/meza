@@ -5,7 +5,7 @@
 
 <img src="https://raw.githubusercontent.com/enterprisemediawiki/meza/master/manual/commands.gif">
 
-Setup an enterprise MediaWiki server with **simple commands**. Put all components on a single monolithic server or split load balancer, web server, memcached, master and replica databases, Parsoid, Elasticsearch and backups all onto separate servers. Deploy to multiple environments. Run backups. Do it all using the `meza` command. Run `meza --help` for more info.
+Setup an enterprise MediaWiki server with **simple commands**. Put all components on a single monolithic server or split them out over many. Run a solitary master database or have replicas. Deploy to multiple environments. Run backups. Do it all using the `meza` command. Run `meza --help` for more info.
 
 ## Table of contents
 
@@ -20,7 +20,7 @@ Setup an enterprise MediaWiki server with **simple commands**. Put all component
 
 ## Why meza?
 
-Standard MediaWiki is easy to install, but increasingly its newer and better features are contained within extensions that are more complicated. Additionally, they may be particularly difficult to install on Enterprise Linux derivatives. This project aims to make these features (VisualEditor, CirrusSearch, etc) easy to install in a robust and well-tested way.
+Standard MediaWiki is easy to install, but increasingly its newer and better features are contained within extensions that are more complicated. Additionally, they may be particularly difficult to install on Enterprise Linux derivatives. This project aims to make these features (VisualEditor, CirrusSearch, etc) easy to *install, backup, reconfigure, and maintain* in a robust and well-tested way.
 
 ## Requirements
 
@@ -126,4 +126,4 @@ This is not necessarily an exhaustive list
 
 ## Contributing
 
-If you'd like to contribute to this project, please see [this guide on how to help](CONTRIBUTING.md).
+If you'd like to contribute to this project, please see [this guide on how to help](CONTRIBUTING.md). 
