@@ -2,7 +2,9 @@
 
 [![Build Status](https://travis-ci.org/enterprisemediawiki/meza.svg?branch=dev)](https://travis-ci.org/enterprisemediawiki/meza)
 
-meza configures a CentOS/RedHat server with a complete enterprise MediaWiki installation.
+<img src="https://raw.githubusercontent.com/enterprisemediawiki/meza/dev/manual/commands.gif">
+
+Setup an enterprise MediaWiki server with simple commands. Put all components on a single monolithic server or split load balancer, web server, memcached, master and replica databases, Parsoid, Elasticsearch and backups all onto separate servers. Deploy to multiple environments. Run backups. Just use the `meza` command. `meza --help` for more info.
 
 ## Server setup
 
@@ -29,4 +31,5 @@ sudo meza install monolith
 * [Directory structure overview](manual/DirectoryStructure.md)
 
 ## Contributing
+
 If you'd like to contribute to this project, please see [this guide on how to help](CONTRIBUTING.md).
