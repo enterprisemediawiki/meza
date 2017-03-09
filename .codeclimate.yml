@@ -27,5 +27,6 @@ ratings:
   - "**.php"
   - "**.py"
   - "**.rb"
+  - "**.sh"
 exclude_paths:
 - config/
