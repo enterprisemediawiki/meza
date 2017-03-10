@@ -33,3 +33,6 @@ mysql_replication_user:
 #   true
 #   false
 enable_wiki_emails: INSERT_ENABLE_EMAIL
+
+# May be required for certain cryptographic functions
+wg_secret_key: INSERT_SECRET_KEY
