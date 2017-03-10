@@ -24,9 +24,9 @@ list:
   - name: CharInsert
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CharInsert.git
     version: REL1_27
-  - name: SemanticForms
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticForms.git
-    version: tags/3.5
+  - name: PageForms
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PageForms
+    version: tags/4.1
   - name: SemanticInternalObjects
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticInternalObjects.git
     version: REL1_27
