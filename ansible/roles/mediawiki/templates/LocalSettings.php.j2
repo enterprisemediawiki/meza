@@ -404,16 +404,8 @@ $wgHashedUploadDirectory = true;
 # Site language code, should be one of the list in ./languages/Names.php
 $wgLanguageCode = "en";
 
-/**
- * @todo: figure out what to do with these.
- * These should be moved out of this file and generated randomly for each
- * install. Either that, or they should be removed entirely since they
- * appear not to be used post MW v1.17.
- **/
-$wgSecretKey = "h950ac53h622q0shtr0aSDh743y534yae68i8745436hl29iu48974safgd435o6";
-# Site upgrade key. Must be set to a string (default provided) to turn on the
-# web installer while LocalSettings.php is in place
-$wgUpgradeKey = "8w456u657946rw45";
+# https://www.mediawiki.org/wiki/Manual:$wgSecretKey
+$wgSecretKey = "{{ wg_secret_key }}";
 
 ## For attaching licensing metadata to pages, and displaying an
 ## appropriate copyright notice / icon. GNU Free Documentation

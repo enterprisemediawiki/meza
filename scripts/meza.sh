@@ -290,9 +290,13 @@ case "$1" in
 					email=$(echo "$email" | sed -e 's/[\/&]/\\&/g')
 					private_net_zone=$(echo "$private_net_zone" | sed -e 's/[\/&]/\\&/g')
 
+					# Generate a random secret key
+					wg_secret_key=$(cat /dev/urandom | tr -dc "a-zA-Z0-9" | fold -w 64 | head -n 1)
+
 					sed -r -i "s/INSERT_FQDN/$fqdn/g;"                         "$m_meza/ansible/env/$3/group_vars/all.yml"
 					sed -r -i "s/INSERT_PRIVATE_ZONE/$private_net_zone/g;"     "$m_meza/ansible/env/$3/group_vars/all.yml"
 					sed -r -i "s/INSERT_ENABLE_EMAIL/$email/g;"                "$m_meza/ansible/env/$3/group_vars/all.yml"
+					sed -r -i "s/INSERT_SECRET_KEY/$wg_secret_key/g;"          "$m_meza/ansible/env/$3/group_vars/all.yml"
 
 					# All DB users used by the application (root, app, slave)
 					# have the same password. Update as required.
