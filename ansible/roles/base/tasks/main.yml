@@ -17,6 +17,7 @@
     - openssh-server
     - openssh-clients
     - vim
+    - git
     - net-tools
     - firewalld
     - selinux-policy
