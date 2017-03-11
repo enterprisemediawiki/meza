@@ -46,8 +46,21 @@
   npm:
     path: "{{ m_parsoid_path }}"
     state: latest
+  tags:
+    - latest
+    - parsoid-deps
 
-- name: Copy localsettings.js
+- name: Get individual wikis dirs from localhost
+  find:
+    paths: "{{ m_local_control }}/wikis/"
+    file_type: directory
+  register: wikis_dirs
+  delegate_to: localhost
+
+- set_fact:
+    list_of_wikis: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+- name: Ensure localsettings.js present and up-to-date
   template:
     src: localsettings.js.j2
     dest: "{{ m_parsoid_path }}/localsettings.js"
