@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# {{ ansible_managed }}
+
+### DIRECTORY STRUCTURE ###
+
+# meza install location
+m_install="{{ m_install }}"
+m_meza="{{ m_meza }}"
+
+# config dir
+m_config="{{ m_config }}"
+
+# scripts dir
+m_scripts="{{ m_scripts }}"
+
+# test dir
+m_test="{{ m_test }}"
+
+# data dir
+m_meza_data="{{ m_meza_data }}"
+
+# webserver variables
+m_htdocs="{{ m_htdocs }}"
+m_mediawiki="{{ m_mediawiki }}"
+
+### CONFIG FILES ###
+m_local_config_file="{{ m_local_config_file }}"
+
+### SLACK ANNOUNCEMENT ###.
+slackwebhook="{{ slackwebhook }}"
+
+### DATABASE DATA AND CREDENTIALS ###
+db_master="{{ groups['db-master'][0] }}"
+m_wiki_app_user="{{ m_wiki_app_user }}"
+m_wiki_app_user_password="{{ m_wiki_app_user_password }}"
+m_db_slave_user="{{ m_db_slave_user }}"
+m_db_slave_user_password="{{ m_db_slave_user_password }}"
+
+### LANGUAGE ###
+m_language="{{ m_language }}"

@@ -30,7 +30,7 @@ before_install:
   - 'docker pull ${docker_repo}'
 
 script:
-  - 'bash ./test/travis/run-tests.sh'
+  - 'bash ./tests/travis/run-tests.sh'
 
 notifications:
   slack:

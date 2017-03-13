@@ -1,10 +1,10 @@
 Meza configuration directories
 ==============================
 
-/opt/meza/config/env
---------------------
+/opt/meza/config/local-secret
+-----------------------------
 
-Not yet setup here. Currently in `/opt/meza/ansible/env`. This is the location of secure configuration items for one or more environments. These may be named anything, but typical names include:
+Contains secret information about environments managed by meza. This includes the list of hosts for each environment (IP addresses and what they're assigned to) as well as passwords and other secret information.
 
 * `monolith`: This is the only special name with any real significance. It means a single server configured with all groups on the controlling machine. It is special because attempting to deploy a `monolith` environment if one doesn't already exist will generate the monolith environment. All other environments need to be set up prior to attempting to deploy them
 * `prod`: Production environment
@@ -13,9 +13,10 @@ Not yet setup here. Currently in `/opt/meza/ansible/env`. This is the location o
 * `dev`: A
 
 
-/opt/meza/config/local_control
-------------------------------
+/opt/meza/config/local-public
+-----------------------------
 
+This contains non-secret information about environments. This includes TBD.
 
 
 /opt/meza/config/local_app

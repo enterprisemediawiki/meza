@@ -34,7 +34,7 @@ These tests should be performed on all changes
 * Verify ElasticSearch works by searching with a typo (e.g. search for "Test Paeg" when looking for "Test Page")
 * Verify file uploads work
 * Verify thumbnailing works (upload a larger image and verify small images are generated)
-* Verify `create-wiki.sh` successfully creates a wiki
+* Verify `sudo meza create wiki` successfully creates a wiki
 
 #### Desired testing
 

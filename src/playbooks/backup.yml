@@ -1,0 +1,48 @@
+---
+# FIXME: remove all this planning doc stuff
+#
+# Thinking this could be used like:
+#   $ meza backup prod && meza deploy stage --source=prod --force --clean
+#     1. Backup to production
+#     2. Deploy "stage" environment
+#        1. Source from production backup
+#        2. --force --> remove existing database/uploads and overwrite
+#        3. --clean --> remove /uploads rather than just rsyncing on top of them
+#
+# Consider supporting method like this
+#   [backups]
+#   192.168.56.90
+#   192.168.56.100 backup_wikis=['eva','robo','oso']
+#
+# Consider supporting alternate backups like:
+#   - backup-db-all
+#   - backup-db-all-incremental
+#
+
+# Define a timestamp fact to persist throughout this playbook
+- hosts: all
+  tasks:
+    - set_fact:
+        backup_timestamp: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+
+
+# FIXME: If a slave is available, should pull from there
+- hosts: db-master
+  become: yes
+  vars_files:
+    - ["paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
+
+  roles:
+    - dump-db-wikis
+
+
+- hosts: backup-servers
+  become: yes
+  vars_files:
+    - ["paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
+  roles:
+    - backup-db-wikis
+    - backup-uploads
+    # FIXME: add role to specify current configuration state, such that it's
+    #        possible to redeploy entirely from backup.
+    # - backup-config-state

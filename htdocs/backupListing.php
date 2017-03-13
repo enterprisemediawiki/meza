@@ -31,11 +31,11 @@ $arrContextOptions=array(
         "verify_peer"=>false,
         "verify_peer_name"=>false,
     ),
-); 
+);
 
-$path = realpath('/opt/meza/backup');
+$path = realpath('/opt/meza/data/backups');
 $undesiredStrings = array(
-  ".", 
+  ".",
   "..",
   ".DS_Store",
   ".htaccess",
@@ -55,8 +55,8 @@ foreach( $wikis as $wiki ){
   );
 
   // if there's a config file with a list of users allowed to download backup files, use it
-  if ( is_file("/opt/meza/backup/$wiki/config/backupDownloaders.php") ) {
-    require_once "/opt/meza/backup/$wiki/config/backupDownloaders.php";
+  if ( is_file("/opt/meza/data/backups/$wiki/config/backupDownloaders.php") ) {
+    require_once "/opt/meza/data/backups/$wiki/config/backupDownloaders.php";
   }
 
   if ( in_array($AUID, $allowedUsers) ) {
