@@ -143,14 +143,15 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	echo "TEST TYPE = monolith_from_import"
 
 	# TEST ANSIBLE SYNTAX. FIXME: syntax check all playbooks
-	${docker_exec[@]} ansible-playbook /opt/meza/ansible/site.yml --syntax-check
+	${docker_exec[@]} ansible-playbook /opt/meza/src/playbooks/site.yml --syntax-check
 
 	# Get test "secret" config
+	${docker_exec[@]} mkdir /opt/meza/config/local-secret
 	${docker_exec[@]} git clone https://github.com/enterprisemediawiki/meza-test-config-secret.git /opt/meza/config/local-secret/imported
 
 	# Write the docker containers IP as the FQDN for the test config (the only
 	# config setting we can't know ahead of time)
-	${docker_exec[@]} sed -r -i "s/INSERT_FQDN/$docker_ip/g;" "/opt/meza/ansible/config/local-secret/group_vars/all.yml"
+	${docker_exec[@]} sed -r -i "s/INSERT_FQDN/$docker_ip/g;" "/opt/meza/config/local-secret/group_vars/all.yml"
 
 	# get backup files
 	${docker_exec[@]} git clone https://github.com/jamesmontalvo3/meza-test-backups.git /opt/meza/backups/imported

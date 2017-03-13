@@ -246,6 +246,10 @@ case "$1" in
 					exit 1;
 				fi
 
+				if [ ! -d "$m_meza/config/local-secret" ]; then
+					mkdir "$m_meza/config/local-secret"
+				fi
+
 				# If environment doesn't already exist, create it
 				if [ ! -d "$m_meza/config/local-secret/$3" ]; then
 
