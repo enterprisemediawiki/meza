@@ -143,7 +143,7 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	echo "TEST TYPE = monolith_from_import"
 
 	# TEST ANSIBLE SYNTAX. FIXME: syntax check all playbooks
-	${docker_exec[@]} ansible-playbook /opt/meza/src/playbooks/site.yml --syntax-check
+	${docker_exec[@]} ANSIBLE_CONFIG=/opt/meza/config/core/ansible.cfg ansible-playbook /opt/meza/src/playbooks/site.yml --syntax-check
 
 	# Get test "secret" config
 	${docker_exec[@]} mkdir /opt/meza/config/local-secret

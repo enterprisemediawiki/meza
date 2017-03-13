@@ -3,7 +3,7 @@
 - hosts: app-servers
   become: yes
   vars_files:
-    - "paths.yml"
+    - "/opt/meza/config/core/paths.yml"
 
   roles:
     - create-wiki-wrapper
