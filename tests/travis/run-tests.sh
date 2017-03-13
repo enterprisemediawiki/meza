@@ -132,11 +132,11 @@ if [ "$test_type" == "monolith_from_scratch" ]; then
 
 	${docker_exec[@]} meza backup monolith
 
-	${docker_exec[@]} ls /opt/meza/backups/monolith/demo
+	${docker_exec[@]} ls /opt/meza/data/backups/monolith/demo
 
 	# find any files matching *_wiki.sql in demo backups. egrep command will
 	# exit-0 if something found, exit-1 (fail) if nothing found.
-	${docker_exec[@]} find /opt/meza/backups/monolith/demo -name "*_wiki.sql" | egrep '.*'
+	${docker_exec[@]} find /opt/meza/data/backups/monolith/demo -name "*_wiki.sql" | egrep '.*'
 
 elif [ "$test_type" == "monolith_from_import" ]; then
 
@@ -151,10 +151,10 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 
 	# Write the docker containers IP as the FQDN for the test config (the only
 	# config setting we can't know ahead of time)
-	${docker_exec[@]} sed -r -i "s/INSERT_FQDN/$docker_ip/g;" "/opt/meza/config/local-secret/group_vars/all.yml"
+	${docker_exec[@]} sed -r -i "s/INSERT_FQDN/$docker_ip/g;" "/opt/meza/config/local-secret/imported/group_vars/all.yml"
 
 	# get backup files
-	${docker_exec[@]} git clone https://github.com/jamesmontalvo3/meza-test-backups.git /opt/meza/backups/imported
+	${docker_exec[@]} git clone https://github.com/jamesmontalvo3/meza-test-backups.git /opt/meza/data/backups/imported
 
 	# Deploy "imported" environment with test config
 	${docker_exec[@]} meza deploy imported
