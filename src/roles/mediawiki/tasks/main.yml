@@ -1,0 +1,175 @@
+---
+
+
+- name: Ensure proper MediaWiki git version installed
+  git:
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/core.git
+    dest: "{{ m_mediawiki }}"
+    version: "1.27.1"
+
+# The following was required for MediaWiki 1.25.5, and appears fixed in 1.25.6+
+#
+# Before composer-merge-plugin v1.2.0, MW incorrectly required
+# v1.0.0 of the Composer internal composer-plugin-api component.
+# Composer recently bumped this internal version to v1.1.0 [0].
+# A patch to MW is in work, but this is required to keep meza
+# building properly.
+#
+# [0]: https://github.com/composer/composer/commit/aeafe2fe59992efd1bc3f890b760f1a9c4874e1c
+#
+# Replace v1.0.0 with v1.3.1 of wikimedia/composer-merge-plugin in composer.json
+# sed -r -i 's/"wikimedia\/composer-merge-plugin": "1.0.0",/"wikimedia\/composer-merge-plugin": "1.3.1",/;' "$m_mediawiki/composer.json"
+
+
+
+- name: Ensure Vector skin installed
+  git:
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git
+    dest: "{{ m_mediawiki }}/skins/Vector"
+    version: "REL1_27"
+
+- name: Put composer.local.json in place to load composer-supported extensions
+  template:
+    src: composer.local.json.j2
+    dest: "{{ m_mediawiki }}/composer.local.json"
+
+- name: Run composer install on MediaWiki for dependencies
+  composer:
+    command: install
+    working_dir: "{{ m_mediawiki }}"
+  # FIXME: need ignore_errors because composer throws an error when running as root.
+  ignore_errors: yes
+
+- name: Run composer update on MediaWiki for extensions
+  composer:
+    command: update
+    working_dir: "{{ m_mediawiki }}"
+  # FIXME: need ignore_errors because composer throws an error when running as root.
+  ignore_errors: yes
+
+- name: Ensure WikiBlender installed
+  git:
+    repo: https://github.com/jamesmontalvo3/WikiBlender.git
+    dest: "{{ m_htdocs }}/WikiBlender"
+    version: "master"
+
+
+- name: Ensure base meza extensions installed
+  include_role:
+    name: load-extensions-from-file
+  vars:
+    extfile: "{{ m_meza }}/src/roles/mediawiki/files/base-extensions.yml"
+
+- name: VisualEditor git submodule update --init
+  shell: |
+    cd "{{ m_mediawiki }}/extensions/VisualEditor"
+    git submodule update --init
+
+- name: Composer install Elastica dependencies
+  composer:
+    command: install
+    working_dir: "{{ m_mediawiki }}/extensions/Elastica"
+  # FIXME: need ignore_errors because composer throws an error when running as root.
+  ignore_errors: yes
+
+- name: Composer install SyntaxHighlight_GeSHi dependencies
+  composer:
+    command: install
+    working_dir: "{{ m_mediawiki }}/extensions/SyntaxHighlight_GeSHi"
+  # FIXME: need ignore_errors because composer throws an error when running as root.
+  ignore_errors: yes
+
+
+
+- name: Ensure LocalSettings.php in place
+  template:
+    src: LocalSettings.php.j2
+    dest: "{{ m_mediawiki }}/LocalSettings.php"
+    backup: yes
+
+- name: Ensure BlenderSettings.php in place
+  template:
+    src: BlenderSettings.php.j2
+    dest: "{{ m_htdocs }}/WikiBlender/BlenderSettings.php"
+
+
+#
+# 1. Sync configurations
+# 2. Check if wikis exist
+# 3. Create Demo Wiki if they don't (create-wiki will re-sync configs)
+#
+- name: Sync configuration between controller and app servers
+  include_role:
+    name: sync-configs
+
+- name: Check if any wikis exist
+  find:
+    paths: "{{ m_local_public }}/wikis"
+    file_type: directory
+  delegate_to: localhost
+  register: initial_wikis_dirs_check
+  run_once: true
+
+- name: Add Demo Wiki to config if no wikis exist
+  include_role:
+    name: configure-wiki
+  vars:
+    wiki_id: demo
+    wiki_name: Demo Wiki
+  when: "initial_wikis_dirs_check.files|length == 0"
+
+- name: Re-sync configuration between controller and app servers if Demo just configured
+  include_role:
+    name: sync-configs
+  when: "initial_wikis_dirs_check.files|length == 0"
+
+#
+# Get meza-installation-specific extensions, both for all-wikis and for
+# specific wikis
+#
+- name: install installation-specific extensions
+  include_role:
+    name: load-extensions-from-file
+  vars:
+    extfile: "{{ m_local_public }}/all-wiki-more-extensions.yml"
+
+- name: Get individual wikis dirs
+  find:
+    paths: "{{ m_local_public }}/wikis/"
+    file_type: directory
+  register: wikis_dirs
+  delegate_to: localhost
+
+- name: loop over wikis, install wiki-specific extensions
+  include_role:
+    name: load-extensions-from-file
+  vars:
+    extfile: "{{ item.path }}/this-wiki-more-extensions.yml"
+  with_items: "{{ wikis_dirs.files }}"
+
+
+
+#
+# Check that all wikis in config are present on app and DB servers
+#
+- name: Ensure defined wikis exist
+  include_role:
+    name: verify-wiki
+  vars:
+    wiki_id: "{{ item }}"
+  # with initial wikis list of file info objects:
+  #   filter 1: reduce list items to just the path
+  #   filter 2: then reduce to just the last part of the path
+  #   filter 3: convert map object back to an Ansible-friendly list
+  with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+
+# Run update.php (MediaWiki's database update script) against all wikis. This
+# only needs to be done once, since the first app server that runs it will
+# update the master database.
+- include_role:
+    name: update.php
+  vars:
+    wiki_id: "{{ item }}"
+  with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+  run_once: true

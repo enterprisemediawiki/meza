@@ -1,0 +1,978 @@
+<?php
+
+# Protect against web entry
+if ( !defined( 'MEDIAWIKI' ) ) {
+	exit;
+}
+
+
+/**
+ *  TABLE OF CONTENTS
+ *
+ *    1) WIKI-SPECIFIC SETUP
+ *    2) DEBUG
+ *    3) PATH SETUP
+ *    4) EMAIL
+ *    5) DATABASE SETUP
+ *    6) GENERAL CONFIGURATION
+ *    7) PERMISSIONS
+ *    8) EXTENSION SETTINGS
+ *    9) LOAD OVERRIDES
+ *
+ **/
+
+
+
+/**
+ *  1) WIKI-SPECIFIC SETUP
+ *
+ *  Acquire the intended wiki either from the REQUEST_URI (for web requests) or
+ *  from the WIKI environment variable (for command line scripts)
+ **/
+
+// same value as bash variable in config.sh
+$m_meza = '{{ m_meza }}';
+$m_config = '{{ m_config }}';
+$m_htdocs = '{{ m_htdocs }}';
+
+if( $wgCommandLineMode ) {
+
+	$mezaWikiEnvVarName='WIKI';
+
+	// get $wikiId from environment variable
+	$wikiId = getenv( $mezaWikiEnvVarName );
+
+}
+else {
+
+	// get $wikiId from URI
+	$uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
+	$wikiId = strtolower( $uriParts[1] ); // URI has leading slash, so $uriParts[0] is empty string
+
+}
+
+// get all directory names in /wikis, minus the first two: . and ..
+$wikis = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
+
+
+if ( ! in_array( $wikiId, $wikis ) ) {
+
+	// handle invalid wiki
+	die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
+
+}
+
+// Load all-wikis preLocalSettings_allWikis.php first, then allow wiki-specific preLocalSettings.php to modify
+require_once "$m_meza/config/local_app/preLocalSettings_allWikis.php";
+
+// Gets wiki-specific config variables like:
+// $wgSitename, $mezaAuthType, $mezaDebug, $mezaEnableWikiEmail
+require_once "$m_htdocs/wikis/$wikiId/config/preLocalSettings.php";
+
+
+
+
+
+
+/**
+ *  2) DEBUG
+ *
+ *  Options to enable debug are below. The lowest-impact solution should be
+ *  chosen. Options are listed from least impact to most impact.
+ *    1) Add to the URI you're requesting `requestDebug=true` to enable debug
+ *       for just that request.
+ *    2) Set `$mezaCommandLineDebug = true;` for debug on the command line.
+ *       This is the default, which can be overriden in preLocalSettings_allWiki.php.
+ *    3) Set `$mezaDebug = array( "NDC\Your-ndc", ... );` in a wiki's preLocalSettings.php
+ *       to enable debug for just specific users on a single wiki.
+ *    4) Set `$mezaDebug = true;` in a wiki's preLocalSettings.php to enable debug for all
+ *       users of a single wiki.
+ *    5) Set `$mezaForceDebug = true;` to turn on debug for all users and wikis
+ **/
+$mezaCommandLineDebug = true; // don't we always want debug on command line?
+$mezaForceDebug = false;
+
+
+if ( $mezaForceDebug ) {
+	$debug = true;
+}
+
+elseif ( $wgCommandLineMode && $mezaCommandLineDebug ) {
+	$debug = true;
+}
+
+elseif ( $GLOBALS['mezaDebug'] === true ) {
+	$debug = true;
+}
+
+// Check if $mezaDebug is an array, and if so check if the requesting user is
+// in the array.
+elseif ( ! $wgCommandLineMode
+	&& is_array( $GLOBALS['mezaDebug'] )
+	&& in_array( $_SERVER["REMOTE_USER"], $GLOBALS['mezaDebug'] )
+) {
+	$debug = true;
+}
+
+elseif ( isset( $_GET['requestDebug'] ) ) {
+	$debug = true;
+}
+
+else {
+	$debug = false;
+}
+
+
+if ( $debug ) {
+
+	// turn error logging on
+	error_reporting( -1 );
+	ini_set( 'display_errors', 1 );
+	ini_set( 'log_errors', 1 );
+
+	// Output errors to log file
+	ini_set( 'error_log', "$m_meza/data/logs/php.log" );
+
+	// MediaWiki Debug Tools
+	$wgShowExceptionDetails = true;
+	$wgDebugToolbar = true;
+	$wgShowDebug = true;
+
+}
+
+// production: no error reporting
+else {
+
+	error_reporting(0);
+	ini_set("display_errors", 0);
+
+}
+
+
+
+
+
+
+
+
+
+
+/**
+ *  3) PATH SETUP
+ *
+ *
+ **/
+
+// ref: https://www.mediawiki.org/wiki/Manual:$wgServer
+//   From section #Autodetection:
+//     "When $wgServer is not set, the default value is calculated
+//     automatically. Some web servers end up returning silly defaults or
+//     internal names which aren't what you want..."
+//
+// Depending on proxy setup (particularly for Varnish/Squid caching) may need
+// to set $wgInternalServer:
+// ref: https://www.mediawiki.org/wiki/Manual:$wgInternalServer
+$wgServer = 'https://{{ wiki_app_fqdn }}';
+
+// https://www.mediawiki.org/wiki/Manual:$wgScriptPath
+$wgScriptPath = "/$wikiId";
+
+// https://www.mediawiki.org/wiki/Manual:$wgUploadPath
+$wgUploadPath = "$wgScriptPath/img_auth.php";
+
+// https://www.mediawiki.org/wiki/Manual:$wgUploadDirectory
+$wgUploadDirectory = "$m_meza/data/uploads/$wikiId";
+
+// https://www.mediawiki.org/wiki/Manual:$wgLogo
+$wgLogo = "/wikis/$wikiId/config/logo.png";
+
+// https://www.mediawiki.org/wiki/Manual:$wgFavicon
+$wgFavicon = "/wikis/$wikiId/config/favicon.ico";
+
+
+// https://www.mediawiki.org/wiki/Manual:$wgMetaNamespace
+$wgMetaNamespace = str_replace( ' ', '_', $wgSitename );
+
+// @todo: handle auth type from preLocalSettings.php
+// @todo: handle debug from preLocalSettings_allWikis.php
+
+// From MW web install: Uncomment this to disable output compression
+# $wgDisableOutputCompression = true;
+
+$wgScriptExtension = ".php";
+
+## The relative URL path to the skins directory
+$wgStylePath = "$wgScriptPath/skins";
+$wgResourceBasePath = $wgScriptPath;
+
+
+
+
+
+
+
+
+
+/**
+ *  4) EMAIL
+ *
+ *  Email configuration
+ **/
+if ( $mezaEnableAllWikiEmail && isset( $mezaEnableWikiEmail ) && $mezaEnableWikiEmail ) {
+	$wgEnableEmail = true;
+}
+else {
+	$wgEnableEmail = false;
+}
+
+## UPO means: this is also a user preference option
+$wgEnableUserEmail = $wgEnableEmail; # UPO
+$wgEnotifUserTalk = $wgEnableEmail; # UPO
+$wgEnotifWatchlist = $wgEnableEmail; # UPO
+$wgEmailAuthentication = $wgEnableEmail;
+
+
+
+
+
+
+
+
+
+
+/**
+ *  5) DATABASE SETUP
+ *
+ *
+ **/
+$mezaDatabaseServers = array( '{{ groups['db-master'][0] }}' );
+
+{% for host in groups['db-slaves'] %}
+    $mezaDatabaseServers[] = '{{ host }}';
+{% endfor %}
+
+$mezaDatabasePassword = '{{ wiki_app_db_user.password }}';
+$mezaDatabaseUser = '{{ wiki_app_db_user.name }}';
+$mezaThisServer = '{{ inventory_hostname }}';
+
+// even though using $wgDBservers method below, keep $wgDBname per warning in:
+// https://www.mediawiki.org/wiki/Manual:$wgDBservers
+$wgDBname = isset( $mezaCustomDBname ) ? $mezaCustomDBname : "wiki_$wikiId";
+
+// first server in list, master, gets a value of 1. If it's the only server, it
+// will get 100% of the load. If there is one slave, it will get a value of 10
+// and thus will take ~90% of the read-load (master will take ~10%). If there
+// are X slaves, master will take 1/(1+10X) of the load. This causes master to
+// get very little of the load, but in the case that all the slaves fail master
+// still is configured to pick up the entirety of the read-load.
+//
+// FIXME: Make load configurable.
+$databaseReadLoadRatio = 1;
+
+$wgDBservers = array();
+foreach( $mezaDatabaseServers as $databaseServer ) {
+	if ( $databaseServer === $mezaThisServer ) {
+		$databaseServer = 'localhost';
+	}
+	$wgDBservers[] = array(
+		'host' => $databaseServer,
+		'dbname' => $wgDBname,
+		'user' => $mezaDatabaseUser,
+		'password' => $mezaDatabasePassword,
+		'type' => "mysql",
+		'flags' => DBO_DEFAULT,
+		'load' => $databaseReadLoadRatio,
+	);
+	$databaseReadLoadRatio = 10; // every server after the first gets the same loading
+}
+
+
+# MySQL specific settings
+$wgDBprefix = "";
+
+# MySQL table options to use during installation or update
+$wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
+
+# Experimental charset support for MySQL 5.0.
+$wgDBmysql5 = false;
+
+/**
+ *  If a primewiki is defined then every wiki will use that wiki db for certain
+ *  tables. The shared `interwiki` table allows users to use the same interwiki
+ *  prefixes across all wikis. The `user` and `user_properties` tables make all
+ *  wikis have the same set of users and user properties/preferences. This does
+ *  not affect the user groups, so a user can be a sysop on one wiki and just a
+ *  user on another.
+ *
+ *  To enable a primewiki create the file $m_config/local/primewiki and make
+ *  the file contents be the id of the desired wiki.
+ *
+ *  In order for this to work properly the wikis need to have been created with
+ *  a single user table in mind. If you're starting a new wiki farm then you're
+ *  all set. If you're importing wikis which didn't previously have shared user
+ *  tables, then you'll need to use the unifyUserTables.php script.
+ *
+ **/
+if ( file_exists( "$m_config/local/primewiki" ) ) {
+
+	// grab prime wiki data using closure to encapsulate the data
+	// and not overwrite existing config ($wgSitename, etc)
+	$primewiki = call_user_func( function() use ( $m_htdocs, $m_config ) {
+
+		$primeWikiId = trim( file_get_contents( "$m_config/local/primewiki" ) );
+
+		require_once "$m_htdocs/wikis/$primeWikiId/config/preLocalSettings.php";
+
+		if ( isset( $mezaCustomDBname ) ) {
+			$primeWikiDBname = $mezaCustomDBname;
+		} else {
+			$primeWikiDBname = "wiki_$primeWikiId";
+		}
+
+		return array(
+			'id' => $primeWikiId,
+			'database' => $primeWikiDBname,
+		);
+	} );
+
+	$wgSharedDB = $primewiki[ 'database' ];
+	$wgSharedTables = array(
+		'user',            // default
+		'user_properties', // default
+		'interwiki',       // additional
+	);
+
+}
+
+
+
+
+
+
+
+/**
+ *  6) GENERAL CONFIGURATION
+ *
+ *
+ *
+ **/
+// memcached settings
+$wgMainCacheType = CACHE_MEMCACHED;
+// If parser cache set to CACHE_MEMCACHED, templates used to format SMW query
+// results in generic footer don't work. This is a limitation of
+// Extension:HeaderFooter which may or may not be able to be worked around.
+$wgParserCacheType = CACHE_NONE;
+$wgMessageCacheType = CACHE_MEMCACHED;
+$wgMemCachedServers = array( "127.0.0.1:11211" );
+
+// memcached is setup and will work for sessions with meza, unless you use
+// SimpleSamlPhp. Previous versions of meza had this set to CACHE_NONE, but
+// MW 1.27 requires a session cache. Setting this to CACHE_MEMCACHED as it
+// is the ultimate goal. A separate branch contains pulling PHP from the
+// IUS repository, which should simplify integrating PHP and memcached in a
+// way that SimpleSamlPhp likes. So this may be temporarily breaking for
+// SAML, but MW 1.27 may be breaking for SAML anyway due to changes in
+// AuthPlugin/AuthManager.
+$wgSessionCacheType = CACHE_MEMCACHED;
+
+## To enable image uploads, make sure the 'images' directory
+## is writable, then set this to true:
+$wgEnableUploads = true;
+$wgMaxUploadSize = 1024*1024*100; // 100 MB
+$wgUseImageMagick = true;
+$wgImageMagickConvertCommand = "/usr/bin/convert";
+
+# InstantCommons allows wiki to use images from http://commons.wikimedia.org
+$wgUseInstantCommons = false;
+
+## If you use ImageMagick (or any other shell command) on a
+## Linux server, this will need to be set to the name of an
+## available UTF-8 locale
+$wgShellLocale = "en_US.utf8";
+
+## If you want to use image uploads under safe mode,
+## create the directories images/archive, images/thumb and
+## images/temp, and make them all writable. Then uncomment
+## this, if it's not already uncommented:
+$wgHashedUploadDirectory = true;
+
+## Set $wgCacheDirectory to a writable directory on the web server
+## to make your wiki go slightly faster. The directory should not
+## be publically accessible from the web.
+#$wgCacheDirectory = "$IP/cache";
+
+# Site language code, should be one of the list in ./languages/Names.php
+$wgLanguageCode = "en";
+
+# https://www.mediawiki.org/wiki/Manual:$wgSecretKey
+$wgSecretKey = "{{ wg_secret_key }}";
+
+## For attaching licensing metadata to pages, and displaying an
+## appropriate copyright notice / icon. GNU Free Documentation
+## License and Creative Commons licenses are supported so far.
+$wgRightsPage = ""; # Set to the title of a wiki page that describes your license/copyright
+$wgRightsUrl = "";
+$wgRightsText = "";
+$wgRightsIcon = "";
+
+# Path to the GNU diff3 utility. Used for conflict resolution.
+$wgDiff3 = "/usr/bin/diff3";
+
+## Default skin: you can change the default skin. Use the internal symbolic
+## names, ie 'vector', 'monobook':
+$wgDefaultSkin = "vector";
+
+# Enabled skins.
+# The following skins were automatically enabled:
+wfLoadSkin( 'Vector' );
+
+// allows users to remove the page title.
+// https://www.mediawiki.org/wiki/Manual:$wgRestrictDisplayTitle
+$wgRestrictDisplayTitle = false;
+
+
+
+
+
+
+
+/**
+ *
+ * Take from LocalSettingsAdditions
+ *
+ **/
+
+// opens external links in new window
+$wgExternalLinkTarget = '_blank';
+
+// added this line to allow linking. specifically to Imagery Online.
+$wgAllowExternalImages = true;
+$wgAllowImageTag = true;
+
+$wgVectorUseSimpleSearch = true;
+
+//$wgDefaultUserOptions['useeditwarning'] = 1;
+
+// disable page edit warning (edit warning affect Semantic Forms)
+$wgVectorFeatures['editwarning']['global'] = false;
+
+$wgDefaultUserOptions['rememberpassword'] = 1;
+
+// users watch pages by default (they can override in settings)
+$wgDefaultUserOptions['watchdefault'] = 1;
+$wgDefaultUserOptions['watchmoves'] = 1;
+$wgDefaultUserOptions['watchdeletion'] = 1;
+$wgDefaultUserOptions['watchcreations'] = 1;
+
+$wgEnableMWSuggest = true;
+
+// fixes login issue for some users (login issue fixed in MW version 1.18.1 supposedly)
+$wgDisableCookieCheck = true;
+
+#Set Default Timezone
+$wgLocaltimezone = "America/Chicago";
+$oldtz = getenv("TZ");
+putenv("TZ=$wgLocaltimezone");
+
+
+$wgMaxImageArea = 1.25e10; // Images on [[Snorkel]] fail without this
+// $wgMemoryLimit = 500000000; //Default is 50M. This is 500M.
+
+
+// Increase from default setting for large form
+// See https://www.mediawiki.org/wiki/Extension_talk:Semantic_Forms/Archive_April_to_June_2012#Error:_Backtrace_limit_exceeded_during_parsing
+// If set to 10million, errors are seen when using Edit with form on mission pages like 41S
+// ini_set( 'pcre.backtrack_limit', 10000000 ); //10million
+ini_set( 'pcre.backtrack_limit', 1000000000 ); //1 billion
+
+
+$wgUseImageMagick = true;
+$wgImageMagickConvertCommand = '/usr/local/bin/convert';
+
+// Allowed file types
+$wgFileExtensions = array(
+	'aac',
+	'bmp',
+	'docx',
+	'gif',
+	'jpg',
+	'jpeg',
+	'mpp',
+	'mp3',
+	'msg',
+	'odg',
+	'odp',
+	'ods',
+	'odt',
+	'pdf',
+	'png',
+	'pptx',
+	'ps',
+	'svg',
+	'tiff',
+	'txt',
+	'xlsx'
+);
+
+
+
+
+
+
+
+
+
+/**
+ *  7) PERMISSIONS
+ *
+ *
+ *
+ **/
+if ( ! isset( $mezaAuthType ) ) {
+	$mezaAuthType = 'anon-edit'; // default: wide open!
+}
+if ( $mezaAuthType === 'anon-edit' ) {
+
+    // allow anonymous read
+    $wgGroupPermissions['*']['read'] = true;
+    $wgGroupPermissions['user']['read'] = true;
+
+    // allow anonymous write
+    $wgGroupPermissions['*']['edit'] = true;
+    $wgGroupPermissions['user']['edit'] = true;
+
+}
+
+else if ( $mezaAuthType === 'anon-read' ) {
+
+    // allow anonymous read
+    $wgGroupPermissions['*']['read'] = true;
+    $wgGroupPermissions['user']['read'] = true;
+
+    // do not allow anonymous write (must be registered user)
+    $wgGroupPermissions['*']['edit'] = false;
+    $wgGroupPermissions['user']['edit'] = true;
+
+}
+
+else if ( $mezaAuthType === 'user-edit' ) {
+
+    // no anonymous
+    $wgGroupPermissions['*']['read'] = false;
+    $wgGroupPermissions['*']['edit'] = false;
+
+    // users read and write
+    $wgGroupPermissions['user']['read'] = true;
+    $wgGroupPermissions['user']['edit'] = true;
+
+}
+
+else if ( $mezaAuthType === 'user-read' ) {
+
+    // no anonymous
+    $wgGroupPermissions['*']['read'] = false;
+    $wgGroupPermissions['*']['edit'] = false;
+
+    // users read NOT write
+    $wgGroupPermissions['user']['read'] = true;
+    $wgGroupPermissions['user']['edit'] = false;
+
+    $wgGroupPermissions['Contributor'] = $wgGroupPermissions['user'];
+    $wgGroupPermissions['Contributor']['edit'] = true;
+
+}
+
+else if ( $mezaAuthType === 'viewer-read' ) {
+
+    // no anonymous or ordinary users
+    $wgGroupPermissions['*']['read'] = false;
+    $wgGroupPermissions['*']['edit'] = false;
+    $wgGroupPermissions['user']['read'] = false;
+    $wgGroupPermissions['user']['edit'] = false;
+
+    // create the Viewer group with read permissions
+    $wgGroupPermissions['Viewer'] = $wgGroupPermissions['user'];
+    $wgGroupPermissions['Viewer']['read'] = true;
+
+    // also explicitly give sysop read since you otherwise end up with
+    // a chicken/egg situation prior to giving people Viewer
+    $wgGroupPermissions['sysop']['read'] = true;
+
+    // Create a contributors group that can edit
+    $wgGroupPermissions['Contributor'] = $wgGroupPermissions['user'];
+    $wgGroupPermissions['Contributor']['edit'] = true;
+
+}
+
+
+
+
+
+
+
+
+
+
+/**
+ *  8) EXTENSION SETTINGS
+ *
+ *  Code to load the extension "ExtensionLoader", which then installs and loads
+ *  other extensions as defined in "ExtensionSettings.php". Note that the file
+ *  or files defining which extensions are loaded is configurable below, as is
+ *  the path to where extensions are installed.
+ */
+
+#
+# Enable Semantic MediaWiki semantics
+#
+enableSemantics( $wikiId );
+
+
+#
+# Semantic MediaWiki Settings (extension loaded via Composer)
+#
+$smwgQMaxSize = 5000;
+
+#
+# SemanticResultFormats formats enabled (beyond defaults)
+#
+
+// These are disabled by default because they send data to external
+// web services for rendering, which may be considered a data leak
+// $srfgFormats[] = 'googlebar';
+// $srfgFormats[] = 'googlepie';
+
+// Disabled until the proper dependencies are added (PHPExcel I think)
+// $srfgFormats[] = 'excel';
+
+// Enables the "filtered" format. Where do we use this?
+$srfgFormats[] = 'filtered';
+
+// Disabled due to some issue on FOD wikis. Confirm, reenable if possible
+// $srfgFormats[] = 'exhibit';
+
+
+
+// allows adding semantic properties to Templates themselves
+// (not just on pages via templates).
+// ENABLE THIS AFTER ALL TEMPLATES HAVE BEEN CHECKED FOR PROPER FORM
+// i.e. using <noinclude> and <includeonly> properly
+// $smwgNamespacesWithSemanticLinks[NS_TEMPLATE] = true;
+$smwgNamespacesWithSemanticLinks[NS_TALK] = true;
+
+
+#
+# Start of non-composer extensions
+#
+wfLoadExtensions( array(
+	'ParserFunctions',
+	'ExternalData',
+	'LabeledSectionTransclusion',
+	'Cite',
+	'ParserFunctionHelper',
+	'CharInsert',
+	'SemanticForms',
+	'DismissableSiteNotice',
+	'WikiEditor',
+
+	# consider replacing with https://gerrit.wikimedia.org/r/mediawiki/extensions/SyntaxHighlight_Pygments.git
+	'SyntaxHighlight_GeSHi',
+	'InputBox',
+	'ReplaceText',
+	'Interwiki',
+	'YouTube',
+	'UniversalLanguageSelector',
+	'VisualEditor',
+	'Elastica',
+	'Thanks',
+	'CollapsibleVector',
+	'Math'
+) );
+
+
+# Extension:ParserFunctions
+$wgPFEnableStringFunctions = true;
+
+# Extension:Cite
+$wgCiteEnablePopups = true;
+
+# Extension:WhoIsWatching
+$wgPageShowWatchingUsers = true;
+
+# Extension:HeaderTabs
+$htEditTabLink = false;
+$htRenderSingleTab = true;
+
+# Extension:WikiEditor
+$wgDefaultUserOptions['usebetatoolbar'] = 1;
+$wgDefaultUserOptions['usebetatoolbar-cgd'] = 1;
+$wgDefaultUserOptions['wikieditor-publish'] = 1; # displays publish button
+$wgDefaultUserOptions['wikieditor-preview'] = 1; # Displays the Preview and Changes tabs
+
+# Extension:Interwiki
+$wgGroupPermissions['sysop']['interwiki'] = true;
+
+# Extension:Math
+$wgMathValidModes[] = 'MW_MATH_MATHJAX'; // Define MathJax as one of the valid math rendering modes
+$wgUseMathJax = true; // Enable MathJax as a math rendering option for users to pick
+$wgDefaultUserOptions['math'] = 'MW_MATH_MATHJAX'; // Set MathJax as the default rendering option for all users (optional)
+$wgMathDisableTexFilter = true; // or compile "texvccheck"
+$wgDefaultUserOptions['mathJax'] = true; // Enable the MathJax checkbox option
+
+
+#
+# Extensions without extension.json
+#
+$noExtensionJSONfile = array(
+	'StringFunctionsEscaped',
+	'SemanticInternalObjects',
+	'SemanticCompoundQueries',
+	'Arrays',
+	'TalkRight', // branch `extreg`...should have extension.json
+	'AdminLinks',
+	'BatchUserRights',
+	'CopyWatchers', // branch `extreg`...should have extension.json
+	'Wiretap', // extreg
+	'ApprovedRevs',
+	'MasonryMainPage',
+	'WatchAnalytics',
+	'Variables',
+	'ContributionScores',
+	'PipeEscape',
+	'CirrusSearch',
+	'Echo',
+	'UploadWizard',
+	'DataTransfer',
+	'WhoIsWatching',
+);
+foreach( $noExtensionJSONfile as $mezaLegacyExt ) {
+	require_once "$IP/extensions/$mezaLegacyExt/$mezaLegacyExt.php";
+}
+
+
+
+# Extension:AdminLinks
+$wgGroupPermissions['sysop']['adminlinks'] = true;
+
+# Extension:ApprovedRevs
+$egApprovedRevsAutomaticApprovals = false;
+
+# Extension:WatchAnalytics
+$egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
+
+# Extension:CirrusSearch
+$wgSearchType = 'CirrusSearch';
+$wgCirrusSearchClusters['default'] = [];
+{% for host in groups['elastic-servers'] %}
+{% if host == inventory_hostname %}
+$wgCirrusSearchClusters['default'][] = 'localhost';
+{% else %}
+$wgCirrusSearchClusters['default'][] = '{{ host }}';
+{% endif %}
+{% endfor %}
+
+
+# Extension:Echo
+$wgEchoEmailFooterAddress = $wgPasswordSender;
+
+# Extension:Thanks
+$wgThanksConfirmationRequired = false;
+
+
+#
+# Extension:ContributionScores
+#
+// Exclude Bots from the reporting - Can be omitted.
+$wgContribScoreIgnoreBots = true;
+
+// Exclude Blocked Users from the reporting - Can be omitted.
+$wgContribScoreIgnoreBlockedUsers = true;
+
+// Use real user names when available - Can be omitted. Only for MediaWiki 1.19 and later.c
+$wgContribScoresUseRealName = true;
+
+// Set to true to disable cache for parser function and inclusion of table.
+$wgContribScoreDisableCache = false;
+
+// Each array defines a report - 7,50 is "past 7 days" and "LIMIT 50" - Can be omitted.
+$wgContribScoreReports = array(
+	array(7,50),
+	array(30,50),
+	array(0,50)
+);
+
+
+#
+# Extension:VisualEditor
+#
+
+// Allow read and edit permission for requests from the server (e.g. Parsoid)
+// Ref: https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
+// Ref: https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
+$mezaValidParsoidServers = [];
+{% for host in groups['parsoid-servers'] %}
+	{% if host == inventory_hostname %}
+	$mezaValidParsoidServers[] = '127.0.0.1';
+	{% endif %}
+	$mezaValidParsoidServers[] = '{{ host }}';
+{% endfor %}
+if ( isset( $_SERVER['REMOTE_ADDR'] ) && in_array( $_SERVER['REMOTE_ADDR'], $mezaValidParsoidServers ) ) {
+	$wgGroupPermissions['*']['read'] = true;
+	$wgGroupPermissions['*']['edit'] = true;
+}
+
+// Enable by default for everybody
+$wgDefaultUserOptions['visualeditor-enable'] = 1;
+
+// Don't allow users to disable it
+$wgHiddenPrefs[] = 'visualeditor-enable';
+
+// OPTIONAL: Enable VisualEditor's experimental code features
+#$wgDefaultUserOptions['visualeditor-enable-experimental'] = 1;
+
+// URL to the Parsoid instance MUST NOT end in a slash due to Parsoid bug
+if ( in_array( '127.0.0.1', $mezaValidParsoidServers ) ) {
+	$parsoidDomain = '127.0.0.1';
+}
+else {
+	$parsoidDomain = $mezaValidParsoidServers[ array_rand( $mezaValidParsoidServers ) ];
+}
+$wgVirtualRestConfig['modules']['parsoid'] = array(
+	'url' => "http://$parsoidDomain:8000",
+
+	// domain here is not really the domain. It needs to be unique to each wiki
+	// and both domain and prefix must match settings in Parsoid's settings in
+	// /opt/meza/config/core/localsettings.js
+	// ref:
+	// https://www.mediawiki.org/wiki/Parsoid/Setup#Multiple_wikis_sharing_the_same_parsoid_service
+	'domain' => $wikiId,
+	'prefix' => $wikiId
+);
+
+// Define which namespaces will use VE
+$wgVisualEditorNamespaces = array_merge(
+	$wgContentNamespaces,
+        array( NS_USER,
+          NS_HELP,
+          NS_PROJECT
+	)
+);
+
+
+#
+# Extension:Upload Wizard
+#
+// Needed to make UploadWizard work in IE, see bug 39877
+// See also: https://www.mediawiki.org/wiki/Manual:$wgApiFrameOptions
+$wgApiFrameOptions = 'SAMEORIGIN';
+
+// Use UploadWizard by default in navigation bar
+$wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard";
+$wgUploadWizardConfig = array(
+	'debug' => false,
+	'autoCategory' => 'Uploaded with UploadWizard',
+	'feedbackPage' => 'Project:UploadWizard/Feedback',
+	'altUploadForm' => 'Special:Upload',
+	'fallbackToAltUploadForm' => false,
+	'enableFormData' => true,  # Should FileAPI uploads be used on supported browsers?
+	'enableMultipleFiles' => true,
+	'enableMultiFileSelect' => true,
+	'tutorial' => array('skip' => true),
+	'fileExtensions' => $wgFileExtensions, //omitting this can cause errors
+	'licensing' => array(
+		// alternatively, use "thirdparty". Set in postLocalSettings.php like:
+		// $wgUploadWizardConfig['licensing']['defaultType'] = 'thirdparty';
+		'defaultType' => 'ownwork',
+
+		'ownWork' => array(
+			'type' => 'or',
+			// Use [[Project:General disclaimer]] instead of default [[Template:Generic]]
+			'template' => 'Project:General disclaimer',
+			'defaults' => array( 'generic' ),
+			'licenses' => array( 'generic' )
+		),
+
+		'thirdParty' => array(
+			'type' => 'or',
+			'defaults' => array( 'generic' ),
+			'licenseGroups' => array(
+				array(
+					'head' => 'mwe-upwiz-license-generic-head',
+					'template' => 'Project:General disclaimer', // again, use General disclaimer
+					'licenses' => array( 'generic' ),
+				),
+			)
+		),
+	),
+);
+
+
+
+# Extension:HeaderFooter (currently pulled in by composer as dependency)
+# https://github.com/enterprisemediawiki/HeaderFooter.git
+
+# Extension:NumerAlpha (currently pulled in by composer as dependency)
+# https://github.com/jamesmontalvo3/NumerAlpha.git
+
+# Extension:PdfHandler (breaks on very large PDFs)
+# https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler
+// Location of PdfHandler dependencies
+// $wgPdfProcessor = '/usr/bin/gs'; // installed via yum
+// $wgPdfPostProcessor = '/usr/local/bin/convert'; // built from source
+// $wgPdfInfo = '/usr/local/bin/pdfinfo'; // pre-built binaries installed
+
+
+# Extension:Flow
+#
+# Note: Flow removed due to being unable to search discussions. While the
+# improved interface is great, it's useless if we can't search our old content.
+# See issues #272.
+#
+// $egExtensionLoader->load(
+// 	'Flow',
+// 	'https://gerrit.wikimedia.org/r/mediawiki/extensions/Flow.git',
+// 	'REL1_27'
+// );
+
+// // only allow sysops to create new flow boards
+// $wgGroupPermissions['sysop']['flow-create-board'] = true;
+
+// // store posts as html using Parsoid
+// $wgFlowContentFormat = 'html';
+
+// // use VE
+// $wgFlowEditorList = array( 'visualeditor', 'none' );
+
+// // Define which namespaces will use Flow
+// $wgNamespaceContentModels[NS_PROJECT_TALK]        = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_USER_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_TALK]                = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_HELP_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_FILE_TALK]           = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_CATEGORY_TALK]       = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_MEDIAWIKI_TALK]      = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[NS_TEMPLATE_TALK]       = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[SMW_NS_FORM_TALK]       = CONTENT_MODEL_FLOW_BOARD; // MW throws error: SMW_NS_FORM_TALK not a constant
+// $wgNamespaceContentModels[SMW_NS_PROPERTY_TALK]   = CONTENT_MODEL_FLOW_BOARD;
+// $wgNamespaceContentModels[SMW_NS_CONCEPT_TALK]    = CONTENT_MODEL_FLOW_BOARD;
+
+// // Connect Flow to Parsoid
+// $wgFlowParsoidURL = 'http://127.0.0.1:8000';
+// $wgFlowParsoidPrefix = $wikiId;
+
+
+
+
+/**
+ *  9) LOAD OVERRIDES
+ *
+ *
+ *
+ *
+ **/
+if ( file_exists( "$m_meza/config/local_app/postLocalSettings_allWikis.php" ) ) {
+	require_once "$m_meza/config/local_app/postLocalSettings_allWikis.php";
+}
+if ( file_exists( "$m_htdocs/wikis/$wikiId/config/postLocalSettings.php" ) ) {
+	require_once "$m_htdocs/wikis/$wikiId/config/postLocalSettings.php";
+}

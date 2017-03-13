@@ -1,27 +1,22 @@
 .DS_Store
-logs/*
-!logs/README.md
 config/config.local.sh
 
-config/local_control
+config/local-secret
+config/local-public
 config/local_app
 
 # data directory used to hold MariaDB and Elasticsearch data
 # which should not be added to this repo. However, there are
 # some README files as placeholders in this directory which
-# have been explicitly added to the repo.
+# have been explicitly added to the repo. Also includes logs
+# and backups.
 data/*
-
-# backups directory
-backups/*
 
 # ignore wiki blender landing page
 htdocs/WikiBlender
 
 htdocs/mediawiki
 htdocs/wikis/*
-
-ansible/env/*
 
 simplesamlphp/
 

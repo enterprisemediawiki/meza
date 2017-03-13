@@ -13,8 +13,7 @@ m_meza="$m_install/meza" # was: m_meza="$m_install/meza1"
 m_config="$m_meza/config"
 
 # scripts dir
-m_scripts="$m_meza/scripts"
-m_modules="$m_scripts/modules"
+m_scripts="$m_meza/src/scripts"
 
 # test dir
 m_test="$m_meza/test"

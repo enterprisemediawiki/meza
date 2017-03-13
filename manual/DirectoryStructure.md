@@ -6,17 +6,6 @@ This is an overview of the directory structure used by a meza server. This does 
 |	|-- my.cnf -> /opt/meza/config/core/my.conf
 |-- opt/
 |	└-- meza/ (primary installation location for meza)
-|		|-- backup/
-|		|	|-- demo/
-|		|	|	|-- YYYYMMDDHHMMSS_wiki.sql (several of these will accumulate from each backup)
-|		|	|	|-- config/ (config for each wiki)
-|		|	|	|	|-- backupDownloaders.php (copy here from template and configure with usernames)
-|		|	|	|	|-- favicon.ico
-|		|	|	|	|-- logo.png
-|		|	|	|	|-- postLocalSettings.php
-|		|	|	|	└-- preLocalSettings.php
-|		|	|	└-- images/
-|		|	└-- (other wikis yet to be created, same structure as /opt/meza/htdocs/wikis/demo)
 |		|-- config/
 |		|	|-- core/ (config for meza application, not to be changed by meza admins)
 |		|	|	|-- BlenderSettings.php (for landing page)
@@ -72,6 +61,17 @@ This is an overview of the directory structure used by a meza server. This does 
 |		|	|	└-- work/ (temp files for ES)
 |		|	|-- mysql/
 |		|	|	└-- databases/
+|		|	|--	backup/
+|		|	|	|-- demo/
+|		|	|	|	|-- YYYYMMDDHHMMSS_wiki.sql (several of these will accumulate from each backup)
+|		|	|	|	└-- uploads/
+|		|	|	└-- (other wikis yet to be created, same structure as /opt/meza/htdocs/wikis/demo)
+|		|	└-- logs/
+|		|		|-- <sometimestamp>_cmd.log (command start/stop times during meza install)
+|		|		|-- <sometimestamp>_err.log (errors during meza install)
+|		|		|-- <sometimestamp>_out.log (output from meza install)
+|		|		|-- php.log (PHP logging when debug is on)
+|		|		└-- user-unify-<sometimestamp>/ (lots of logging during user unification script)
 |		|-- .gitignore
 |		|-- htdocs/
 |		|	|-- .htaccess
@@ -107,12 +107,6 @@ This is an overview of the directory structure used by a meza server. This does 
 |		|		|	|	└-- preLocalSettings.php
 |		|		|	└-- images/
 |		|		└-- (other wikis yet to be created, same structure as /opt/meza/htdocs/wikis/demo)
-|		|-- logs/
-|		|	|-- <sometimestamp>_cmd.log (command start/stop times during meza install)
-|		|	|-- <sometimestamp>_err.log (errors during meza install)
-|		|	|-- <sometimestamp>_out.log (output from meza install)
-|		|	|-- php.log (PHP logging when debug is on)
-|		|	└-- user-unify-<sometimestamp>/ (lots of logging during user unification script)
 |		|-- manual/ (lots of markdown files for documentation)
 |		|-- scripts/
 |		|	|-- backup-remote-wikis.sh
