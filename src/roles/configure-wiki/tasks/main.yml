@@ -20,7 +20,7 @@
 
 - name: Ensure wiki directory exists in config
   file:
-    path: "/opt/meza/config/local_public/wikis/{{ wiki_id }}"
+    path: "/opt/meza/config/local-public/wikis/{{ wiki_id }}"
     state: directory
     owner: apache
     group: apache

@@ -58,7 +58,7 @@
   include_role:
     name: load-extensions-from-file
   vars:
-    extfile: "{{ m_meza }}/ansible/roles/mediawiki/files/base-extensions.yml"
+    extfile: "{{ m_meza }}/src/roles/mediawiki/files/base-extensions.yml"
 
 - name: VisualEditor git submodule update --init
   shell: |
