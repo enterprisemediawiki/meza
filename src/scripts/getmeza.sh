@@ -19,7 +19,7 @@ if [ ! -d "/opt/meza" ]; then
 fi
 
 if [ ! -f "/usr/bin/meza" ]; then
-	ln -s "/opt/meza/src/scripts/meza.sh" "/usr/bin/meza"
+	ln -s "/opt/meza/src/scripts/meza.py" "/usr/bin/meza"
 fi
 
 ret=false
