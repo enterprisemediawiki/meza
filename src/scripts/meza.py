@@ -106,7 +106,7 @@ def meza_command_setup (argv):
 	sub_command = argv[0]
 	if sub_command == "dev-networking":
 		sub_command = "dev_networking" # hyphen not a valid function character
-	command_fn = "meza_command_setup_" + argv[0]
+	command_fn = "meza_command_setup_" + sub_command
 
 	# if command_fn is a valid Python function, pass it all remaining args
 	if command_fn in globals() and callable( globals()[command_fn] ):
@@ -119,10 +119,13 @@ def meza_command_setup (argv):
 # FIXME: This function is big.
 def meza_command_setup_env (argv, return_not_exit=False):
 
-	env = argv[0]
+	if isinstance( argv, basestring ):
+		env = argv
+	else:
+		env = argv[0]
 
-	# if not os.path.isdir( "/opt/meza/config/local-secret" ):
-	#   os.mkdir( "/opt/meza/config/local-secret" )
+	if not os.path.isdir( "/opt/meza/config/local-secret" ):
+		os.mkdir( "/opt/meza/config/local-secret" )
 
 	if os.path.isdir( "/opt/meza/config/local-secret/" + env ):
 		print
@@ -131,16 +134,13 @@ def meza_command_setup_env (argv, return_not_exit=False):
 
 	fqdn = db_pass = enable_email = private_net_zone = False
 	try:
-		opts, args = getopt.getopt(argv,"h",["help","fqdn=","db_pass=","enable_email=","private_net_zone="])
-	except getopt.GetoptError:
+		opts, args = getopt.getopt(argv[1:],"",["fqdn=","db_pass=","enable_email=","private_net_zone="])
+	except Exception as e:
+		print str(e)
 		print 'meza setup env <env> [options]'
 		sys.exit(1)
 	for opt, arg in opts:
-		if opt in ("-h", "--help"):
-			# FIXME: better help
-			print 'meza setup env <env> [options]'
-			sys.exit(0)
-		elif opt == "--fqdn":
+		if opt == "--fqdn":
 			fqdn = arg
 		elif opt == "--db_pass":
 			# This will put the DB password on the command line, so should
@@ -163,6 +163,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	if not enable_email:
 		enable_email = prompt("enable_email")
 
+
 	# No need for private networking. Set to public.
 	if env == "monolith":
 		private_net_zone = "public"
@@ -179,7 +180,6 @@ def meza_command_setup_env (argv, return_not_exit=False):
 
 		# single server, e.g. just a string
 		db_master = '# INSERT'
-
 
 	if not private_net_zone:
 		private_net_zone = prompt("private_net_zone")
@@ -416,7 +416,7 @@ def meza_shell_exec ( shell_cmd, return_output=False ):
 	# rc = child.returncode
 
 	cmd = ' '.join(shell_cmd)
-	print cmd
+	#print cmd
 	rc = os.system(cmd)
 
 	# FIXME: See above
@@ -494,14 +494,26 @@ def check_environment(env):
 
 	env_dir = os.path.join( conf_dir, env )
 	if not os.path.isdir( env_dir ):
+
+		if env == "monolith":
+			return 1
+
 		print
 		print '"{}" is not a valid environment.'.format(env)
 		print "Please choose one of the following:"
 
-		# this gets all dirs within then env_dir dir
-		valid_envs = os.walk( conf_dir ).next()[1]
-		for valid_env in valid_envs:
-			print valid_env
+		conf_dir_stuff = os.listdir( conf_dir )
+		valid_envs = []
+		for x in conf_dir_stuff:
+			if os.path.isdir( os.path.join( conf_dir, x ) ):
+				valid_envs.append( x )
+
+		if len(valid_envs) > 0:
+			for x in valid_envs:
+				print "  " + x
+		else:
+			print "  No environments configured"
+			print "  Run command: meza setup env <environment name>"
 
 		return 1
 
