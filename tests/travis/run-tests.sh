@@ -109,9 +109,9 @@ if [ "$test_type" == "monolith_from_scratch" ]; then
 	# Since we want to make the monolith environment without prompts, need to do
 	# `meza setup env monolith` with values for required args included (fqdn,
 	# db_pass, email, private_net_zone).
-	${docker_exec[@]} meza setup env monolith --fqdn="${docker_ip}" --db_pass=1234 --enable_email=false --private_net_zone=public 
+	${docker_exec[@]} meza setup env monolith --fqdn="${docker_ip}" --db_pass=1234 --enable_email=false --private_net_zone=public
 	# Now that environment monolith is setup, deploy/install it
-	${docker_exec[@]} meza install monolith
+	${docker_exec[@]} meza deploy monolith
 
 	# TEST BASIC SYSTEM FUNCTIONALITY
 	server_check
