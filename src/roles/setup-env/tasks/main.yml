@@ -1,0 +1,37 @@
+---
+
+- name: Ensure local-secret directory exists
+  file:
+    path: "{{ m_local_secret }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Ensure local-secret environment directory exists
+  file:
+    path: "{{ m_local_secret }}/{{ env }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Ensure group_vars directory exists
+  file:
+    path: "{{ m_local_secret }}/{{ env }}/group_vars"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+# Ansible writing Ansible
+- name: Ensure hosts file configured
+  template:
+    src: hosts.j2
+    dest: "{{ m_local_secret }}/{{ env }}/hosts"
+
+- name: Ensure all.yml configured
+  template:
+    src: all.yml.j2
+    dest: "{{ m_local_secret }}/{{ env }}/group_vars/all.yml"
+

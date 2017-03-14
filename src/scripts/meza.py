@@ -16,31 +16,6 @@ print 'Number of arguments:', len(sys.argv), 'arguments.'
 print 'Argument List:', str(sys.argv)
 
 
-getopt.getopt(args, options, [long_options])
-
-
-
-
-
-def FIXME argHandling(argv):
-   inputfile = ''
-   outputfile = ''
-   try:
-      opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
-   except getopt.GetoptError:
-      print 'test.py -i <inputfile> -o <outputfile>'
-      sys.exit(2)
-   for opt, arg in opts:
-      if opt == '-h':
-         print 'test.py -i <inputfile> -o <outputfile>'
-         sys.exit()
-      elif opt in ("-i", "--ifile"):
-         inputfile = arg
-      elif opt in ("-o", "--ofile"):
-         outputfile = arg
-   print 'Input file is "', inputfile
-   print 'Output file is "', outputfile
-
 
 
 
@@ -76,10 +51,12 @@ def main (argv):
 
 
 def playbook_cmd ( playbook, env ):
-	host_file = "/opt/meza/config/local-secret/{}/hosts".format(env)
-	return ['sudo', '-u', 'meza-ansible', 'ansible-playbook',
-		'/opt/meza/src/playbooks/{}.yml'.format(playbook), '-i', host_file,
-		"--extra-vars", "env="+env ]
+	command = ['sudo', '-u', 'meza-ansible', 'ansible-playbook',
+		'/opt/meza/src/playbooks/{}.yml'.format(playbook)]
+	if env:
+		host_file = "/opt/meza/config/local-secret/{}/hosts".format(env)
+		command = command + [ '-i', host_file, "--extra-vars", "env="+env ]
+	return command
 
 # FIXME install --> setup dev-networking, setup docker, deploy monolith (special case)
 
@@ -130,11 +107,155 @@ def meza_command_deploy (argv):
 
 
 
+# env
+# dev
+# dev-networking --> vbox-networking ??
+# docker
 def meza_command_setup (argv):
-	# env (complicated)
-	# dev (simple shell-exec bash script)
-	print "not yet built"
 
+	sub_command = argv[0]
+	if sub_command == "dev-networking":
+		sub_command = "dev_networking" # hyphen not a valid function character
+	command_fn = "meza_command_setup_" + argv[0]
+
+	# if command_fn is a valid Python function, pass it all remaining args
+	if command_fn in locals() and callable( locals()[command_fn] ):
+		locals()[command_fn]( argv[1:] )
+	else:
+		print
+		print sub_command + " is not a valid sub-command for setup"
+		sys.exit(1)
+
+def meza_command_setup_env (argv):
+
+	if len(argv) == 0:
+		print
+		print "Please include a valid environment name"
+		sys.exit(1)
+
+	env = argv[0]
+
+	# if not os.path.isdir( "/opt/meza/config/local-secret" ):
+	# 	os.mkdir( "/opt/meza/config/local-secret" )
+
+	if os.path.isdir( "/opt/meza/config/local-secret/" + env ):
+		print
+		print "Environment {} already exists".format(env)
+		sys.exit(1)
+
+
+
+	# Copy the template environment
+	# cp( "/opt/meza/config/core/template/template-env/blank", "/opt/meza/config/local-secret/" + env )
+
+
+	# --fqdn=
+	# --db_pass=
+	# --enable_email=
+	# --private_net_zone=
+	inputfile = ''
+	outputfile = ''
+	try:
+		opts, args = getopt.getopt(argv,"h",["help","fqdn=","db_pass=","enable_email=","private_net_zone="])
+	except getopt.GetoptError:
+		print 'meza setup env <env> [options]'
+		sys.exit(1)
+	for opt, arg in opts:
+		if opt in ("-h", "--help"):
+			# FIXME: better help
+			print 'meza setup env <env> [options]'
+			sys.exit(0)
+		elif opt == "--fqdn":
+			fqdn = arg
+		elif opt == "--db_pass":
+			# This will put the DB password on the command line, so should
+			# only be done in testing cases
+			db_pass = arg
+		elif opt == "--enable_email":
+			enable_email = arg
+		elif opt == "--private_net_zone":
+			private_net_zone = arg
+		else:
+			print "Unrecognized option " + opt
+			sys.exit(1)
+
+	if not fqdn:
+		fqdn = prompt("fqdn")
+
+	if not db_pass:
+		db_pass = prompt_secure("db_pass")
+
+	if not enable_email:
+		enable_email = prompt("enable_email")
+
+	# No need for private networking. Set to public.
+	if env == "monolith":
+		private_net_zone = "public"
+
+		# list of servers
+		load_balancers = app_servers = memcached_servers = parsoid_servers = elastic_servers = backup_servers = ['localhost']
+		db_slaves = [] # None on a monolith
+		db_master = 'localhost' # single server, e.g. just a string
+
+
+	else:
+		# list of servers
+		load_balancers = app_servers = memcached_servers = db_slaves = parsoid_servers = elastic_servers = backup_servers = ['# INSERT']
+
+		# single server, e.g. just a string
+		db_master = '# INSERT'
+
+
+	if not private_net_zone:
+		private_net_zone = prompt("private_net_zone")
+
+	import json
+	env_vars = json.dumps({
+		'env': env,
+
+		'fqdn': fqdn,
+		'enable_email': enable_email,
+		'private_net_zone': private_net_zone,
+
+		# Set all db passwords the same
+		'mysql_root_pass': db_pass,
+		'wiki_app_db_pass': db_pass,
+		'db_slave_pass': db_pass,
+
+		# Generate a random secret key
+		'wg_secret_key': random_string( num_chars=64, valid_chars= string.ascii_letters + string.digits ),
+
+		# Lists of servers
+		'load_balancers': load_balancers,
+		'app_servers': app_servers,
+		'memcached_servers': memcached_servers,
+		'db_slaves': db_slaves,
+		'parsoid_servers': parsoid_servers,
+		'elastic_servers': elastic_servers,
+		'backup_servers': backup_servers,
+
+		# Single server
+		'db_master': db_master
+	})
+
+
+	shell_cmd = playbook_cmd( "setup-env" ) + ["--extra-vars", env_vars]
+	return_code = meza_shell_exec( shell_cmd )
+
+	print
+	print "Please review your config files. Run commands:"
+	print "  sudo vi /opt/meza/config/local-secret/{}/hosts".format(env)
+	print "  sudo vi /opt/meza/config/local-secret/{}/group_vars/all.yml".format(env)
+	sys.exit(0)
+
+def meza_command_setup_dev (argv):
+	source "$m_scripts/setup-dev.sh"
+
+def meza_command_setup_dev_networking (argv):
+	???
+
+def meza_command_setup_docker (argv):
+	???
 
 def meza_command_create (argv):
 	# wiki
@@ -237,6 +358,19 @@ def check_environment(env):
 		sys.exit(1)
 
 
+
+# http://stackoverflow.com/questions/1994488/copy-file-or-directories-recursively-in-python
+def copy (src, dst):
+	import shutil, errno
+
+    try:
+        shutil.copytree(src, dst)
+    except OSError as exc: # python >2.5
+        if exc.errno == errno.ENOTDIR:
+            shutil.copy(src, dst)
+        else: raise
+
+
 if __name__ == "__main__":
    main(sys.argv[1:])
 
@@ -287,120 +421,7 @@ case "$1" in
 
 
 	setup)
-		case "$2" in
-			"env")
 
-				if [ -z "$3" ]; then
-					echo
-					echo "Please include a valid environment name"
-					exit 1;
-				fi
-
-				if [ ! -d "$m_meza/config/local-secret" ]; then
-					mkdir "$m_meza/config/local-secret"
-				fi
-
-				# If environment doesn't already exist, create it
-				if [ ! -d "$m_meza/config/local-secret/$3" ]; then
-
-					# Copy the template environment
-					cp -r "$m_meza/config/core/template/template-env/blank" "$m_meza/config/local-secret/$3"
-
-					# allow setting required params (and other params) with a file
-					if [ -f "$4" ]; then
-						source "$4"
-
-					# If required params somehow already set, use them
-					# Could be done like:
-					#   fqdn=enterprisemediawiki.org \
-					#   db_pass=1234 \
-					#   email=false \
-					#   private_net_zone=public \
-					#   meza setup env test-env
-					# This will put the DB password on the command line, so
-					# should only be done in testing cases
-					elif [ ! -z "$fqdn" ] && [ ! -z "$db_pass" ] && [ ! -z "$email" ] && [ ! -z "$private_net_zone" ]; then
-						echo "All required params defined, skipping prompts."
-					else
-						prompt "fqdn" "$MSG_prompt_fqdn"
-						prompt_secure "db_pass" "$MSG_prompt_db_password"
-						prompt "email" "$MSG_prompt_enable_email" "true"
-						if [ "$3" = "monolith" ]; then
-							private_net_zone="public"
-						else
-							prompt "private_net_zone" "$MSG_prompt_private_net_zone" "public"
-						fi
-					fi
-
-					# Make sure required params are present, or exit.
-					if [ -z "$fqdn" ]; then             echo "Missing fqdn param";             exit 1; fi;
-					if [ -z "$db_pass" ]; then          echo "Missing db_pass param";          exit 1; fi;
-					if [ -z "$email" ]; then            echo "Missing email param";            exit 1; fi;
-					if [ -z "$private_net_zone" ]; then echo "Missing private_net_zone param"; exit 1; fi;
-
-					# escape vars prior to sed
-					fqdn=$(echo "$fqdn" | sed -e 's/[\/&]/\\&/g')
-					db_pass=$(echo "$db_pass" | sed -e 's/[\/&]/\\&/g')
-					email=$(echo "$email" | sed -e 's/[\/&]/\\&/g')
-					private_net_zone=$(echo "$private_net_zone" | sed -e 's/[\/&]/\\&/g')
-
-					# Generate a random secret key
-					wg_secret_key=$(cat /dev/urandom | tr -dc "a-zA-Z0-9" | fold -w 64 | head -n 1)
-
-					sed -r -i "s/INSERT_FQDN/$fqdn/g;"                         "$m_meza/config/local-secret/$3/group_vars/all.yml"
-					sed -r -i "s/INSERT_PRIVATE_ZONE/$private_net_zone/g;"     "$m_meza/config/local-secret/$3/group_vars/all.yml"
-					sed -r -i "s/INSERT_ENABLE_EMAIL/$email/g;"                "$m_meza/config/local-secret/$3/group_vars/all.yml"
-					sed -r -i "s/INSERT_SECRET_KEY/$wg_secret_key/g;"          "$m_meza/config/local-secret/$3/group_vars/all.yml"
-
-					# All DB users used by the application (root, app, slave)
-					# have the same password. Update as required.
-					sed -r -i "s/INSERT_MYSQL_ROOT_PASS/$db_pass/g;"           "$m_meza/config/local-secret/$3/group_vars/all.yml"
-					sed -r -i "s/INSERT_WIKI_APP_DB_USER_PASSWORD/$db_pass/g;" "$m_meza/config/local-secret/$3/group_vars/all.yml"
-					sed -r -i "s/INSERT_SLAVE_PASSWORD/$db_pass/g;"            "$m_meza/config/local-secret/$3/group_vars/all.yml"
-
-					# For monolith, make the IP/domain for every part of meza
-					# be localhost. All other cases make user edit inventory
-					# (AKA "hosts") file
-					# NOTE: "INSERT_SLAVE" not in monolith list, so as not to
-					#       configure the monolith as DB master _and_ slave
-					if [ "$3" = "monolith" ]; then
-						for part in INSERT_LB INSERT_APP INSERT_MEM INSERT_MASTER INSERT_PARSOID INSERT_ES INSERT_BACKUP; do
-							sed -r -i "s/# $part/localhost/g;" "$m_meza/config/local-secret/$3/hosts"
-						done
-					else
-
-						# If any of these variables are defined, put them into inventory file
-						for INVENTORY_VARNAME in INSERT_LB INSERT_APP INSERT_MEM INSERT_MASTER INSERT_SLAVE INSERT_PARSOID INSERT_ES INSERT_BACKUP; do
-
-							# Make INVENTORY_VALUE be the value of a variable with the name in INVENTORY_VARNAME
-							# printf -v "${INVENTORY_VARNAME}" '%s' "${INVENTORY_VARNAME}"
-							eval INVENTORY_VALUE="\$$INVENTORY_VARNAME"
-
-							if [ ! -z "$INVENTORY_VALUE" ]; then
-								# Excape value before doing sed-insertion
-								INVENTORY_VALUE=$(echo "$INVENTORY_VALUE" | sed -e 's/[\/&]/\\&/g')
-								sed -r -i "s/# $INVENTORY_VARNAME/$INVENTORY_VALUE/g;" "$m_meza/config/local-secret/$3/hosts"
-							fi
-						done
-
-						echo
-						echo "Please edit your inventory file to add or confirm the proper servers."
-						echo "Run command:  sudo vi $m_meza/config/local-secret/$3/hosts"
-					fi
-
-				fi
-
-
-				;;
-			"dev")
-				"$m_scripts/setup-dev.sh"
-				;;
-			*)
-				echo "NOT A VALID SETUP COMMAND"
-				exit 1;
-				;;
-		esac
-		;;
 
 	create)
 
@@ -702,10 +723,3 @@ case "$1" in
 		esac
 		;;
 
-	# not a valid command, show help and exit with error code
-	*)
-		cat "/opt/meza/manual/meza-command-help.txt"
-		exit 1;
-		;;
-
-esac
