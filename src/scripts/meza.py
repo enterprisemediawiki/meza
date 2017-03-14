@@ -4,87 +4,77 @@
 #
 # FIXME: get commented out notes from meza.sh and make sure documented
 
-import sys, getopt
+import sys, getopt, os
 
 
-# how to do this in Python
-FIXME: source "/opt/meza/config/core/config.sh"
+def load_yaml ( filepath ):
+	import yaml
+	with open(filepath, 'r') as stream:
+		try:
+			return yaml.load(stream)
+		except yaml.YAMLError as exc:
+			print(exc)
 
 
+paths = load_yaml( "/opt/meza/config/core/paths.yml" )
 
-print 'Number of arguments:', len(sys.argv), 'arguments.'
-print 'Argument List:', str(sys.argv)
-
-
-
-
+# Hard-coded for now, because I'm not sure where to set it yet
+language = "en"
+i18n = load_yaml( os.path.join( paths['m_i18n'], language+".yml" ) )
 
 
 def main (argv):
 
 	# meza requires a command parameter. No first param, no command. Display
 	# help. Also display help if explicitly specifying help.
-	if len(argv) == 0 or argv[0] == '-h' or argv[0] == '--help':
+	if len(argv) == 0:
 		display_docs('base')
 		sys.exit(1)
+	elif argv[0] in ('-h', '--help'):
+		display_docs('base')
+		sys.exit(0) # asking for help doesn't give error code
+	elif argv[0] in ('-v', '--version'):
+		version, rc = meza_shell_exec( ["git", "--git-dir=/opt/meza/.git", "describe", "--tags" ], True )
+		print "Meza " + version.strip()
+		print "Mediawiki EZ Admin"
+		print
+		sys.exit(rc)
 
-	# Every command has a directive. No second param, no directives. Display
-	# help for that specific directive.
+
+	# Every command has a sub-command. No second param, no sub-command. Display
+	# help for that specific sub-command.
 	if len(argv) == 1:
 		display_docs(argv[0])
 		sys.exit(1)
+	elif len(argv) == 2 and argv[1] in ('--help','-h'):
+		display_docs(argv[0])
+		sys.exit(0)
 
-	FIXME source "$m_i18n/$m_language.sh"
-
-	FIXME touch "$m_local_config_file"
 
 	command = argv[0]
 	command_fn = "meza_command_{}".format( argv[0] )
 
 	# if command_fn is a valid Python function, pass it all remaining args
-	if command_fn in locals() and callable( locals()[command_fn] ):
-		locals()[command_fn]( argv[1:] )
+	if command_fn in globals() and callable( globals()[command_fn] ):
+		globals()[command_fn]( argv[1:] )
 	else:
 		print
 		print "{} is not a valid command".format(command)
 		sys.exit(1)
 
 
-def playbook_cmd ( playbook, env ):
-	command = ['sudo', '-u', 'meza-ansible', 'ansible-playbook',
-		'/opt/meza/src/playbooks/{}.yml'.format(playbook)]
-	if env:
-		host_file = "/opt/meza/config/local-secret/{}/hosts".format(env)
-		command = command + [ '-i', host_file, "--extra-vars", "env="+env ]
-	return command
-
-# FIXME install --> setup dev-networking, setup docker, deploy monolith (special case)
-
-def meza_shell_exec ( shell_cmd ):
-
-	# FIXME
-	# Get errors with user meza-ansible trying to write to the calling-user's
-	# home directory if don't cd to a neutral location. FIXME.
-	starting_wd = os.getcwd()
-	os.chdir( "/opt/meza/config/core" )
-
-	import subprocess
-	child = subprocess.Popen(shell_cmd, stdout=subprocess.PIPE)
-	print child.communicate()[0]
-	rc = child.returncode
-
-	# FIXME: See above
-	os.chdir( starting_wd )
-
-	return rc
-
-
 def meza_command_deploy (argv):
 
 	env = argv[0]
 
-	# first param to deploy should be environment
-	check_environment(env)
+	rc = check_environment(env)
+
+	# return code != 0 means failure
+	if rc != 0:
+		if env == "monolith":
+			meza_command_setup_env(env, True)
+		else:
+			sys.exit(rc)
 
 	# This breaks continuous integration. FIXME to get it back.
 	# THIS WAS WRITTEN WHEN `meza` WAS A BASH SCRIPT
@@ -119,42 +109,27 @@ def meza_command_setup (argv):
 	command_fn = "meza_command_setup_" + argv[0]
 
 	# if command_fn is a valid Python function, pass it all remaining args
-	if command_fn in locals() and callable( locals()[command_fn] ):
-		locals()[command_fn]( argv[1:] )
+	if command_fn in globals() and callable( globals()[command_fn] ):
+		globals()[command_fn]( argv[1:] )
 	else:
 		print
 		print sub_command + " is not a valid sub-command for setup"
 		sys.exit(1)
 
-def meza_command_setup_env (argv):
-
-	if len(argv) == 0:
-		print
-		print "Please include a valid environment name"
-		sys.exit(1)
+# FIXME: This function is big.
+def meza_command_setup_env (argv, return_not_exit=False):
 
 	env = argv[0]
 
 	# if not os.path.isdir( "/opt/meza/config/local-secret" ):
-	# 	os.mkdir( "/opt/meza/config/local-secret" )
+	#   os.mkdir( "/opt/meza/config/local-secret" )
 
 	if os.path.isdir( "/opt/meza/config/local-secret/" + env ):
 		print
 		print "Environment {} already exists".format(env)
 		sys.exit(1)
 
-
-
-	# Copy the template environment
-	# cp( "/opt/meza/config/core/template/template-env/blank", "/opt/meza/config/local-secret/" + env )
-
-
-	# --fqdn=
-	# --db_pass=
-	# --enable_email=
-	# --private_net_zone=
-	inputfile = ''
-	outputfile = ''
+	fqdn = db_pass = enable_email = private_net_zone = False
 	try:
 		opts, args = getopt.getopt(argv,"h",["help","fqdn=","db_pass=","enable_email=","private_net_zone="])
 	except getopt.GetoptError:
@@ -209,7 +184,7 @@ def meza_command_setup_env (argv):
 	if not private_net_zone:
 		private_net_zone = prompt("private_net_zone")
 
-	import json
+	import json, string
 	env_vars = json.dumps({
 		'env': env,
 
@@ -238,86 +213,265 @@ def meza_command_setup_env (argv):
 		'db_master': db_master
 	})
 
+	# Create temporary extra vars file in local-secret directory so passwords
+	# are not written to command line. Putting in local-secret should make
+	# permissions acceptable since this dir will hold secret info, though it's
+	# sort of an odd place for a temporary file. Perhaps /root instead?
+	extra_vars_file = "/opt/meza/config/local-secret/temp_vars.json"
+	if os.path.isfile(extra_vars_file):
+		os.remove(extra_vars_file)
+	f = open(extra_vars_file, 'w')
+	f.write(env_vars)
+	f.close()
 
-	shell_cmd = playbook_cmd( "setup-env" ) + ["--extra-vars", env_vars]
-	return_code = meza_shell_exec( shell_cmd )
+	shell_cmd = playbook_cmd( "setup-env" ) + ["--extra-vars", '@'+extra_vars_file]
+	rc = meza_shell_exec( shell_cmd )
+
+	os.remove(extra_vars_file)
 
 	print
 	print "Please review your config files. Run commands:"
 	print "  sudo vi /opt/meza/config/local-secret/{}/hosts".format(env)
 	print "  sudo vi /opt/meza/config/local-secret/{}/group_vars/all.yml".format(env)
-	sys.exit(0)
+
+	if return_not_exit:
+		return rc
+	else:
+		sys.exit(rc)
 
 def meza_command_setup_dev (argv):
-	source "$m_scripts/setup-dev.sh"
+	rc = meza_shell_exec(["bash","/opt/meza/src/scripts/setup-dev.sh"])
+	sys.exit(rc)
 
 def meza_command_setup_dev_networking (argv):
-	???
+	rc = meza_shell_exec(["bash","/opt/meza/src/scripts/dev-networking.sh"])
+	sys.exit(rc)
 
 def meza_command_setup_docker (argv):
-	???
+	shell_cmd = playbook_cmd( "getdocker" )
+	rc = meza_shell_exec( shell_cmd )
+	sys.exit(0)
 
 def meza_command_create (argv):
-	# wiki
-	# wiki-promptless
-	print "not yet built"
 
+	sub_command = argv[0]
+
+	if sub_command in ("wiki", "wiki-promptless"):
+
+		if len(argv) < 2:
+			print "You must specify an environment: 'meza create wiki ENV'"
+			sys.exit(1)
+
+		env = argv[1]
+
+		rc = check_environment(env)
+		if rc > 0:
+			sys.exit(rc)
+
+		playbook = "create-" + sub_command
+
+		if sub_command == "wiki-promptless":
+			if len(argv) < 4:
+				print "create wiki-promptless requires wiki_id and wiki_name arguments"
+				sys.exit(1)
+			shell_cmd = playbook_cmd( playbook, env, { 'wiki_id': argv[2], 'wiki_name': argv[3] } )
+		else:
+			shell_cmd = playbook_cmd( playbook, env )
+
+		rc = meza_shell_exec( shell_cmd )
+		sys.exit(rc)
 
 def meza_command_backup (argv):
-	print "not yet built"
+
+	env = argv[0]
+
+	rc = check_environment(env)
+	if rc != 0:
+		sys.exit(rc)
+
+	shell_cmd = playbook_cmd( 'backup', env ) + argv[1:]
+	rc = meza_shell_exec( shell_cmd )
+
+	sys.exit(rc)
 
 
 def meza_command_destroy (argv):
-	print "not yet built"
+	print "command not yet built"
 
 
 def meza_command_update (argv):
-	print "not yet built"
+	print "command not yet built"
 
-
+# FIXME: It would be great to have this function automatically map all scripts
+# in MediaWiki's maintenance directory to all wikis. Then you could do:
+#   $ meza maint runJobs + argv            --> run jobs on all wikis
+#   $ meza maint createAndPromote + argv   --> create a user on all wikis
 def meza_command_maint (argv):
-	print "not yet built"
+
+		if argv[0] != "runJobs":
+			print "Currently the only maint command is 'runJobs'"
+			print "  meza maint runJobs"
+			sys.exit(1)
+
+		# FIXME: This has no notion of environments
+
+		#
+		# WARNING: THIS FUNCTION SHOULD STILL WORK ON MONOLITHS, BUT HAS NOT BE
+		#          RE-TESTED SINCE MOVING TO ANSIBLE. FOR NON-MONOLITHS IT WILL
+		#          NOT WORK AND NEEDS TO BE ANSIBLE-IZED. FIXME.
+		#
+
+		wikis_dir = "/opt/meza/htdocs/wikis"
+		wikis = os.listdir( wikis_dir )
+		for i in wikis:
+			if os.path.isdir(os.path.join(wikis_dir, i)):
+				anywiki=i
+				break
+
+		if not anywiki:
+			print "No wikis available to run jobs"
+			sys.exit(1)
+
+		shell_cmd = ["WIKI="+anywiki, "php", "/opt/meza/src/scripts/runAllJobs.php"]
+		if len(argv) > 1:
+			shell_cmd = shell_cmd + ["--wikis="+argv[1]]
+		rc = meza_shell_exec( shell_cmd )
+
+		sys.exit(rc)
 
 
 def meza_command_docker (argv):
-	print "not yet built"
+
+	if argv[0] == "run":
+
+		if len(argv) == 1:
+			docker_repo = "jamesmontalvo3/meza-docker-test-max:latest"
+		else:
+			docker_repo = argv[1]
+
+		rc = meza_shell_exec([ "bash", "/opt/meza/src/scripts/build-docker-container.sh", docker_repo])
+		sys.exit(rc)
+
+
+	elif argv[0] == "exec":
+
+		if len(argv) < 2:
+			print "Please provide docker container id"
+			meza_shell_exec(["docker", "ps" ])
+			sys.exit(1)
+		else:
+			container_id = argv[1]
+
+		if len(argv) < 3:
+			print "Please supply a command for your container"
+			sys.exit(1)
+
+		shell_cmd = ["docker","exec","--tty",container_id,"env","TERM=xterm"] + argv[2:]
+		rc = meza_shell_exec( shell_cmd )
+
+	else:
+		print argv[0] + " is not a valid command"
+		sys.exit(1)
 
 
 
+def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
+	command = ['sudo', '-u', 'meza-ansible', 'ansible-playbook',
+		'/opt/meza/src/playbooks/{}.yml'.format(playbook)]
+	if env:
+		host_file = "/opt/meza/config/local-secret/{}/hosts".format(env)
+		command = command + [ '-i', host_file ]
+		extra_vars = { 'env': env }
 
+	else:
+		extra_vars = {}
 
+	if more_extra_vars:
+		for varname, value in more_extra_vars.iteritems():
+			extra_vars[varname] = value
 
+	if len(extra_vars) > 0:
+		import json
+		command = command + ["--extra-vars", "'{}'".format(json.dumps(extra_vars))]
 
+	return command
 
+# FIXME install --> setup dev-networking, setup docker, deploy monolith (special case)
+
+def meza_shell_exec ( shell_cmd, return_output=False ):
+
+	# FIXME
+	# Get errors with user meza-ansible trying to write to the calling-user's
+	# home directory if don't cd to a neutral location. FIXME.
+	starting_wd = os.getcwd()
+	os.chdir( "/opt/meza/config/core" )
+
+	# import subprocess
+	# # child = subprocess.Popen(shell_cmd, stdout=subprocess.PIPE)
+	# child = subprocess.Popen(shell_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	# if return_output:
+	# 	output = child.communicate()[0]
+	# else:
+	# 	print child.communicate()[0]
+	# rc = child.returncode
+
+	cmd = ' '.join(shell_cmd)
+	print cmd
+	rc = os.system(cmd)
+
+	# FIXME: See above
+	os.chdir( starting_wd )
+
+	if return_output:
+		return ( output, rc )
+	else:
+		return rc
 
 
 def display_docs(name):
 	f = open('/opt/meza/manual/meza-cmd/{}.txt'.format(name),'r')
-	f.read()
+	print f.read()
 
-def prompt(varname,default):
+def prompt(varname,default=False):
+
+	# Pretext message is prior to the actual line the user types on. Input msg
+	# is on the same line and will be repeated if the user does not give good
+	# input
+	pretext_msg = i18n["MSG_prompt_pretext_"+varname]
+	input_msg = i18n["MSG_prompt_input_"+varname]
+
 	print
-	print FIXME i18n pretext
-	FIXME[varname] = input( FIXME i18n varname )
+	print pretext_msg
+
+	value = raw_input( input_msg )
 	if default:
 		# If there's a default, either use user entry or default
-		FIXME[varname] = FIXME[varname] or default
+		value = value or default
 	else:
 		# If no default, keep asking until user supplies a value
-		while (not FIXME[varname]):
-			FIXME[varname] = input( FIXME i18n varname )
+		while (not value):
+			value = raw_input( input_msg )
 
+	return value
 
 def prompt_secure(varname):
 	import getpass
 
+	# See prompt() for more info
+	pretext_msg = i18n["MSG_prompt_pretext_"+varname]
+	input_msg = i18n["MSG_prompt_input_"+varname]
+
 	print
-	print FIXME i18n pretext
-	FIXME[varname] = getpass.getpass( FIXME i18n varname )
-	if not FIXME[varname]:
-		FIXME[varname] = random_string()
+	print pretext_msg
+
+	value = getpass.getpass( input_msg )
+	if not value:
+		value = random_string()
+
+	return value
 
 def random_string(**params):
+	import string, random
 
 	if 'num_chars' in params:
 		num_chars = params['num_chars']
@@ -326,13 +480,13 @@ def random_string(**params):
 
 	if 'valid_chars' in params:
 		valid_chars = params['valid_chars']
-	else
+	else:
 		valid_chars = string.ascii_letters + string.digits + '!@$%^*'
 
 	return ''.join(random.SystemRandom().choice(valid_chars) for _ in range(num_chars))
 
 
-
+# return code 0 success, 1+ failure
 def check_environment(env):
 	import os
 
@@ -349,377 +503,28 @@ def check_environment(env):
 		for valid_env in valid_envs:
 			print valid_env
 
-		sys.exit(1)
+		return 1
 
 	host_file = os.path.join( env_dir, "hosts" )
 	if not os.path.isfile( host_file ):
 		print
 		print "{} not a valid file".format( host_file )
-		sys.exit(1)
+		return 1
 
-
+	return 0
 
 # http://stackoverflow.com/questions/1994488/copy-file-or-directories-recursively-in-python
 def copy (src, dst):
 	import shutil, errno
 
-    try:
-        shutil.copytree(src, dst)
-    except OSError as exc: # python >2.5
-        if exc.errno == errno.ENOTDIR:
-            shutil.copy(src, dst)
-        else: raise
+	try:
+		shutil.copytree(src, dst)
+	except OSError as exc: # python >2.5
+		if exc.errno == errno.ENOTDIR:
+			shutil.copy(src, dst)
+		else: raise
 
 
 if __name__ == "__main__":
-   main(sys.argv[1:])
-
-
-
-
-
-case "$1" in
-	install)
-
-		case "$2" in
-			"dev-networking")
-				source "$m_scripts/dev-networking.sh"
-				exit 0;
-				;;
-			"monolith")
-
-				# If a "monolith" environment doesn't already exist, create one
-				if [ ! -d "$m_meza/config/local-secret/monolith" ]; then
-
-					# Prompt for domain, DB password, whether to enable email
-					# Skip prompts for private net zone (no need in monolith)
-					private_net_zone=public meza setup env monolith
-
-				fi
-
-				meza deploy monolith ${@:3}
-
-				exit $?;
-				;;
-
-			"docker")
-				# Local playbook only, doesn't need to be run by meza-ansible user
-				ansible-playbook /opt/meza/src/playbooks/getdocker.yml
-				;;
-
-			# Perhaps consider common setups like:
-			# "monolith-with-remote-db-master")
-			# "monolith-with-remote-db-slave")
-			# "duolith" <-- two mega servers, identical, except one has slave DB
-			# "triolith" <-- three mega servers, identical, two with slave DBs
-			*)
-				echo "NOT A VALID INSTALL COMMAND"
-				exit 1;
-				;;
-		esac
-		;;
-
-
-	setup)
-
-
-	create)
-
-		case "$2" in
-			"wiki" | "wiki-promptless")
-
-				if [ ! -z "$3" ]; then
-					environment="$3"
-				else
-					echo
-					echo "You must specify an environment: 'meza create wiki ENV'"
-					exit 1;
-				fi
-
-				check_environment "$environment"
-				host_file="/opt/meza/config/local-secret/$environment/hosts"
-
-				# Get errors with user meza-ansible trying to write to the calling-user's
-				# home directory if don't cd to a neutral location. FIXME.
-				starting_wd=`pwd`
-				cd /opt/meza/config/core
-
-				if [ "$2" == "wiki-promptless" ]; then
-					if [ -z "$4" ]; then echo "Please specify a wiki ID"; exit 1; fi
-					if [ -z "$5" ]; then echo "Please specify a wiki name"; exit 1; fi
-					playbook="create-wiki-promptless.yml"
-					sudo -u meza-ansible ansible-playbook "/opt/meza/src/playbooks/$playbook" -i "$host_file" --extra-vars "env=$environment wiki_id=$4 wiki_name='$5'" ${@:6}
-				else
-					playbook="create-wiki.yml"
-					sudo -u meza-ansible ansible-playbook "/opt/meza/src/playbooks/$playbook" -i "$host_file" --extra-vars "env=$environment" ${@:4}
-				fi
-
-				cd "$starting_wd"
-				exit 0;
-
-				;;
-
-			*)
-				echo "Not a valid CREATE command"
-				exit 1;
-				;;
-		esac
-		;;
-
-	backup)
-
-		if [ ! -z "$2" ]; then
-			environment="$2"
-		else
-			echo
-			echo "You must specify an environment: 'meza backup ENV'"
-			exit 1;
-		fi
-
-		check_environment "$environment"
-		host_file="/opt/meza/config/local-secret/$environment/hosts"
-
-		# Get errors with user meza-ansible trying to write to the calling-user's
-		# home directory if don't cd to a neutral location. FIXME.
-		starting_wd=`pwd`
-		cd /opt/meza/config/core
-		sudo -u meza-ansible ansible-playbook "/opt/meza/src/playbooks/backup.yml" -i "$host_file" --extra-vars "env=$environment" ${@:3}
-		cd "$starting_wd"
-		exit 0;
-
-		;;
-
-	destroy)
-		echo "This function not created yet"
-		exit 1;
-		;;
-
-	update)
-		echo "This function not created yet"
-		exit 1;
-		;;
-
-	config)
-
-		#
-		# WARNING: THIS FUNCTION IS NOT USED ANYMORE AFAIK. IT WILL BE REMOVED
-		# WHEN THAT IS CONFIRMED. FIXME.
-		#
-
-		# $2 is key
-		# $3 is optional, and is value to set to key
-		if [ ! -f "$m_local_config_file" ]; then
-			# No local config file; create one.
-			echo -e "#!/bin/sh\n#\n# Local config overriding /opt/meza/config/core/config.sh\n" > "$m_local_config_file"
-		fi
-
-		source "$m_local_config_file"
-		var_name="$2"
-		new_val="$3"
-		eval current_val=\$$var_name
-
-		# No value, so just getting value
-		if [ -z "$new_val" ]; then
-			# no current value, so nothing to get
-			if [ -z "$current_val" ]; then
-				exit 1; # exit with failure exit code
-			else
-				echo "$current_val"
-				exit 0;
-			fi
-		else
-
-			# for not echoing values in terminal, for passwords and such
-			quiet="$4"
-			if [ "$quiet" = "quiet" ]; then
-				print_new_val="<hidden-value>"
-				print_current_val="<hidden-value>"
-			else
-				print_new_val="$new_val"
-				print_current_val="$current_val"
-			fi
-
-			eval "$var_name=\"$new_val\""
-			var_in_config_file=`grep "^$var_name=" "$m_local_config_file"`
-
-			if [ "$current_val" = "$new_val" ]; then
-				echo "'$var_name' already set to '$print_current_val' in $m_local_config_file"
-				echo
-
-			elif [ -z "$var_in_config_file" ]; then
-				# var_name not already in config.local.sh, append it
-				echo -e "\n\n$var_name=\"$new_val\"\n" >> "$m_local_config_file"
-
-				echo "Adding '$var_name' value '$print_new_val' to $m_local_config_file"
-				echo
-
-			else
-				# var_name already present, replace it
-				sed -i "s/^$var_name=.*$/$var_name=\"$new_val\"/g" "$m_local_config_file"
-
-				echo "Changing '$var_name' value in $m_local_config_file"
-				echo "  FROM: '$print_current_val'"
-				echo "  TO:   '$print_new_val'"
-				echo
-			fi
-
-		fi
-		;;
-
-	prompt)
-
-		#
-		# WARNING: THIS FUNCTION IS NOT USED ANYMORE AFAIK. IT WILL BE REMOVED
-		# WHEN THAT IS CONFIRMED. FIXME.
-		#
-
-		# $1 = prompt
-		prompt_var="$2"
-		prompt_description="$3 and press [ENTER]:"
-		prompt_prefill="$4"
-
-		source "$m_local_config_file"
-		eval prompt_value=\$$prompt_var
-
-
-		while [ -z "$prompt_value" ]; do
-
-			echo -e "\n$prompt_description"
-
-			# If $prompt_prefill not null/empty/""
-			if [ -n "$prompt_prefill" ]; then
-
-				# If prefill suggestion given, display it and prompt user for changes
-				read -e -i "$prompt_prefill" prompt_value
-
-			else
-				# no prefill, force user to enter
-				read -e prompt_value
-			fi
-
-		done
-
-		meza config "$prompt_var" "$prompt_value"
-		;;
-
-	prompt_default_on_blank)
-
-		#
-		# WARNING: THIS FUNCTION IS NOT USED ANYMORE AFAIK. IT WILL BE REMOVED
-		# WHEN THAT IS CONFIRMED. FIXME.
-		#
-
-		# $1 = prompt
-		prompt_var="$2"
-		prompt_description="$3 and press [ENTER]:"
-		prompt_default="$4"
-
-		source "$m_local_config_file"
-		eval prompt_value=\$$prompt_var
-
-		if [ -z "$prompt_value" ]; then
-
-			echo -e "\n$prompt_description"
-			read prompt_value
-
-			prompt_value=${prompt_value:-$prompt_default}
-		fi
-
-		meza config "$prompt_var" "$prompt_value"
-		;;
-
-	prompt_secure)
-
-		#
-		# WARNING: THIS FUNCTION IS NOT USED ANYMORE AFAIK. IT WILL BE REMOVED
-		# WHEN THAT IS CONFIRMED. FIXME.
-		#
-
-		# $1 = prompt
-		prompt_var="$2"
-
-		source "$m_local_config_file"
-		eval prompt_value=\$$prompt_var
-
-		if [ -z "$prompt_value" ]; then
-
-			# Generate a password
-			gen_password_length=${4:-32} # get password length from $4 or use default 32
-			def_chars="a-zA-Z0-9\!@#\$%^&*"
-			gen_password_chars=${5:-$def_chars} # get allowable chars from $5 or use default
-			gen_password=`cat /dev/urandom | tr -dc "$gen_password_chars" | fold -w $gen_password_length | head -n 1`
-
-			prompt_description="$3 and press [ENTER]:\n(or leave blank to generate $gen_password_length-character password)"
-
-			echo -e "\n$prompt_description"
-			read -s prompt_value
-
-			prompt_value=${prompt_value:-$gen_password}
-
-		fi
-
-		meza config "$prompt_var" "$prompt_value" quiet
-		;;
-
-	maint)
-
-		#
-		# WARNING: THIS FUNCTION SHOULD STILL WORK ON MONOLITHS, BUT HAS NOT BE
-		#          RE-TESTED SINCE MOVING TO ANSIBLE. FOR NON-MONOLITHS IT WILL
-		#          NOT WORK AND NEEDS TO BE ANSIBLE-IZED. FIXME.
-		#
-
-		case "$2" in
-			"jobs")
-				anywiki=`ls -d /opt/meza/htdocs/wikis/*/ | tail -1`
-				anywiki=`basename $anywiki`
-				if [ ! -z "$3" ]; then
-					WIKI="$anywiki" php "$m_scripts/runAllJobs.php" "--wikis=$3"
-				else
-					WIKI="$anywiki" php "$m_scripts/runAllJobs.php"
-				fi
-				exit 0;
-				;;
-
-			*)
-				echo "Not a valid MAINT command"
-				exit 1;
-				;;
-		esac
-		;;
-
-	docker)
-		case "$2" in
-			"run")
-				if [ -z "$3" ]; then
-					docker_repo="jamesmontalvo3/meza-docker-test-max:latest"
-				else
-					docker_repo="$3"
-				fi
-				bash "$m_scripts/build-docker-container.sh" "$docker_repo"
-				exit 0;
-				;;
-			"exec")
-				if [ -z "$3" ]; then
-					echo "Please provide docker container id"
-					docker ps
-					exit 1;
-				else
-					container_id="$3"
-				fi
-
-				if [ -z "$4" ]; then
-					echo "Please supply a command for your container"
-					exit 1;
-				fi
-
-				docker_exec=( docker exec --tty "$container_id" env TERM=xterm )
-				${docker_exec[@]} ${@:4}
-				;;
-			*)
-				echo "$2 not a valid command"
-				exit 1;
-				;;
-		esac
-		;;
+	main(sys.argv[1:])
 
