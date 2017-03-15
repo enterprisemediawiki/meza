@@ -34,10 +34,10 @@ ${docker_exec[@]} mv /opt/mediawiki /opt/meza/htdocs/mediawiki || true
 # Get IP of docker image
 docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$container_id")
 
-${docker_exec[@]} fqdn="${docker_ip}" db_pass=1234 email=false private_net_zone=public meza setup env monolith
+${docker_exec[@]} meza setup env monolith --fqdn="${docker_ip}" --db_pass=1234 --enable_email=false --private_net_zone=public
 
 # Now that environment monolith is setup, deploy/install it
-${docker_exec[@]} meza install monolith
+${docker_exec[@]} meza deploy monolith
 
 echo "Container setup with id ="
 echo "$container_id"

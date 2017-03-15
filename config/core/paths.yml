@@ -6,6 +6,7 @@ m_meza: /opt/meza
 
 # config dir
 m_config: /opt/meza/config
+m_local_secret: /opt/meza/config/local-secret
 m_local_public: /opt/meza/config/local-public
 m_local_app: /opt/meza/config/local_app
 
