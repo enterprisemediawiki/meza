@@ -264,7 +264,7 @@ def meza_command_setup_dev (argv):
 
 	print "To setup SFTP in Sublime Text, see:"
 	print "https://wbond.net/sublime_packages/sftp/settings#Remote_Server_Settings"
-	sys.exit(rc)
+	sys.exit()
 
 
 def meza_command_setup_dev_networking (argv):
