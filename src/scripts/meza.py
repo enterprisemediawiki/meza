@@ -240,8 +240,32 @@ def meza_command_setup_env (argv, return_not_exit=False):
 		sys.exit(rc)
 
 def meza_command_setup_dev (argv):
-	rc = meza_shell_exec(["bash","/opt/meza/src/scripts/setup-dev.sh"])
+
+	dev_users          = prompt("dev_users")
+	dev_git_user       = prompt("dev_git_user")
+	dev_git_user_email = prompt("dev_git_user_email")
+
+	for dev_user in dev_users.split(' '):
+		os.system( "sudo -u {} git config --global user.name '{}'".format( dev_user, dev_git_user ) )
+		os.system( "sudo -u {} git config --global user.email {}".format( dev_user, dev_git_user_email ) )
+		os.system( "sudo -u {} git config --global color.ui true".format( dev_user ) )
+
+	# ref: https://www.liquidweb.com/kb/how-to-install-and-configure-vsftpd-on-centos-7/
+	os.system( "yum -y install vsftpd" )
+	os.system( "sed -r -i 's/anonymous_enable=YES/anonymous_enable=NO/g;' /etc/vsftpd/vsftpd.conf" )
+	os.system( "sed -r -i 's/local_enable=NO/local_enable=YES/g;' /etc/vsftpd/vsftpd.conf" )
+	os.system( "sed -r -i 's/write_enable=NO/write_enable=YES/g;' /etc/vsftpd/vsftpd.conf" )
+
+	# Start FTP and setup firewall
+	os.system( "systemctl restart vsftpd" )
+	os.system( "systemctl enable vsftpd" )
+	os.system( "firewall-cmd --permanent --add-port=21/tcp" )
+	os.system( "firewall-cmd --reload" )
+
+	print "To setup SFTP in Sublime Text, see:"
+	print "https://wbond.net/sublime_packages/sftp/settings#Remote_Server_Settings"
 	sys.exit(rc)
+
 
 def meza_command_setup_dev_networking (argv):
 	rc = meza_shell_exec(["bash","/opt/meza/src/scripts/dev-networking.sh"])

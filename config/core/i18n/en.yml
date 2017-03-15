@@ -1,6 +1,6 @@
 ---
 
-# PROMPTS
+# PROMPTS: setup environment
 MSG_prompt_pretext_fqdn: "Type the domain or IP address you'll use to get to your wiki and press [enter]"
 MSG_prompt_input_fqdn: "Domain or IP address: "
 
@@ -13,6 +13,18 @@ MSG_prompt_input_enable_email: "Send emails? true or false: "
 MSG_prompt_pretext_private_net_zone: "Type the private networking zone for your server and press [enter]"
 MSG_prompt_input_private_net_zone: "Private networking zone: "
 
+
+# PROMPTS: setup dev
+MSG_prompt_pretext_dev_users: "Type users who use Git separated by spaces, e.g. 'root james', and press [enter]"
+MSG_prompt_input_dev_users: "System users using Git: "
+
+MSG_prompt_pretext_dev_git_user: "Type full name of git user and press [enter]"
+MSG_prompt_input_dev_git_user: "Full name: "
+
+MSG_prompt_pretext_dev_git_user_email: "Type e-mail address of git user and press [enter]"
+MSG_prompt_input_dev_git_user_email: "E-mail: "
+
+
 # Maybe not used prompts
 MSG_prompt_mysql_root_pass: "Type your desired MySQL root password"
 MSG_prompt_db_password: "Type password for database"
@@ -24,9 +36,5 @@ MSG_prompt_db_server_ips: "Type space-separated list of database-server IP addre
 MSG_prompt_db_slave_password: "Type the password used by replication (slave) servers"
 MSG_prompt_db_slave_id: "Each replication (slave) server needs a unique ID greater than 1. Pick a number"
 
-# PROMPTS: DEV
-MSG_prompt_dev_users: "Type space-separated list of this server's users to apply settings to"
-MSG_prompt_dev_git_user: "Type full name of git user"
-MSG_prompt_dev_git_user_email: "Type email address of git user"
 
 
