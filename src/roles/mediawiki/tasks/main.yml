@@ -28,6 +28,11 @@
     dest: "{{ m_mediawiki }}/skins/Vector"
     version: "REL1_27"
 
+- name: Get MediaWiki core extensions list for composer.local.json and LocalSettings.php
+  include_vars:
+    file: "{{ m_meza }}/src/roles/mediawiki/files/base-extensions.yml"
+    name: meza_core_extensions
+
 - name: Put composer.local.json in place to load composer-supported extensions
   template:
     src: composer.local.json.j2
@@ -80,6 +85,10 @@
   ignore_errors: yes
 
 
+- name: Ensure MezaCoreExtensions.php in place
+  template:
+    src: load-extensions-template.php.j2
+    dest: "{{ m_local_app }}/MezaCoreExtensions.php"
 
 - name: Ensure LocalSettings.php in place
   template:
@@ -131,7 +140,24 @@
   include_role:
     name: load-extensions-from-file
   vars:
-    extfile: "{{ m_local_public }}/all-wiki-more-extensions.yml"
+    extfile: "{{ m_local_public }}/MezaLocalExtensions.yml"
+
+- name: Get local all-wiki extensions list for FIXME.php
+  include_vars:
+    file: "{{ m_local_public }}/MezaLocalExtensions.yml"
+    name: meza_local_extensions
+
+- name: Ensure MezaLocalExtensions.php in place
+  template:
+    src: MezaLocalExtensions.php.j2
+    dest: "{{ m_local_app }}/MezaLocalExtensions.php"
+
+
+
+
+
+
+
 
 - name: Get individual wikis dirs
   find:
@@ -139,15 +165,6 @@
     file_type: directory
   register: wikis_dirs
   delegate_to: localhost
-
-- name: loop over wikis, install wiki-specific extensions
-  include_role:
-    name: load-extensions-from-file
-  vars:
-    extfile: "{{ item.path }}/this-wiki-more-extensions.yml"
-  with_items: "{{ wikis_dirs.files }}"
-
-
 
 #
 # Check that all wikis in config are present on app and DB servers
