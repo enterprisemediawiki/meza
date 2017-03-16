@@ -36,4 +36,4 @@ fi
 
 
 echo "meza command installed. Use it:"
-echo "  sudo meza install monolith"
+echo "  sudo meza deploy monolith"
