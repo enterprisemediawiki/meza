@@ -17,7 +17,8 @@
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/core.git
     dest: "{{ m_mediawiki }}"
     version: "1.27.1"
-
+  tags:
+    - latest
 
 
 #
@@ -101,6 +102,9 @@
     working_dir: "{{ m_mediawiki }}"
   # FIXME: need ignore_errors because composer throws an error when running as root.
   ignore_errors: yes
+  tags:
+    - composer-extensions
+    - latest
 
 # install doesn't appear to do extensions
 - name: Run composer update on MediaWiki for extensions
@@ -109,15 +113,9 @@
     working_dir: "{{ m_mediawiki }}"
   # FIXME: need ignore_errors because composer throws an error when running as root.
   ignore_errors: yes
-
-# FIXME: VE has dependencies installed via Git submodules. In the same way
-#        extensions marked with composer_merge=True can be added to
-#        composer.local.json, extensions with Git submodules should be able to
-#        mark git_submodules=True to automatically install
-# - name: VisualEditor git submodule update --init
-#   shell: |
-#     cd "{{ m_mediawiki }}/extensions/VisualEditor"
-#     git submodule update --init
+  tags:
+    - composer-extensions
+    - latest
 
 - name: Ensure Git submodule requirements met for core meza extensions
   shell: |
@@ -138,22 +136,6 @@
   tags:
     - git-submodules
     - latest
-
-
-# FIXME: Remove commented-out lines below after confirming composer-merge
-#        working in composer.local.json
-# - name: Composer install Elastica dependencies
-#   composer:
-#     command: install
-#     working_dir: "{{ m_mediawiki }}/extensions/Elastica"
-#   # FIXME: need ignore_errors because composer throws an error when running as root.
-#   ignore_errors: yes
-# - name: Composer install SyntaxHighlight_GeSHi dependencies
-#   composer:
-#     command: install
-#     working_dir: "{{ m_mediawiki }}/extensions/SyntaxHighlight_GeSHi"
-#   # FIXME: need ignore_errors because composer throws an error when running as root.
-#   ignore_errors: yes
 
 
 

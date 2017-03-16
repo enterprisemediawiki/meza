@@ -42,7 +42,6 @@
   with_items:
     - favicon.ico
     - logo.png
-    - this-wiki-more-extensions.yml
   delegate_to: localhost
   run_once: true
 
