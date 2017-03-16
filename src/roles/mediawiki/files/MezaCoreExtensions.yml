@@ -106,6 +106,7 @@ list:
   - name: SyntaxHighlight_GeSHi
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SyntaxHighlight_GeSHi.git
     version: REL1_27
+    composer_merge: True
   - name: InputBox
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/InputBox.git
     version: REL1_27
@@ -126,6 +127,7 @@ list:
   - name: VisualEditor
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git
     version: REL1_27
+    git_submodules: True
     config: |
       // Parsoid servers are defined based upon Ansible hosts file and thus
       // cannot be easily added to base-extensions.yml. As such, VisualEditor config
@@ -133,6 +135,7 @@ list:
   - name: Elastica
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Elastica.git
     version: REL1_27
+    composer_merge: True
   - name: Thanks
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Thanks.git
     version: REL1_27

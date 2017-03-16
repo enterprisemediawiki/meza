@@ -1,42 +1,96 @@
 ---
 
+#
+# SYNC CONFIGS
+#
 - name: Sync configuration between controller and app servers
   include_role:
     name: sync-configs
 
+
+
+#
+# MEDIAWIKI CORE
+#
 - name: Ensure proper MediaWiki git version installed
   git:
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/core.git
     dest: "{{ m_mediawiki }}"
     version: "1.27.1"
 
-# The following was required for MediaWiki 1.25.5, and appears fixed in 1.25.6+
-#
-# Before composer-merge-plugin v1.2.0, MW incorrectly required
-# v1.0.0 of the Composer internal composer-plugin-api component.
-# Composer recently bumped this internal version to v1.1.0 [0].
-# A patch to MW is in work, but this is required to keep meza
-# building properly.
-#
-# [0]: https://github.com/composer/composer/commit/aeafe2fe59992efd1bc3f890b760f1a9c4874e1c
-#
-# Replace v1.0.0 with v1.3.1 of wikimedia/composer-merge-plugin in composer.json
-# sed -r -i 's/"wikimedia\/composer-merge-plugin": "1.0.0",/"wikimedia\/composer-merge-plugin": "1.3.1",/;' "$m_mediawiki/composer.json"
 
 
-
+#
+# SKINS
+#
+# FIXME: Add skins in Meza(Core|Local)Extensions.yml
 - name: Ensure Vector skin installed
   git:
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git
     dest: "{{ m_mediawiki }}/skins/Vector"
     version: "REL1_27"
 
-- name: Get MediaWiki core extensions list for composer.local.json and LocalSettings.php
+
+
+#
+# EXTENSIONS
+#
+- name: Set variable holding list of core extensions
   include_vars:
-    file: "{{ m_meza }}/src/roles/mediawiki/files/base-extensions.yml"
+    file: "{{ m_meza }}/src/roles/mediawiki/files/MezaCoreExtensions.yml"
     name: meza_core_extensions
 
-- name: Put composer.local.json in place to load composer-supported extensions
+- name: Set variable holding list of local extensions
+  include_vars:
+    file: "{{ m_local_public }}/MezaLocalExtensions.yml"
+    name: meza_local_extensions
+
+# FIXME: REMOVE commented-out items below AND role "load-extensions-from-file"
+#        after confirming functionality of single-task, non-role method below
+# - name: Ensure core meza extensions installed (non-Composer)
+#   include_role:
+#     name: load-extensions-from-file
+#   vars:
+#     extfile: "{{ m_meza }}/src/roles/mediawiki/files/MezaCoreExtensions.yml"
+# - name: Ensure local meza extensions installed (non-Composer)
+#   include_role:
+#     name: load-extensions-from-file
+#   vars:
+#     extfile: "{{ m_local_public }}/MezaLocalExtensions.yml"
+
+- name: Ensure core meza extensions installed (non-Composer)
+  git:
+    repo: "{{ item.repo }}"
+    dest: "/opt/meza/htdocs/mediawiki/extensions/{{ item.name }}"
+    version: "{{ item.version }}"
+  with_items: "{{ meza_core_extensions.list }}"
+  when: meza_core_extensions.list[0] is defined and item.repo is defined
+  tags:
+    - git-extensions
+    - git-core-extensions
+    - latest
+
+- name: Ensure local meza extensions installed (non-Composer)
+  git:
+    repo: "{{ item.repo }}"
+    dest: "/opt/meza/htdocs/mediawiki/extensions/{{ item.name }}"
+    version: "{{ item.version }}"
+  with_items: "{{ meza_local_extensions.list }}"
+  when: meza_local_extensions.list[0] is defined and item.repo is defined
+  tags:
+    - git-extensions
+    - git-local-extensions
+    - latest
+
+# File holding extension loading and config for core and local extensions
+- name: Ensure Extensions.php in place
+  template:
+    src: Extensions.php.j2
+    dest: "{{ m_local_app }}/Extensions.php"
+
+# Adds extensions with composer param from MezaCoreExtensions.yml and
+# MezaLocalExtensions.yml
+- name: Ensure composer.local.json in place to load composer-based extensions
   template:
     src: composer.local.json.j2
     dest: "{{ m_mediawiki }}/composer.local.json"
@@ -48,6 +102,7 @@
   # FIXME: need ignore_errors because composer throws an error when running as root.
   ignore_errors: yes
 
+# install doesn't appear to do extensions
 - name: Run composer update on MediaWiki for extensions
   composer:
     command: update
@@ -55,49 +110,72 @@
   # FIXME: need ignore_errors because composer throws an error when running as root.
   ignore_errors: yes
 
-- name: Ensure WikiBlender installed
-  git:
-    repo: https://github.com/jamesmontalvo3/WikiBlender.git
-    dest: "{{ m_htdocs }}/WikiBlender"
-    version: "master"
+# FIXME: VE has dependencies installed via Git submodules. In the same way
+#        extensions marked with composer_merge=True can be added to
+#        composer.local.json, extensions with Git submodules should be able to
+#        mark git_submodules=True to automatically install
+# - name: VisualEditor git submodule update --init
+#   shell: |
+#     cd "{{ m_mediawiki }}/extensions/VisualEditor"
+#     git submodule update --init
 
-
-- name: Ensure base meza extensions installed
-  include_role:
-    name: load-extensions-from-file
-  vars:
-    extfile: "{{ m_meza }}/src/roles/mediawiki/files/base-extensions.yml"
-
-- name: VisualEditor git submodule update --init
+- name: Ensure Git submodule requirements met for core meza extensions
   shell: |
-    cd "{{ m_mediawiki }}/extensions/VisualEditor"
+    cd "{{ m_mediawiki }}/extensions/{{ item.name }}"
     git submodule update --init
+  with_items: "{{ meza_core_extensions.list }}"
+  when: meza_core_extensions.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
+  tags:
+    - git-submodules
+    - latest
 
-- name: Composer install Elastica dependencies
-  composer:
-    command: install
-    working_dir: "{{ m_mediawiki }}/extensions/Elastica"
-  # FIXME: need ignore_errors because composer throws an error when running as root.
-  ignore_errors: yes
-
-- name: Composer install SyntaxHighlight_GeSHi dependencies
-  composer:
-    command: install
-    working_dir: "{{ m_mediawiki }}/extensions/SyntaxHighlight_GeSHi"
-  # FIXME: need ignore_errors because composer throws an error when running as root.
-  ignore_errors: yes
+- name: Ensure Git submodule requirements met for local meza extensions
+  shell: |
+    cd "{{ m_mediawiki }}/extensions/{{ item.name }}"
+    git submodule update --init
+  with_items: "{{ meza_local_extensions.list }}"
+  when: meza_local_extensions.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
+  tags:
+    - git-submodules
+    - latest
 
 
-- name: Ensure MezaCoreExtensions.php in place
-  template:
-    src: MezaCoreExtensions.php.j2
-    dest: "{{ m_local_app }}/MezaCoreExtensions.php"
+# FIXME: Remove commented-out lines below after confirming composer-merge
+#        working in composer.local.json
+# - name: Composer install Elastica dependencies
+#   composer:
+#     command: install
+#     working_dir: "{{ m_mediawiki }}/extensions/Elastica"
+#   # FIXME: need ignore_errors because composer throws an error when running as root.
+#   ignore_errors: yes
+# - name: Composer install SyntaxHighlight_GeSHi dependencies
+#   composer:
+#     command: install
+#     working_dir: "{{ m_mediawiki }}/extensions/SyntaxHighlight_GeSHi"
+#   # FIXME: need ignore_errors because composer throws an error when running as root.
+#   ignore_errors: yes
 
+
+
+#
+# LocalSettings.php
+#
 - name: Ensure LocalSettings.php in place
   template:
     src: LocalSettings.php.j2
     dest: "{{ m_mediawiki }}/LocalSettings.php"
     backup: yes
+
+
+
+#
+# LANDING PAGE
+#
+- name: Ensure WikiBlender installed
+  git:
+    repo: https://github.com/jamesmontalvo3/WikiBlender.git
+    dest: "{{ m_htdocs }}/WikiBlender"
+    version: "master"
 
 - name: Ensure BlenderSettings.php in place
   template:
@@ -105,6 +183,9 @@
     dest: "{{ m_htdocs }}/WikiBlender/BlenderSettings.php"
 
 
+
+#
+# DEMO WIKI (if needed)
 #
 # 1. Check if wikis exist
 # 2. Create Demo Wiki if they don't
@@ -131,33 +212,11 @@
     name: sync-configs
   when: "initial_wikis_dirs_check.files|length == 0"
 
+
+
 #
-# Get meza-installation-specific extensions, both for all-wikis and for
-# specific wikis
+# VERIFY WIKIS
 #
-- name: install installation-specific extensions
-  include_role:
-    name: load-extensions-from-file
-  vars:
-    extfile: "{{ m_local_public }}/MezaLocalExtensions.yml"
-
-- name: Get local all-wiki extensions list for FIXME.php
-  include_vars:
-    file: "{{ m_local_public }}/MezaLocalExtensions.yml"
-    name: meza_local_extensions
-
-- name: Ensure MezaLocalExtensions.php in place
-  template:
-    src: MezaLocalExtensions.php.j2
-    dest: "{{ m_local_app }}/MezaLocalExtensions.php"
-
-
-
-
-
-
-
-
 - name: Get individual wikis dirs
   find:
     paths: "{{ m_local_public }}/wikis/"
@@ -165,9 +224,7 @@
   register: wikis_dirs
   delegate_to: localhost
 
-#
 # Check that all wikis in config are present on app and DB servers
-#
 - name: Ensure defined wikis exist
   include_role:
     name: verify-wiki
@@ -178,7 +235,6 @@
   #   filter 2: then reduce to just the last part of the path
   #   filter 3: convert map object back to an Ansible-friendly list
   with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
-
 
 # Run update.php (MediaWiki's database update script) against all wikis. This
 # only needs to be done once, since the first app server that runs it will
