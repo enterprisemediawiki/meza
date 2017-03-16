@@ -2,11 +2,10 @@
 // {{ ansible_managed }}
 // Generated: {{ template_run_date }}
 
-{%+ for ext in meza_local_extensions['list'] if not ext.composer +%}
+{% for ext in meza_local_extensions['list'] if ext.composer is not defined %}
 
-// Extension:{{ ext.name }}
-{%+ if ext.wikis is defined -%}
-	if ( in_array( $wikiId, array( {%+ for wiki in ext.wikis -%}'{{ wiki}}', {%- endfor -%} ) ) ) {
+{% if ext.wikis is defined -%}
+	if ( in_array( $wikiId, array( {% for wiki in ext.wikis -%}'{{ wiki}}', {%- endfor -%} ) ) ) {
 {%- endif -%}
 
 
@@ -16,13 +15,14 @@
 		wfLoadExtension( "{{ ext.name }}" );
 	{%- endif -%}
 
-	{%- if ext.config is defined +%}
+	{%- if ext.config is defined %}
+
 {{ ext.config }}
 	{%- endif -%}
 
 
-{%- if ext.wikis is defined +%}
+{%- if ext.wikis is defined %}
 }
 {%- endif -%}
 
-{%- endfor +%}
+{%- endfor %}

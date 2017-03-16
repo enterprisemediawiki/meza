@@ -2,17 +2,17 @@
 // {{ ansible_managed }}
 // Generated: {{ template_run_date }}
 
-{%+ for ext in meza_core_extensions['list'] if not ext.composer +%}
+{% for ext in meza_core_extensions['list'] if ext.composer is not defined %}
 
-// Extension:{{ ext.name }}
-{%+ if ext.legacy_load is defined and ext.legacy_load -%}
+{% if ext.legacy_load is defined and ext.legacy_load -%}
 	require_once "$IP/extensions/{{ ext.name }}/{{ ext.name }}.php";
 {%- else -%}
 	wfLoadExtension( "{{ ext.name }}" );
 {%- endif -%}
 
-{%- if ext.config is defined +%}
+{%- if ext.config is defined %}
+
 {{ ext.config }}
 {%- endif -%}
 
-{%- endfor +%}
+{%- endfor %}

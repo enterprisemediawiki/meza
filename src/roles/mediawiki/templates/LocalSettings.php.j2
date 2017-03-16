@@ -611,14 +611,12 @@ else if ( $mezaAuthType === 'viewer-read' ) {
 /**
  *  8) EXTENSION SETTINGS
  *
- *  Code to load the extension "ExtensionLoader", which then installs and loads
- *  other extensions as defined in "ExtensionSettings.php". Note that the file
- *  or files defining which extensions are loaded is configurable below, as is
- *  the path to where extensions are installed.
+ *  Extensions defined in meza core and meza local yaml files, which are used to  *  load the extensions via Git or Composer, and which generate the PHP files 
+ *  below.
  */
 
-require_once "{{ m_local_app }}/MezaCoreExtensions.php"
-require_once "{{ m_local_app }}/MezaLocalExtensions.php"
+require_once "{{ m_local_app }}/MezaCoreExtensions.php";
+require_once "{{ m_local_app }}/MezaLocalExtensions.php";
 
 
 /**

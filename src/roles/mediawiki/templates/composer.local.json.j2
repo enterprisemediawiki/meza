@@ -1,9 +1,10 @@
 {
 	"require": {
-		{% for ext in meza_core_extensions['list'] %}
-		{% if ext.composer is defined %}
-		"{{ ext.composer }}" : "{{ ext.version }}"{% if not loop.last %},{% endif %}
-		{% endif %}
-		{% endfor %}
+		{% for ext in meza_core_extensions['list'] if ext.composer is defined -%}
+			{%- if ext.composer is defined -%}
+				"{{ ext.composer }}": "{{ ext.version }}"
+				{%- if not loop.last -%},{%- endif %}
+			{%- endif -%}
+		{%- endfor %}
 	}
 }

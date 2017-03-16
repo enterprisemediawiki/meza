@@ -87,7 +87,7 @@
 
 - name: Ensure MezaCoreExtensions.php in place
   template:
-    src: load-extensions-template.php.j2
+    src: MezaCoreExtensions.php.j2
     dest: "{{ m_local_app }}/MezaCoreExtensions.php"
 
 - name: Ensure LocalSettings.php in place
