@@ -54,6 +54,32 @@ Additionally, `MezaLocalExtensions.yml` is able to limit the inclusion of extens
       - cronus
 ```
 
+### Extensions that require a separate Composer install step
+
+Some extensions, like [Elastica](https://www.mediawiki.org/wiki/Extension:Elastica), say that in addition to downloading the code you must also `cd` into the `Elastica` directory and then run `composer install`. To make Meza handle this for you, add `composer_merge: True` to your extension configuration:
+
+```yaml
+  - name: Elastica
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Elastica.git
+    version: REL1_27
+    composer_merge: True
+```
+
+Note: Elastica is installed on Meza by default, so this is for example only.
+
+### Extensions that require a Git submodule step
+
+Some extensions, perhaps currently only [Visual Editor](https://www.mediawiki.org/wiki/Extension:VisualEditor), say that in addition to downloading the code you must also `cd` into the `VisualEditor` directory then run `git submodule update --init`. To make Meza handle this for you, add `git_submodules: True` to the extension's configuration:
+
+```yaml
+  - name: VisualEditor
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git
+    version: REL1_27
+    git_submodules: True
+```
+
+Note: Visual Editor is installed on Meza by default, so this is for example only.
+
 ## Example MezaLocalConfig.yml
 
 ```yaml
