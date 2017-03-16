@@ -1,5 +1,8 @@
 ---
 
+- name: Sync configuration between controller and app servers
+  include_role:
+    name: sync-configs
 
 - name: Ensure proper MediaWiki git version installed
   git:
@@ -103,14 +106,10 @@
 
 
 #
-# 1. Sync configurations
-# 2. Check if wikis exist
-# 3. Create Demo Wiki if they don't (create-wiki will re-sync configs)
+# 1. Check if wikis exist
+# 2. Create Demo Wiki if they don't
+# 3. FIXME: Will create-wiki re-sync configs? If so, explicit re-sync not required.
 #
-- name: Sync configuration between controller and app servers
-  include_role:
-    name: sync-configs
-
 - name: Check if any wikis exist
   find:
     paths: "{{ m_local_public }}/wikis"
