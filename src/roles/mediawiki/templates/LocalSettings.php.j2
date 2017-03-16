@@ -608,159 +608,23 @@ else if ( $mezaAuthType === 'viewer-read' ) {
 
 
 
-
-
-
-
-
 /**
  *  8) EXTENSION SETTINGS
  *
- *  Code to load the extension "ExtensionLoader", which then installs and loads
- *  other extensions as defined in "ExtensionSettings.php". Note that the file
- *  or files defining which extensions are loaded is configurable below, as is
- *  the path to where extensions are installed.
+ *  Extensions defined in meza core and meza local yaml files, which are used to  *  load the extensions via Git or Composer, and which generate the PHP files 
+ *  below.
  */
 
-#
-# Enable Semantic MediaWiki semantics
-#
-enableSemantics( $wikiId );
+require_once "{{ m_local_app }}/Extensions.php";
 
 
-#
-# Semantic MediaWiki Settings (extension loaded via Composer)
-#
-$smwgQMaxSize = 5000;
-
-#
-# SemanticResultFormats formats enabled (beyond defaults)
-#
-
-// These are disabled by default because they send data to external
-// web services for rendering, which may be considered a data leak
-// $srfgFormats[] = 'googlebar';
-// $srfgFormats[] = 'googlepie';
-
-// Disabled until the proper dependencies are added (PHPExcel I think)
-// $srfgFormats[] = 'excel';
-
-// Enables the "filtered" format. Where do we use this?
-$srfgFormats[] = 'filtered';
-
-// Disabled due to some issue on FOD wikis. Confirm, reenable if possible
-// $srfgFormats[] = 'exhibit';
-
-
-
-// allows adding semantic properties to Templates themselves
-// (not just on pages via templates).
-// ENABLE THIS AFTER ALL TEMPLATES HAVE BEEN CHECKED FOR PROPER FORM
-// i.e. using <noinclude> and <includeonly> properly
-// $smwgNamespacesWithSemanticLinks[NS_TEMPLATE] = true;
-$smwgNamespacesWithSemanticLinks[NS_TALK] = true;
-
-
-#
-# Start of non-composer extensions
-#
-wfLoadExtensions( array(
-	'ParserFunctions',
-	'ExternalData',
-	'LabeledSectionTransclusion',
-	'Cite',
-	'ParserFunctionHelper',
-	'CharInsert',
-	'SemanticForms',
-	'DismissableSiteNotice',
-	'WikiEditor',
-
-	# consider replacing with https://gerrit.wikimedia.org/r/mediawiki/extensions/SyntaxHighlight_Pygments.git
-	'SyntaxHighlight_GeSHi',
-	'InputBox',
-	'ReplaceText',
-	'Interwiki',
-	'YouTube',
-	'UniversalLanguageSelector',
-	'VisualEditor',
-	'Elastica',
-	'Thanks',
-	'CollapsibleVector',
-	'Math'
-) );
-
-
-# Extension:ParserFunctions
-$wgPFEnableStringFunctions = true;
-
-# Extension:Cite
-$wgCiteEnablePopups = true;
-
-# Extension:WhoIsWatching
-$wgPageShowWatchingUsers = true;
-
-# Extension:HeaderTabs
-$htEditTabLink = false;
-$htRenderSingleTab = true;
-
-# Extension:WikiEditor
-$wgDefaultUserOptions['usebetatoolbar'] = 1;
-$wgDefaultUserOptions['usebetatoolbar-cgd'] = 1;
-$wgDefaultUserOptions['wikieditor-publish'] = 1; # displays publish button
-$wgDefaultUserOptions['wikieditor-preview'] = 1; # Displays the Preview and Changes tabs
-
-# Extension:Interwiki
-$wgGroupPermissions['sysop']['interwiki'] = true;
-
-# Extension:Math
-$wgMathValidModes[] = 'MW_MATH_MATHJAX'; // Define MathJax as one of the valid math rendering modes
-$wgUseMathJax = true; // Enable MathJax as a math rendering option for users to pick
-$wgDefaultUserOptions['math'] = 'MW_MATH_MATHJAX'; // Set MathJax as the default rendering option for all users (optional)
-$wgMathDisableTexFilter = true; // or compile "texvccheck"
-$wgDefaultUserOptions['mathJax'] = true; // Enable the MathJax checkbox option
-
-
-#
-# Extensions without extension.json
-#
-$noExtensionJSONfile = array(
-	'StringFunctionsEscaped',
-	'SemanticInternalObjects',
-	'SemanticCompoundQueries',
-	'Arrays',
-	'TalkRight', // branch `extreg`...should have extension.json
-	'AdminLinks',
-	'BatchUserRights',
-	'CopyWatchers', // branch `extreg`...should have extension.json
-	'Wiretap', // extreg
-	'ApprovedRevs',
-	'MasonryMainPage',
-	'WatchAnalytics',
-	'Variables',
-	'ContributionScores',
-	'PipeEscape',
-	'CirrusSearch',
-	'Echo',
-	'UploadWizard',
-	'DataTransfer',
-	'WhoIsWatching',
-);
-foreach( $noExtensionJSONfile as $mezaLegacyExt ) {
-	require_once "$IP/extensions/$mezaLegacyExt/$mezaLegacyExt.php";
-}
-
-
-
-# Extension:AdminLinks
-$wgGroupPermissions['sysop']['adminlinks'] = true;
-
-# Extension:ApprovedRevs
-$egApprovedRevsAutomaticApprovals = false;
-
-# Extension:WatchAnalytics
-$egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
-
-# Extension:CirrusSearch
+/**
+ * Extension:CirrusSearch
+ *
+ * CirrusSearch cluster(s) are defined based upon Ansible hosts file and thus
+ * cannot be easily added to base-extensions.yml. As such, CirrusSearch config
+ * is included directly in LocalSettings.php.j2
+ */
 $wgSearchType = 'CirrusSearch';
 $wgCirrusSearchClusters['default'] = [];
 {% for host in groups['elastic-servers'] %}
@@ -772,49 +636,22 @@ $wgCirrusSearchClusters['default'][] = '{{ host }}';
 {% endfor %}
 
 
-# Extension:Echo
-$wgEchoEmailFooterAddress = $wgPasswordSender;
-
-# Extension:Thanks
-$wgThanksConfirmationRequired = false;
-
-
-#
-# Extension:ContributionScores
-#
-// Exclude Bots from the reporting - Can be omitted.
-$wgContribScoreIgnoreBots = true;
-
-// Exclude Blocked Users from the reporting - Can be omitted.
-$wgContribScoreIgnoreBlockedUsers = true;
-
-// Use real user names when available - Can be omitted. Only for MediaWiki 1.19 and later.c
-$wgContribScoresUseRealName = true;
-
-// Set to true to disable cache for parser function and inclusion of table.
-$wgContribScoreDisableCache = false;
-
-// Each array defines a report - 7,50 is "past 7 days" and "LIMIT 50" - Can be omitted.
-$wgContribScoreReports = array(
-	array(7,50),
-	array(30,50),
-	array(0,50)
-);
-
-
-#
-# Extension:VisualEditor
-#
-
+/**
+ * Extension:VisualEditor
+ *
+ * Parsoid servers are defined based upon Ansible hosts file and thus
+ * cannot be easily added to base-extensions.yml. As such, VisualEditor config
+ * is included directly in LocalSettings.php.j2
+ */
 // Allow read and edit permission for requests from the server (e.g. Parsoid)
 // Ref: https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
 // Ref: https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
 $mezaValidParsoidServers = [];
 {% for host in groups['parsoid-servers'] %}
-	{% if host == inventory_hostname %}
-	$mezaValidParsoidServers[] = '127.0.0.1';
-	{% endif %}
-	$mezaValidParsoidServers[] = '{{ host }}';
+{% if host == inventory_hostname %}
+$mezaValidParsoidServers[] = '127.0.0.1';
+{% endif %}
+$mezaValidParsoidServers[] = '{{ host }}';
 {% endfor %}
 if ( isset( $_SERVER['REMOTE_ADDR'] ) && in_array( $_SERVER['REMOTE_ADDR'], $mezaValidParsoidServers ) ) {
 	$wgGroupPermissions['*']['read'] = true;
@@ -852,113 +689,13 @@ $wgVirtualRestConfig['modules']['parsoid'] = array(
 // Define which namespaces will use VE
 $wgVisualEditorNamespaces = array_merge(
 	$wgContentNamespaces,
-        array( NS_USER,
-          NS_HELP,
-          NS_PROJECT
+	array(
+		NS_USER,
+		NS_HELP,
+		NS_PROJECT
 	)
 );
 
-
-#
-# Extension:Upload Wizard
-#
-// Needed to make UploadWizard work in IE, see bug 39877
-// See also: https://www.mediawiki.org/wiki/Manual:$wgApiFrameOptions
-$wgApiFrameOptions = 'SAMEORIGIN';
-
-// Use UploadWizard by default in navigation bar
-$wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard";
-$wgUploadWizardConfig = array(
-	'debug' => false,
-	'autoCategory' => 'Uploaded with UploadWizard',
-	'feedbackPage' => 'Project:UploadWizard/Feedback',
-	'altUploadForm' => 'Special:Upload',
-	'fallbackToAltUploadForm' => false,
-	'enableFormData' => true,  # Should FileAPI uploads be used on supported browsers?
-	'enableMultipleFiles' => true,
-	'enableMultiFileSelect' => true,
-	'tutorial' => array('skip' => true),
-	'fileExtensions' => $wgFileExtensions, //omitting this can cause errors
-	'licensing' => array(
-		// alternatively, use "thirdparty". Set in postLocalSettings.php like:
-		// $wgUploadWizardConfig['licensing']['defaultType'] = 'thirdparty';
-		'defaultType' => 'ownwork',
-
-		'ownWork' => array(
-			'type' => 'or',
-			// Use [[Project:General disclaimer]] instead of default [[Template:Generic]]
-			'template' => 'Project:General disclaimer',
-			'defaults' => array( 'generic' ),
-			'licenses' => array( 'generic' )
-		),
-
-		'thirdParty' => array(
-			'type' => 'or',
-			'defaults' => array( 'generic' ),
-			'licenseGroups' => array(
-				array(
-					'head' => 'mwe-upwiz-license-generic-head',
-					'template' => 'Project:General disclaimer', // again, use General disclaimer
-					'licenses' => array( 'generic' ),
-				),
-			)
-		),
-	),
-);
-
-
-
-# Extension:HeaderFooter (currently pulled in by composer as dependency)
-# https://github.com/enterprisemediawiki/HeaderFooter.git
-
-# Extension:NumerAlpha (currently pulled in by composer as dependency)
-# https://github.com/jamesmontalvo3/NumerAlpha.git
-
-# Extension:PdfHandler (breaks on very large PDFs)
-# https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler
-// Location of PdfHandler dependencies
-// $wgPdfProcessor = '/usr/bin/gs'; // installed via yum
-// $wgPdfPostProcessor = '/usr/local/bin/convert'; // built from source
-// $wgPdfInfo = '/usr/local/bin/pdfinfo'; // pre-built binaries installed
-
-
-# Extension:Flow
-#
-# Note: Flow removed due to being unable to search discussions. While the
-# improved interface is great, it's useless if we can't search our old content.
-# See issues #272.
-#
-// $egExtensionLoader->load(
-// 	'Flow',
-// 	'https://gerrit.wikimedia.org/r/mediawiki/extensions/Flow.git',
-// 	'REL1_27'
-// );
-
-// // only allow sysops to create new flow boards
-// $wgGroupPermissions['sysop']['flow-create-board'] = true;
-
-// // store posts as html using Parsoid
-// $wgFlowContentFormat = 'html';
-
-// // use VE
-// $wgFlowEditorList = array( 'visualeditor', 'none' );
-
-// // Define which namespaces will use Flow
-// $wgNamespaceContentModels[NS_PROJECT_TALK]        = CONTENT_MODEL_FLOW_BOARD;
-// $wgNamespaceContentModels[NS_USER_TALK]           = CONTENT_MODEL_FLOW_BOARD;
-// $wgNamespaceContentModels[NS_TALK]                = CONTENT_MODEL_FLOW_BOARD;
-// $wgNamespaceContentModels[NS_HELP_TALK]           = CONTENT_MODEL_FLOW_BOARD;
-// $wgNamespaceContentModels[NS_FILE_TALK]           = CONTENT_MODEL_FLOW_BOARD;
-// $wgNamespaceContentModels[NS_CATEGORY_TALK]       = CONTENT_MODEL_FLOW_BOARD;
-// $wgNamespaceContentModels[NS_MEDIAWIKI_TALK]      = CONTENT_MODEL_FLOW_BOARD;
-// $wgNamespaceContentModels[NS_TEMPLATE_TALK]       = CONTENT_MODEL_FLOW_BOARD;
-// $wgNamespaceContentModels[SMW_NS_FORM_TALK]       = CONTENT_MODEL_FLOW_BOARD; // MW throws error: SMW_NS_FORM_TALK not a constant
-// $wgNamespaceContentModels[SMW_NS_PROPERTY_TALK]   = CONTENT_MODEL_FLOW_BOARD;
-// $wgNamespaceContentModels[SMW_NS_CONCEPT_TALK]    = CONTENT_MODEL_FLOW_BOARD;
-
-// // Connect Flow to Parsoid
-// $wgFlowParsoidURL = 'http://127.0.0.1:8000';
-// $wgFlowParsoidPrefix = $wikiId;
 
 
 

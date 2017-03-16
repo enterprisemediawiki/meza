@@ -1,9 +1,40 @@
 {
 	"require": {
-		"mediawiki/semantic-media-wiki": "~2.4",
-		"mediawiki/semantic-result-formats": "~2.0",
-		"mediawiki/sub-page-list": "~1.1",
-		"mediawiki/semantic-meeting-minutes": "~0.3",
-	  	"mediawiki/semantic-maps": "~3.2"
+
+		{% for ext in meza_local_extensions['list'] if ext.composer is defined %}
+
+		"{{ ext.composer }}": "{{ ext.version }}",
+		{# Note: no loop.last check: more extensions listed below #}
+
+		{%- endfor -%}
+
+		{%- for ext in meza_core_extensions['list'] if ext.composer is defined %}
+
+		"{{ ext.composer }}": "{{ ext.version }}"
+		{%- if not loop.last -%},{%- endif %}
+
+		{%- endfor %}
+
+	},
+	"extra": {
+		"merge-plugin": {
+			"include": [
+
+				{% for ext in meza_local_extensions['list'] if ext.composer_merge is defined and ext.composer_merge == True %}
+
+				"extensions/{{ ext.name }}/composer.json",
+				{# Note: no loop.last check: more extensions listed below #}
+
+				{%- endfor -%}
+
+				{%- for ext in meza_core_extensions['list'] if ext.composer_merge is defined and ext.composer_merge == True %}
+
+				"extensions/{{ ext.name }}/composer.json"
+				{%- if not loop.last -%},{%- endif %}
+
+				{%- endfor %}
+
+			]
+		}
 	}
 }

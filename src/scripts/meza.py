@@ -88,7 +88,7 @@ def meza_command_deploy (argv):
 
 	shell_cmd = playbook_cmd( 'site', env )
 	if len(argv) > 1:
-		shell_cmd + argv[1:]
+		shell_cmd = shell_cmd + argv[1:]
 
 	return_code = meza_shell_exec( shell_cmd )
 
@@ -440,7 +440,7 @@ def meza_shell_exec ( shell_cmd, return_output=False ):
 	# rc = child.returncode
 
 	cmd = ' '.join(shell_cmd)
-	#print cmd
+	print cmd
 	rc = os.system(cmd)
 
 	# FIXME: See above

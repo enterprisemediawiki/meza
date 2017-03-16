@@ -1,0 +1,13 @@
+---
+list: []
+  # To add extensions to this file, first remove the [] from the line above,
+  # then define an extension as follows:
+  #
+  # - name: UserJourney
+  #   repo: https://github.com/darenwelsh/UserJourney
+  #   version: master
+  #   config: |
+  #     $wgSomeVar = true;
+  #     $wgAnotherVar = false;
+  #
+
