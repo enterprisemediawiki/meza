@@ -1,20 +1,89 @@
 Installing additional extensions
 ================================
 
-meza comes pre-built with many extensions, but if you need additional extensions you can add them to any configuration file. The recommended method for adding extensions to all wikis is to use your "postLocalSettings_allWikis.php" file in `/opt/meza/config/local`. This file may not already exist, but if you add it meza will automatically start using it.
+Meza comes pre-built with many extensions, but additional extensions can be added to an installation. To do so:
 
-An example file is located at `/opt/meza/config/template/more-extensions.php`. This shows a method to load extensions for all wikis or just for select wikis.
+1. Add the extensions to the `MezaLocalExtensions.yml` configuration file
+2. Run `sudo meza deploy <env>` where "env" is your environment name (probably "monolith")
 
-After you've moved this file into `postLocalSettings_allWikis.php`, or included it from `postLocalSettings_allWikis.php`, you need to perform the installation. To do that run:
+## Adding extensions
 
+Extensions can be added to `/opt/meza/config/local-public/MezaLocalExtensions.yml` in the following ways. If adding your first extension, please make sure the part that says `list: []` (an empty list) is changed to `list:`. Then add extensions as follows.
+
+### Standard extension configuration
+```yaml
+  - name: CommentStreams
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CommentStreams.git
+    version: master
+    config: |
+      $wgCommentStreamsEnableTalk = true;
 ```
-sudo WIKI=<wiki-id> php /opt/meza/htdocs/mediawiki/extensions/ExtensionLoader/updateExtensions.php
+
+### Legacy extensions
+If the extension you're trying to install has documentation on mediawiki.org saying to put a `require_once` statement into `LocalSettings.php`, then extension uses the legacy loading method. To add it, include `legacy_load: True` as follows:
+
+```yaml
+  - name: UserJourney
+    repo: https://github.com/darenwelsh/UserJourney
+    version: master
+    legacy_load: True
+    config: |
+      $fakeVarJustForTesting = false;
 ```
 
-Replace `<wiki-id>` with any wiki ID. If the extensions you are installing require database updates (e.g. if their install instructions tell you to run `update.php`) then you will need to run `update.php` for **all wikis**. To do that, run the following:
-
+### Composer installation
+If the extension says to use Composer to install it, use the following format:
+```yaml
+  - name: Semantic Breadcrumb Links
+    composer: mediawiki/semantic-breadcrumb-links
+    version: "~1.3"
+    config: |
+      $egSBLTryToFindClosestDescendant = true;
 ```
-sudo WIKI=<wiki-id> php /opt/meza/htdocs/mediawiki/maintenance/update.php
+
+### Limiting to specific wikis
+Additionally, `MezaLocalExtensions.yml` is able to limit the inclusion of extensions to specific wikis as follows. This would limit Extension:CommentStreams to only be loaded by the "robo" and "cronus" wikis.
+```yaml
+  - name: CommentStreams
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CommentStreams.git
+    version: master
+    config: |
+      $wgCommentStreamsEnableTalk = true;
+    wikis:
+      - robo
+      - cronus
 ```
 
-Do the command above for all wiki IDs.
+## Example MezaLocalConfig.yml
+
+```yaml
+---
+list:
+  # A legacy loaded extension
+  - name: UserJourney
+    repo: https://github.com/darenwelsh/UserJourney
+    version: master
+    legacy_load: True
+    config: |
+      $fakeVarJustForTesting = false;
+
+  # A modern loaded extension, limited just to the demo wiki
+  - name: CommentStreams
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CommentStreams.git
+    version: master
+    config: |
+      $wgCommentStreamsEnableTalk = true;
+    wikis:
+      - demo
+
+  # A Composer loaded extension (these cannot be limited to specific wikis)
+  - name: Semantic Breadcrumb Links
+    composer: mediawiki/semantic-breadcrumb-links
+    version: "~1.3"
+    config: |
+      $egSBLTryToFindClosestDescendant = true;
+```
+
+## Adding extensions to Meza core
+
+There is a file very similar to `MezaLocalExtensions.yml` located at `src/roles/mediawiki/files/MezaCoreExtensions.yml`. This is the list of extensions installed as part of every Meza installation. If you want to request that an extension be added to Meza core you'll need to edit this file in the same way that you edit `MezaLocalExtensions.yml`, and then submit a pull request to `enterprisemediawiki/meza`. The only difference in functionality between the core and local files is that `MezaCoreExtensions.yml` does not support limiting extensions to specific wikis.
