@@ -34,7 +34,7 @@ Login to your server and run the following (should take 15-30 minutes depending 
 ```bash
 curl -L getmeza.org > doit
 sudo bash doit
-sudo meza install monolith
+sudo meza deploy monolith
 ```
 
 Running VirtualBox and need to get your virtual machine configured? See our
