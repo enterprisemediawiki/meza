@@ -34,6 +34,9 @@
   ignore_errors: "{{ ansible_check_mode }}"
 
 
+- name: Ensure optional repos enabled
+  shell: subscription-manager repos --enable rhel-7-server-optional-rpms
+  when: ansible_distribution == "RedHat"
 
 
 - name: ensure libselinux-python installed prior to SELinux
