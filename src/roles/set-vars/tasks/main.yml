@@ -1,0 +1,11 @@
+---
+- name: Set meza-core path variables
+  include_vars:
+    file: /opt/meza/config/core/paths.yml
+
+- name: Set meza-local variables
+  include_vars:
+    file: "{{ m_local_public }}/deploy-config.yml"
+
+  # Ingore errors so this file is not required to be included
+  ignore_errors: yes

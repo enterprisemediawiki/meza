@@ -2,7 +2,8 @@
 
 - hosts: localhost
   become: yes
-  vars_files:
-    - "/opt/meza/config/core/paths.yml"
+  # vars_files:
+  #   - "/opt/meza/config/core/paths.yml"
   roles:
+    - set-vars
     - setup-env

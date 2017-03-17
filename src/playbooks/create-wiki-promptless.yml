@@ -2,9 +2,10 @@
 
 - hosts: app-servers
   become: yes
-  vars_files:
-    - "/opt/meza/config/core/paths.yml"
-    - "/opt/meza/config/local-public/deploy-config.yml"
+  # vars_files:
+  #   - "/opt/meza/config/core/paths.yml"
+  #   - "/opt/meza/config/local-public/deploy-config.yml"
 
   roles:
+    - set-vars
     - create-wiki-wrapper

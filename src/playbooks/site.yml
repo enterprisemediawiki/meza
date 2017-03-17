@@ -6,38 +6,42 @@
 
 - hosts: all
   become: yes
-  vars_files:
-    - "/opt/meza/config/core/paths.yml"
+  # vars_files:
+  #   - "/opt/meza/config/core/paths.yml"
   roles:
+    - set-vars
     - base
     # FIXME: add "security" module here
 
 # FIXME: why is controller init on all app servers?
 - hosts: app-servers
   become: yes
-  vars_files:
-    - "/opt/meza/config/core/paths.yml"
+  # vars_files:
+  #   - "/opt/meza/config/core/paths.yml"
   roles:
+    - set-vars
     - init-controller-config
 
 - hosts: load-balancers
   become: yes
-  vars_files:
+  # vars_files:
     # NOTE: This, oddly, will supposedly load all files that exist, but putting
     # the files on separate lines will cause an error if deploy-config.yml
     # doesn't exist yet.
-    - "/opt/meza/config/core/paths.yml"
-    - "/opt/meza/config/local-public/deploy-config.yml"
+    # - "/opt/meza/config/core/paths.yml"
+    # - "/opt/meza/config/local-public/deploy-config.yml"
   tags: load-balancer
   roles:
+    - set-vars
     - haproxy
 
 - hosts: app-servers
   become: yes
-  vars_files:
-    - "/opt/meza/config/core/paths.yml"
-    - "/opt/meza/config/local-public/deploy-config.yml"
+  # vars_files:
+  #   - "/opt/meza/config/core/paths.yml"
+  #   - "/opt/meza/config/local-public/deploy-config.yml"
   roles:
+    - set-vars
     - role: firewalld
       # firewalld_service: http
       firewalld_port: 8080
@@ -56,10 +60,11 @@
 
 - hosts: memcached-servers
   become: yes
-  vars_files:
-    - "/opt/meza/config/core/paths.yml"
-    - "/opt/meza/config/local-public/deploy-config.yml"
+  # vars_files:
+  #   - "/opt/meza/config/core/paths.yml"
+  #   - "/opt/meza/config/local-public/deploy-config.yml"
   roles:
+    - set-vars
     - role: firewalld
       firewalld_port: 11211
       firewalld_protocol: tcp
@@ -70,10 +75,11 @@
 - hosts: db-master
   become: yes
   tags: database
-  vars_files:
-    - "/opt/meza/config/core/paths.yml"
-    - "/opt/meza/config/local-public/deploy-config.yml"
+  # vars_files:
+  #   - "/opt/meza/config/core/paths.yml"
+  #   - "/opt/meza/config/local-public/deploy-config.yml"
   roles:
+    - set-vars
     - role: firewalld
       firewalld_service: mysql
       firewalld_servers: "{{ groups['app-servers'] }}"
@@ -94,10 +100,11 @@
 - hosts: db-slaves
   become: yes
   tags: database
-  vars_files:
-    - "/opt/meza/config/core/paths.yml"
-    - "/opt/meza/config/local-public/deploy-config.yml"
+  # vars_files:
+  #   - "/opt/meza/config/core/paths.yml"
+  #   - "/opt/meza/config/local-public/deploy-config.yml"
   roles:
+    - set-vars
     - role: firewalld
       firewalld_service: mysql
       firewalld_servers: "{{ groups['app-servers'] }}"
@@ -112,11 +119,12 @@
 
 - hosts: parsoid-servers
   become: yes
-  vars_files:
-    - "/opt/meza/config/core/paths.yml"
-    - "/opt/meza/config/local-public/deploy-config.yml"
+  # vars_files:
+  #   - "/opt/meza/config/core/paths.yml"
+  #   - "/opt/meza/config/local-public/deploy-config.yml"
   tags: parsoid
   roles:
+    - set-vars
     # Allow app servers to get to parsoid server(s) on port 8000
     - role: firewalld
       firewalld_port: 8000
@@ -137,11 +145,12 @@
 
 - hosts: elastic-servers
   become: yes
-  vars_files:
-    - "/opt/meza/config/core/paths.yml"
-    - "/opt/meza/config/local-public/deploy-config.yml"
+  # vars_files:
+  #   - "/opt/meza/config/core/paths.yml"
+  #   - "/opt/meza/config/local-public/deploy-config.yml"
   tags: elasticsearch
   roles:
+    - set-vars
     - role: firewalld
       firewalld_port: 9200
       firewalld_protocol: tcp
@@ -167,10 +176,11 @@
 # Note: this is app-servers again, but must be after everything else is setup
 - hosts: app-servers
   become: yes
-  vars_files:
-    - "/opt/meza/config/core/paths.yml"
-    - "/opt/meza/config/local-public/deploy-config.yml"
+  # vars_files:
+  #   - "/opt/meza/config/core/paths.yml"
+  #   - "/opt/meza/config/local-public/deploy-config.yml"
   tags: mediawiki
   roles:
+    - set-vars
     - composer
     - mediawiki
