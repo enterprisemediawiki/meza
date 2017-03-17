@@ -12,14 +12,14 @@ fi
 # Install epel if not installed
 if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 
-	# if CentOS
-	if [ $(cat /etc/redhat-release | grep -q "CentOS") ]; then
+	distro=$(cat /etc/redhat-release | grep -q "CentOS" && echo "CentOS" || echo "RedHat")
+
+ 	if [ "$distro" == "CentOS" ]; then
 		yum install -y epel-release
 	else # if RedHat
 		epel_repo_url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
-		epel_repo_gpg_key_url="/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7"
+		# epel_repo_gpg_key_url="/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7"
 		rpm -Uvh $epel_repo_url
-
 	fi
 
 fi
