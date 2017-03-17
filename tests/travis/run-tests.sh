@@ -141,9 +141,6 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 
 	echo "TEST TYPE = monolith_from_import"
 
-	# TEST ANSIBLE SYNTAX. FIXME: syntax check all playbooks
-	${docker_exec[@]} ANSIBLE_CONFIG=/opt/meza/config/core/ansible.cfg ansible-playbook /opt/meza/src/playbooks/site.yml --syntax-check
-
 	# Get test "secret" config
 	${docker_exec[@]} mkdir /opt/meza/config/local-secret
 	${docker_exec[@]} git clone https://github.com/enterprisemediawiki/meza-test-config-secret.git /opt/meza/config/local-secret/imported
@@ -157,6 +154,10 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 
 	# Deploy "imported" environment with test config
 	${docker_exec[@]} meza deploy imported
+
+	# TEST ANSIBLE SYNTAX. FIXME: syntax check all playbooks
+	# Won't pass syntax checks prior to deploy because it won't find deploy-config.yaml
+	# ${docker_exec[@]} ANSIBLE_CONFIG=/opt/meza/config/core/ansible.cfg ansible-playbook /opt/meza/src/playbooks/site.yml --syntax-check
 
 	# Basic system check
 	server_check

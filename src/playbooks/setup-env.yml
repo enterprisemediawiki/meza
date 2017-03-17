@@ -4,6 +4,5 @@
   become: yes
   vars_files:
     - "/opt/meza/config/core/paths.yml"
-    - "/opt/meza/config/local-public/deploy-config.yml"
   roles:
     - setup-env
