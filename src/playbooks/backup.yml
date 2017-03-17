@@ -29,18 +29,15 @@
 # FIXME: If a slave is available, should pull from there
 - hosts: db-master
   become: yes
-  vars_files:
-    - ["/opt/meza/config/core/paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
-
   roles:
+    - set-vars
     - dump-db-wikis
 
 
 - hosts: backup-servers
   become: yes
-  vars_files:
-    - ["/opt/meza/config/core/paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
   roles:
+    - set-vars
     - backup-db-wikis
     - backup-uploads
     # FIXME: add role to specify current configuration state, such that it's
