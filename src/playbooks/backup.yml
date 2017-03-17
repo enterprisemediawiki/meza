@@ -30,7 +30,8 @@
 - hosts: db-master
   become: yes
   vars_files:
-    - ["/opt/meza/config/core/paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
+    - "/opt/meza/config/core/paths.yml"
+    - "/opt/meza/config/local-public/deploy-config.yml"
 
   roles:
     - dump-db-wikis
@@ -39,7 +40,8 @@
 - hosts: backup-servers
   become: yes
   vars_files:
-    - ["/opt/meza/config/core/paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
+    - "/opt/meza/config/core/paths.yml"
+    - "/opt/meza/config/local-public/deploy-config.yml"
   roles:
     - backup-db-wikis
     - backup-uploads

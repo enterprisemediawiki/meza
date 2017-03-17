@@ -4,6 +4,7 @@
   become: yes
   vars_files:
     - "/opt/meza/config/core/paths.yml"
+    - "/opt/meza/config/local-public/deploy-config.yml"
 
   # prompt for wiki_id and wiki_name
   vars_prompt:

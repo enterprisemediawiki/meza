@@ -26,7 +26,8 @@
     # NOTE: This, oddly, will supposedly load all files that exist, but putting
     # the files on separate lines will cause an error if deploy-config.yml
     # doesn't exist yet.
-    - ["/opt/meza/config/core/paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
+    - "/opt/meza/config/core/paths.yml"
+    - "/opt/meza/config/local-public/deploy-config.yml"
   tags: load-balancer
   roles:
     - haproxy
@@ -34,7 +35,8 @@
 - hosts: app-servers
   become: yes
   vars_files:
-    - ["/opt/meza/config/core/paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
+    - "/opt/meza/config/core/paths.yml"
+    - "/opt/meza/config/local-public/deploy-config.yml"
   roles:
     - role: firewalld
       # firewalld_service: http
@@ -55,7 +57,8 @@
 - hosts: memcached-servers
   become: yes
   vars_files:
-    - ["/opt/meza/config/core/paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
+    - "/opt/meza/config/core/paths.yml"
+    - "/opt/meza/config/local-public/deploy-config.yml"
   roles:
     - role: firewalld
       firewalld_port: 11211
@@ -68,7 +71,8 @@
   become: yes
   tags: database
   vars_files:
-    - ["/opt/meza/config/core/paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
+    - "/opt/meza/config/core/paths.yml"
+    - "/opt/meza/config/local-public/deploy-config.yml"
   roles:
     - role: firewalld
       firewalld_service: mysql
@@ -91,7 +95,8 @@
   become: yes
   tags: database
   vars_files:
-    - ["/opt/meza/config/core/paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
+    - "/opt/meza/config/core/paths.yml"
+    - "/opt/meza/config/local-public/deploy-config.yml"
   roles:
     - role: firewalld
       firewalld_service: mysql
@@ -108,7 +113,8 @@
 - hosts: parsoid-servers
   become: yes
   vars_files:
-    - ["/opt/meza/config/core/paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
+    - "/opt/meza/config/core/paths.yml"
+    - "/opt/meza/config/local-public/deploy-config.yml"
   tags: parsoid
   roles:
     # Allow app servers to get to parsoid server(s) on port 8000
@@ -132,7 +138,8 @@
 - hosts: elastic-servers
   become: yes
   vars_files:
-    - ["/opt/meza/config/core/paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
+    - "/opt/meza/config/core/paths.yml"
+    - "/opt/meza/config/local-public/deploy-config.yml"
   tags: elasticsearch
   roles:
     - role: firewalld
@@ -161,7 +168,8 @@
 - hosts: app-servers
   become: yes
   vars_files:
-    - ["/opt/meza/config/core/paths.yml","/opt/meza/config/local-public/deploy-config.yml"]
+    - "/opt/meza/config/core/paths.yml"
+    - "/opt/meza/config/local-public/deploy-config.yml"
   tags: mediawiki
   roles:
     - composer
