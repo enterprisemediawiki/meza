@@ -123,4 +123,4 @@
     - MezaLocalExtensions.yml
     - preLocalSettings_allWikis.php
     - postLocalSettings_allWikis.php
-    - deploy-config.yml
+    - vars.yml
