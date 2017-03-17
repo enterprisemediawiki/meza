@@ -9,7 +9,21 @@ if [ "$(whoami)" != "root" ]; then
 	exit 1
 fi
 
-yum install -y epel-release
+# Install epel if not installed
+if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
+
+	# if CentOS
+	if [ $(cat /etc/redhat-release | grep -q "CentOS") ]; then
+		yum install -y epel-release
+	else # if RedHat
+		epel_repo_url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
+		epel_repo_gpg_key_url="/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7"
+		rpm -Uvh $epel_repo_url
+
+	fi
+
+fi
+
 yum install -y git ansible
 
 # if /opt/meza doesn't exist, clone into and use master branch (which is the

@@ -3,9 +3,40 @@
   yum: name=deltarpm state=installed
 - name: upgrade all packages
   yum: name=* state=latest
+
+
 # FIXME: for RedHat may need to enable "Optional RPMs"
 - name: ensure EPEL installed
-  yum: name=epel-release state=installed
+  yum:
+    name: epel-release
+    state: installed
+  when: ansible_distribution == "CentOS"
+
+- name: Check if EPEL repo is already configured.
+  stat: path={{ epel_repofile_path }}
+  register: epel_repofile_result
+  when: ansible_distribution == "RedHat"
+
+- name: Install EPEL repo.
+  yum:
+    name: "{{ epel_repo_url }}"
+    state: present
+  register: result
+  until: '"failed" not in result'
+  retries: 5
+  delay: 10
+  when: ansible_distribution == "RedHat" and not epel_repofile_result.stat.exists
+
+- name: Import EPEL GPG key.
+  rpm_key:
+    key: "{{ epel_repo_gpg_key_url }}"
+    state: present
+  when: ansible_distribution == "RedHat" and not epel_repofile_result.stat.exists
+  ignore_errors: "{{ ansible_check_mode }}"
+
+
+
+
 - name: ensure libselinux-python installed prior to SELinux
   yum: name=libselinux-python state=installed
 - name: Install base packages
