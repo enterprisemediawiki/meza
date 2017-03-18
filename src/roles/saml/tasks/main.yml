@@ -1,0 +1,52 @@
+---
+
+- name: Ensure SimpleSamlPhp (PHP SAML library) installed
+  git:
+    repo: https://github.com/simplesamlphp/simplesamlphp.git
+    dest: "{{ m_simplesamlphp_path }}"
+    version: "master"
+  tags:
+    - latest
+
+- name: Ensure SimpleSamlAuth (MediaWiki extension) installed
+  git:
+    repo: https://github.com/jornane/mwSimpleSamlAuth.git
+    dest: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
+    version: "v0.7"
+  tags:
+    - latest
+
+- name: Ensure simplesamlphp dependencies in place
+  composer:
+    command: install
+    working_dir: "{{ m_simplesamlphp_path }}"
+
+- name: Ensure config files in place
+  template:
+    src: "{{ item.filename }}.j2"
+    dest: "{{ item.dest_path }}/{{ item.filename }}"
+  with_items:
+
+    # Config files for SimpleSamlPhp (PHP SAML library)
+    - filename: "config.php"
+      dest_path: "{{ m_simplesamlphp_path }}/config"
+    - filename: "saml20-idp-remote.php"
+      dest_path: "{{ m_simplesamlphp_path }}/metadata"
+    - filename: "authsources.php"
+      dest_path: "{{ m_simplesamlphp_path }}/config"
+
+    # Config files for SimpleSamlAuth (MediaWiki extension)
+    - filename: "preLocalSettings.d/saml.php"
+      dest_path: "{{ m_local_public }}"
+    - filename: "postLocalSettings.d/saml.php"
+      dest_path: "{{ m_local_public }}"
+
+    # Config file used by MW extension + any other PHP app needing auth
+    # (landing page, admin functions, etc)
+    - filename: "SAMLConfig.php"
+      dest_path: "/opt/meza/config/local_app"
+
+
+
+memcached for sessions?
+memcahced for sessions not in MW?

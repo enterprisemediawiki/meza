@@ -11,11 +11,11 @@ $wgSamlCreateUser = true;
 
 // SAML attributes. These are edited by /opt/meza/src/scripts/saml.sh
 // when setting up SAML auth.
-$wgSamlUsernameAttr = 'username_attr';
-$wgSamlRealnameAttr = 'realname_attr';
-$wgSamlMailAttr = 'email_attr';
+$wgSamlUsernameAttr = '{{ saml_public.idp_username_attr }}';
+$wgSamlRealnameAttr = '{{ saml_public.idp_realname_attr }}';
+$wgSamlMailAttr = '{{ saml_public.idp_email_attr }}';
 
 // SimpleSamlPhp settings
-$wgSamlSspRoot = '/opt/meza/simplesamlphp';
+$wgSamlSspRoot = '/opt/simplesamlphp';
 $wgSamlAuthSource = 'default-sp';
 $wgSamlPostLogoutRedirect = NULL;

@@ -1,4 +1,4 @@
-
+<?php
 
 // don't let nobody do no account creatin'
 $wgGroupPermissions['*']['createaccount'] = false;

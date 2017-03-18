@@ -154,6 +154,16 @@
 
 
 #
+# Authentication roles
+#
+- name: Include SAML role if SAML configured
+  include_role:
+    name: saml
+  when: saml_public is defined
+
+
+
+#
 # DEMO WIKI (if needed)
 #
 # 1. Check if wikis exist
