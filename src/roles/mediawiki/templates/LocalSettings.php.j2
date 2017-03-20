@@ -62,13 +62,17 @@ if ( ! in_array( $wikiId, $wikis ) ) {
 
 }
 
-// Load all-wikis preLocalSettings_allWikis.php first, then allow wiki-specific preLocalSettings.php to modify
-require_once "$m_meza/config/local_app/preLocalSettings_allWikis.php";
-
-// Gets wiki-specific config variables like:
-// $wgSitename, $mezaAuthType, $mezaDebug, $mezaEnableWikiEmail
-require_once "$m_htdocs/wikis/$wikiId/config/preLocalSettings.php";
-
+#
+# PRE LOCAL SETTINGS
+#
+#    (1) Load all PHP files in preLocalSettings.d for all wikis
+foreach ( glob("$m_meza/config/local_app/preLocalSettings.d/*.php") as $filename) {
+    require_once $filename;
+}
+#    (2) Load all PHP files in preLocalSettings.d for this wiki
+foreach ( glob("$m_meza/config/local_app/wikis/$wikiId/preLocalSettings.d/*.php") as $filename) {
+    require_once $filename;
+}
 
 
 
@@ -611,7 +615,7 @@ else if ( $mezaAuthType === 'viewer-read' ) {
 /**
  *  8) EXTENSION SETTINGS
  *
- *  Extensions defined in meza core and meza local yaml files, which are used to  *  load the extensions via Git or Composer, and which generate the PHP files 
+ *  Extensions defined in meza core and meza local yaml files, which are used to  *  load the extensions via Git or Composer, and which generate the PHP files
  *  below.
  */
 
@@ -701,15 +705,17 @@ $wgVisualEditorNamespaces = array_merge(
 
 
 /**
- *  9) LOAD OVERRIDES
+ *  9) LOAD POST LOCAL SETTINGS
  *
- *
+ *     Items to override standard config
  *
  *
  **/
-if ( file_exists( "$m_meza/config/local_app/postLocalSettings_allWikis.php" ) ) {
-	require_once "$m_meza/config/local_app/postLocalSettings_allWikis.php";
+#    (1) Load all PHP files in postLocalSettings.d for all wikis
+foreach ( glob("$m_meza/config/local_app/postLocalSettings.d/*.php") as $filename) {
+    require_once $filename;
 }
-if ( file_exists( "$m_htdocs/wikis/$wikiId/config/postLocalSettings.php" ) ) {
-	require_once "$m_htdocs/wikis/$wikiId/config/postLocalSettings.php";
+#    (2) Load all PHP files in postLocalSettings.d for this wiki
+foreach ( glob("$m_meza/config/local_app/wikis/$wikiId/postLocalSettings.d/*.php") as $filename) {
+    require_once $filename;
 }

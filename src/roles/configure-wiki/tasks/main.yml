@@ -45,6 +45,19 @@
   delegate_to: localhost
   run_once: true
 
+- name: Ensure wiki pre/post settings directories exists in config
+  file:
+    path: "/opt/meza/config/local-public/wikis/{{ wiki_id }}/{{ item }}"
+    state: directory
+    owner: apache
+    group: apache
+    mode: 0755
+  delegate_to: localhost
+  run_once: true
+  with_items:
+    - preLocalSettings.d
+    - postLocalSettings.d
+
 - name: Ensure base templates are present (but do not overwrite)
   template:
     src: "templates/{{ item }}.j2"
@@ -55,7 +68,8 @@
     group: apache
     mode: 0755
   with_items:
-    - preLocalSettings.php
-    - postLocalSettings.php
+    - preLocalSettings.d/base.php
+    - preLocalSettings.d/README.md
+    - postLocalSettings.d/README.md
   delegate_to: localhost
   run_once: true

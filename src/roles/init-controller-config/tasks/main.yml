@@ -109,9 +109,25 @@
   delegate_to: localhost
   run_once: true
 
+
+- name: Ensure pre/post settings directories exists in config
+  file:
+    path: "/opt/meza/config/local-public/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  delegate_to: localhost
+  run_once: true
+  with_items:
+    - preLocalSettings.d
+    - postLocalSettings.d
+
+
+
 - name: "Ensure base files present, do NOT overwrite"
-  copy:
-    src: "templates/{{ item }}"
+  template:
+    src: "templates/{{ item }}.j2"
     dest: "{{ m_local_public }}/{{ item }}"
     owner: root
     group: root
@@ -121,6 +137,7 @@
   run_once: true
   with_items:
     - MezaLocalExtensions.yml
-    - preLocalSettings_allWikis.php
-    - postLocalSettings_allWikis.php
+    - preLocalSettings.d/email.php
+    - preLocalSettings.d/README.md
+    - postLocalSettings.d/README.md
     - vars.yml
