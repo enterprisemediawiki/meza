@@ -126,8 +126,8 @@
 
 
 - name: "Ensure base files present, do NOT overwrite"
-  copy:
-    src: "{{ item }}.j2"
+  template:
+    src: "templates/{{ item }}.j2"
     dest: "{{ m_local_public }}/{{ item }}"
     owner: root
     group: root

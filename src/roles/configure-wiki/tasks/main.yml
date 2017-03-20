@@ -60,7 +60,7 @@
 
 - name: Ensure base templates are present (but do not overwrite)
   template:
-    src: "{{ item }}.j2"
+    src: "templates/{{ item }}.j2"
     dest: "/opt/meza/config/local-public/wikis/{{ wiki_id }}/{{ item }}"
     # force=no: Non-default for templates. Destination files will not be overwritten
     force: no
