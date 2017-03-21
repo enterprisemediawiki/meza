@@ -184,6 +184,10 @@ list:
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticCompoundQueries.git
     version: REL1_27
     legacy_load: true
+  - name: SemanticDrilldown
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticDrilldown.git
+    version: REL1_27
+    legacy_load: true
   - name: Arrays
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Arrays.git
     version: REL1_27
