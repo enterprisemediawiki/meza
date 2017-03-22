@@ -47,8 +47,6 @@ mysql_sql_mode: ''
 # The following variables have a default value depending on operating system.
 # mysql_pid_file: /var/run/mysqld/mysqld.pid
 # mysql_socket: /var/lib/mysql/mysql.sock
-# Deviation from geerlinguy role
-mysql_socket: /opt/meza/data/mariadb/mysql.sock
 
 # Slow query log settings.
 mysql_slow_query_log_enabled: no
