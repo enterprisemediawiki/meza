@@ -38,7 +38,11 @@ mysql_enablerepo: ""
 mysql_port: "3306"
 mysql_bind_address: '0.0.0.0'
 mysql_skip_name_resolve: no
-mysql_datadir: /var/lib/mysql
+
+# Deviation from geerlinguy role
+# mysql_datadir: /var/lib/mysql
+mysql_datadir: /opt/meza/data/mariadb
+
 mysql_sql_mode: ''
 # The following variables have a default value depending on operating system.
 # mysql_pid_file: /var/run/mysqld/mysqld.pid
