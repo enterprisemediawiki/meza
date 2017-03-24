@@ -657,7 +657,16 @@ $mezaValidParsoidServers[] = '127.0.0.1';
 {% endif %}
 $mezaValidParsoidServers[] = '{{ host }}';
 {% endfor %}
-if ( isset( $_SERVER['REMOTE_ADDR'] ) && in_array( $_SERVER['REMOTE_ADDR'], $mezaValidParsoidServers ) ) {
+
+/**
+ * HTTP_X_FORWARDED_FOR is set by HAProxy when users request pages via
+ * the load balancer. No users should directly access webservers. Only
+ * other services (e.g. Parsoid) should directly access webservers. In
+ * order to allow services to access MediaWiki with full permissions,
+ * if HTTP_X_FORWARDED_FOR does NOT exist then assume it's not a regular
+ * user and grant permissions
+ **/
+if ( ! isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 	$wgGroupPermissions['*']['read'] = true;
 	$wgGroupPermissions['*']['edit'] = true;
 }
