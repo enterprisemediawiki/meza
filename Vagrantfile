@@ -23,7 +23,7 @@ Vagrant.configure("2") do |config|
 
   # Disable default synced folder at /vagrant, instead put at /opt/meza
   config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.vm.synced_folder ".", "/opt/meza"
+  config.vm.synced_folder ".", "/opt/meza", type: "rsync", rsync__exclude: ".git/"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
