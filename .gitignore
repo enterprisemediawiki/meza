@@ -20,3 +20,4 @@ htdocs/wikis/*
 
 simplesamlphp/
 
+.vagrant/*
