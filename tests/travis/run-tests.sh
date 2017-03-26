@@ -7,61 +7,6 @@
 # -x: debug mode; print executed commands
 set -eux
 
-server_check () {
-
-	# Ensure Node.js, PHP, MariaDB installed
-	${docker_exec[@]} which node
-	${docker_exec[@]} node -v
-	${docker_exec[@]} which php
-	${docker_exec[@]} php --version
-	${docker_exec[@]} which mysql
-	${docker_exec[@]} mysql --version
-
-
-	# HAProxy 302 redirect test
-	${docker_exec[@]} ${curl_args[@]} http://127.0.0.1
-
-	${docker_exec[@]} ${curl_args[@]} http://127.0.0.1 \
-		| grep -q '302' \
-		&& (echo 'HAProxy 302 redirect test: pass' && exit 0) \
-		|| (echo 'HAProxy 302 redirect test: fail' && exit 1)
-
-	# Apache (over port 8080) 200 OK test
-	${docker_exec[@]} ${curl_args[@]} http://127.0.0.1:8080
-
-	${docker_exec[@]} ${curl_args[@]} http://127.0.0.1:8080 \
-		| grep -q '200' \
-		&& (echo 'Apache 200 test: pass' && exit 0) \
-		|| (echo 'Apache 200 test: fail' && exit 1)
-
-}
-
-wiki_check () {
-
-	# Wiki API test
-	api_url_base="http://127.0.0.1:8080/$wiki_id/api.php?action=query&meta=siteinfo&format=json"
-
-	api_url_siteinfo="$api_url_base?action=query&meta=siteinfo&format=json"
-	api_url_ve="$api_url_base?action=visualeditor&format=json&paction=parse&page=Main_Page&uselang=en"
-
-	${docker_exec[@]} curl -L "$api_url_siteinfo"
-	${docker_exec[@]} curl -L "$api_url_siteinfo" \
-	    | grep -q "\"sitename\":\"$wiki_name\"," \
-	    && (echo '$wiki_name API test: pass' && exit 0) \
-	    || (echo '$wiki_name API test: fail' && exit 1)
-
-	# Verify Parsoid is working
-	${docker_exec[@]} curl -L "$api_url_ve" | jq '.visualeditor.result == "success"' \
-		&& (echo 'VisualEditor PASS' && exit 0) || (echo 'VisualEditor FAIL' && exit 1)
-
-	# Verify an indices exist for this wiki
-	curl "http://127.0.0.1:9200/_stats/index,store" | jq ".indices | has(\"wiki_${wiki_id}_content_first\")" \
-		&& (echo 'Elasticsearch PASS' && exit 0) || (echo 'Elasticsearch FAIL' && exit 1)
-	curl "http://127.0.0.1:9200/_stats/index,store" | jq ".indices | has(\"wiki_${wiki_id}_general_first\")" \
-		&& (echo 'Elasticsearch PASS' && exit 0) || (echo 'Elasticsearch FAIL' && exit 1)
-
-}
-
 # Report docker version just in case we run into issues in the future, and we
 # want to be able to track how things have changed
 docker -v
@@ -114,20 +59,16 @@ if [ "$test_type" == "monolith_from_scratch" ]; then
 	${docker_exec[@]} meza deploy monolith
 
 	# TEST BASIC SYSTEM FUNCTIONALITY
-	server_check
+	${docker_exec[@]} /opt/meza/tests/travis/server-check.sh
 
 	# Demo Wiki API test
-	wiki_id="demo"
-	wiki_name="Demo Wiki"
-	wiki_check
+	${docker_exec[@]} /opt/meza/tests/travis/wiki-check.sh "demo" "Demo Wiki"
 
 	# CREATE WIKI AND TEST
 	${docker_exec[@]} meza create wiki-promptless monolith created "Created Wiki"
 
 	# Created Wiki API test
-	wiki_id="created"
-	wiki_name="Created Wiki"
-	wiki_check
+	${docker_exec[@]} /opt/meza/tests/travis/wiki-check.sh "created" "Created Wiki"
 
 	${docker_exec[@]} meza backup monolith
 
@@ -159,12 +100,10 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	${docker_exec[@]} meza deploy imported
 
 	# Basic system check
-	server_check
+	${docker_exec[@]} /opt/meza/tests/travis/server-check.sh
 
 	# Top Wiki API test
-	wiki_id="top"
-	wiki_name="Top Wiki"
-	wiki_check
+	${docker_exec[@]} /opt/meza/tests/travis/wiki-check.sh "top" "Top Wiki"
 
 
 	# Check if title of "Test image" exists
