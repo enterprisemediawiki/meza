@@ -59,16 +59,16 @@ if [ "$test_type" == "monolith_from_scratch" ]; then
 	${docker_exec[@]} meza deploy monolith
 
 	# TEST BASIC SYSTEM FUNCTIONALITY
-	${docker_exec[@]} /opt/meza/tests/travis/server-check.sh
+	${docker_exec[@]} bash /opt/meza/tests/travis/server-check.sh
 
 	# Demo Wiki API test
-	${docker_exec[@]} /opt/meza/tests/travis/wiki-check.sh "demo" "Demo Wiki"
+	${docker_exec[@]} bash /opt/meza/tests/travis/wiki-check.sh "demo" "Demo Wiki"
 
 	# CREATE WIKI AND TEST
 	${docker_exec[@]} meza create wiki-promptless monolith created "Created Wiki"
 
 	# Created Wiki API test
-	${docker_exec[@]} /opt/meza/tests/travis/wiki-check.sh "created" "Created Wiki"
+	${docker_exec[@]} bash /opt/meza/tests/travis/wiki-check.sh "created" "Created Wiki"
 
 	${docker_exec[@]} meza backup monolith
 
@@ -100,10 +100,10 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	${docker_exec[@]} meza deploy imported
 
 	# Basic system check
-	${docker_exec[@]} /opt/meza/tests/travis/server-check.sh
+	${docker_exec[@]} bash /opt/meza/tests/travis/server-check.sh
 
 	# Top Wiki API test
-	${docker_exec[@]} /opt/meza/tests/travis/wiki-check.sh "top" "Top Wiki"
+	${docker_exec[@]} bash /opt/meza/tests/travis/wiki-check.sh "top" "Top Wiki"
 
 
 	# Check if title of "Test image" exists
