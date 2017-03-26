@@ -102,6 +102,8 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	# Basic system check
 	${docker_exec[@]} bash /opt/meza/tests/travis/server-check.sh
 
+	${docker_exec[@]} cat /etc/parsoid/localsettings.js
+
 	# Top Wiki API test
 	${docker_exec[@]} bash /opt/meza/tests/travis/wiki-check.sh "top" "Top Wiki"
 
