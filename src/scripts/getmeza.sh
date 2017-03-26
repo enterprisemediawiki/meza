@@ -24,7 +24,7 @@ if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 
 fi
 
-yum install -y git ansible
+yum install -y git ansible libselinux-python
 
 # if /opt/meza doesn't exist, clone into and use master branch (which is the
 # default, but should we make this configurable?)
