@@ -1,4 +1,10 @@
 ---
+- name: Ensure user meza-ansible in group "wheel"
+  user:
+    name: meza-ansible
+    # primary group
+    group: wheel
+
 - name: ensure deltarpm is installed and latest
   yum: name=deltarpm state=installed
 - name: upgrade all packages
