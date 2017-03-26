@@ -25,13 +25,13 @@ api_url_ve="$api_url_base?action=visualeditor&format=json&paction=parse&page=Mai
 #             "base": "https://en.wikipedia.org/wiki/Main_Page",
 #             "sitename": "Wikipedia",
 curl -L "$api_url_siteinfo"
-curl -L "$api_url_siteinfo" | jq '.query.general.sitename == "$wiki_name"' -e \
+curl -L "$api_url_siteinfo" | jq ".query.general.sitename == \"$wiki_name\"" -e \
     && (echo "$wiki_name API test: pass" && exit 0) \
     || (echo "$wiki_name API test: fail" && exit 1)
 
 # Verify Parsoid is working
 curl -L "$api_url_ve"
-curl -L "$api_url_ve" | jq '.visualeditor.result == "success"' -e \
+curl -L "$api_url_ve" | jq ".visualeditor.result == \"success\"" -e \
 	&& (echo 'VisualEditor PASS' && exit 0) || (echo 'VisualEditor FAIL' && exit 1)
 
 # Verify an indices exist for this wiki
