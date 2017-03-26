@@ -25,18 +25,18 @@ api_url_ve="$api_url_base?action=visualeditor&format=json&paction=parse&page=Mai
 #             "base": "https://en.wikipedia.org/wiki/Main_Page",
 #             "sitename": "Wikipedia",
 curl -L "$api_url_siteinfo"
-curl -L "$api_url_siteinfo" | jq '.query.general.sitename == "$wiki_name"' \
-    && (echo '$wiki_name API test: pass' && exit 0) \
-    || (echo '$wiki_name API test: fail' && exit 1)
+curl -L "$api_url_siteinfo" | jq '.query.general.sitename == "$wiki_name"' -e \
+    && (echo "$wiki_name API test: pass" && exit 0) \
+    || (echo "$wiki_name API test: fail" && exit 1)
 
 # Verify Parsoid is working
 curl -L "$api_url_ve"
-curl -L "$api_url_ve" | jq '.visualeditor.result == "success"' \
+curl -L "$api_url_ve" | jq '.visualeditor.result == "success"' -e \
 	&& (echo 'VisualEditor PASS' && exit 0) || (echo 'VisualEditor FAIL' && exit 1)
 
 # Verify an indices exist for this wiki
 curl "http://127.0.0.1:9200/_stats/index,store"
-curl "http://127.0.0.1:9200/_stats/index,store" | jq ".indices | has(\"wiki_${wiki_id}_content_first\")" \
+curl "http://127.0.0.1:9200/_stats/index,store" | jq ".indices | has(\"wiki_${wiki_id}_content_first\")" -e \
 	&& (echo 'Elasticsearch PASS' && exit 0) || (echo 'Elasticsearch FAIL' && exit 1)
-curl "http://127.0.0.1:9200/_stats/index,store" | jq ".indices | has(\"wiki_${wiki_id}_general_first\")" \
+curl "http://127.0.0.1:9200/_stats/index,store" | jq ".indices | has(\"wiki_${wiki_id}_general_first\")" -e \
 	&& (echo 'Elasticsearch PASS' && exit 0) || (echo 'Elasticsearch FAIL' && exit 1)
