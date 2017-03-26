@@ -153,6 +153,9 @@ list:
       $wgDefaultUserOptions['math'] = 'MW_MATH_MATHJAX'; // Set MathJax as the default rendering option for all users (optional)
       $wgMathDisableTexFilter = true; // or compile "texvccheck"
       $wgDefaultUserOptions['mathJax'] = true; // Enable the MathJax checkbox option
+  - name: ImageMap
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ImageMap
+    version: REL1_27
   # Extension:PdfHandler (breaks on very large PDFs)
   # https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler
   # // Location of PdfHandler dependencies
