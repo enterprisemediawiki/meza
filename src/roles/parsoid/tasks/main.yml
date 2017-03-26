@@ -52,7 +52,7 @@
 
 - name: Get individual wikis dirs from localhost
   find:
-    paths: "{{ m_local_control }}/wikis/"
+    paths: "{{ m_local_public }}/wikis/"
     file_type: directory
   register: wikis_dirs
   delegate_to: localhost
