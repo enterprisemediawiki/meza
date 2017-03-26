@@ -12,6 +12,13 @@
     group: apache
     mode: 0775
 
+- name: Ensure user meza-ansible is in group "apache"
+  user:
+    name: meza-ansible
+    # add onto groups
+    groups: apache
+    append: yes
+
 # Check if there's a CA cert file in place, so the appropriate directives
 # can be added to httpd.conf if needed
 - name: Check if CA cert exists
