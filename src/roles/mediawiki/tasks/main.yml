@@ -228,8 +228,3 @@
   with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
   run_once: true
 
-- name: Ensure Parsoid configured and running
-  include_role:
-    name: parsoid-settings
-  delegate_to: "{{ item }}"
-  with_items: "{{ groups['parsoid-servers'] }}"
