@@ -21,3 +21,9 @@
 - name: Use verify-wiki to make sure new wiki is setup
   include_role:
     name: verify-wiki
+
+- name: Ensure Parsoid configured for new wiki
+  include_role:
+    name: parsoid-settings
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['parsoid-servers'] }}"

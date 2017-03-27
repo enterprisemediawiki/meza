@@ -44,6 +44,8 @@ m_apache: /etc/httpd
 m_apache_conf: /etc/httpd/conf/httpd.conf
 m_php_ini: /etc/php.ini
 m_memcached_conf: /etc/sysconfig/memcached
+m_parsoid_path: /etc/parsoid
+
 
 # files
 m_local_config_file: /opt/meza/config/local/config.local.sh
@@ -51,3 +53,10 @@ m_i18n: /opt/meza/config/core/i18n
 m_db_replication_dump_file: /opt/meza/data/db_master_for_replication.sql
 m_db_replication_log_file: /opt/meza/data/db_master_log_file
 m_db_replication_log_pos: /opt/meza/data/db_master_log_pos
+
+
+# FIXME: this is not a "path" but it's the best place to keep it for now
+# Set Parsoid version.
+# This commit is closest to MW 1.27 release date of 28 June 2016
+# Default = "master"
+m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8

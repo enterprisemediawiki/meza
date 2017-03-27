@@ -9,8 +9,6 @@
   shell: >
     WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/importDump.php" --report --debug < {{ m_mediawiki }}/extensions/SemanticMeetingMinutes/ImportFiles/import.xml
   run_once: true
-  notify:
-    - restart parsoid
 
 - name: rebuildrecentchanges.php
   shell: >
