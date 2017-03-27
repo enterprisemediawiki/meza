@@ -46,23 +46,6 @@
   npm:
     path: "{{ m_parsoid_path }}"
     state: latest
-
-- name: Copy localsettings.js
-  template:
-    src: localsettings.js.j2
-    dest: "{{ m_parsoid_path }}/localsettings.js"
-
-- name: Copy systemd service
-  template:
-    src: parsoid.initd.sh.j2
-    dest: /etc/init.d/parsoid
-    mode: 0755
-  notify:
-    - reload systemd
-    - restart parsoid
-
-- name: Enable parsoid service
-  service:
-    name: parsoid
-    state: started
-    enabled: yes
+  tags:
+    - latest
+    - parsoid-deps
