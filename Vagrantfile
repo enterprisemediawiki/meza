@@ -41,11 +41,11 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "setup", type: "shell", inline: <<-SHELL
     bash /opt/meza/src/scripts/getmeza.sh
-    meza setup env monolith --fqdn=192.168.56.56 --db_pass=1234 --enable_email=true
   SHELL
+  # meza setup env monolith --fqdn=192.168.56.56 --db_pass=1234 --enable_email=true
 
-  config.vm.provision "deploy", type: "shell", inline: <<-SHELL
-    meza deploy monolith
-  SHELL
+  # config.vm.provision "deploy", type: "shell", inline: <<-SHELL
+  #   meza deploy monolith
+  # SHELL
 
 end
