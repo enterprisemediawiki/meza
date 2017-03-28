@@ -18,7 +18,8 @@ fqdn="$1"
 # sed -r -i "s/INSERT_FQDN/$fqdn/g;" "/opt/meza/config/local-secret/imported/group_vars/all.yml"
 
 # TRYING TO FIGURE OUT WHAT IS BREAKING...TEMPORARILY MAKE IT NOT "from import"
-meza setup env imported --fqdn="${fqdn}" --db_pass=1234 --enable_email=false --private_net_zone=public
+meza setup env monolith --fqdn="${fqdn}" --db_pass=1234 --enable_email=false --private_net_zone=public
+mv /opt/meza/config/local-secret/monolith /opt/meza/config/local-secret/imported
 meza deploy imported
 
 
