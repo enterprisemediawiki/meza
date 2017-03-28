@@ -27,7 +27,7 @@ meza deploy imported
 # git clone https://github.com/jamesmontalvo3/meza-test-backups.git /opt/meza/data/backups/imported
 
 # Deploy "imported" environment with test config
-meza deploy imported
+# meza deploy imported
 
 # Basic system check
 bash /opt/meza/tests/travis/server-check.sh
