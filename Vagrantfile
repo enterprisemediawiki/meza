@@ -41,11 +41,23 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "setup", type: "shell", inline: <<-SHELL
     bash /opt/meza/src/scripts/getmeza.sh
-    meza setup env monolith --fqdn=192.168.56.56 --db_pass=1234 --enable_email=true
   SHELL
 
-  config.vm.provision "deploy", type: "shell", inline: <<-SHELL
-    meza deploy monolith
-  SHELL
+  # Default is to run `meza deploy` command. Add environment variable to override
+  if not ENV["deploy"] || ENV["deploy"] == "basic"
+
+    config.vm.provision "deploy", type: "shell", inline: <<-SHELL
+      meza setup env monolith --fqdn=192.168.56.56 --db_pass=1234 --enable_email=true
+      meza deploy monolith
+    SHELL
+
+  # Could have option to get test configs enterprisemediawiki/meza-test-config
+  # and enterprisemediawiki/meza-test-config-secret, and backups from
+  # jamesmontalvo3/meza-test-backups, to bootstrap a test config. Also could
+  # have more involved installations with many well-developed wikis showcasing
+  # what is possible.
+  # elsif ENV["deploy"] == "test"
+
+  end
 
 end
