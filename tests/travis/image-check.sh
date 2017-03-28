@@ -20,7 +20,7 @@ api_url_image="$api_url_base?action=query&titles=File:$image_title&prop=imageinf
 curl --insecure -L "$api_url_image" | jq '.query.pages[].title'
 
 # Get image url, get sha1 according to database (via API)
-img_url=$( curl --insecure -L "$api_url_image" | jq --raw-output '.query.pages[].imageinfo[0].url' )
+img_url=$( curl --insecure -L "$api_url_image" | jq --raw-output '.query.pages[].imageinfo[0].url' -e )
 img_url=$( echo $img_url | sed 's/https:\/\/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\///' )
 img_url="http://127.0.0.1:8080/$img_url"
 
