@@ -117,17 +117,10 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	${docker_exec[@]} git clone https://github.com/jamesmontalvo3/meza-test-backups.git /opt/meza/data/backups/imported
 
 	# Deploy "imported" environment with test config
-	${docker_exec[@]} meza deploy imported
+	${docker_exec[@]} meza deploy imported -vvvv
 
 	# Basic system check
 	${docker_exec[@]} bash /opt/meza/tests/travis/server-check.sh
-
-	# Try restarting Parsoid to see if it will fix the wiki-check.sh issue.
-	#
-	# VisualEditor tests fail in wiki-check.sh below on Travis CI, but not on
-	# local Docker builds. Restarting Parsoid in this way always gives a bad
-	# exit code, so override with exit 0.
-	${docker_exec[@]} systemctl restart parsoid || (exit 0)
 
 	# Top Wiki API test
 	${docker_exec[@]} bash /opt/meza/tests/travis/wiki-check.sh "top" "Top Wiki"
