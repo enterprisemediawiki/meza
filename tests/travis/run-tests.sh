@@ -2,10 +2,30 @@
 #
 #
 
+# Set defaults before declaring now undefined variables
+if [ -z "$docker_repo" ]; then
+	docker_repo="jamesmontalvo3/meza-docker-test-max:latest"
+	echo "Using default docker_repo = $docker_repo"
+fi
+if [ -z "$init" ]; then
+	init="/usr/lib/systemd/systemd"
+	echo "Using default init = $init"
+fi
+if [ -z "$run_opts" ]; then
+	run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+	echo "Using default run_opts = $run_opts"
+fi
+
 # -e: kill script if anything fails
 # -u: don't allow undefined variables
 # -x: debug mode; print executed commands
 set -eux
+
+# Pull the docker image if not already present
+if [[ "$(docker images -q $docker_repo 2> /dev/null)" == "" ]]; then
+	echo "pulling image $docker_repo"
+	docker pull ${docker_repo}
+fi
 
 # Report docker version just in case we run into issues in the future, and we
 # want to be able to track how things have changed
