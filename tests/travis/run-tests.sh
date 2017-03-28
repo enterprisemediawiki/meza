@@ -81,7 +81,8 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	# TEST ANSIBLE SYNTAX. FIXME: syntax check all playbooks
 	${docker_exec[@]} ANSIBLE_CONFIG=/opt/meza/config/core/ansible.cfg ansible-playbook /opt/meza/src/playbooks/site.yml --syntax-check
 
-	${docker_exec[@]} bash /opt/meza/tests/travis/monolith-from-import.sh "$docker_ip"
+	# ${docker_exec[@]} bash /opt/meza/tests/travis/monolith-from-import.sh "$docker_ip"
+	${docker_exec[@]} bash /opt/meza/tests/travis/monolith-from-scratch.sh "$docker_ip"
 
 else
 	echo "Bad test type: $test_type"
