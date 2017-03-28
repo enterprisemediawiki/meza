@@ -16,10 +16,11 @@ expected_code="200"
 
 # Check if title of "Test image" exists
 api_url_base="$origin/$wiki_id/api.php"
-curl --insecure -L "$api_url_base?action=query&titles=File:$image_title&prop=imageinfo&iiprop=sha1|url&format=json" | jq '.query.pages[].title'
+api_url_image="$api_url_base?action=query&titles=File:$image_title&prop=imageinfo&iiprop=sha1|url&format=json"
+curl --insecure -L "$api_url_image" | jq '.query.pages[].title'
 
 # Get image url, get sha1 according to database (via API)
-img_url=$( curl --insecure -L "$api_url_base/api.php?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq --raw-output '.query.pages[].imageinfo[0].url' )
+img_url=$( curl --insecure -L "$api_url_image" | jq --raw-output '.query.pages[].imageinfo[0].url' )
 img_url=$( echo $img_url | sed 's/https:\/\/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\///' )
 img_url="http://127.0.0.1:8080/$img_url"
 
