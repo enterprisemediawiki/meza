@@ -117,10 +117,13 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	${docker_exec[@]} git clone https://github.com/jamesmontalvo3/meza-test-backups.git /opt/meza/data/backups/imported
 
 	# Deploy "imported" environment with test config
-	${docker_exec[@]} meza deploy imported -vvvv
+	${docker_exec[@]} meza deploy imported
 
 	# Basic system check
 	${docker_exec[@]} bash /opt/meza/tests/travis/server-check.sh
+
+	# Is Parsoid service running?
+	${docker_exec[@]} curl -L "http://127.0.0.1:8000"
 
 	# Top Wiki API test
 	${docker_exec[@]} bash /opt/meza/tests/travis/wiki-check.sh "top" "Top Wiki"
