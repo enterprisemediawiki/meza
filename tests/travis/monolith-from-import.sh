@@ -18,7 +18,7 @@ git clone https://github.com/enterprisemediawiki/meza-test-config-secret.git /op
 sed -r -i "s/INSERT_FQDN/$fqdn/g;" "/opt/meza/config/local-secret/imported/group_vars/all.yml"
 
 # get backup files
-git clone https://github.com/jamesmontalvo3/meza-test-backups.git /opt/meza/data/backups/imported
+# git clone https://github.com/jamesmontalvo3/meza-test-backups.git /opt/meza/data/backups/imported
 
 # Deploy "imported" environment with test config
 meza deploy imported
