@@ -127,21 +127,8 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	# Top Wiki API test
 	${docker_exec[@]} bash /opt/meza/tests/travis/wiki-check.sh "top" "Top Wiki"
 
-
-	# Check if title of "Test image" exists
-	url_base="http://127.0.0.1/top/api.php"
-	${docker_exec[@]} curl --insecure -L "$url_base?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq '.query.pages[].title'
-
-	# Get image url, get sha1 according to database (via API)
-	img_url=$( ${docker_exec[@]} curl --insecure -L "$url_base/api.php?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq --raw-output '.query.pages[].imageinfo[0].url' )
-	img_url=$( echo $img_url | sed 's/https:\/\/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\///' )
-	img_url="http://127.0.0.1:8080/$img_url"
-
-	# Retrieve image
-	${docker_exec[@]} curl --write-out %{http_code} --silent --output /dev/null "$img_url" \
-		| grep -q '200' \
-		&& (echo 'Imported image test: pass' && exit 0) \
-		|| (echo 'Imported image test: fail' && exit 1)
+	# Test for imported image
+	${docker_exec[@]} bash /opt/meza/tests/travis/image-check.sh "top" "Test_image.png"
 
 	# FIXME: TEST FOR IDEMPOTENCE. THIS WILL FAIL CURRENTLY.
 
