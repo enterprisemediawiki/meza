@@ -21,7 +21,7 @@ git clone -b test-fix https://github.com/enterprisemediawiki/meza-test-config-se
 sed -r -i "s/INSERT_FQDN/$fqdn/g;" "/opt/meza/config/local-secret/$env_name/group_vars/all.yml"
 
 # get backup files
-# git clone https://github.com/jamesmontalvo3/meza-test-backups.git "/opt/meza/data/backups/$env_name"
+git clone -b test-fix https://github.com/jamesmontalvo3/meza-test-backups.git "/opt/meza/data/backups/$env_name"
 
 # Deploy environment with test config
 meza deploy "$env_name"
@@ -36,4 +36,4 @@ curl -L "http://127.0.0.1:8000"
 bash /opt/meza/tests/travis/wiki-check.sh "demo" "Demo Wiki"
 
 # Test for imported image
-# bash /opt/meza/tests/travis/image-check.sh "demo" "Test_image.png"
+bash /opt/meza/tests/travis/image-check.sh "demo" "Test_image.png"
