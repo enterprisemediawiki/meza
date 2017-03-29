@@ -35,7 +35,7 @@ bash /opt/meza/tests/travis/server-check.sh
 echo "is parsoid running"
 curl -L "http://127.0.0.1:8000"
 
-bash /opt/meza/tests/travis/wiki-check.sh "demo" "Demo Wiki"
+bash /opt/meza/tests/travis/wiki-check.sh "top" "Top Wiki"
 
 # Test for imported image
-bash /opt/meza/tests/travis/image-check.sh "demo" "Test_image.png"
+bash /opt/meza/tests/travis/image-check.sh "top" "Test_image.png"
