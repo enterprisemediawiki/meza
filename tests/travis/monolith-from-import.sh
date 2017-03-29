@@ -28,6 +28,7 @@ git clone -b test-fix https://github.com/jamesmontalvo3/meza-test-backups.git "/
 # Trivial change to catch enterprisemediawiki/meza-test-config-secret change: disable email
 # Previous change from Demo Wiki to Top Wiki still passed
 # Trivial change to catch enterprisemediawiki/meza-test-config-secret change: fqdn/networking variable quoting
+# Trivial change to catch enterprisemediawiki/meza-test-config change: MezaLocalExtensions.yml
 meza deploy "$env_name"
 
 # Basic system check
@@ -41,3 +42,24 @@ bash /opt/meza/tests/travis/wiki-check.sh "top" "Top Wiki"
 
 # Test for imported image
 bash /opt/meza/tests/travis/image-check.sh "top" "Test_image.png"
+
+
+# Possible issues:
+# 	meza:
+# 		--lack of backup files--
+# 	secret:
+# 		--enable email--
+# 		--quoting on fqdn and networking zone--
+# 		password length
+# 		comment after db-slave section
+# 	public:
+# 		--mezaDebug--
+# 		--MezaLocalExtensions--
+# 		enable vs disable email
+# 		lack of
+# 			(pre|post)LocalSettings_allWikis.php
+# 			wikis/demo/(pre|post)LocalSettings.php
+# 			this-wiki-more-extensions.yml
+# 		demo wiki mezaEnableWikiEmail = True (was true)
+# 	public + backups + meza:
+# 		wiki ID "demo" vs "top"
