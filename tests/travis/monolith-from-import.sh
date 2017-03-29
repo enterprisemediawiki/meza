@@ -30,8 +30,8 @@ meza deploy "$env_name"
 bash /opt/meza/tests/travis/server-check.sh
 
 # Is Parsoid service running?
-# echo "is parsoid running"
-# curl -L "http://127.0.0.1:8000"
+echo "is parsoid running"
+curl -L "http://127.0.0.1:8000"
 
 bash /opt/meza/tests/travis/wiki-check.sh "demo" "Demo Wiki"
 
