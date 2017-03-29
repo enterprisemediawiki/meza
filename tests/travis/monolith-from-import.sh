@@ -30,11 +30,10 @@ meza deploy "$env_name"
 bash /opt/meza/tests/travis/server-check.sh
 
 # Is Parsoid service running?
-echo "is parsoid running"
-curl -L "http://127.0.0.1:8000"
+# echo "is parsoid running"
+# curl -L "http://127.0.0.1:8000"
 
-# Top Wiki API test
-bash /opt/meza/tests/travis/wiki-check.sh "demo" "Top Wiki"
+bash /opt/meza/tests/travis/wiki-check.sh "demo" "Demo Wiki"
 
 # Test for imported image
 # bash /opt/meza/tests/travis/image-check.sh "demo" "Test_image.png"

@@ -156,3 +156,46 @@
         # # latest version
         # - name: node-sass
     - parsoid-settings
+
+- hosts: localhost
+  become: yes
+  roles:
+    - set-vars
+  tasks:
+    - name: Ensure package "tree" installed
+      yum:
+        name: tree
+        state: present
+
+    # Secret config
+    - name: Print directory tree of local-secret
+      shell: "tree /opt/meza/config/local-secret"
+    - name: Print group_vars/all.yml
+      shell: "cat /opt/meza/config/local-secret/{{ env }}/group_vars/all.yml"
+    - name: Print hosts
+      shell: "cat /opt/meza/config/local-secret/{{ env }}/hosts"
+
+    # Public config
+    - name: Print directory tree of local-public
+      shell: "tree /opt/meza/config/local-public"
+    - name: Print MezaLocalExtensions.yml
+      shell: "cat /opt/meza/config/local-public/MezaLocalExtensions.yml"
+    - name: Print public vars
+      shell: "cat /opt/meza/config/local-public/vars.yml"
+    - name: Print preLocalSettings.d/email.php
+      shell: "cat /opt/meza/config/local-public/preLocalSettings.d/email.php"
+    - name: Print wikis/demo/preLocalSettings.d/base.php
+      shell: "cat /opt/meza/config/local-public/wikis/demo/preLocalSettings.d/base.php"
+
+    # Uploads
+    - name: Print directory tree of local-public
+      shell: "tree /opt/meza/data/uploads"
+
+    # Local app
+    - name: Print directory tree of local_app
+      shell: "tree /opt/meza/config/local_app"
+    - name: Print LocalSettings.php
+      shell: "cat /opt/meza/htdocs/mediawiki/LocalSettings.php"
+    - name: Print Extensions.php
+      shell: "cat /opt/meza/config/local_app/Extensions.php"
+
