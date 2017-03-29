@@ -157,11 +157,14 @@
         # - name: node-sass
     - parsoid-settings
 
-# - hosts: localhost
-#   become: yes
-#   roles:
-#     - set-vars
-#   tasks:
+- hosts: localhost
+  become: yes
+  roles:
+    - set-vars
+  tasks:
+    - name: Print Extensions.php
+      shell: "cat /opt/meza/config/local_app/Extensions.php"
+
 #     - name: Ensure package "tree" installed
 #       yum:
 #         name: tree
