@@ -184,8 +184,8 @@
       shell: "cat /opt/meza/config/local-public/vars.yml"
     - name: Print preLocalSettings.d/email.php
       shell: "cat /opt/meza/config/local-public/preLocalSettings.d/email.php"
-    - name: Print wikis/demo/preLocalSettings.d/base.php
-      shell: "cat /opt/meza/config/local-public/wikis/demo/preLocalSettings.d/base.php"
+    - name: Print wikis/top/preLocalSettings.d/base.php
+      shell: "cat /opt/meza/config/local-public/wikis/top/preLocalSettings.d/base.php"
 
     # Uploads
     - name: Print directory tree of local-public
