@@ -26,6 +26,8 @@ git clone -b test-fix https://github.com/jamesmontalvo3/meza-test-backups.git "/
 # Deploy environment with test config
 # Trivial change to catch enterprisemediawiki/meza-test-config change: enable mezaDebug
 # Trivial change to catch enterprisemediawiki/meza-test-config-secret change: disable email
+# Previous change from Demo Wiki to Top Wiki still passed
+# Trivial change to catch enterprisemediawiki/meza-test-config-secret change: fqdn/networking variable quoting
 meza deploy "$env_name"
 
 # Basic system check
