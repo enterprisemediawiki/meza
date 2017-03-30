@@ -14,14 +14,14 @@ env_name="monolith"
 
 # Get test "secret" config
 # mkdir /opt/meza/config/local-secret
-git clone -b test-fix https://github.com/enterprisemediawiki/meza-test-config-secret.git "/opt/meza/config/local-secret/$env_name"
+git clone https://github.com/enterprisemediawiki/meza-test-config-secret.git "/opt/meza/config/local-secret/$env_name"
 
 # Write the docker containers IP as the FQDN for the test config (the only
 # config setting we can't know ahead of time)
 sed -r -i "s/INSERT_FQDN/$fqdn/g;" "/opt/meza/config/local-secret/$env_name/group_vars/all.yml"
 
 # get backup files
-git clone -b test-fix https://github.com/jamesmontalvo3/meza-test-backups.git "/opt/meza/data/backups/$env_name"
+git clone https://github.com/jamesmontalvo3/meza-test-backups.git "/opt/meza/data/backups/$env_name"
 
 # Deploy environment with test config
 # Trivial change to catch enterprisemediawiki/meza-test-config change: enable mezaDebug
