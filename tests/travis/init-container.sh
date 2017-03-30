@@ -49,7 +49,7 @@ fi
 # SETUP CONTAINER
 # Run container in detached state, capture container ID
 container_id=$(mktemp)
-docker run --detach "$meza_mount" \
+docker run --detach "$docker_mount" \
 	--add-host="localhost:127.0.0.1" ${run_opts} \
 	"${docker_repo}" "${init}" > "${container_id}"
 container_id=$(cat ${container_id})
@@ -80,3 +80,6 @@ fi
 
 # Install meza command
 ${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh
+
+# Get IP of docker image
+docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$container_id")
