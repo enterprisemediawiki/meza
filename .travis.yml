@@ -26,6 +26,13 @@ env:
   #   run_opts: ""
 
 before_install:
+
+  # To upgrade Docker, uncomment the following lines. Do this only if there are
+  # suspected differences between Travis' version and latest Docker CE version,
+  # since these lines take additional time and occasionally cause build errors.
+  # - sudo apt-get update
+  # - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-engine
+
   # Pull container.
   - 'docker pull ${docker_repo}'
 

@@ -2,65 +2,30 @@
 #
 #
 
+# Set defaults before declaring now undefined variables
+if [ -z "$docker_repo" ]; then
+	docker_repo="jamesmontalvo3/meza-docker-test-max:latest"
+	echo "Using default docker_repo = $docker_repo"
+fi
+if [ -z "$init" ]; then
+	init="/usr/lib/systemd/systemd"
+	echo "Using default init = $init"
+fi
+if [ -z "$run_opts" ]; then
+	run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+	echo "Using default run_opts = $run_opts"
+fi
+
 # -e: kill script if anything fails
 # -u: don't allow undefined variables
 # -x: debug mode; print executed commands
 set -eux
 
-server_check () {
-
-	# Ensure Node.js, PHP, MariaDB installed
-	${docker_exec[@]} which node
-	${docker_exec[@]} node -v
-	${docker_exec[@]} which php
-	${docker_exec[@]} php --version
-	${docker_exec[@]} which mysql
-	${docker_exec[@]} mysql --version
-
-
-	# HAProxy 302 redirect test
-	${docker_exec[@]} ${curl_args[@]} http://127.0.0.1
-
-	${docker_exec[@]} ${curl_args[@]} http://127.0.0.1 \
-		| grep -q '302' \
-		&& (echo 'HAProxy 302 redirect test: pass' && exit 0) \
-		|| (echo 'HAProxy 302 redirect test: fail' && exit 1)
-
-	# Apache (over port 8080) 200 OK test
-	${docker_exec[@]} ${curl_args[@]} http://127.0.0.1:8080
-
-	${docker_exec[@]} ${curl_args[@]} http://127.0.0.1:8080 \
-		| grep -q '200' \
-		&& (echo 'Apache 200 test: pass' && exit 0) \
-		|| (echo 'Apache 200 test: fail' && exit 1)
-
-}
-
-wiki_check () {
-
-	# Wiki API test
-	api_url_base="http://127.0.0.1:8080/$wiki_id/api.php?action=query&meta=siteinfo&format=json"
-
-	api_url_siteinfo="$api_url_base?action=query&meta=siteinfo&format=json"
-	api_url_ve="$api_url_base?action=visualeditor&format=json&paction=parse&page=Main_Page&uselang=en"
-
-	${docker_exec[@]} curl -L "$api_url_siteinfo"
-	${docker_exec[@]} curl -L "$api_url_siteinfo" \
-	    | grep -q "\"sitename\":\"$wiki_name\"," \
-	    && (echo '$wiki_name API test: pass' && exit 0) \
-	    || (echo '$wiki_name API test: fail' && exit 1)
-
-	# Verify Parsoid is working
-	${docker_exec[@]} curl -L "$api_url_ve" | jq '.visualeditor.result == "success"' \
-		&& (echo 'VisualEditor PASS' && exit 0) || (echo 'VisualEditor FAIL' && exit 1)
-
-	# Verify an indices exist for this wiki
-	curl "http://127.0.0.1:9200/_stats/index,store" | jq ".indices | has(\"wiki_${wiki_id}_content_first\")" \
-		&& (echo 'Elasticsearch PASS' && exit 0) || (echo 'Elasticsearch FAIL' && exit 1)
-	curl "http://127.0.0.1:9200/_stats/index,store" | jq ".indices | has(\"wiki_${wiki_id}_general_first\")" \
-		&& (echo 'Elasticsearch PASS' && exit 0) || (echo 'Elasticsearch FAIL' && exit 1)
-
-}
+# Pull the docker image if not already present
+if [[ "$(docker images -q $docker_repo 2> /dev/null)" == "" ]]; then
+	echo "pulling image $docker_repo"
+	docker pull ${docker_repo}
+fi
 
 # Report docker version just in case we run into issues in the future, and we
 # want to be able to track how things have changed
@@ -104,85 +69,15 @@ ${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh
 docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$container_id")
 
 if [ "$test_type" == "monolith_from_scratch" ]; then
-	echo "TEST TYPE = monolith_from_scratch"
 
-	# Since we want to make the monolith environment without prompts, need to do
-	# `meza setup env monolith` with values for required args included (fqdn,
-	# db_pass, email, private_net_zone).
-	${docker_exec[@]} meza setup env monolith --fqdn="${docker_ip}" --db_pass=1234 --enable_email=false --private_net_zone=public
-	# Now that environment monolith is setup, deploy/install it
-	${docker_exec[@]} meza deploy monolith
-
-	# TEST BASIC SYSTEM FUNCTIONALITY
-	server_check
-
-	# Demo Wiki API test
-	wiki_id="demo"
-	wiki_name="Demo Wiki"
-	wiki_check
-
-	# CREATE WIKI AND TEST
-	${docker_exec[@]} meza create wiki-promptless monolith created "Created Wiki"
-
-	# Created Wiki API test
-	wiki_id="created"
-	wiki_name="Created Wiki"
-	wiki_check
-
-	${docker_exec[@]} meza backup monolith
-
-	${docker_exec[@]} ls /opt/meza/data/backups/monolith/demo
-
-	# find any files matching *_wiki.sql in demo backups. egrep command will
-	# exit-0 if something found, exit-1 (fail) if nothing found.
-	${docker_exec[@]} find /opt/meza/data/backups/monolith/demo -name "*_wiki.sql" | egrep '.*'
+	${docker_exec[@]} bash /opt/meza/tests/travis/monolith-from-scratch.sh "$docker_ip"
 
 elif [ "$test_type" == "monolith_from_import" ]; then
-
-	echo "TEST TYPE = monolith_from_import"
 
 	# TEST ANSIBLE SYNTAX. FIXME: syntax check all playbooks
 	${docker_exec[@]} ANSIBLE_CONFIG=/opt/meza/config/core/ansible.cfg ansible-playbook /opt/meza/src/playbooks/site.yml --syntax-check
 
-	# Get test "secret" config
-	${docker_exec[@]} mkdir /opt/meza/config/local-secret
-	${docker_exec[@]} git clone https://github.com/enterprisemediawiki/meza-test-config-secret.git /opt/meza/config/local-secret/imported
-
-	# Write the docker containers IP as the FQDN for the test config (the only
-	# config setting we can't know ahead of time)
-	${docker_exec[@]} sed -r -i "s/INSERT_FQDN/$docker_ip/g;" "/opt/meza/config/local-secret/imported/group_vars/all.yml"
-
-	# get backup files
-	${docker_exec[@]} git clone https://github.com/jamesmontalvo3/meza-test-backups.git /opt/meza/data/backups/imported
-
-	# Deploy "imported" environment with test config
-	${docker_exec[@]} meza deploy imported
-
-	# Basic system check
-	server_check
-
-	# Top Wiki API test
-	wiki_id="top"
-	wiki_name="Top Wiki"
-	wiki_check
-
-
-	# Check if title of "Test image" exists
-	url_base="http://127.0.0.1/top/api.php"
-	${docker_exec[@]} curl --insecure -L "$url_base?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq '.query.pages[].title'
-
-	# Get image url, get sha1 according to database (via API)
-	img_url=$( ${docker_exec[@]} curl --insecure -L "$url_base/api.php?action=query&titles=File:Test_image.png&prop=imageinfo&iiprop=sha1|url&format=json" | jq --raw-output '.query.pages[].imageinfo[0].url' )
-	img_url=$( echo $img_url | sed 's/https:\/\/[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\///' )
-	img_url="http://127.0.0.1:8080/$img_url"
-
-	# Retrieve image
-	${docker_exec[@]} curl --write-out %{http_code} --silent --output /dev/null "$img_url" \
-		| grep -q '200' \
-		&& (echo 'Imported image test: pass' && exit 0) \
-		|| (echo 'Imported image test: fail' && exit 1)
-
-	# FIXME: TEST FOR IDEMPOTENCE. THIS WILL FAIL CURRENTLY.
+	${docker_exec[@]} bash /opt/meza/tests/travis/monolith-from-import.sh "$docker_ip"
 
 else
 	echo "Bad test type: $test_type"
