@@ -19,6 +19,9 @@ meza setup env monolith --fqdn="${fqdn}" --db_pass=1234 --enable_email=false --p
 # Now that environment monolith is setup, deploy/install it
 meza deploy monolith
 
+# Need to sleep 10 seconds to let Parsoid finish loading
+sleep 10s
+
 # TEST BASIC SYSTEM FUNCTIONALITY
 bash /opt/meza/tests/travis/server-check.sh
 

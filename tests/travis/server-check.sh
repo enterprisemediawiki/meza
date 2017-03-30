@@ -37,7 +37,7 @@ ${curl_args[@]} http://127.0.0.1:8080 \
 # Parsoid check
 ${curl_args[@]} http://127.0.0.1:8000
 
-${curl_args[@]} http://127.0.0.1:8080 \
+${curl_args[@]} http://127.0.0.1:8000 \
 	| grep -q '200' \
 	&& (echo 'Parsoid 200 test: pass' && exit 0) \
 	|| (echo 'Parsoid 200 test: fail' && exit 1)
