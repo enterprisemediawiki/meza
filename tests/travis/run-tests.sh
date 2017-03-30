@@ -8,7 +8,7 @@ docker -v
 
 # Working directory in Travis is the GitHub repo, which is meza. Mount it.
 host_mount_dir="${PWD}"
-source /opt/meza/tests/travis/init-container.sh
+source ./tests/travis/init-container.sh
 
 # Get IP of docker image
 docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$container_id")
