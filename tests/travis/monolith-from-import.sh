@@ -32,10 +32,13 @@ git clone -b test-fix https://github.com/jamesmontalvo3/meza-test-backups.git "/
 # Trivial change to catch enterprisemediawiki/meza-test-config change: mezaEnableAllWikiEmail = false
 meza deploy "$env_name"
 
+# Need to wait after install before checking that Parsoid is working
+sleep 60s
+
 # Basic system check
 bash /opt/meza/tests/travis/server-check.sh
 
-# Is Parsoid service running?
+# Is Parsoid service running? This should go in server-check.sh
 echo "is parsoid running"
 curl -L "http://127.0.0.1:8000"
 
