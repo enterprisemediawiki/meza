@@ -33,7 +33,7 @@ git clone -b test-fix https://github.com/jamesmontalvo3/meza-test-backups.git "/
 meza deploy "$env_name"
 
 # Need to wait after install before checking that Parsoid is working
-sleep 60s
+sleep 30s
 
 # Basic system check
 bash /opt/meza/tests/travis/server-check.sh
