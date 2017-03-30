@@ -167,9 +167,9 @@
       register: extphp
     - name: Print Extensions.php
       debug: { msg: "{{ extphp.stdout }}" }
-    # - name: Wait for 60 seconds to see if that fixes things
-    #   pause:
-    #     seconds: 60
+    - name: Wait for 60 seconds to see if that fixes things
+      pause:
+        seconds: 60
 
 #     - name: Ensure package "tree" installed
 #       yum:
