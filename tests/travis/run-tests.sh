@@ -70,13 +70,9 @@ docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}
 
 if [ "$test_type" == "monolith_from_scratch" ]; then
 
-	echo "TEST TYPE = monolith_from_scratch"
-
 	${docker_exec[@]} bash /opt/meza/tests/travis/monolith-from-scratch.sh "$docker_ip"
 
 elif [ "$test_type" == "monolith_from_import" ]; then
-
-	echo "TEST TYPE = monolith_from_import"
 
 	# TEST ANSIBLE SYNTAX. FIXME: syntax check all playbooks
 	${docker_exec[@]} ANSIBLE_CONFIG=/opt/meza/config/core/ansible.cfg ansible-playbook /opt/meza/src/playbooks/site.yml --syntax-check

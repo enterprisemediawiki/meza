@@ -7,6 +7,8 @@
 # -x: debug mode; print executed commands
 set -eux
 
+echo "RUNNING TEST monolith-from-scratch"
+
 fqdn="$1"
 
 # Since we want to make the monolith environment without prompts, need to do
