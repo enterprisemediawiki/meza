@@ -9,27 +9,18 @@
     mode: 0755
     recurse: yes
 
-
-# # Ensure nothing in app servers m_local, to make sure it gets a clean copy from
-# # controller
-# - name: Empty m_local on app servers (not idempotent)
-#   file:
-#     state: absent
-#     path: "{{ m_local }}/"
-
 # At this point the controller must have a local config. Now force it upon the
 # app servers.
 # This is run on all app servers (assuming conditions apply)
 - name: Ensure app servers have config from controller
-  copy:
-    # trailing slash means CONTENTS of m_local on controller will be copied
-    # into already existing m_local directory on app servers
+  synchronize:
     src: "{{ m_local_public }}/"
     dest: "{{ m_local_app }}"
-    owner: root
-    group: root
-    mode: 755
-    force: yes
+    recursive: yes
+    delete: yes
+    rsync_opts:
+      - "--no-motd"
+      - "--exclude=.git"
 
 # The commands above seemed to be putting the files in m_local_app without
 # properly setting` file modes. This does a recursive setting of those modes.
@@ -41,5 +32,3 @@
     group: root
     mode: 0755
     recurse: yes
-
-
