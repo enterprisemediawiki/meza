@@ -48,8 +48,8 @@ elif [ "$test_type" == "two_containers" ]; then
 
 	# Note: both of these git commands should be replaced by `meza --version`
 	#       but that is having issues as of this time (Issue #527)
-	${docker_exec_1[@]} git --git-dir=/opt/meza/.git describe --tags
-	${docker_exec_2[@]} git --git-dir=/opt/meza/.git describe --tags
+	${docker_exec_1[@]} git --git-dir=/opt/meza/.git rev-parse HEAD
+	${docker_exec_2[@]} git --git-dir=/opt/meza/.git rev-parse HEAD
 
 else
 	echo "Bad test type: $test_type"
