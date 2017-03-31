@@ -112,4 +112,4 @@ list:
 
 ## Adding extensions to Meza core
 
-There is a file very similar to `MezaLocalExtensions.yml` located at `src/roles/mediawiki/files/MezaCoreExtensions.yml`. This is the list of extensions installed as part of every Meza installation. If you want to request that an extension be added to Meza core you'll need to edit this file in the same way that you edit `MezaLocalExtensions.yml`, and then submit a pull request to `enterprisemediawiki/meza`. The only difference in functionality between the core and local files is that `MezaCoreExtensions.yml` does not support limiting extensions to specific wikis.
+There is a file very similar to `MezaLocalExtensions.yml` located at `config/core/MezaCoreExtensions.yml`. This is the list of extensions installed as part of every Meza installation. If you want to request that an extension be added to Meza core you'll need to edit this file in the same way that you edit `MezaLocalExtensions.yml`, and then submit a pull request to `enterprisemediawiki/meza`. The only difference in functionality between the core and local files is that `MezaCoreExtensions.yml` does not support limiting extensions to specific wikis.
