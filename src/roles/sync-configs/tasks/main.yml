@@ -30,16 +30,20 @@
     group: root
     mode: 755
     force: yes
+  register: app_server_config
 
 # The commands above seemed to be putting the files in m_local_app without
 # properly setting` file modes. This does a recursive setting of those modes.
 - name: Ensure app servers local config directory and contents configured
-  file:
-    path: "{{ m_local_app }}"
-    state: directory
-    owner: root
-    group: root
-    mode: 0755
-    recurse: yes
-
+  shell: |
+    chown -R root:root {{ m_local_app }}
+    chmod -R 0755 {{ m_local_app }}
+  # file:
+  #   path: "{{ m_local_app }}"
+  #   state: directory
+  #   owner: root
+  #   group: root
+  #   mode: 0755
+  #   recurse: yes
+  when: app_server_config.changed
 
