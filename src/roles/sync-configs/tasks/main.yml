@@ -34,6 +34,9 @@
 
 - name: "Print directory info for {{ m_local_app }}"
   shell: "tree -aCugp {{ m_local_app }}"
+  register: treeoutput
+
+- debug: { msg: "{{treeoutput.stdout}}" }
 
 # The commands above seemed to be putting the files in m_local_app without
 # properly setting` file modes. This does a recursive setting of those modes.
@@ -52,4 +55,6 @@
 
 - name: "Print directory info for {{ m_local_app }}"
   shell: "tree -aCugp {{ m_local_app }}"
+  register: treeoutput
 
+- debug: { msg: "{{treeoutput.stdout}}" }
