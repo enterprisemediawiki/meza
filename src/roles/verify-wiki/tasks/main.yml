@@ -158,20 +158,25 @@
     path: "{{ m_uploads_dir }}/{{ wiki_id }}"
   register: uploads_dir
 
-- name: Check if wiki's uploads backup dir exists ON CONTROLLER
+- name: Check if wiki's uploads backup dir exists on backups.0
   stat:
     path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}/uploads"
   register: images_backup_dir
-  delegate_to: localhost
+  delegate_to: "{{ groups['backup-servers'][0] }}"
 
-
-- name: If no uploads dir, but there is a backup dir
-  copy:
+# copy from server A (backups.0) to server B (the app server in context)
+- name: If no uploads dir, but backup dir exists, copy from there
+  synchronize:
+    # copy from server A
     src: "{{ m_backups }}/{{ env }}/{{ wiki_id }}/uploads/"
+    # copy to server B
     dest: "{{ m_uploads_dir }}/{{ wiki_id }}"
+    recursive: yes
     mode: 0755
     owner: apache
     group: apache
+  # server A
+  delegate_to: "{{ groups['backup-servers'][0] }}"
   when:
     not uploads_dir.stat.exists
     and images_backup_dir.stat.exists
@@ -184,7 +189,7 @@
     mode: 0755
     owner: apache
     group: apache
-
+    # recursive?
 
 - name: Include init-wiki.yml only when a new wiki was created
   include: init-wiki.yml
