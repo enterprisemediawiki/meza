@@ -172,9 +172,6 @@
     # copy to server B
     dest: "{{ m_uploads_dir }}/{{ wiki_id }}"
     recursive: yes
-    mode: 0755
-    owner: apache
-    group: apache
   # server A
   delegate_to: "{{ groups['backup-servers'][0] }}"
   when:
