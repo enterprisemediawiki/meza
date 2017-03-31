@@ -164,6 +164,18 @@
   register: images_backup_dir
   delegate_to: "{{ groups['backup-servers'][0] }}"
 
+# Either way (existing backup or no) make sure uploads dir is configured
+- name: If no uploads dir, but backup dir exists, first make uploads dir
+  file:
+    path: "{{ m_uploads_dir }}/{{ wiki_id }}"
+    state: directory
+    mode: 0755
+    owner: apache
+    group: apache
+  when:
+    not uploads_dir.stat.exists
+    and images_backup_dir.stat.exists
+
 # copy from server A (backups.0) to server B (the app server in context)
 - name: If no uploads dir, but backup dir exists, copy from there
   synchronize:
