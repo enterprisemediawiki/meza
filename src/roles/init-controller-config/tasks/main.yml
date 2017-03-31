@@ -48,9 +48,6 @@
     mode: pull
     src: "{{ m_local_app }}"
     dest: "{{ m_local_public }}"
-    owner: root
-    group: root
-    mode: 0755
   run_once: true
   when:
     not controller_local_config.stat.exists
