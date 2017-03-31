@@ -87,7 +87,7 @@
 - name: Ensure Extensions.php in place
   template:
     src: Extensions.php.j2
-    dest: "{{ m_local_app }}/Extensions.php"
+    dest: "{{ m_config_app_ansible }}/Extensions.php"
 
 # Adds extensions with composer param from MezaCoreExtensions.yml and
 # MezaLocalExtensions.yml
