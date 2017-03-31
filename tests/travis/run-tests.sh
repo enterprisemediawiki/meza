@@ -7,8 +7,7 @@
 docker -v
 
 # Working directory in Travis is the GitHub repo, which is meza. Mount it.
-host_mount_dir="${PWD}"
-source ./tests/travis/init-container.sh
+source ./tests/travis/init-container.sh "${PWD}" "mount"
 
 if [ "$test_type" == "monolith_from_scratch" ]; then
 
@@ -35,9 +34,7 @@ elif [ "$test_type" == "two_containers" ]; then
 
 	# Create a second container that needs to git-clone meza and checkout the
 	# same commit as Travis already has
-	host_mount_dir=""
-	meza_version="$TRAVIS_COMMIT"
-	source ./tests/travis/init-container.sh
+	source ./tests/travis/init-container.sh "${PWD}" "copy"
 
 	# Get vars and copy the docker exec command
 	container_id_2="$container_id"

@@ -19,25 +19,28 @@ if [ -z "$run_opts" ]; then
 	echo "Using default run_opts = $run_opts"
 fi
 
-# If $host_mount_dir is defined, mount that dir as /opt/meza on the container.
-# If not, mount nothing. $meza_version must then be supplied, to git-clone that
-# version further down in this script
-if [ -z "$host_mount_dir" ]; then
-	docker_mount=""
+host_meza_dir="$1"
+host_meza_dir_method="$2"
+
+if [ -z "$host_meza_dir" ]; then
+	echo "host_meza_dir not set"
+	exit 1
+elif [ ! -d "$host_meza_dir" ]; then
+	echo "$host_meza_dir is not a valid directory (for host_meza_dir)"
+	exit 1
+fi
+
+if [ "$host_meza_dir_method" = "mount" ]; then
+	docker_volume="--volume=${host_meza_dir}:/opt/meza"
 else
-	docker_mount="--volume=${host_mount_dir}:/opt/meza"
+	docker_volume=""
+	host_meza_dir_method="copy"
 fi
 
 # -e: kill script if anything fails
 # -u: don't allow undefined variables
 # -x: debug mode; print executed commands
 set -eux
-
-# Print git version that will be checked out. Since the -u option is set above,
-# this will cause an error if $meza_version is missing.
-if [ "$docker_mount" = "" ]; then
-	echo "Not mounting /opt/meza from host. Will git-clone meza version $meza_version"
-fi
 
 # Pull the docker image if not already present
 if [[ "$(docker images -q $docker_repo 2> /dev/null)" == "" ]]; then
@@ -49,7 +52,7 @@ fi
 # SETUP CONTAINER
 # Run container in detached state, capture container ID
 container_id=$(mktemp)
-docker run --detach $docker_mount \
+docker run --detach $docker_volume \
 	--add-host="localhost:127.0.0.1" ${run_opts} \
 	"${docker_repo}" "${init}" > "${container_id}"
 container_id=$(cat ${container_id})
@@ -72,10 +75,9 @@ ${docker_exec[@]} firewall-cmd --permanent --zone=public --change-interface=dock
 # non-failing exit code.
 ${docker_exec[@]} mv /opt/mediawiki /opt/meza/htdocs/mediawiki || true
 
-# If meza repo not mounted from host, clone it
-if [ "$docker_mount" = "" ]; then
-	${docker_exec[@]} git clone https://github.com/enterprisemediawiki/meza /opt/meza
-	${docker_exec[@]} git --git-dir=/opt/meza/.git checkout "$meza_version"
+# If not mounting the host's meza directory, copy it to the container
+if [ "$host_meza_dir_method" = "copy" ]; then
+	docker cp "$host_meza_dir" "$container_id:/opt/meza"
 fi
 
 # Install meza command
