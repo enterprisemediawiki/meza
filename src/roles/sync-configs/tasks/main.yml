@@ -32,6 +32,9 @@
     force: yes
   register: app_server_config
 
+- name: "Print directory info for {{ m_local_app }}"
+  shell: "tree -aCugp {{ m_local_app }}"
+
 # The commands above seemed to be putting the files in m_local_app without
 # properly setting` file modes. This does a recursive setting of those modes.
 - name: Ensure app servers local config directory and contents configured
@@ -46,4 +49,7 @@
   #   mode: 0755
   #   recurse: yes
   when: app_server_config.changed
+
+- name: "Print directory info for {{ m_local_app }}"
+  shell: "tree -aCugp {{ m_local_app }}"
 

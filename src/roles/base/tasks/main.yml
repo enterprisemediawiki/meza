@@ -62,6 +62,7 @@
     - selinux-policy
     - rsyslog
     - jq
+    - tree
 - name: put SELinux in permissive mode
   selinux:
     policy: targeted
