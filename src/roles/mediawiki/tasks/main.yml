@@ -38,26 +38,13 @@
 #
 - name: Set variable holding list of core extensions
   include_vars:
-    file: "{{ m_meza }}/src/roles/mediawiki/files/MezaCoreExtensions.yml"
+    file: "{{ m_config }}/core/MezaCoreExtensions.yml"
     name: meza_core_extensions
 
 - name: Set variable holding list of local extensions
   include_vars:
     file: "{{ m_local_public }}/MezaLocalExtensions.yml"
     name: meza_local_extensions
-
-# FIXME: REMOVE commented-out items below AND role "load-extensions-from-file"
-#        after confirming functionality of single-task, non-role method below
-# - name: Ensure core meza extensions installed (non-Composer)
-#   include_role:
-#     name: load-extensions-from-file
-#   vars:
-#     extfile: "{{ m_meza }}/src/roles/mediawiki/files/MezaCoreExtensions.yml"
-# - name: Ensure local meza extensions installed (non-Composer)
-#   include_role:
-#     name: load-extensions-from-file
-#   vars:
-#     extfile: "{{ m_local_public }}/MezaLocalExtensions.yml"
 
 - name: Ensure core meza extensions installed (non-Composer)
   git:
