@@ -66,7 +66,7 @@ elif [ "$test_type" == "docker_preinstall" ]; then
 	source ./tests/travis/init-container.sh "none"
 
 	${docker_exec[@]} git --git-dir=/opt/meza/.git fetch origin
-	${docker_exec[@]} git --git-dir=/opt/meza/.git checkout docker-tags
+	${docker_exec[@]} git --git-dir=/opt/meza/.git pull docker-tags
 
 	${docker_exec[@]} bash /opt/meza/tests/travis/monolith-from-preinstall.sh "$docker_ip"
 
