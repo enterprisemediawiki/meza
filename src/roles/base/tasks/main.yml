@@ -69,7 +69,7 @@
     state: permissive # log actions that would be blocked if state=enforcing
 - name: ensure firewalld is running (and enable it at boot)
   service: name=firewalld state=started enabled=yes
-
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
 # FIXME: These were not in non-ansible meza, but was present in the firewalld
 #        role I co-opted.
 # - name: set firewalld default zone
@@ -92,6 +92,8 @@
     name: ntpd
     state: started
     enabled: yes
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
 - name: Copy the ntp.conf template file
   template: src=ntp.conf.j2 dest=/etc/ntp.conf
   notify:

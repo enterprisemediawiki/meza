@@ -130,6 +130,8 @@
   with_items:
     - 80
     - 443
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
 
 # FIXME: haproxy will need to handle reverse proxy for Elasticsearch plugins
 # - name: Configure firewalld for Elasticsearch reverse proxy
@@ -170,3 +172,4 @@
     name: haproxy
     state: started
     enabled: yes
+  when: docker_skip_tasks is not defined or not docker_skip_tasks

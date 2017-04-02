@@ -7,3 +7,4 @@
   - restart memcached
 - name: ensure memcached is running (and enable it at boot)
   service: name=memcached state=started enabled=yes
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
