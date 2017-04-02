@@ -16,7 +16,7 @@ env:
     init: /usr/lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
     test_type: two_containers
-  - docker_repo: jamesmontalvo3/meza-docker-preinstall:latest
+  - docker_repo: jamesmontalvo3/meza-docker-full:latest
     init: /usr/lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
     test_type: docker_preinstall
