@@ -6,14 +6,18 @@
 # want to be able to track how things have changed
 docker -v
 
-# Working directory in Travis is the GitHub repo, which is meza. Mount it.
-source ./tests/travis/init-container.sh "${PWD}" "mount"
 
 if [ "$test_type" == "monolith_from_scratch" ]; then
+
+	# Working directory in Travis is the GitHub repo, which is meza. Mount it.
+	source ./tests/travis/init-container.sh "${PWD}" "mount"
 
 	${docker_exec[@]} bash /opt/meza/tests/travis/monolith-from-scratch.sh "$docker_ip"
 
 elif [ "$test_type" == "monolith_from_import" ]; then
+
+	# Working directory in Travis is the GitHub repo, which is meza. Mount it.
+	source ./tests/travis/init-container.sh "${PWD}" "mount"
 
 	# TEST ANSIBLE SYNTAX. FIXME: syntax check all playbooks
 	${docker_exec[@]} ANSIBLE_CONFIG=/opt/meza/config/core/ansible.cfg ansible-playbook /opt/meza/src/playbooks/site.yml --syntax-check
@@ -21,6 +25,9 @@ elif [ "$test_type" == "monolith_from_import" ]; then
 	${docker_exec[@]} bash /opt/meza/tests/travis/monolith-from-import.sh "$docker_ip"
 
 elif [ "$test_type" == "two_containers" ]; then
+
+	# Working directory in Travis is the GitHub repo, which is meza. Mount it.
+	source ./tests/travis/init-container.sh "${PWD}" "mount"
 
 	# Get vars and copy the docker exec command from first container
 	container_id_1="$container_id"
@@ -50,6 +57,15 @@ elif [ "$test_type" == "two_containers" ]; then
 	#       but that is having issues as of this time (Issue #527)
 	${docker_exec_1[@]} git --git-dir=/opt/meza/.git rev-parse HEAD
 	${docker_exec_2[@]} git --git-dir=/opt/meza/.git rev-parse HEAD
+
+elif [ "$test_type" == "docker_preinstall" ]; then
+
+	docker_repo="jamesmontalvo3/meza-docker-full:latest"
+
+	# Working directory in Travis is the GitHub repo, which is meza. Mount it.
+	source ./tests/travis/init-container.sh "none"
+
+	${docker_exec[@]} bash /opt/meza/tests/travis/monolith-from-preinstall.sh "$docker_ip"
 
 else
 	echo "Bad test type: $test_type"

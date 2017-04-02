@@ -25,6 +25,8 @@ host_meza_dir_method="$2"
 if [ -z "$host_meza_dir" ]; then
 	echo "host_meza_dir not set"
 	exit 1
+elif [ "$host_meza_dir" = "none" ]; then
+	host_meza_dir_method="none"
 elif [ ! -d "$host_meza_dir" ]; then
 	echo "$host_meza_dir is not a valid directory (for host_meza_dir)"
 	exit 1
@@ -32,6 +34,8 @@ fi
 
 if [ "$host_meza_dir_method" = "mount" ]; then
 	docker_volume="--volume=${host_meza_dir}:/opt/meza"
+elif [ "$host_meza_dir_method" = "none" ]; then
+	docker_volume=""
 else
 	docker_volume=""
 	host_meza_dir_method="copy"
