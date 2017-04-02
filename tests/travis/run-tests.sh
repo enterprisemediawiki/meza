@@ -65,7 +65,7 @@ elif [ "$test_type" == "docker_preinstall" ]; then
 	# Working directory in Travis is the GitHub repo, which is meza. Mount it.
 	source ./tests/travis/init-container.sh "none"
 
-	${docker_exec[@]} git --git-dir=/opt/meza/.git pull origin docker-tags
+	${docker_exec[@]} git --git-dir=/opt/meza/.git --work-tree=/opt/meza pull origin docker-tags
 
 	${docker_exec[@]} bash /opt/meza/tests/travis/monolith-from-preinstall.sh "$docker_ip"
 
