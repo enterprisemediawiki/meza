@@ -16,10 +16,10 @@ env:
     init: /usr/lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
     test_type: two_containers
-  - docker_repo: jamesmontalvo3/meza-docker-full:latest
-    init: /usr/lib/systemd/systemd
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-    test_type: docker_preinstall
+  # - docker_repo: jamesmontalvo3/meza-docker-full:latest
+  #   init: /usr/lib/systemd/systemd
+  #   run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  #   test_type: docker_preinstall
 
   # - distro: centos6
   #   init: /sbin/init
