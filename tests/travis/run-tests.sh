@@ -60,15 +60,9 @@ elif [ "$test_type" == "two_containers" ]; then
 
 elif [ "$test_type" == "docker_preinstall" ]; then
 
-	docker_repo="jamesmontalvo3/meza-docker-full:latest"
-
-	# Working directory in Travis is the GitHub repo, which is meza. Mount it.
-	source ./tests/travis/init-container.sh "none"
-
-	${docker_exec[@]} bash /opt/meza/tests/travis/git-setup.sh "$TRAVIS_EVENT_TYPE" \
-		"$TRAVIS_COMMIT" "$TRAVIS_PULL_REQUEST_SHA" "$TRAVIS_BRANCH" "$TRAVIS_PULL_REQUEST_BRANCH"
-
-	${docker_exec[@]} bash /opt/meza/tests/travis/monolith-from-preinstall.sh "$docker_ip"
+	m_meza_host="${PWD}"
+	env_name=travis
+	source ./tests/travis/monolith-with-backup.sh
 
 else
 	echo "Bad test type: $test_type"

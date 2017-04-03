@@ -61,10 +61,16 @@ rootCheck
 # Was `mf_add_ssh_user "$ansible_user"` but hard-coding user due to [1] above
 mf_add_ssh_user "meza-ansible"
 
-echo
-echo "Add a temporary password for meza-ansible. This password can be deleted after"
-echo "SSH keys are setup. Script 'transfer-master-key.sh' will auto-delete password."
-passwd "meza-ansible"
+
+if [ -f /tmp/meza-ansible.id_rsa.pub ]; then
+	cat /tmp/meza-ansible.id_rsa.pub >> /home/meza-ansible/.ssh/authorized_keys
+	passwd --delete meza-ansible
+else
+	echo
+	echo "Add a temporary password for meza-ansible. This password can be deleted after"
+	echo "SSH keys are setup. Script 'transfer-master-key.sh' will auto-delete password."
+	passwd "meza-ansible"
+fi
 
 # Add $ansible_user to sudoers as a passwordless user
 bash -c "echo 'meza-ansible ALL=(ALL) NOPASSWD: ALL' | (EDITOR='tee -a' visudo)"

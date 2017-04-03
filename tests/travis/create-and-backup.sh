@@ -7,17 +7,13 @@
 # -x: debug mode; print executed commands
 set -eux
 
-echo "RUNNING TEST monolith-from-preinstall"
+echo "RUNNING TEST create-and-backup"
 
-fqdn="$1"
-
-sed -r -i 's/docker_skip_tasks: true//g;' "/opt/meza/config/local-secret/monolith/group_vars/all.yml"
-sed -r -i "s/INSERT_FQDN/$fqdn/g;" "/opt/meza/config/local-secret/monolith/hosts"
 
 # FIXME: Need to git-fetch and git-checkout the appropriate commit
 
 # Now that environment monolith is setup, deploy/install it
-meza deploy monolith
+meza deploy "$1"
 
 # Need to sleep 10 seconds to let Parsoid finish loading
 sleep 10s
