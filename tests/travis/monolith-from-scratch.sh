@@ -27,17 +27,3 @@ bash /opt/meza/tests/travis/server-check.sh
 
 # Demo Wiki API test
 bash /opt/meza/tests/travis/wiki-check.sh "demo" "Demo Wiki"
-
-# CREATE WIKI AND TEST
-meza create wiki-promptless monolith created "Created Wiki"
-
-# Created Wiki API test
-bash /opt/meza/tests/travis/wiki-check.sh "created" "Created Wiki"
-
-meza backup monolith
-
-ls /opt/meza/data/backups/monolith/demo
-
-# find any files matching *_wiki.sql in demo backups. egrep command will
-# exit-0 if something found, exit-1 (fail) if nothing found.
-find /opt/meza/data/backups/monolith/demo -name "*_wiki.sql" | egrep '.*'
