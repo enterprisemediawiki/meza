@@ -167,6 +167,7 @@
   delegate_to: localhost
   register: initial_wikis_dirs_check
   run_once: true
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 - name: Add Demo Wiki to config if no wikis exist
   include_role:
@@ -174,12 +175,12 @@
   vars:
     wiki_id: demo
     wiki_name: Demo Wiki
-  when: "initial_wikis_dirs_check.files|length == 0"
+  when: "initial_wikis_dirs_check.files|length == 0 and (docker_skip_tasks is not defined or not docker_skip_tasks)"
 
 - name: Re-sync configuration between controller and app servers if Demo just configured
   include_role:
     name: sync-configs
-  when: "initial_wikis_dirs_check.files|length == 0"
+  when: "initial_wikis_dirs_check.files|length == 0 and (docker_skip_tasks is not defined or not docker_skip_tasks)"
 
 
 
@@ -192,6 +193,7 @@
     file_type: directory
   register: wikis_dirs
   delegate_to: localhost
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 # Check that all wikis in config are present on app and DB servers
 - name: Ensure defined wikis exist
@@ -204,6 +206,7 @@
   #   filter 2: then reduce to just the last part of the path
   #   filter 3: convert map object back to an Ansible-friendly list
   with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 # Run update.php (MediaWiki's database update script) against all wikis. This
 # only needs to be done once, since the first app server that runs it will
@@ -214,4 +217,5 @@
     wiki_id: "{{ item }}"
   with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
   run_once: true
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
 

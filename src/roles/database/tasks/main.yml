@@ -18,6 +18,13 @@
 # Configure MySQL.
 - include: configure.yml
 - include: secure-installation.yml
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
 - include: databases.yml
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
 - include: users.yml
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
 - include: replication.yml
+  when: docker_skip_tasks is not defined or not docker_skip_tasks

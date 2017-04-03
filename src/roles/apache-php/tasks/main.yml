@@ -67,6 +67,7 @@
 # Now that PHP is installed, start apache
 - name: ensure apache is running (and enable it at boot)
   service: name=httpd state=started enabled=yes
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 
 

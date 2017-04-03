@@ -75,8 +75,10 @@
   notify: restart elasticsearch
 - name: Start Elasticsearch.
   service: name=elasticsearch state=started enabled=yes
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
 - name: Make sure Elasticsearch is running before proceeding.
   wait_for: host={{ elasticsearch_network_host }} port={{ elasticsearch_http_port }} delay=3 timeout=300
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 
 # INSTALL PLUGINS: kopf, head, bigdesk

@@ -19,7 +19,7 @@
 # mysql and remove the logfiles in case the user set a custom log file size.
 - name: Ensure MySQL is stopped after initial install.
   service: "name={{ mysql_daemon }} state=stopped"
-  when: mysql_installed.stat.exists == false
+  when: mysql_installed.stat.exists == false and (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 - name: Delete innodb log files created by apt package after initial install.
   file: path={{ mysql_datadir }}/{{item}} state=absent
