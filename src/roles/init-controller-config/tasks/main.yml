@@ -33,27 +33,6 @@
   register: app1_local_config
   run_once: true
 
-# No controller_local_config, but YES to app1_local_config?
-# Copy from app1 to controller
-# Run once for reason [1] above
-#
-# I've run into issues with synchronize in situations where localhost may be
-# copying to/from an inventory host _that may also be localhost_. In other
-# words, mixing localhost into the application, and making the controller a
-# member of the inventory, has caused issues. However, I don't think that can
-# happen here since the "when" condition is when localhost doesn't have the
-# directory and app1 does, meaning they're different servers.
-- name: "Ensure controller has config from app server 1"
-  synchronize:
-    mode: pull
-    src: "{{ m_local_app }}"
-    dest: "{{ m_local_public }}"
-  run_once: true
-  when:
-    not controller_local_config.stat.exists
-    and app1_local_config.stat.isdir is defined
-    and app1_local_config.stat.isdir
-
 # If controller still doesn't have a local config, but a git repo is defined,
 # use that. Need to check if both controller_local_config and app1_local_config
 # DIDN'T exist, since that would mean that the controller still doesn't have a
