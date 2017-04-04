@@ -27,7 +27,7 @@ cd /opt/meza
 git fetch origin
 if [ "$TRAVIS_EVENT_TYPE" = "pull_request" ]; then
 	git checkout "$TRAVIS_BRANCH"
-	git merge "$TRAVIS_PULL_REQUEST_BRANCH" || true
+	git merge "origin/$TRAVIS_PULL_REQUEST_BRANCH" || true
 	git status
 	echo
 	echo "rev-parse HEAD:"
