@@ -33,12 +33,15 @@ docker_exec_2=( "${docker_exec[@]}" )
 
 # CONTAINER 1
 # (1) Get local secret config from repo
-# (2) Change backup server IP address to docker#2
-# (3) Change FQDN IP address to docker#1
+# (2) Change backup server IP address to docker#2 in hosts file
+# (3) Change all other servers to docker#1 IP address in hosts file
+# (4) Change FQDN to docker#1 IP address in group_vars/all.yml
 ${docker_exec_1[@]} git clone \
 	https://github.com/enterprisemediawiki/meza-test-config-secret.git \
 	"/opt/meza/config/local-secret/$env_name"
 ${docker_exec_1[@]} sed -r -i "s/localhost #backup/$docker_ip_2/g;" \
+	"/opt/meza/config/local-secret/$env_name/hosts"
+${docker_exec_1[@]} sed -r -i "s/localhost/$docker_ip_1/g;" \
 	"/opt/meza/config/local-secret/$env_name/hosts"
 ${docker_exec_1[@]} sed -r -i "s/INSERT_FQDN/$docker_ip_1/g;" \
 	"/opt/meza/config/local-secret/$env_name/group_vars/all.yml"
