@@ -26,17 +26,7 @@
   delegate_to: localhost
   run_once: true
 
-# Run once for reason [1] above
-- name: Does first app-server have local config
-  stat:
-    path: "{{ m_local_app }}"
-  register: app1_local_config
-  run_once: true
-
-# If controller still doesn't have a local config, but a git repo is defined,
-# use that. Need to check if both controller_local_config and app1_local_config
-# DIDN'T exist, since that would mean that the controller still doesn't have a
-# config directory
+# If a git repo is defined use that for config
 - name: Get local config repo if set
   git:
     repo: "{{ local_config_repo.repo }}"
@@ -47,7 +37,6 @@
   run_once: true
   when:
     not controller_local_config.stat.exists
-    and not app1_local_config.stat.exists
     and local_config_repo.repo is defined
 
 # After all that, now check if controller has a local config
