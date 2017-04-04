@@ -62,7 +62,7 @@ fi
 # SETUP CONTAINER
 # Run container in detached state, capture container ID
 container_id=$(mktemp)
-docker run --detach $docker_volume -e ANSIBLE_HOST_KEY_CHECKING='False' \
+docker run --detach $docker_volume \
 	--add-host="localhost:127.0.0.1" ${run_opts} \
 	"${docker_repo}" "${init}" > "${container_id}"
 container_id=$(cat ${container_id})
