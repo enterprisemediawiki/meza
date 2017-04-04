@@ -119,6 +119,8 @@ def meza_command_setup (argv):
 # FIXME: This function is big.
 def meza_command_setup_env (argv, return_not_exit=False):
 
+	import json, string
+
 	if isinstance( argv, basestring ):
 		env = argv
 	else:
@@ -211,8 +213,6 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	else:
 		env_vars["db_master"] = ['localhost']
 
-
-	import json, string
 	json_env_vars = json.dumps(env_vars)
 
 	# Create temporary extra vars file in local-secret directory so passwords

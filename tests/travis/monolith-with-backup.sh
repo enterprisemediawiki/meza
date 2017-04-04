@@ -12,9 +12,14 @@
 #   4) TRAVIS_COMMIT= a sha1 hash for a commit or a branch like origin/fix123
 
 
+# -e: kill script if anything fails
+# -u: don't allow undefined variables
+# -x: debug mode; print executed commands
+set -eux
+
 # Initiate CONTAINER 1
 docker_repo="jamesmontalvo3/meza-docker-full:latest"
-source /opt/meza/tests/travis/init-container.sh "none"
+source "$m_meza_host/tests/travis/init-container.sh" "none"
 container_id_1="$container_id"
 docker_ip_1="$docker_ip"
 docker_exec_1=( "${docker_exec[@]}" )
