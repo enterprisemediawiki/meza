@@ -58,11 +58,11 @@ elif [ "$test_type" == "two_containers" ]; then
 	${docker_exec_1[@]} git --git-dir=/opt/meza/.git rev-parse HEAD
 	${docker_exec_2[@]} git --git-dir=/opt/meza/.git rev-parse HEAD
 
-elif [ "$test_type" == "docker_preinstall" ]; then
+elif [ "$test_type" == "backup_to_remote" ]; then
 
 	m_meza_host="${PWD}"
 	env_name=travis
-	source ./tests/travis/monolith-with-backup.sh
+	source ./tests/travis/backup-to-remote.sh
 
 else
 	echo "Bad test type: $test_type"

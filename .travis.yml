@@ -19,7 +19,7 @@ env:
   - docker_repo: jamesmontalvo3/meza-docker-full:latest
     init: /usr/lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-    test_type: docker_preinstall
+    test_type: backup_to_remote
 
   # - distro: centos6
   #   init: /sbin/init

@@ -54,7 +54,7 @@ ${docker_exec_1[@]} default_servers="localhost" backup_servers="$docker_ip_2" \
 	--fqdn="$docker_ip_1" --db_pass=1234 --enable_email=false --private_net_zone=public
 
 
-${docker_exec_1[@]} bash /opt/meza/tests/travis/create-and-backup.sh "$env_name"
+${docker_exec_1[@]} bash /opt/meza/tests/travis/deploy-create-backup.sh "$env_name"
 
 
 ${docker_exec_2[@]} ls "/opt/meza/data/backups/$env_name/demo"
