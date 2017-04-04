@@ -211,7 +211,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	elif "default_servers" in os.environ:
 		env_vars["db_master"] = os.environ["default_servers"].strip()
 	else:
-		env_vars["db_master"] = ['localhost']
+		env_vars["db_master"] = 'localhost'
 
 	json_env_vars = json.dumps(env_vars)
 

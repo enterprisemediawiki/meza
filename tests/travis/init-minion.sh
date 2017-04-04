@@ -4,7 +4,7 @@
 
 # Initiate CONTAINER 2
 # FIXME: pre-yum has more than we need. Go lighter.
-docker_repo="jamesmontalvo3/meza-docker-base:latest"
+docker_repo="jamesmontalvo3/meza-docker-pre-yum:latest"
 is_minion=yes
 source "$m_meza_host/tests/travis/init-container.sh" "none"
 
