@@ -42,7 +42,7 @@ docker_exec_2=( "${docker_exec[@]}" )
 # What's present on the pre-built container is not the latest. Need to pull
 # master in case the docker image doesn't have the correct git-setup.sh script
 # yet
-${docker_exec_1[@]} bash -c "cd /opt/meza && git pull origin master --ff-only"
+${docker_exec_1[@]} bash -c "cd /opt/meza && git fetch origin && git reset --hard origin/master"
 ${docker_exec_1[@]} bash /opt/meza/tests/travis/git-setup.sh "$TRAVIS_EVENT_TYPE" \
 	"$TRAVIS_COMMIT" "$TRAVIS_PULL_REQUEST_SHA" "$TRAVIS_BRANCH" "$TRAVIS_PULL_REQUEST_BRANCH"
 

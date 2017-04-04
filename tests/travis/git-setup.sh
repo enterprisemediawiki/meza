@@ -24,7 +24,6 @@ TRAVIS_BRANCH="$4"
 TRAVIS_PULL_REQUEST_BRANCH="$5"
 
 cd /opt/meza
-git fetch origin
 if [ "$TRAVIS_EVENT_TYPE" = "pull_request" ]; then
 	git checkout "$TRAVIS_BRANCH"
 	git config --global user.name "Docker User"
