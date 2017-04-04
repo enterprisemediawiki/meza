@@ -30,8 +30,7 @@ docker_exec_1=( "${docker_exec[@]}" )
 docker cp "$container_id_1:/home/meza-ansible/.ssh/id_rsa.pub" /tmp/controller.id_rsa.pub
 
 # CONTAINER 1 disable host key checking to not get prompts
-${docker_exec_1[@]} bash -c "echo ''                          >> /opt/meza/config/core/ansible.cfg"
-${docker_exec_1[@]} bash -c "echo 'host_key_checking = False' >> /opt/meza/config/core/ansible.cfg"
+${docker_exec_1[@]} export ANSIBLE_HOST_KEY_CHECKING=False
 
 # CONTAINER 2 is a backup server
 source "$m_meza_host/tests/travis/init-minion.sh"
