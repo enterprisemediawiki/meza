@@ -40,7 +40,7 @@ ${docker_exec_1[@]} default_servers="localhost" backup_servers="$docker_ip_2" \
 
 # Run script on controller to `meza deploy`, `meza create wiki` and
 # `meza backup`
-${docker_exec_1[@]} bash /opt/meza/tests/travis/deploy-create-backup.sh "$env_name"
+${docker_exec_1[@]} bash /opt/meza/tests/travis/backup-to-remote.controller.sh "$env_name"
 
 
 # RUN TESTS ON CONTAINER 2

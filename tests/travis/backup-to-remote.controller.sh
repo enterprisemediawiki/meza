@@ -7,7 +7,7 @@
 # -x: debug mode; print executed commands
 set -eux
 
-echo "RUNNING TEST create-and-backup"
+echo "RUNNING TEST"
 
 
 # FIXME: Need to git-fetch and git-checkout the appropriate commit
