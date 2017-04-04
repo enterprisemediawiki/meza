@@ -48,8 +48,8 @@ ${docker_exec_1[@]} bash /opt/meza/tests/travis/git-setup.sh "$TRAVIS_EVENT_TYPE
 
 
 # Remove existing config info
-${docker_exec_1[@]} rm -rf /opt/meza/config/local-secret/monolith
-${docker_exec_1[@]} rm -rf /opt/meza/config/local-public
+${docker_exec_1[@]} rm -rf /opt/meza/config/local-secret/monolith || true
+${docker_exec_1[@]} rm -rf /opt/meza/config/local-public || true
 
 # create a new environment called "travis"
 ${docker_exec_1[@]} default_servers="localhost" backup_servers="$docker_ip_2" \
