@@ -223,7 +223,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	if os.path.isfile(extra_vars_file):
 		os.remove(extra_vars_file)
 	f = open(extra_vars_file, 'w')
-	f.write(env_vars)
+	f.write(json_env_vars)
 	f.close()
 
 	shell_cmd = playbook_cmd( "setup-env" ) + ["--extra-vars", '@'+extra_vars_file]
