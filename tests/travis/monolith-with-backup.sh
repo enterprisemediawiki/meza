@@ -29,10 +29,12 @@ docker_exec_1=( "${docker_exec[@]}" )
 # Copy SSH public key from user "meza-ansible" to host
 docker cp "$container_id_1:/home/meza-ansible/.ssh/id_rsa.pub" /tmp/controller.id_rsa.pub
 
+# CONTAINER 1 disable host key checking to not get prompts
+${docker_exec_1[@]} sed -r -i 's/#host_key_checking.*/host_key_checking = False/g;' /etc/ansible/ansible.cfg
+
 # CONTAINER 2 is a backup server
 source "$m_meza_host/tests/travis/init-minion.sh"
 docker_ip_2="$docker_ip"
-
 
 
 # Checkout the correct version of meza on the container
