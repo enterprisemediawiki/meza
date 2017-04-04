@@ -35,6 +35,7 @@ ${docker_exec_1[@]} bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   Us
 # CONTAINER 2 is a backup server
 source "$m_meza_host/tests/travis/init-minion.sh"
 docker_ip_2="$docker_ip"
+docker_exec_2=( "${docker_exec[@]}" )
 
 
 # Checkout the correct version of meza on the container
@@ -54,3 +55,10 @@ ${docker_exec_1[@]} default_servers="localhost" backup_servers="$docker_ip_2" \
 
 
 ${docker_exec_1[@]} bash /opt/meza/tests/travis/create-and-backup.sh "$env_name"
+
+
+${docker_exec_2[@]} ls "/opt/meza/data/backups/$env_name/demo"
+
+# find any files matching *_wiki.sql in demo backups. egrep command will
+# exit-0 if something found, exit-1 (fail) if nothing found.
+${docker_exec_2[@]} find "/opt/meza/data/backups/$env_name/demo" -name "*_wiki.sql" | egrep '.*'

@@ -12,7 +12,7 @@ echo "RUNNING TEST create-and-backup"
 
 # FIXME: Need to git-fetch and git-checkout the appropriate commit
 
-# Now that environment monolith is setup, deploy/install it
+# Now that environment is setup, deploy/install it
 meza deploy "$1"
 
 # Need to sleep 10 seconds to let Parsoid finish loading
@@ -25,15 +25,9 @@ bash /opt/meza/tests/travis/server-check.sh
 bash /opt/meza/tests/travis/wiki-check.sh "demo" "Demo Wiki"
 
 # CREATE WIKI AND TEST
-meza create wiki-promptless monolith created "Created Wiki"
+meza create wiki-promptless "$1" created "Created Wiki"
 
 # Created Wiki API test
 bash /opt/meza/tests/travis/wiki-check.sh "created" "Created Wiki"
 
-meza backup monolith
-
-ls /opt/meza/data/backups/monolith/demo
-
-# find any files matching *_wiki.sql in demo backups. egrep command will
-# exit-0 if something found, exit-1 (fail) if nothing found.
-find /opt/meza/data/backups/monolith/demo -name "*_wiki.sql" | egrep '.*'
+meza backup "$1"
