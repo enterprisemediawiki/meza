@@ -5,6 +5,7 @@
 # Initiate CONTAINER 2
 # FIXME: pre-yum has more than we need. Go lighter.
 docker_repo="jamesmontalvo3/meza-docker-base:latest"
+is_minion=yes
 source "$m_meza_host/tests/travis/init-container.sh" "none"
 
 # CONTAINER 2 is a minion. Give access to meza-ansible from controller CONTAINER 1
