@@ -47,6 +47,12 @@ else
 	is_minion=yes
 fi
 
+if [ ! -z "$container_name" ]; then
+	set_container_name="--name $container_name"
+else
+	set_container_name=""
+fi
+
 # -e: kill script if anything fails
 # -u: don't allow undefined variables
 # -x: debug mode; print executed commands
@@ -62,7 +68,7 @@ fi
 # SETUP CONTAINER
 # Run container in detached state, capture container ID
 container_id=$(mktemp)
-docker run --detach $docker_volume \
+docker run --detach $docker_volume "$set_container_name" \
 	--add-host="localhost:127.0.0.1" ${run_opts} \
 	"${docker_repo}" "${init}" > "${container_id}"
 container_id=$(cat ${container_id})

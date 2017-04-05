@@ -19,6 +19,7 @@ set -eux
 
 
 # CONTAINER 1 is controller and monolith
+container_name="ctrl"
 source "$m_meza_host/tests/travis/init-controller.sh"
 container_id_1="$container_id"
 docker_ip_1="$docker_ip"
@@ -26,6 +27,7 @@ docker_exec_1=( "${docker_exec[@]}" )
 
 
 # CONTAINER 2 is a backup server
+container_name="bkup"
 source "$m_meza_host/tests/travis/init-minion.sh"
 docker_ip_2="$docker_ip"
 docker_exec_2=( "${docker_exec[@]}" )
