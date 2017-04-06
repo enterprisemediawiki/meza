@@ -12,3 +12,5 @@
     mode: "0600"
   - file: id_rsa.pub
     mode: "0644"
+  - file: known_hosts
+    mode: "0644"
