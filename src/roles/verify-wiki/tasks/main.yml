@@ -190,6 +190,7 @@
   when:
     not uploads_dir.stat.exists
     and images_backup_dir.stat.exists
+    and groups['backup-servers'][0] != inventory_hostname
 
 - name: ls -l /home/meza-ansible/.ssh on backups.0, again
   shell: ls -l /home/meza-ansible/.ssh
