@@ -5,6 +5,13 @@
     # primary group
     group: wheel
 
+- name: Ensure user meza-ansible authorized_keys configured
+  file:
+    path: /home/meza-ansible/.ssh/authorized_keys
+    owner: meza-ansible
+    group: wheel
+    mode: 0644
+
 - name: ensure deltarpm is installed and latest
   yum: name=deltarpm state=installed
 - name: upgrade all packages
