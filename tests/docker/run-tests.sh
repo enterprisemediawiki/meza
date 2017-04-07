@@ -10,8 +10,8 @@ test_type="$1"
 m_meza_host="/opt/meza"
 
 # Emulate some travis environment variables.
-TRAVIS_EVENT_TYPE="push"
-TRAVIS_COMMIT=$(git --git-dir=/opt/meza/.git rev-parse HEAD)
+export TRAVIS_EVENT_TYPE="push"
+export TRAVIS_COMMIT=$(git --git-dir=/opt/meza/.git rev-parse HEAD)
 
 # None of these should be required provided TRAVIS_EVENT_TYPE=push
 # TRAVIS_PULL_REQUEST_SHA
