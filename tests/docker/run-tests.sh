@@ -13,10 +13,13 @@ m_meza_host="/opt/meza"
 export TRAVIS_EVENT_TYPE="push"
 export TRAVIS_COMMIT=$(git --git-dir=/opt/meza/.git rev-parse HEAD)
 
-# None of these should be required provided TRAVIS_EVENT_TYPE=push
-# TRAVIS_PULL_REQUEST_SHA
-# TRAVIS_BRANCH
-# TRAVIS_PULL_REQUEST_BRANCH
+echo "Using version $TRAVIS_COMMIT"
+
+# None of these should be required provided TRAVIS_EVENT_TYPE=push, but they
+# can't be unset.
+TRAVIS_PULL_REQUEST_SHA=""
+TRAVIS_BRANCH=""
+TRAVIS_PULL_REQUEST_BRANCH=""
 
 
 if [ "$test_type" == "monolith-from-scratch" ]; then
