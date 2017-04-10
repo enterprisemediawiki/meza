@@ -10,7 +10,7 @@ set -eux
 echo "RUNNING TEST"
 
 # Deploy environment with test config
-meza deploy "$1" -vv
+meza deploy "$1"
 
 # Need to wait after install before checking that Parsoid is working
 sleep 10s

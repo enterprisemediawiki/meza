@@ -176,12 +176,6 @@
     not uploads_dir.stat.exists
     and images_backup_dir.stat.exists
 
-- name: ls -l /home/meza-ansible/.ssh on backups.0
-  shell: ls -l /home/meza-ansible/.ssh
-  register: ssh_dir
-
-- debug: { var: ssh_dir }
-
 - name: If no uploads dir, but backup dir exists, give backups.0 the keys
   include_role:
     name: grant-keys
@@ -191,12 +185,6 @@
     not uploads_dir.stat.exists
     and images_backup_dir.stat.exists
     and groups['backup-servers'][0] != inventory_hostname
-
-- name: ls -l /home/meza-ansible/.ssh on backups.0, again
-  shell: ls -l /home/meza-ansible/.ssh
-  register: ssh_dir
-
-- debug: { var: ssh_dir }
 
 # copy from server A (backups.0) to server B (the app server in context)
 - name: If no uploads dir, but backup dir exists, copy from there
