@@ -4,14 +4,14 @@
 services: docker
 
 env:
-  # - docker_repo: jamesmontalvo3/meza-docker-test-max:latest
-  #   init: /usr/lib/systemd/systemd
-  #   run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-  #   test_type: monolith-from-scratch
-  # - docker_repo: jamesmontalvo3/meza-docker-test-max:latest
-  #   init: /usr/lib/systemd/systemd
-  #   run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-  #   test_type: monolith-from-import
+  - docker_repo: jamesmontalvo3/meza-docker-test-max:latest
+    init: /usr/lib/systemd/systemd
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    test_type: monolith-from-scratch
+  - docker_repo: jamesmontalvo3/meza-docker-test-max:latest
+    init: /usr/lib/systemd/systemd
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    test_type: monolith-from-import
   - docker_repo: jamesmontalvo3/meza-docker-full:latest
     init: /usr/lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
