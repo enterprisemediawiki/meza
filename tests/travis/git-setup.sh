@@ -27,6 +27,8 @@ cd /opt/meza
 git fetch origin
 if [ "$TRAVIS_EVENT_TYPE" = "pull_request" ]; then
 	git checkout "$TRAVIS_BRANCH"
+	git config --global user.name "Docker User"
+	git config --global user.email docker@example.com
 	git merge "origin/$TRAVIS_PULL_REQUEST_BRANCH" || true
 	git status
 	echo
