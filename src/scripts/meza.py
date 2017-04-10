@@ -119,6 +119,8 @@ def meza_command_setup (argv):
 # FIXME: This function is big.
 def meza_command_setup_env (argv, return_not_exit=False):
 
+	import json, string
+
 	if isinstance( argv, basestring ):
 		env = argv
 	else:
@@ -163,29 +165,14 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	if not enable_email:
 		enable_email = prompt("enable_email")
 
-
 	# No need for private networking. Set to public.
 	if env == "monolith":
 		private_net_zone = "public"
-
-		# list of servers
-		load_balancers = app_servers = memcached_servers = parsoid_servers = elastic_servers = backup_servers = ['localhost']
-		db_slaves = [] # None on a monolith
-		db_master = 'localhost' # single server, e.g. just a string
-
-
-	else:
-		# list of servers
-		load_balancers = app_servers = memcached_servers = db_slaves = parsoid_servers = elastic_servers = backup_servers = ['# INSERT']
-
-		# single server, e.g. just a string
-		db_master = '# INSERT'
-
-	if not private_net_zone:
+	elif not private_net_zone:
 		private_net_zone = prompt("private_net_zone")
 
-	import json, string
-	env_vars = json.dumps({
+	# Ansible environment variables
+	env_vars = {
 		'env': env,
 
 		'fqdn': fqdn,
@@ -198,20 +185,35 @@ def meza_command_setup_env (argv, return_not_exit=False):
 		'db_slave_pass': db_pass,
 
 		# Generate a random secret key
-		'wg_secret_key': random_string( num_chars=64, valid_chars= string.ascii_letters + string.digits ),
+		'wg_secret_key': random_string( num_chars=64, valid_chars= string.ascii_letters + string.digits )
 
-		# Lists of servers
-		'load_balancers': load_balancers,
-		'app_servers': app_servers,
-		'memcached_servers': memcached_servers,
-		'db_slaves': db_slaves,
-		'parsoid_servers': parsoid_servers,
-		'elastic_servers': elastic_servers,
-		'backup_servers': backup_servers,
+	}
 
-		# Single server
-		'db_master': db_master
-	})
+
+	server_types = ['load_balancers','app_servers','memcached_servers',
+		'db_slaves','parsoid_servers','elastic_servers','backup_servers']
+
+
+	for stype in server_types:
+		if stype in os.environ:
+			env_vars[stype] = [x.strip() for x in os.environ[stype].split(',')]
+		elif stype == "db_slaves":
+			# unless db_slaves are explicitly set, don't configure any
+			env_vars["db_slaves"] = []
+		elif "default_servers" in os.environ:
+			env_vars[stype] = [x.strip() for x in os.environ["default_servers"].split(',')]
+		else:
+			env_vars[stype] = ['localhost']
+
+
+	if "db_master" in os.environ:
+		env_vars["db_master"] = os.environ["db_master"].strip()
+	elif "default_servers" in os.environ:
+		env_vars["db_master"] = os.environ["default_servers"].strip()
+	else:
+		env_vars["db_master"] = 'localhost'
+
+	json_env_vars = json.dumps(env_vars)
 
 	# Create temporary extra vars file in local-secret directory so passwords
 	# are not written to command line. Putting in local-secret should make
@@ -221,7 +223,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	if os.path.isfile(extra_vars_file):
 		os.remove(extra_vars_file)
 	f = open(extra_vars_file, 'w')
-	f.write(env_vars)
+	f.write(json_env_vars)
 	f.close()
 
 	shell_cmd = playbook_cmd( "setup-env" ) + ["--extra-vars", '@'+extra_vars_file]

@@ -1,0 +1,28 @@
+---
+- name: "Grant keys to delegated server {{ grant_keys_to_server }}"
+  copy:
+    src: "/home/meza-ansible/.ssh/{{ item.file }}"
+    dest: "/home/meza-ansible/.ssh/{{ item.file }}"
+    owner: meza-ansible
+    group: wheel
+    mode: "{{ item.mode }}"
+  delegate_to: "{{ grant_keys_to_server }}"
+  with_items:
+  - file: id_rsa
+    mode: "0600"
+  - file: id_rsa.pub
+    mode: "0644"
+
+
+# When the delegated server uses rsync to another server, allow it the same
+# list of known hosts as the controller. In some cases this file may not exist,
+# so ignore_errors.
+- name: "Copy known_hosts to delegated server {{ grant_keys_to_server }}"
+  copy:
+    src: "/home/meza-ansible/.ssh/known_hosts"
+    dest: "/home/meza-ansible/.ssh/known_hosts"
+    owner: meza-ansible
+    group: wheel
+    mode: "0644"
+  delegate_to: "{{ grant_keys_to_server }}"
+  ignore_errors: True

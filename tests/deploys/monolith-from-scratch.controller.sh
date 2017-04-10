@@ -16,6 +16,9 @@ fqdn="$1"
 # db_pass, email, private_net_zone).
 meza setup env monolith --fqdn="${fqdn}" --db_pass=1234 --enable_email=false --private_net_zone=public
 
+echo "print hosts file"
+cat /opt/meza/config/local-secret/monolith/hosts
+
 # Now that environment monolith is setup, deploy/install it
 meza deploy monolith
 
@@ -23,21 +26,7 @@ meza deploy monolith
 sleep 10s
 
 # TEST BASIC SYSTEM FUNCTIONALITY
-bash /opt/meza/tests/travis/server-check.sh
+bash /opt/meza/tests/integration/server-check.sh
 
 # Demo Wiki API test
-bash /opt/meza/tests/travis/wiki-check.sh "demo" "Demo Wiki"
-
-# CREATE WIKI AND TEST
-meza create wiki-promptless monolith created "Created Wiki"
-
-# Created Wiki API test
-bash /opt/meza/tests/travis/wiki-check.sh "created" "Created Wiki"
-
-meza backup monolith
-
-ls /opt/meza/data/backups/monolith/demo
-
-# find any files matching *_wiki.sql in demo backups. egrep command will
-# exit-0 if something found, exit-1 (fail) if nothing found.
-find /opt/meza/data/backups/monolith/demo -name "*_wiki.sql" | egrep '.*'
+bash /opt/meza/tests/integration/wiki-check.sh "demo" "Demo Wiki"

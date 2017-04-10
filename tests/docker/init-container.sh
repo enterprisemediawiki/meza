@@ -41,6 +41,18 @@ else
 	host_meza_dir_method="copy"
 fi
 
+if [ -z "$is_minion" ] || [ "$is_minion" == "no" ]; then
+	is_minion=no
+else
+	is_minion=yes
+fi
+
+if [ ! -z "$container_name" ]; then
+	set_container_name="--name $container_name"
+else
+	set_container_name=""
+fi
+
 # -e: kill script if anything fails
 # -u: don't allow undefined variables
 # -x: debug mode; print executed commands
@@ -56,7 +68,7 @@ fi
 # SETUP CONTAINER
 # Run container in detached state, capture container ID
 container_id=$(mktemp)
-docker run --detach $docker_volume \
+docker run --detach $docker_volume $set_container_name \
 	--add-host="localhost:127.0.0.1" ${run_opts} \
 	"${docker_repo}" "${init}" > "${container_id}"
 container_id=$(cat ${container_id})
@@ -73,19 +85,25 @@ ${docker_exec[@]} yum -y install firewalld
 ${docker_exec[@]} systemctl start firewalld
 ${docker_exec[@]} firewall-cmd --permanent --zone=public --change-interface=docker0
 
-# Docker image "jamesmontalvo3/meza-docker-test-max:latest" has mediawiki and
-# several extensions pre-cloned, but not in the correct location. Move them
-# into place. For some reason gives exit code 129 on Travis sometimes. Force
-# non-failing exit code.
-${docker_exec[@]} mv /opt/mediawiki /opt/meza/htdocs/mediawiki || true
+if [ "$is_minion" == "no" ]; then
 
-# If not mounting the host's meza directory, copy it to the container
-if [ "$host_meza_dir_method" = "copy" ]; then
-	docker cp "$host_meza_dir" "$container_id:/opt/meza"
+	# Docker image "jamesmontalvo3/meza-docker-test-max:latest" has mediawiki and
+	# several extensions pre-cloned, but not in the correct location. Move them
+	# into place. For some reason gives exit code 129 on Travis sometimes. Force
+	# non-failing exit code.
+	${docker_exec[@]} mv /opt/mediawiki /opt/meza/htdocs/mediawiki || true
+
+	# If not mounting the host's meza directory, copy it to the container
+	if [ "$host_meza_dir_method" = "copy" ]; then
+		docker cp "$host_meza_dir" "$container_id:/opt/meza"
+	fi
+
+	# Install meza command
+	${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh
+
 fi
-
-# Install meza command
-${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh
+# reset to no, in case follow on builds don't reset
+is_minion=no
 
 # Get IP of docker image
 docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$container_id")

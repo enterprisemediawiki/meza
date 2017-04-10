@@ -30,10 +30,10 @@ meza deploy "$env_name"
 sleep 10s
 
 # Basic system check
-bash /opt/meza/tests/travis/server-check.sh
+bash /opt/meza/tests/integration/server-check.sh
 
 # Several wiki checks
-bash /opt/meza/tests/travis/wiki-check.sh "top" "Top Wiki"
+bash /opt/meza/tests/integration/wiki-check.sh "top" "Top Wiki"
 
 # Test for imported image
-bash /opt/meza/tests/travis/image-check.sh "top" "Test_image.png"
+bash /opt/meza/tests/integration/image-check.sh "top" "Test_image.png"
