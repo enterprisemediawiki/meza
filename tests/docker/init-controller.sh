@@ -5,7 +5,7 @@
 
 # Initiate container
 docker_repo="jamesmontalvo3/meza-docker-full:latest"
-source "$m_meza_host/tests/travis/init-container.sh" "none"
+source "$m_meza_host/tests/docker/init-container.sh" "none"
 
 
 # Copy SSH public key from user "meza-ansible" to host

@@ -26,7 +26,7 @@ meza deploy monolith
 sleep 10s
 
 # TEST BASIC SYSTEM FUNCTIONALITY
-bash /opt/meza/tests/travis/server-check.sh
+bash /opt/meza/tests/integration/server-check.sh
 
 # Demo Wiki API test
-bash /opt/meza/tests/travis/wiki-check.sh "demo" "Demo Wiki"
+bash /opt/meza/tests/integration/wiki-check.sh "demo" "Demo Wiki"

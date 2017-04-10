@@ -19,14 +19,14 @@ set -eux
 
 
 # CONTAINER 1 is controller and monolith
-source "$m_meza_host/tests/travis/init-controller.sh"
+source "$m_meza_host/tests/docker/init-controller.sh"
 container_id_1="$container_id"
 docker_ip_1="$docker_ip"
 docker_exec_1=( "${docker_exec[@]}" )
 
 
 # CONTAINER 2 is a backup server
-source "$m_meza_host/tests/travis/init-minion.sh"
+source "$m_meza_host/tests/docker/init-minion.sh"
 docker_ip_2="$docker_ip"
 docker_exec_2=( "${docker_exec[@]}" )
 
@@ -40,7 +40,7 @@ ${docker_exec_1[@]} default_servers="localhost" backup_servers="$docker_ip_2" \
 
 # Run script on controller to `meza deploy`, `meza create wiki` and
 # `meza backup`
-${docker_exec_1[@]} bash /opt/meza/tests/travis/backup-to-remote.controller.sh "$env_name"
+${docker_exec_1[@]} bash /opt/meza/tests/deploys/backup-to-remote.controller.sh "$env_name"
 
 
 # RUN TESTS ON CONTAINER 2

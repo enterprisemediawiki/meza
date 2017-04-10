@@ -21,19 +21,6 @@ env:
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
     test_type: backup-to-remote
 
-  # - distro: centos6
-  #   init: /sbin/init
-  #   run_opts: ""
-  # - distro: ubuntu1604
-  #   init: /lib/systemd/systemd
-  #   run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-  # - distro: ubuntu1404
-  #   init: /sbin/init
-  #   run_opts: ""
-  # - distro: ubuntu1204
-  #   init: /sbin/init
-  #   run_opts: ""
-
 before_install:
 
   # To upgrade Docker, uncomment the following lines. Do this only if there are
@@ -46,7 +33,7 @@ before_install:
   - 'docker pull ${docker_repo}'
 
 script:
-  - 'bash ./tests/travis/run-tests.sh'
+  - 'bash ./tests/docker/run-tests.sh ${test_type} ${PWD}'
 
 notifications:
   slack:

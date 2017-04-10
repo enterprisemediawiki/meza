@@ -7,7 +7,7 @@
 #        than meza-docker-base, though.
 docker_repo="jamesmontalvo3/meza-docker-pre-yum:latest"
 is_minion=yes
-source "$m_meza_host/tests/travis/init-container.sh" "none"
+source "$m_meza_host/tests/docker/init-container.sh" "none"
 
 # Container is a minion. Give access to meza-ansible from controller CONTAINER 1
 docker cp /tmp/controller.id_rsa.pub "$container_id:/tmp/meza-ansible.id_rsa.pub"

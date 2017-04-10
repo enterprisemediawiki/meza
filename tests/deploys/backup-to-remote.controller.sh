@@ -19,15 +19,15 @@ meza deploy "$1"
 sleep 10s
 
 # TEST BASIC SYSTEM FUNCTIONALITY
-bash /opt/meza/tests/travis/server-check.sh
+bash /opt/meza/tests/integration/server-check.sh
 
 # Demo Wiki API test
-bash /opt/meza/tests/travis/wiki-check.sh "demo" "Demo Wiki"
+bash /opt/meza/tests/integration/wiki-check.sh "demo" "Demo Wiki"
 
 # CREATE WIKI AND TEST
 meza create wiki-promptless "$1" created "Created Wiki"
 
 # Created Wiki API test
-bash /opt/meza/tests/travis/wiki-check.sh "created" "Created Wiki"
+bash /opt/meza/tests/integration/wiki-check.sh "created" "Created Wiki"
 
 meza backup "$1"
