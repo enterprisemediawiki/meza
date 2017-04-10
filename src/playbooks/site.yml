@@ -3,6 +3,12 @@
 # cd /opt/meza/ansible
 # sudo -u meza-ansible ansible-playbook site.yml
 
+- hosts: localhost
+  become: yes
+  tasks:
+  - name: Ensure no password on meza-ansible user on controller
+    shell: passwd --delete meza-ansible
+    ignore_errors: yes
 
 - hosts: all
   become: yes
