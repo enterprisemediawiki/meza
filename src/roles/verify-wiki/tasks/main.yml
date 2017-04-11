@@ -19,40 +19,222 @@
 #   if no database:  wiki_database.rc == 1
 - name: check if wiki database exists
   shell: 'mysqlshow "wiki_{{ wiki_id }}" | grep -v Wildcard | grep -o wiki_{{ wiki_id }}'
-  register: wiki_exists
+  register: wiki_exists_check
   delegate_to: "{{ groups['db-master'][0] }}"
   ignore_errors: yes
   run_once: true
 
-- debug: { msg: "Database wiki_{{ wiki_id }} DOES exist" }
-  when: wiki_exists is defined and wiki_exists.rc == 0
+- name: "Set fact if database wiki_{{ wiki_id }} DOES exist"
+  set_fact:
+    wiki_exists: True
+  when: wiki_exists_check is defined and wiki_exists_check.rc == 0
 
-- debug: { msg: "Database wiki_{{ wiki_id }} DOES NOT exist" }
-  when: wiki_exists is defined and wiki_exists.rc == 1
+- name: "Set fact if database wiki_{{ wiki_id }} DOES NOT exist"
+  set_fact:
+    wiki_exists: False
+  when: wiki_exists_check is defined and wiki_exists_check.rc != 0
+
+
+
+# Logic for sourcing database:
+#
+# If db-src[0] exists:
+#     make dump
+#     pull dump onto db-master[0]
+# If backup-src[0] exists and backups_src_sql_path valid on server:
+#
+#
+#
+#
+#
+# If not backup exists (force-overwrite impossible):
+#     If wiki exists: DO BASICALLY NOTHING
+#     If not wiki exists: SOURCE WIKI FROM tables.sql
+#
+# If backup exists:
+#     If force-overwrite:
+#         If wiki exists: DROP DATABASE, THEN SOURCE FROM BACKUP
+#         If not wiki exists: SOURCE FROM BACKUP
+#
+#     If not force-overwrite:
+#         If wiki exists: DO BASICALLY NOTHING
+#         If not wiki exists: SOURCE WIKI FROM tables.sql
+#
+
+
+
+
+
+# WARNING: If you're using db-src and/or backups-src servers and DO NOT want
+#          this meza installation to attempt to alter those servers, also add
+#          them to the [exclude-all] group in your inventory file.
+#
+# Wiki database and uploads can be pulled from the `backup-servers` group or
+# can optionally come from either of the following if they are defined:
+#
+#   1. groups['db-src'][0]: Will pull directly from a mysql database on this
+#      server. Must also include db_src_mysql_user and db_src_mysql_pass vars.
+#
+#   2. groups['backups-src'][0]: Will pull database (if #1 above not defined)
+#      and uploads from this source. Requires the following to be defined:
+#
+#      a. backups_src_sql_path: Path to directory holding SQL file for a wiki.
+#         The wiki ID, if it is part of the path, should be indicated by `<id>`
+#         so the deploy script can properly set the ID at runtime. This path
+#         should ONLY SET THE DIRECTORY of the SQL file, not the filename
+#         itself, and should not end in a slash. If the filename does not match
+#         the pattern *.sql or includes the wiki ID in the filename, the can be
+#         set using backups_src_sql_file_match. See example 2 below.
+#
+#         ex1: backups_src_sql_path: /home/mw/backups/<id>
+#
+#              This will find the alphabetically-latest SQL file in the $1
+#              directory. Override the filename matching default of *.sql by
+#              setting the backups_src_sql_file_match var. See next example.
+#
+#         ex2: backups_src_sql_path: /home/mw/backups
+#              backups_src_sql_file_match: wiki_<id>*.sql
+#
+#              This will find the alphabetically latest file matching
+#              wiki_demo*.sql (if your wiki ID was "demo") in the
+#              /home/mw/backups directory
+#
+#      b. backups_src_uploads_path: Path to the directory holding uploads (AKA
+#         "images") for a given wiki ID. Make a placeholder for the wiki ID
+#         with a `<id>`, such that the deploy script can fill in the wiki ID at
+#         runtime. Do not end in a slash.
+#
+#         ex: backups_src_uploads_path: /opt/meza/htdocs/wikis/<id>/images
+#
+
+
+
+# Logic for sourcing database:
+#
+# If db-src[0] exists:
+#     make dump
+#     pull dump onto db-master[0]
+# If backup-src[0] exists and backups_src_sql_path valid on server:
+#
+
+
+
+
 
 #
-# If wiki database does not exist
+# Set facts to clarify if overwriting data is INITIALLY INTENDED (regardless of
+#  whether later checks make it possible)
 #
+- name: "Set fact if INTEND overwrite data"
+  set_fact:
+    intend_overwrite_from_backup: True
+  when: force_overwrite_from_backup is defined and force_overwrite_from_backup == true
 
+- name: "Set fact if NOT INTEND overwrite data"
+  set_fact:
+    intend_overwrite_from_backup: False
+  when: force_overwrite_from_backup is not defined or force_overwrite_from_backup == false
+
+
+
+
+- name: "Set SQL source-from-backup facts IF SOURCING FROM db-src"
+  set_fact:
+    sql_backup_server: "{{ groups['db-src'][0] }}"
+    do_sql_dump: True
+    sql_dir_path: /home/meza-ansible
+    sql_file_match: "wiki_{{ wiki_id }}.sql"
+  when: "'db-src' in groups and groups['db-src']|length|int > 0"
+
+- name: "Set SQL source-from-backup facts IF SOURCING FROM backups-src"
+  set_fact:
+    sql_backup_server: "{{ groups['backup-src'][0] }}"
+    do_sql_dump: False
+    sql_dir_path: "{{ backups_src_sql_path | regex_replace('<id>', wiki_id) }}"
+    sql_file_match: "{{ backups_src_sql_file_match | default('wiki*.sql') | regex_replace('<id>', wiki_id) }}"
+  when: "'backup-src' in groups and groups['backup-src']|length|int > 0"
+
+- name: "Set SQL source-from-backup facts IF SOURCING FROM backup-servers"
+  set_fact:
+    sql_backup_server: "{{ groups['backup-servers'][0] }}"
+    do_sql_dump: False
+    sql_dir_path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}"
+    sql_file_match: "*.sql"
+  when: "'backup-servers' in groups and groups['backup-servers']|length|int > 0"
+
+
+
+#
+# Check for backups directory
+#
 - name: Check if backups dir exists
   stat:
-    path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}"
-  register: backups_dir
-  when: wiki_exists is defined and wiki_exists.rc == 1
-  delegate_to: "{{ groups['backup-servers'][0] }}"
+    path: "{{ sql_dir_path }}"
+  register: backups_dir_stat
+  delegate_to: "{{ sql_backup_server }}"
+  run_once: true
+
+- name: "Set fact if backups server DOES have {{ sql_dir_path }}"
+  set_fact:
+    backup_dir_exists: True
+  when: backups_dir_stat.stat.exists == true
+
+- name: "Set fact if backups server DOES NOT have {{ sql_dir_path }}"
+  set_fact:
+    backup_dir_exists: False
+  when: backups_dir_stat.stat.exists == false
+
+
+
+#
+# Dump SQL if required
+#
+- name: Dump SQL file from db-src
+  mysql_db:
+    state: dump
+    name: "wiki_{{ wiki_id }}"
+    target: "{{ sql_dir_path }}/{{ sql_file_match }}"
+  delegate_to: "{{ sql_backup_server }}"
+  run_once: true
+  when: do_sql_dump
+
 
 
 # This will find the latest sql file by name, or wiki.sql over any timestamped one
 # assuming timestamp-named files like 20170220000002_wiki.sql
 - name: Find SQL file if it exists
-  shell: 'find {{ m_backups }}/{{ env }}/{{ wiki_id }} -maxdepth 1 -type f -iname "*.sql" | sort -r | head -n +1'
+  shell: 'find {{ sql_dir_path }} -maxdepth 1 -type f -iname "{{ sql_file_match }}" | sort -r | head -n +1'
   register: wiki_sql_file
-  delegate_to: "{{ groups['backup-servers'][0] }}"
+  delegate_to: "{{ sql_backup_server }}"
   run_once: true
-  when:
-    wiki_exists is defined
-    and wiki_exists.rc == 1
-    and backups_dir.stat.exists == true
+  when: backup_dir_exists and (not wiki_exists or intend_overwrite_from_backup)
+
+- name: "Set fact if SQL file DOES exist"
+  set_fact:
+    sql_file_exists: True
+  when: wiki_sql_file is defined and wiki_sql_file.rc == 0
+
+- name: "Set fact if SQL file DOES NOT exist"
+  set_fact:
+    sql_file_exists: False
+  when: wiki_sql_file is not defined or wiki_sql_file.rc != 0
+
+
+
+#
+# Set facts to clarify if overwriting data should actually occur
+#
+- name: "Set fact if SHOULD overwrite data (only possible if backup exists)"
+  set_fact:
+    do_overwrite_db_from_backup: True
+  when: intend_overwrite_from_backup and sql_file_exists
+
+- name: "Set fact if SHOULD NOT overwrite data"
+  set_fact:
+    do_overwrite_db_from_backup: False
+  when: not intend_overwrite_from_backup or not sql_file_exists
+
+
 
 
   #
@@ -61,16 +243,14 @@
   # servers, there's no way to send from backup-servers[0] to master-db[0]
   # directly. Instead, pass to controller, then form controller to master-db
   #
-- name: if wiki_sql_file defined, FIRST remove preexisting SQL file from controller
+- name: if wiki_sql_file exists, FIRST remove preexisting SQL file from controller
   file:
     path: /tmp/controller-wiki.sql
     state: absent
   run_once: true
   delegate_to: localhost
-  when:
-    wiki_sql_file is defined
-    and wiki_sql_file.rc == 0
-- name: if wiki_sql_file defined, NEXT send SQL file to controller
+  when: sql_file_exists
+- name: if wiki_sql_file exists, NEXT send SQL file to controller
   fetch:
     src: "{{ wiki_sql_file.stdout }}"
     dest: /tmp/controller-wiki.sql
@@ -80,22 +260,22 @@
   # http://docs.ansible.com/ansible/fetch_module.html
   become: no
   run_once: true
-  delegate_to: "{{ groups['backup-servers'][0] }}"
-  when:
-    wiki_sql_file is defined
-    and wiki_sql_file.rc == 0
-- name: if wiki_sql_file defined, NEXT send file from controller to master-db
+  delegate_to: "{{ sql_backup_server }}"
+  when: sql_file_exists
+- name: if wiki_sql_file exists, NEXT send file from controller to master-db
   copy:
     src: /tmp/controller-wiki.sql
     dest: /tmp/wiki.sql
     force: yes
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
-  when:
-    wiki_sql_file is defined
-    and wiki_sql_file.rc == 0
-
-
+  when: sql_file_exists
+- name: If SQL was dumped from db-src, remove file now that it's on db-master
+  file:
+    state: absent
+    path: "{{ wiki_sql_file.stdout }}"
+  delegate_to: "{{ sql_backup_server }}"
+  when: do_sql_dump
 
 - name: If wiki_sql_file NOT defined, send generic file to master db
   copy:
@@ -104,9 +284,13 @@
     force: yes
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
-  when:
-    wiki_sql_file is not defined
-    or wiki_sql_file.rc != 0
+  when: not sql_file_exists
+
+- name: Drop database if --force (or -f) set
+  mysql_db:
+    name: "wiki_{{ wiki_id }}"
+    state: absent
+  when: do_overwrite_db_from_backup
 
 - name: Import SQL file
   mysql_db:
@@ -115,7 +299,7 @@
     target: /tmp/wiki.sql
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
-  when: wiki_exists is defined and wiki_exists.rc == 1
+  when: not wiki_exists or do_overwrite_db_from_backup
 
 - name: Remove SQL file from master DB
   file:
@@ -123,7 +307,15 @@
     state: absent
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
-  when: wiki_exists is defined and wiki_exists.rc == 1
+  when: not wiki_exists or do_overwrite_db_from_backup
+
+
+
+#
+#
+# Ensure access to logo and favicon
+#
+#
 
 
 #
@@ -151,54 +343,106 @@
 
 
 #
-# Make sure wiki's uploads directory is properly setup
 #
+# Handling file uploads
+#
+#
+
+
+# FIXME: This nees to be rectified for multiple app servers vs shared storage
+#        (e.g. on a SAN or other mount) vs GlusterFS.
 - name: Check if wiki's uploads dir exists ON APP SERVER
   stat:
     path: "{{ m_uploads_dir }}/{{ wiki_id }}"
   register: uploads_dir
-
-- name: Check if wiki's uploads backup dir exists on backups.0
-  stat:
-    path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}/uploads"
-  register: images_backup_dir
-  delegate_to: "{{ groups['backup-servers'][0] }}"
-
-# Either way (existing backup or no) make sure uploads dir is configured
-- name: If no uploads dir, but backup dir exists, first make uploads dir
+# Either way (existing backup or no, existing uploads or no) make sure uploads
+# dir is configured
+- name: Ensure uploads dir configured
   file:
     path: "{{ m_uploads_dir }}/{{ wiki_id }}"
     state: directory
     mode: 0755
     owner: apache
     group: apache
-  when:
-    not uploads_dir.stat.exists
-    and images_backup_dir.stat.exists
+
+- name: "Set fact if wiki {{ wiki_id }} DOES HAVE uploads"
+  set_fact:
+    wiki_has_uploads: True
+  when: uploads_dir.stat.exists
+
+- name: "Set fact if wiki {{ wiki_id }} DOES NOT HAVE uploads"
+  set_fact:
+    wiki_has_uploads: False
+  when: not uploads_dir.stat.exists
+
+
+
+
+
+- name: "Set uploads-source-from-backup facts IF SOURCING FROM backups-src"
+  set_fact:
+    uploads_backup_server: "{{ groups['backup-src'][0] }}"
+    uploads_backup_dir_path: "{{ backups_src_uploads_path | regex_replace('<id>', wiki_id) }}"
+  when: "'backup-src' in groups and groups['backup-src']|length|int > 0"
+
+- name: "Set uploads-source-from-backup facts IF SOURCING FROM backup-servers"
+  set_fact:
+    uploads_backup_server: "{{ groups['backup-servers'][0] }}"
+    uploads_backup_dir_path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}/uploads"
+  when: "'backup-servers' in groups and groups['backup-servers']|length|int > 0"
+
+
+#
+# Check if uploads backups exist on defined server
+#
+- name: Check if wiki's uploads backup dir exists on backups.0
+  stat:
+    path: "{{ uploads_backup_dir_path }}"
+  register: images_backup_dir
+  delegate_to: "{{ uploads_backup_server }}"
+  run_once: true
+
+
+
+#
+# Set facts to clarify if overwriting data should actually occur
+#
+- name: "Set fact if SHOULD overwrite uploads data (only possible if backup exists)"
+  set_fact:
+    do_overwrite_uploads_from_backup: True
+  when: intend_overwrite_from_backup and images_backup_dir.stat.exists
+
+- name: "Set fact if SHOULD NOT overwrite uploads data"
+  set_fact:
+    do_overwrite_uploads_from_backup: False
+  when: not intend_overwrite_from_backup or not images_backup_dir.stat.exists
+
+
 
 - name: If no uploads dir, but backup dir exists, give backups.0 the keys
   include_role:
     name: grant-keys
   vars:
-    grant_keys_to_server: "{{ groups['backup-servers'][0] }}"
+    grant_keys_to_server: "{{ uploads_backup_server }}"
   when:
-    not uploads_dir.stat.exists
-    and images_backup_dir.stat.exists
-    and groups['backup-servers'][0] != inventory_hostname
+    images_backup_dir.stat.exists
+    and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
+    and uploads_backup_server != inventory_hostname
+    # don't grant keys if the backup server is the current server
 
 # copy from server A (backups.0) to server B (the app server in context)
 - name: If no uploads dir, but backup dir exists, copy from there
   synchronize:
     # copy from server A
-    src: "{{ m_backups }}/{{ env }}/{{ wiki_id }}/uploads/"
+    src: "{{ uploads_backup_dir_path }}/"
     # copy to server B
     dest: "{{ m_uploads_dir }}/{{ wiki_id }}"
     recursive: yes
   # server A
-  delegate_to: "{{ groups['backup-servers'][0] }}"
+  delegate_to: "{{ uploads_backup_server }}"
   when:
-    not uploads_dir.stat.exists
-    and images_backup_dir.stat.exists
+    images_backup_dir.stat.exists
+    and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
 
 - name: If no uploads dir, but backup dir exists, revoke keys
   include_role:
@@ -206,13 +450,15 @@
   vars:
     revoke_keys_from_server: "{{ groups['backup-servers'][0] }}"
   when:
-    not uploads_dir.stat.exists
-    and images_backup_dir.stat.exists
+    images_backup_dir.stat.exists
+    and (not uploads_dir.stat.exists or do_overwrite_uploads_from_backup)
+    and uploads_backup_server != inventory_hostname
+    # don't revoke keys if the backup server is the current server
 
 
 
 # Either way (existing backup or no) make sure uploads dir is configured
-- name: Ensure wiki's uploads dir is configured
+- name: Ensure wiki's uploads dir is still configured properly
   file:
     path: "{{ m_uploads_dir }}/{{ wiki_id }}"
     state: directory
@@ -221,6 +467,46 @@
     group: apache
     # recursive?
 
-- name: Include init-wiki.yml only when a new wiki was created
+
+
+
+
+
+# Whether a new wiki was created or something was imported, run db update
+- name: Update database
+  include_role:
+    name: update.php
+  when: not wiki_exists or do_overwrite_db_from_backup
+
+
+- name: Include init-wiki.yml only when a new wiki created (but not imported)
   include: init-wiki.yml
-  when: wiki_exists is defined and wiki_exists.rc == 1
+  when: not wiki_exists and not sql_file_exists
+
+
+- name: Run SMW's rebuildData.php
+  shell: >
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/rebuildData.php"
+    -d 5 -v --ignore-exceptions --exception-log="{{ m_meza }}/logs/rebuilddata-exceptions-{{ wiki_id }}-.log"
+  run_once: true
+  when: not wiki_exists or do_overwrite_db_from_backup
+
+
+# Is this "disable search update" required at this point? I'm not sure why we'd do this
+# echo "\$wgDisableSearchUpdate = true;" >> "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
+- name: Run runJobs.php
+  shell: >
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/runJobs.php" --quick
+  run_once: true
+  when: not wiki_exists or do_overwrite_db_from_backup
+# sed -r -i 's/\$wgDisableSearchUpdate = true;//g;' "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
+
+# Generate ES index, since it is skipped in the initial create-wiki.sh
+# Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
+- name: Running elastic-build-index.sh for demo wiki
+  shell: |
+    wiki_id="{{ wiki_id }}"
+    source "/opt/meza/config/core/config.sh"
+    source "{{ m_scripts }}/elastic-build-index.sh"
+  run_once: true
+  when: not wiki_exists or do_overwrite_db_from_backup
