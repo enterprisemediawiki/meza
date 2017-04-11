@@ -14,6 +14,7 @@
 #      - eventually need method to force-rsync from backup
 
 
+
 # Check if databases starting with "wiki_" exist
 #   if database exists: wiki_database.rc == 0
 #   if no database:  wiki_database.rc == 1
@@ -36,91 +37,6 @@
 
 
 
-# Logic for sourcing database:
-#
-# If db-src[0] exists:
-#     make dump
-#     pull dump onto db-master[0]
-# If backup-src[0] exists and backups_src_sql_path valid on server:
-#
-#
-#
-#
-#
-# If not backup exists (force-overwrite impossible):
-#     If wiki exists: DO BASICALLY NOTHING
-#     If not wiki exists: SOURCE WIKI FROM tables.sql
-#
-# If backup exists:
-#     If force-overwrite:
-#         If wiki exists: DROP DATABASE, THEN SOURCE FROM BACKUP
-#         If not wiki exists: SOURCE FROM BACKUP
-#
-#     If not force-overwrite:
-#         If wiki exists: DO BASICALLY NOTHING
-#         If not wiki exists: SOURCE WIKI FROM tables.sql
-#
-
-
-
-
-
-# WARNING: If you're using db-src and/or backups-src servers and DO NOT want
-#          this meza installation to attempt to alter those servers, also add
-#          them to the [exclude-all] group in your inventory file.
-#
-# Wiki database and uploads can be pulled from the `backup-servers` group or
-# can optionally come from either of the following if they are defined:
-#
-#   1. groups['db-src'][0]: Will pull directly from a mysql database on this
-#      server. Must also include db_src_mysql_user and db_src_mysql_pass vars.
-#
-#   2. groups['backups-src'][0]: Will pull database (if #1 above not defined)
-#      and uploads from this source. Requires the following to be defined:
-#
-#      a. backups_src_sql_path: Path to directory holding SQL file for a wiki.
-#         The wiki ID, if it is part of the path, should be indicated by `<id>`
-#         so the deploy script can properly set the ID at runtime. This path
-#         should ONLY SET THE DIRECTORY of the SQL file, not the filename
-#         itself, and should not end in a slash. If the filename does not match
-#         the pattern *.sql or includes the wiki ID in the filename, the can be
-#         set using backups_src_sql_file_match. See example 2 below.
-#
-#         ex1: backups_src_sql_path: /home/mw/backups/<id>
-#
-#              This will find the alphabetically-latest SQL file in the $1
-#              directory. Override the filename matching default of *.sql by
-#              setting the backups_src_sql_file_match var. See next example.
-#
-#         ex2: backups_src_sql_path: /home/mw/backups
-#              backups_src_sql_file_match: wiki_<id>*.sql
-#
-#              This will find the alphabetically latest file matching
-#              wiki_demo*.sql (if your wiki ID was "demo") in the
-#              /home/mw/backups directory
-#
-#      b. backups_src_uploads_path: Path to the directory holding uploads (AKA
-#         "images") for a given wiki ID. Make a placeholder for the wiki ID
-#         with a `<id>`, such that the deploy script can fill in the wiki ID at
-#         runtime. Do not end in a slash.
-#
-#         ex: backups_src_uploads_path: /opt/meza/htdocs/wikis/<id>/images
-#
-
-
-
-# Logic for sourcing database:
-#
-# If db-src[0] exists:
-#     make dump
-#     pull dump onto db-master[0]
-# If backup-src[0] exists and backups_src_sql_path valid on server:
-#
-
-
-
-
-
 #
 # Set facts to clarify if overwriting data is INITIALLY INTENDED (regardless of
 #  whether later checks make it possible)
@@ -135,8 +51,9 @@
     intend_overwrite_from_backup: False
   when: force_overwrite_from_backup is not defined or force_overwrite_from_backup == false
 
-
-
+- name: "Mark sql_backup_server_set as NOT SET yet"
+  set_fact:
+    sql_backup_server_set: False
 
 - name: "Set SQL source-from-backup facts IF SOURCING FROM db-src"
   set_fact:
@@ -144,15 +61,17 @@
     do_sql_dump: True
     sql_dir_path: /home/meza-ansible
     sql_file_match: "wiki_{{ wiki_id }}.sql"
+    sql_backup_server_set: True
   when: "'db-src' in groups and groups['db-src']|length|int > 0"
 
-- name: "Set SQL source-from-backup facts IF SOURCING FROM backups-src"
+- name: "Set SQL source-from-backup facts IF SOURCING FROM backup-src"
   set_fact:
     sql_backup_server: "{{ groups['backup-src'][0] }}"
     do_sql_dump: False
     sql_dir_path: "{{ backups_src_sql_path | regex_replace('<id>', wiki_id) }}"
-    sql_file_match: "{{ backups_src_sql_file_match | default('wiki*.sql') | regex_replace('<id>', wiki_id) }}"
-  when: "'backup-src' in groups and groups['backup-src']|length|int > 0"
+    sql_file_match: "{{ backups_src_sql_file_match | default('*.sql') | regex_replace('<id>', wiki_id) }}"
+    sql_backup_server_set: True
+  when: "not sql_backup_server_set and 'backup-src' in groups and groups['backup-src']|length|int > 0"
 
 - name: "Set SQL source-from-backup facts IF SOURCING FROM backup-servers"
   set_fact:
@@ -160,7 +79,8 @@
     do_sql_dump: False
     sql_dir_path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}"
     sql_file_match: "*.sql"
-  when: "'backup-servers' in groups and groups['backup-servers']|length|int > 0"
+    sql_backup_server_set: True
+  when: "not sql_backup_server_set and 'backup-servers' in groups and groups['backup-servers']|length|int > 0"
 
 
 
@@ -194,6 +114,9 @@
     state: dump
     name: "wiki_{{ wiki_id }}"
     target: "{{ sql_dir_path }}/{{ sql_file_match }}"
+    # FIXME: Security issue?
+    login_user: "{{ db_src_mysql_user }}"
+    login_password: "{{ db_src_mysql_pass }}"
   delegate_to: "{{ sql_backup_server }}"
   run_once: true
   when: do_sql_dump
@@ -236,7 +159,6 @@
 
 
 
-
   #
   # Since backup-servers[0], master-db[0] and controller (localhost) are three
   # different servers, and the current Ansible play is being run against app-
@@ -275,7 +197,7 @@
     state: absent
     path: "{{ wiki_sql_file.stdout }}"
   delegate_to: "{{ sql_backup_server }}"
-  when: do_sql_dump
+  when: do_sql_dump and sql_file_exists
 
 - name: If wiki_sql_file NOT defined, send generic file to master db
   copy:
@@ -286,7 +208,7 @@
   delegate_to: "{{ groups['db-master'][0] }}"
   when: not sql_file_exists
 
-- name: Drop database if --force (or -f) set
+- name: Drop database if --overwrite (or -o) set
   mysql_db:
     name: "wiki_{{ wiki_id }}"
     state: absent
@@ -377,19 +299,27 @@
 
 
 
+#
+# Determine uploads server and required variables
+#
+- name: "Mark uploads_backup_server_set as NOT SET yet"
+  set_fact:
+    uploads_backup_server_set: False
 
-
-- name: "Set uploads-source-from-backup facts IF SOURCING FROM backups-src"
+- name: "Set uploads-source-from-backup facts IF SOURCING FROM backup-src"
   set_fact:
     uploads_backup_server: "{{ groups['backup-src'][0] }}"
     uploads_backup_dir_path: "{{ backups_src_uploads_path | regex_replace('<id>', wiki_id) }}"
+    uploads_backup_server_set: True
   when: "'backup-src' in groups and groups['backup-src']|length|int > 0"
 
 - name: "Set uploads-source-from-backup facts IF SOURCING FROM backup-servers"
   set_fact:
     uploads_backup_server: "{{ groups['backup-servers'][0] }}"
     uploads_backup_dir_path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}/uploads"
-  when: "'backup-servers' in groups and groups['backup-servers']|length|int > 0"
+    uploads_backup_server_set: True
+  when: "not uploads_backup_server_set and 'backup-servers' in groups and groups['backup-servers']|length|int > 0"
+
 
 
 #
@@ -418,7 +348,9 @@
   when: not intend_overwrite_from_backup or not images_backup_dir.stat.exists
 
 
-
+#
+# Do the rsync transfer of files
+#
 - name: If no uploads dir, but backup dir exists, give backups.0 the keys
   include_role:
     name: grant-keys
@@ -455,8 +387,6 @@
     and uploads_backup_server != inventory_hostname
     # don't revoke keys if the backup server is the current server
 
-
-
 # Either way (existing backup or no) make sure uploads dir is configured
 - name: Ensure wiki's uploads dir is still configured properly
   file:
@@ -470,7 +400,11 @@
 
 
 
-
+#
+#
+# Do database and search index updates as required
+#
+#
 
 # Whether a new wiki was created or something was imported, run db update
 - name: Update database

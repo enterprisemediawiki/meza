@@ -71,6 +71,11 @@ elif [ "$test_type" == "backup-to-remote" ]; then
 	env_name=travis
 	source "$m_meza_host/tests/docker/backup-to-remote.setup.sh"
 
+elif [ "$test_type" == "import-from-alt-remote" ]; then
+
+	env_name=travis
+	source "$m_meza_host/tests/docker/import-from-alt-remote.setup.sh"
+
 else
 	echo "Bad test type: $test_type"
 	exit 1

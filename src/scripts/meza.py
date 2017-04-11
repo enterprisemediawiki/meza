@@ -76,6 +76,18 @@ def meza_command_deploy (argv):
 		else:
 			sys.exit(rc)
 
+	more_extra_vars = False
+
+	# strip environment off of it
+	argv = argv[1:]
+
+	# if argv[1:] includes -o or --overwrite
+	if len( set(argv).intersection({"-o", "--overwrite"}) ) > 0:
+		# remove -o and --overwrite from args;
+		argv = [value for value in argv[:] if value not in ["-o", "--overwrite"]]
+
+		more_extra_vars = { 'force_overwrite_from_backup': True }
+
 	# This breaks continuous integration. FIXME to get it back.
 	# THIS WAS WRITTEN WHEN `meza` WAS A BASH SCRIPT
 	# echo "You are about to deploy to the $ansible_env environment"
@@ -86,9 +98,9 @@ def meza_command_deploy (argv):
 		# stuff below was in here
 	# fi
 
-	shell_cmd = playbook_cmd( 'site', env )
-	if len(argv) > 1:
-		shell_cmd = shell_cmd + argv[1:]
+	shell_cmd = playbook_cmd( 'site', env, more_extra_vars )
+	if len(argv) > 0:
+		shell_cmd = shell_cmd + argv
 
 	return_code = meza_shell_exec( shell_cmd )
 
