@@ -16,6 +16,20 @@
     mode: 0700
     state: directory
 
+- shell: ls -la /home
+  register: home_dir
+  ignore_errors: true
+- shell: ls -la /home/alt-meza-ansible
+  register: user_dir
+  ignore_errors: true
+- shell: ls -la /home/alt-meza-ansible/.ssh
+  register: ssh_dir
+  ignore_errors: true
+
+- debug: { var: home_dir }
+- debug: { var: user_dir }
+- debug: { var: ssh_dir }
+
 - name: Ensure user meza-ansible and alt-meza-ansible authorized_keys configured
   file:
     path: "/home/{{ item }}/.ssh/authorized_keys"
