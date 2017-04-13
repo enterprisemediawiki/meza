@@ -2,8 +2,8 @@
 - name: "Grant keys to delegated server {{ grant_keys_to_server }}"
   copy:
     src: "/home/meza-ansible/.ssh/{{ item.file }}"
-    dest: "/home/meza-ansible/.ssh/{{ item.file }}"
-    owner: meza-ansible
+    dest: "/home/alt-meza-ansible/.ssh/{{ item.file }}"
+    owner: alt-meza-ansible
     group: wheel
     mode: "{{ item.mode }}"
   delegate_to: "{{ grant_keys_to_server }}"
@@ -20,8 +20,8 @@
 - name: "Copy known_hosts to delegated server {{ grant_keys_to_server }}"
   copy:
     src: "/home/meza-ansible/.ssh/known_hosts"
-    dest: "/home/meza-ansible/.ssh/known_hosts"
-    owner: meza-ansible
+    dest: "/home/alt-meza-ansible/.ssh/known_hosts"
+    owner: alt-meza-ansible
     group: wheel
     mode: "0644"
   delegate_to: "{{ grant_keys_to_server }}"
