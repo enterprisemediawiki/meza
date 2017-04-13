@@ -42,7 +42,7 @@
 # Add line to visudo file if it does not exist
 - name: Ensure alt-meza-ansible is passwordless sudoer
   lineinfile:
-    path: /etc/sudoers
+    dest: /etc/sudoers
     state: present
     line: 'alt-meza-ansible ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
