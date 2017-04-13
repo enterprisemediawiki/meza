@@ -12,12 +12,15 @@
     group: apache
     mode: 0775
 
-- name: Ensure user meza-ansible is in group "apache"
+- name: Ensure user meza-ansible and alt-meza-ansible in group "apache"
   user:
-    name: meza-ansible
+    name: "{{ item }}"
     # add onto groups
     groups: apache
     append: yes
+  with_items:
+  - meza-ansible
+  - alt-meza-ansible
 
 # Check if there's a CA cert file in place, so the appropriate directives
 # can be added to httpd.conf if needed

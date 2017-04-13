@@ -8,7 +8,15 @@
   - meza-ansible
   - alt-meza-ansible
 
-- name: Ensure user meza-ansible authorized_keys configured
+- name: Ensure user alt-meza-ansible .ssh dir configured
+  file:
+    path: "/home/alt-meza-ansible/.ssh"
+    owner: alt-meza-ansible
+    group: wheel
+    mode: 0700
+    state: directory
+
+- name: Ensure user meza-ansible and alt-meza-ansible authorized_keys configured
   file:
     path: "/home/{{ item }}/.ssh/authorized_keys"
     owner: "{{ item }}"
