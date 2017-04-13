@@ -26,8 +26,8 @@
 
   - name: Copy meza-ansible keys to alt-meza-ansible
     copy:
-      src: "/home/meza-ansible/.ssh/{{ item }}"
-      dest: "/home/alt-meza-ansible/.ssh/{{ item }}"
+      src: "/home/meza-ansible/.ssh/{{ item.name }}"
+      dest: "/home/alt-meza-ansible/.ssh/{{ item.name }}"
       owner: alt-meza-ansible
       group: wheel
       mode: "{{ item.mode }}"
@@ -39,8 +39,8 @@
 
   - name: Copy meza-ansible known_hosts to alt-meza-ansible
     copy:
-      src: "/home/meza-ansible/.ssh/{{ item }}"
-      dest: "/home/alt-meza-ansible/.ssh/{{ item }}"
+      src: "/home/meza-ansible/.ssh/{{ item.name }}"
+      dest: "/home/alt-meza-ansible/.ssh/{{ item.name }}"
       owner: alt-meza-ansible
       group: wheel
       mode: "{{ item.mode }}"
