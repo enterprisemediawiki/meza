@@ -10,6 +10,46 @@
     shell: passwd --delete meza-ansible
     ignore_errors: yes
 
+  - name: Ensure controller has user alt-meza-ansible
+    user:
+      name: alt-meza-ansible
+      # primary group
+      group: wheel
+
+  - name: Ensure user alt-meza-ansible .ssh dir configured
+    file:
+      path: "/home/alt-meza-ansible/.ssh"
+      owner: alt-meza-ansible
+      group: wheel
+      mode: 0700
+      state: directory
+
+  - name: Copy meza-ansible keys to alt-meza-ansible
+    copy:
+      src: "/home/meza-ansible/.ssh/{{ item }}"
+      dest: "/home/alt-meza-ansible/.ssh/{{ item }}"
+      owner: alt-meza-ansible
+      group: wheel
+      mode: "{{ item.mode }}"
+    with_items:
+    - name: id_rsa
+      mode: "0600"
+    - name: id_rsa.pub
+      mode: "0644"
+
+  - name: Copy meza-ansible known_hosts to alt-meza-ansible
+    copy:
+      src: "/home/meza-ansible/.ssh/{{ item }}"
+      dest: "/home/alt-meza-ansible/.ssh/{{ item }}"
+      owner: alt-meza-ansible
+      group: wheel
+      mode: "{{ item.mode }}"
+    ignore_errors: True
+    with_items:
+    - name: known_hosts
+      mode: "0600"
+
+
 # Ensure proper base setup on all servers in inventory, with the exception of
 # servers in "exclude-all" group. At present, the intent of this group is to
 # allow servers which serve as sources for database and user-uploaded files,

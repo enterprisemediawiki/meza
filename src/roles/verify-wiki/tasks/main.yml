@@ -370,6 +370,14 @@
     # copy to server B
     dest: "{{ m_uploads_dir }}/{{ wiki_id }}"
     recursive: yes
+
+    # Perhaps required due to not being able to properly specify an Ansible
+    # user in synchronize
+    # ref: https://github.com/ansible/ansible/issues/16215
+    #
+    # Potentially should use ssh_extra_args or ssh_common_args
+    # Ref: https://github.com/ansible/ansible/pull/15306
+    ssh_args: "-l alt-meza-ansible"
   # server A
   delegate_to: "{{ uploads_backup_server }}"
   become_user: alt-meza-ansible
