@@ -597,7 +597,13 @@ $config = array(
      */
     'memcache_store.servers' => array(
         array(
-            array('hostname' => 'localhost'),
+            {% for server in groups['memcached-servers'] -%}
+            {%- if server == inventory_hostname -%}
+            array('hostname' => '127.0.0.1'),
+            {%- else -%}
+            array('hostname' => '{{ server }}'),
+            {%- endif -%}
+            {%- endfor %}
         ),
     ),
 
@@ -609,7 +615,7 @@ $config = array(
      * than one instance is using memcache, you probably want to assign
      * a unique value per instance to this setting to avoid data collision.
      */
-    'memcache_store.prefix' => null,
+    'memcache_store.prefix' => 'simpleSAMLphp',
 
     /*
      * This value is the duration data should be stored in memcache. Data
@@ -981,7 +987,7 @@ $config = array(
      *
      * (This option replaces the old 'session.handler'-option.)
      */
-    'store.type'                    => 'phpsession',
+    'store.type'                    => 'memcache',
 
     /*
      * The DSN the sql datastore should connect to.
