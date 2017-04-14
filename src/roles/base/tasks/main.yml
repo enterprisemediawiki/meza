@@ -1,16 +1,51 @@
 ---
-- name: Ensure user meza-ansible in group "wheel"
+- name: Ensure user's meza-ansible and alt-meza-ansible in group "wheel"
   user:
-    name: meza-ansible
+    name: "{{ item }}"
     # primary group
     group: wheel
+  with_items:
+  - meza-ansible
+  - alt-meza-ansible
 
-- name: Ensure user meza-ansible authorized_keys configured
+- name: Ensure user alt-meza-ansible .ssh dir configured
   file:
-    path: /home/meza-ansible/.ssh/authorized_keys
-    owner: meza-ansible
+    path: "/home/alt-meza-ansible/.ssh"
+    owner: alt-meza-ansible
+    group: wheel
+    mode: 0700
+    state: directory
+
+- name: Copy meza-ansible authorized_keys to alt-meza-ansible
+  shell: cp /home/meza-ansible/.ssh/authorized_keys /home/alt-meza-ansible/.ssh/authorized_keys
+
+- name: Ensure user meza-ansible and alt-meza-ansible authorized_keys configured
+  file:
+    path: "/home/{{ item }}/.ssh/authorized_keys"
+    owner: "{{ item }}"
     group: wheel
     mode: 0644
+  with_items:
+  - meza-ansible
+  - alt-meza-ansible
+
+- name: Set authorized key for alt-meza-ansible
+  authorized_key:
+    user: alt-meza-ansible
+    state: present
+    key: "{{ lookup('file', '/home/meza-ansible/.ssh/id_rsa.pub') }}"
+
+- name: Ensure no password on alt-meza-ansible user
+  shell: passwd --delete alt-meza-ansible
+  ignore_errors: yes
+
+# Add line to visudo file if it does not exist
+- name: Ensure alt-meza-ansible is passwordless sudoer
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    line: 'alt-meza-ansible ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
 
 - name: ensure deltarpm is installed and latest
   yum: name=deltarpm state=installed

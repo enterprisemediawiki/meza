@@ -8,6 +8,7 @@ env:
   - test_type: monolith-from-import
   - test_type: import-from-remote
   - test_type: backup-to-remote
+  - test_type: import-from-alt-remote
 
 # before_install:
   # To upgrade Docker, uncomment the following lines. Do this only if there are
