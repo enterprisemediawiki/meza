@@ -141,8 +141,8 @@
     name: "wiki_{{ wiki_id }}"
     target: "{{ sql_dir_path }}/{{ sql_file_match }}"
     # FIXME: Security issue?
-    login_user: "{{ db_src_mysql_user }}"
-    login_password: "{{ db_src_mysql_pass }}"
+    login_user: "{{ hostvars[sql_backup_server]['db_src_mysql_user'] }}"
+    login_password: "{{ hostvars[sql_backup_server]['db_src_mysql_pass'] }}"
   delegate_to: "{{ sql_backup_server }}"
   remote_user: "{{ db_backup_server_remote_user }}"
   run_once: true
@@ -344,7 +344,7 @@
 - name: "Set uploads-source-from-backup facts IF SOURCING FROM backup-src"
   set_fact:
     uploads_backup_server: "{{ groups['backup-src'][0] }}"
-    uploads_backup_dir_path: "{{ backups_src_uploads_path | regex_replace('<id>', wiki_id) }}"
+    uploads_backup_dir_path: "{{ hostvars[ groups['backup-src'][0] ]['backups_src_uploads_path'] | regex_replace('<id>', wiki_id) }}"
     uploads_backup_server_set: True
   when: "'backup-src' in groups and groups['backup-src']|length|int > 0"
 
