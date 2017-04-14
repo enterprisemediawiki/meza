@@ -5,6 +5,7 @@
     - httpd-devel
     - mod_ssl
     - mod_proxy_html
+
 - name: Make apache own htdocs directory
   file:
     path: "{{ m_htdocs }}"
@@ -21,35 +22,6 @@
   with_items:
   - meza-ansible
   - alt-meza-ansible
-
-# Check if there's a CA cert file in place, so the appropriate directives
-# can be added to httpd.conf if needed
-- name: Check if CA cert exists
-  stat:
-    path: "{{ m_ca_cert }}"
-  register: ca_cert_stat_result
-- name: If CA cert DOES NOT exist
-  set_fact:
-    httpd_conf_ca_cert_directive: ""
-  when: ca_cert_stat_result.stat.exists == False
-- name: If CA cert DOES exist
-  set_fact:
-    httpd_conf_ca_cert_directive: SSLCACertificateFile /etc/pki/tls/certs/meza-ca.crt
-  when: ca_cert_stat_result.stat.exists == True
-
-# Generate self-signed cert if one doesn't exist (note: trusting an article
-# on the internet on this one, that it'll only generate if one doesn't exist)
-- name: Check if SSL cert private key exists
-  stat:
-    path: "{{ m_cert_private }}"
-  register: ssl_cert_stat_result
-- name: create self-signed SSL cert
-  command: >
-    openssl req -new -newkey rsa:2048 -days 365 -nodes -x509
-    -subj "/C=US/ST=TX/L=Houston/O=EnterpriseMediaWiki/CN=${ansible_fqdn}"
-    -keyout /etc/pki/tls/private/meza.key -out /etc/pki/tls/certs/meza.crt
-  when: ssl_cert_stat_result.stat.exists == False
-  notify: restart apache
 
 - name: write the apache config file
   template: "src=httpd.conf.j2 dest={{ m_apache_conf }}"
