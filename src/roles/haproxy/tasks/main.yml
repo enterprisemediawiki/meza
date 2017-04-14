@@ -13,38 +13,61 @@
     - openssl
     # - keepalived ?
 
-# Generate self-signed cert if one doesn't exist (note: trusting an article
-# on the internet on this one, that it'll only generate if one doesn't exist)
 - name: Ensure haproxy certs directory exists
   file:
     path: /etc/haproxy/certs
     state: directory
+    # owner/group/mode?
 
-- name: Check if SSL cert exists
+#
+# 1. If cert/key don't exist ON CONTROLLER, generate self-signed ON CONTROLLER
+# 2. Ensure cert and key in /etc/haproxy/certs
+# 3. Ensure cert and key assembled into pem file at /etc/haproxy/certs/meza.pem
+#
+- name: Check if secret config on CONTROLLER has SSL keys
   stat:
-    path: "/etc/haproxy/certs/meza.pem"
+    path: "/opt/meza/config/local-secret/{{ env }}/ssl/meza.key"
   register: ssl_cert_stat_result
-- name: create self-signed SSL cert
+  delegate_to: localhost
+  run_once: True
+
+- name: Ensure config SSL directory exists
+  file:
+    path: "{{ m_local_secret }}/{{ env }}/ssl"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  delegate_to: localhost
+  run_once: True
+
+- name: If not exists, create self-signed SSL cert on CONTROLLER
   command: |
     openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
       -subj "/C=US/ST=TX/L=Houston/O=EnterpriseMediaWiki/CN=${ansible_fqdn}" \
-      -keyout /etc/haproxy/certs/meza.key -out /etc/haproxy/certs/meza.crt
-  #cat /etc/haproxy/certs/meza.crt /etc/haproxy/certs/meza.key > /etc/haproxy/certs/meza.pem
-  #rm /etc/haproxy/certs/meza.crt
-  #rm /etc/haproxy/certs/meza.key
+      -keyout /opt/meza/config/local-secret/{{ env }}/ssl/meza.key \
+      -out /opt/meza/config/local-secret/{{ env }}/ssl/meza.crt
   when: ssl_cert_stat_result.stat.exists == False
-  notify:
-    - restart haproxy
-- name: Concatenate cert and key into pem file
-  shell: |
-    cat /etc/haproxy/certs/meza.crt /etc/haproxy/certs/meza.key > /etc/haproxy/certs/meza.pem
-  when: ssl_cert_stat_result.stat.exists == False
+  delegate_to: localhost
+  run_once: True
+
+- name: Ensure cert and key on load balancers
+  copy:
+    src: "/opt/meza/config/local-secret/{{ env }}/ssl/{{ item }}"
+    dest: "/etc/haproxy/certs/{{ item }}"
+  with_items:
+  - meza.key
+  - meza.crt
   notify:
     - restart haproxy
 
+- name: Ensure cert and key assembled into into pem file
+  assemble:
+    src: "/opt/meza/config/local-secret/{{ env }}/ssl"
+    dest: /etc/haproxy/certs/meza.pem
+  notify:
+    - restart haproxy
 
-# Generate self-signed cert if one doesn't exist (note: trusting an article
-# on the internet on this one, that it'll only generate if one doesn't exist)
 - name: Ensure haproxy certs have secure permissions
   file:
     path: /etc/haproxy/certs
@@ -53,6 +76,8 @@
     owner: root
     group: root
     mode: 0600
+  notify:
+    - restart haproxy
 
 - name: write the haproxy config file
   template:
