@@ -59,7 +59,6 @@
   set_fact:
     sql_backup_server: "{{ groups['db-src'][0] }}"
     do_sql_dump: True
-    sql_dir_path: /home/meza-ansible
     sql_file_match: "wiki_{{ wiki_id }}.sql"
     sql_backup_server_set: True
   when: "'db-src' in groups and groups['db-src']|length|int > 0"
@@ -102,6 +101,11 @@
   when:
     sql_backup_server is defined
     and 'alt_remote_user' not in hostvars[sql_backup_server]
+
+- name: If doing a SQL dump, need to set path to SQL file based on remote user
+  set_fact:
+    sql_dir_path: "/home/{{ db_backup_server_remote_user }}"
+  when: do_sql_dump
 
 
 
