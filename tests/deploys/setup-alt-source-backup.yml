@@ -50,3 +50,34 @@
         target: "{{ wiki_sql_file.stdout }}"
         login_user: root
         login_password: 1234
+
+    - name: Create alternate SSH user
+      user:
+        name: test-user
+
+    - name: Ensure test-user .ssh dir configured
+      file:
+        path: "/home/test-user/.ssh"
+        owner: test-user
+        group: test-user
+        mode: 0700
+        state: directory
+
+    - name: Ensure authorized_keys configured
+      file:
+        path: "/home/test-user/.ssh/authorized_keys"
+        owner: test-user
+        group: test-user
+        mode: 0644
+        state: touch
+
+    - name: Set authorized key test-user
+      authorized_key:
+        user: test-user
+        state: present
+        key: "{{ lookup('file', '/home/meza-ansible/.ssh/id_rsa.pub') }}"
+
+    - name: Ensure no password on test-user
+      shell: passwd --delete test-user
+      ignore_errors: yes
+

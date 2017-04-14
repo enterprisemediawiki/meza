@@ -44,7 +44,7 @@ ${docker_exec_1[@]} sed -r -i "s/INSERT_FQDN/$docker_ip_1/g;" \
 # CONTAINER 1
 # Add to inventory file the "db-src" and "backups-src" groups (which will both
 # be CONTAINER 2)
-${docker_exec_1[@]} bash -c "echo -e '[backup-src]\n$docker_ip_2\n' >> /opt/meza/config/local-secret/$env_name/hosts"
+${docker_exec_1[@]} bash -c "echo -e '[backup-src]\n$docker_ip_2 alt_remote_user=test-user\n' >> /opt/meza/config/local-secret/$env_name/hosts"
 ${docker_exec_1[@]} bash -c "echo -e '[exclude-all]\n$docker_ip_2\n' >> /opt/meza/config/local-secret/$env_name/hosts"
 
 

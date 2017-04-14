@@ -7,6 +7,7 @@
     group: wheel
     mode: "{{ item.mode }}"
   delegate_to: "{{ grant_keys_to_server }}"
+  remote_user: "{{ alt_remote_user }}"
   with_items:
   - file: id_rsa
     mode: "0600"
@@ -25,4 +26,5 @@
     group: wheel
     mode: "0644"
   delegate_to: "{{ grant_keys_to_server }}"
+  remote_user: "{{ alt_remote_user }}"
   ignore_errors: True
