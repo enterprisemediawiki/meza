@@ -71,7 +71,7 @@
       file:
         path: "/home/test-user/.ssh"
         owner: test-user
-        group: test-user
+        group: wheel
         mode: 0700
         state: directory
 
@@ -79,7 +79,7 @@
       file:
         path: "/home/test-user/.ssh/authorized_keys"
         owner: test-user
-        group: test-user
+        group: wheel
         mode: 0644
         state: touch
 
