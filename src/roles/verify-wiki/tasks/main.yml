@@ -380,7 +380,7 @@
     ssh_args: "-l alt-meza-ansible"
   # server A
   delegate_to: "{{ uploads_backup_server }}"
-  become_user: alt-meza-ansible
+  remote_user: alt-meza-ansible
   when:
     images_backup_dir.stat.exists
     and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
