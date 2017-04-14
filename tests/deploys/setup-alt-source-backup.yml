@@ -54,6 +54,18 @@
     - name: Create alternate SSH user
       user:
         name: test-user
+        group: wheel
+
+    # Add line to visudo file if it does not exist
+    # FIXME: This is really bad that a backup-retrieval-user needs sudo, but
+    #        unfortunately synchronize doesn't allow one end to be sudo and
+    #        the other to not.
+    - name: Ensure test-user is passwordless sudoer
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        line: 'test-user ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
 
     - name: Ensure test-user .ssh dir configured
       file:

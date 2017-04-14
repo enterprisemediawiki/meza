@@ -85,6 +85,27 @@
 
 
 #
+# Set remote user to access database backup
+#
+- name: Set fact for database backup server remote user IF ALTERNATE SPECIFIED
+  set_fact:
+    db_backup_server_remote_user: "{{ hostvars[sql_backup_server]['alt_remote_user'] }}"
+  when:
+    sql_backup_server is defined
+    and 'alt_remote_user' in hostvars[sql_backup_server]
+
+# Note: since not rsync-ing from one remote to another, can use meza-ansible
+# here instead of alt-meza-ansible
+- name: Set fact for database backup server remote user TO DEFAULT meza-ansible
+  set_fact:
+    db_backup_server_remote_user: "meza-ansible"
+  when:
+    sql_backup_server is defined
+    and 'alt_remote_user' not in hostvars[sql_backup_server]
+
+
+
+#
 # Check for backups directory
 #
 - name: Check if backups dir exists
@@ -92,6 +113,7 @@
     path: "{{ sql_dir_path }}"
   register: backups_dir_stat
   delegate_to: "{{ sql_backup_server }}"
+  remote_user: "{{ db_backup_server_remote_user }}"
   run_once: true
 
 - name: "Set fact if backups server DOES have {{ sql_dir_path }}"
@@ -118,6 +140,7 @@
     login_user: "{{ db_src_mysql_user }}"
     login_password: "{{ db_src_mysql_pass }}"
   delegate_to: "{{ sql_backup_server }}"
+  remote_user: "{{ db_backup_server_remote_user }}"
   run_once: true
   when: do_sql_dump
 
@@ -130,6 +153,7 @@
   register: wiki_sql_file
   delegate_to: "{{ sql_backup_server }}"
   run_once: true
+  remote_user: "{{ db_backup_server_remote_user }}"
   when: backup_dir_exists and (not wiki_exists or intend_overwrite_from_backup)
 
 - name: "Set fact if SQL file DOES exist"
@@ -172,6 +196,7 @@
   run_once: true
   delegate_to: localhost
   when: sql_file_exists
+
 - name: if wiki_sql_file exists, NEXT send SQL file to controller
   fetch:
     src: "{{ wiki_sql_file.stdout }}"
@@ -183,7 +208,9 @@
   become: no
   run_once: true
   delegate_to: "{{ sql_backup_server }}"
+  remote_user: "{{ db_backup_server_remote_user }}"
   when: sql_file_exists
+
 - name: if wiki_sql_file exists, NEXT send file from controller to master-db
   copy:
     src: /tmp/controller-wiki.sql
@@ -192,11 +219,13 @@
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
   when: sql_file_exists
+
 - name: If SQL was dumped from db-src, remove file now that it's on db-master
   file:
     state: absent
     path: "{{ wiki_sql_file.stdout }}"
   delegate_to: "{{ sql_backup_server }}"
+  remote_user: "{{ db_backup_server_remote_user }}"
   when: do_sql_dump and sql_file_exists
 
 - name: If wiki_sql_file NOT defined, send generic file to master db
@@ -212,6 +241,8 @@
   mysql_db:
     name: "wiki_{{ wiki_id }}"
     state: absent
+  run_once: true
+  delegate_to: "{{ groups['db-master'][0] }}"
   when: do_overwrite_db_from_backup
 
 - name: Import SQL file

@@ -76,7 +76,7 @@ ${docker_exec_1[@]} bash -c "echo -e 'db_src_mysql_pass: 1234\n' >> /opt/meza/co
 
 # Add database source (e.g. pull direct from database) to inventory, make some
 # modifications to database and uploaded files, then deploy with overwrite
-${docker_exec_1[@]} bash -c "echo -e '[db-src]\n$docker_ip_2\n\n' >> /opt/meza/config/local-secret/$env_name/hosts"
+${docker_exec_1[@]} bash -c "echo -e '[db-src]\n$docker_ip_2 alt_remote_user=test-user\n\n' >> /opt/meza/config/local-secret/$env_name/hosts"
 ${docker_exec_1[@]} cat "/opt/meza/config/local-secret/$env_name/hosts"
 # garbage data into database and file uploads, just to check that the changes
 # get copied to CONTAINER 1
