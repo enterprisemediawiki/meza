@@ -367,7 +367,15 @@ $wgMainCacheType = CACHE_MEMCACHED;
 // Extension:HeaderFooter which may or may not be able to be worked around.
 $wgParserCacheType = CACHE_NONE;
 $wgMessageCacheType = CACHE_MEMCACHED;
-$wgMemCachedServers = array( "127.0.0.1:11211" );
+$wgMemCachedServers = array(
+    {% for server in groups['memcached-servers'] -%}
+    {%- if server == inventory_hostname -%}
+    '127.0.0.1:11211',
+    {%- else -%}
+    '{{ server }}:11211',
+    {%- endif -%}
+    {%- endfor %}
+);
 
 // memcached is setup and will work for sessions with meza, unless you use
 // SimpleSamlPhp. Previous versions of meza had this set to CACHE_NONE, but
