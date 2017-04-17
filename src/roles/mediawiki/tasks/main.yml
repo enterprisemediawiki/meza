@@ -206,6 +206,8 @@
   #   filter 2: then reduce to just the last part of the path
   #   filter 3: convert map object back to an Ansible-friendly list
   with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+  tags:
+  - verify-wiki
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 # Run update.php (MediaWiki's database update script) against all wikis. This
@@ -217,5 +219,7 @@
     wiki_id: "{{ item }}"
   with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
   run_once: true
+  tags:
+  - update.php
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
