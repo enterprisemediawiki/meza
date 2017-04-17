@@ -300,6 +300,8 @@ $wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
 # Experimental charset support for MySQL 5.0.
 $wgDBmysql5 = false;
 
+
+{% if primary_wiki is defined %}
 /**
  *  If a primewiki is defined then every wiki will use that wiki db for certain
  *  tables. The shared `interwiki` table allows users to use the same interwiki
@@ -308,47 +310,24 @@ $wgDBmysql5 = false;
  *  not affect the user groups, so a user can be a sysop on one wiki and just a
  *  user on another.
  *
- *  To enable a primewiki create the file $m_config/local/primewiki and make
- *  the file contents be the id of the desired wiki.
+ *  To enable a primewiki add the `primary_wiki_db_name` variable to the config
+ *  with the value being the database name. For example, if your primewiki's ID
+ *  is "main", your database name is wiki_main unless you have manually changed
+ *  it to something else.
  *
  *  In order for this to work properly the wikis need to have been created with
  *  a single user table in mind. If you're starting a new wiki farm then you're
  *  all set. If you're importing wikis which didn't previously have shared user
- *  tables, then you'll need to use the unifyUserTables.php script.
- *
+ *  tables, then you'll need to use the unifyUserTables.php script. Please test
+ *  this script extensively before use. Unifying user tables is complicated.
  **/
-if ( file_exists( "$m_config/local/primewiki" ) ) {
-
-	// grab prime wiki data using closure to encapsulate the data
-	// and not overwrite existing config ($wgSitename, etc)
-	$primewiki = call_user_func( function() use ( $m_htdocs, $m_config ) {
-
-		$primeWikiId = trim( file_get_contents( "$m_config/local/primewiki" ) );
-
-		require_once "$m_htdocs/wikis/$primeWikiId/config/preLocalSettings.php";
-
-		if ( isset( $mezaCustomDBname ) ) {
-			$primeWikiDBname = $mezaCustomDBname;
-		} else {
-			$primeWikiDBname = "wiki_$primeWikiId";
-		}
-
-		return array(
-			'id' => $primeWikiId,
-			'database' => $primeWikiDBname,
-		);
-	} );
-
-	$wgSharedDB = $primewiki[ 'database' ];
-	$wgSharedTables = array(
-		'user',            // default
-		'user_properties', // default
-		'interwiki',       // additional
-	);
-
-}
-
-
+$wgSharedDB = '{{ primary_wiki_db_name }}';
+$wgSharedTables = array(
+	'user',            // default
+	'user_properties', // default
+	'interwiki',       // additional
+);
+{% endif %}
 
 
 
