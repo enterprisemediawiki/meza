@@ -2,13 +2,13 @@
 
 - debug: { msg: "Running role:update.php for {{ wiki_id }}" }
 
-# FIXME: This shouldn't go to /tmp. Also it should be pushed to a backup server
+# FIXME: This shouldn't go to {{ m_tmp }}. Also it should be pushed to a backup server
 #        and maybe we should use incremental backups (patches) to limit size.
 - name: Backup wiki database prior to running update.php
   mysql_db:
     state: dump
     name: "wiki_{{ wiki_id }}"
-    target: "/tmp/backup_{{ wiki_id }}_{{ ansible_date_time.iso8601 }}.sql"
+    target: "{{ m_tmp }}/backup_{{ wiki_id }}_{{ ansible_date_time.iso8601 }}.sql"
   delegate_to: "{{ groups['db-master'][0] }}"
 
   # [1] This role should be included in such a way that it is run just once,

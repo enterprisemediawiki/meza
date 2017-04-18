@@ -150,3 +150,11 @@
 #   template:
 #     src: config.php.j2
 #     dest: /opt/meza/config/config.php
+
+- name: "Ensure {{ m_tmp }} exists"
+  file:
+    path: "{{ m_tmp }}"
+    owner: meza-ansible
+    group: wheel
+    mode: 0755
+    state: directory

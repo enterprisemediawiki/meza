@@ -195,7 +195,7 @@
   #
 - name: if wiki_sql_file exists, FIRST remove preexisting SQL file from controller
   file:
-    path: /tmp/controller-wiki.sql
+    path: "{{ m_tmp }}/controller-wiki.sql"
     state: absent
   run_once: true
   delegate_to: localhost
@@ -204,7 +204,7 @@
 - name: if wiki_sql_file exists, NEXT send SQL file to controller
   fetch:
     src: "{{ wiki_sql_file.stdout }}"
-    dest: /tmp/controller-wiki.sql
+    dest: "{{ m_tmp }}/controller-wiki.sql"
     fail_on_missing: yes
     flat: yes
   # note: don't run fetch with become on large files. ref bottom of this page:
@@ -217,8 +217,8 @@
 
 - name: if wiki_sql_file exists, NEXT send file from controller to master-db
   copy:
-    src: /tmp/controller-wiki.sql
-    dest: /tmp/wiki.sql
+    src: "{{ m_tmp }}/controller-wiki.sql"
+    dest: "{{ m_tmp }}/wiki.sql"
     force: yes
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
@@ -235,7 +235,7 @@
 - name: If wiki_sql_file NOT defined, send generic file to master db
   copy:
     src: templates/mediawiki-tables.sql
-    dest: /tmp/wiki.sql
+    dest: "{{ m_tmp }}/wiki.sql"
     force: yes
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
@@ -253,14 +253,14 @@
   mysql_db:
     name: "wiki_{{ wiki_id }}"
     state: import
-    target: /tmp/wiki.sql
+    target: "{{ m_tmp }}/wiki.sql"
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
   when: not wiki_exists or do_overwrite_db_from_backup
 
 - name: Remove SQL file from master DB
   file:
-    path: /tmp/wiki.sql
+    path: "{{ m_tmp }}/wiki.sql"
     state: absent
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
