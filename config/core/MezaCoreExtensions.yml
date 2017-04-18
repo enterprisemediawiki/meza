@@ -336,7 +336,7 @@ list:
     legacy_load: True
   - name: SemanticMeetingMinutes
     repo: https://github.com/enterprisemediawiki/SemanticMeetingMinutes.git
-    version: use-page-importer
+    version: master
     legacy_load: True
   - name: HeaderFooter
     repo: https://github.com/enterprisemediawiki/HeaderFooter.git
