@@ -40,22 +40,9 @@ list:
   - name: SubPageList
     composer: "mediawiki/sub-page-list"
     version: "~1.1"
-  - name: Semantic Meeting Minutes
-    composer: "mediawiki/semantic-meeting-minutes"
-    version: "~0.3"
   - name: Semantic Maps
     composer: "mediawiki/semantic-maps"
     version: "~3.2"
-
-
-  # Extension:HeaderFooter (currently pulled in by composer as dependency)
-  # https://github.com/enterprisemediawiki/HeaderFooter.git
-
-  # Extension:NumerAlpha (currently pulled in by composer as dependency)
-  # https://github.com/jamesmontalvo3/NumerAlpha.git
-
-
-
 
 
 
@@ -232,8 +219,7 @@ list:
       $egApprovedRevsAutomaticApprovals = false;
   - name: MasonryMainPage
     repo: https://github.com/enterprisemediawiki/MasonryMainPage.git
-    version: extreg
-    legacy_load: true
+    version: master
   - name: WatchAnalytics
     repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
     version: master
@@ -343,3 +329,20 @@ list:
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DataTransfer.git
     version: tags/0.6.2
     legacy_load: true
+
+  - name: PageImporter
+    repo: https://github.com/enterprisemediawiki/PageImporter.git
+    version: master
+    legacy_load: True
+  - name: SemanticMeetingMinutes
+    repo: https://github.com/enterprisemediawiki/SemanticMeetingMinutes.git
+    version: master
+    legacy_load: True
+  - name: HeaderFooter
+    repo: https://github.com/enterprisemediawiki/HeaderFooter.git
+    version: master
+    legacy_load: True
+  - name: NumerAlpha
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/NumerAlpha.git
+    version: master
+    legacy_load: True
