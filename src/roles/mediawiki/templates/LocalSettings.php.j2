@@ -301,7 +301,7 @@ $wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
 $wgDBmysql5 = false;
 
 
-{% if primary_wiki is defined %}
+{% if primary_wiki_db_name is defined %}
 /**
  *  If a primewiki is defined then every wiki will use that wiki db for certain
  *  tables. The shared `interwiki` table allows users to use the same interwiki
