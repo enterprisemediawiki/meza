@@ -1,5 +1,11 @@
 # Elasticsearch Plugins
 
+## WARNING
+
+The steps below may be out of date. Meza now uses HAProxy to handle incoming traffic, and changes may be required to this documentation to account for that difference.
+
+## Installed plugg
+
 At present there are four Elasticsearch plugins installed:
 
 * [Kopf](https://github.com/lmenezes/elasticsearch-kopf)
