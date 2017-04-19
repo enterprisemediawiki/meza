@@ -444,7 +444,7 @@
     name: revoke-keys
     alt_remote_user: "{{ uploads_backup_server_remote_user }}"
   vars:
-    revoke_keys_from_server: "{{ groups['backup-servers'][0] }}"
+    revoke_keys_from_server: "{{ uploads_backup_server }}"
   when:
     images_backup_dir.stat.exists
     and (not uploads_dir.stat.exists or do_overwrite_uploads_from_backup)
