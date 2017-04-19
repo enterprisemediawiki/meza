@@ -12,7 +12,7 @@
 
 - name: Remove any existing database dumps
   file:
-    path: "/tmp/{{ env }}_{{ item }}.sql"
+    path: "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
     state: absent
   # see role "mediawiki" for explanation of filters below
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
@@ -21,5 +21,5 @@
   mysql_db:
     state: dump
     name: "wiki_{{ item }}"
-    target: "/tmp/{{ env }}_{{ item }}.sql"
+    target: "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"

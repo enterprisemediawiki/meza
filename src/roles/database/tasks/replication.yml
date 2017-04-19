@@ -89,7 +89,7 @@
     and not role_is_valid_slave|skipped
 
 - name: export dump file on master
-  shell: "mysqldump --databases {{ mysql_content_databases.stdout }} | gzip > /tmp/mysqldump-onmaster.sql.gz"
+  shell: "mysqldump --databases {{ mysql_content_databases.stdout }} | gzip > {{ m_tmp }}/mysqldump-onmaster.sql.gz"
   delegate_to: "{{ mysql_replication_master }}"
   when: >
     not slave_needs_configuration|skipped
@@ -105,17 +105,17 @@
 #
 - name: fetch dump file
   fetch:
-    src=/tmp/mysqldump-onmaster.sql.gz
-    dest=/tmp/mysqldump-oncontrol.sql.gz
-    flat=yes
+    src: "{{ m_tmp }}/mysqldump-onmaster.sql.gz"
+    dest: "{{ m_tmp }}/mysqldump-oncontrol.sql.gz"
+    flat: yes
   delegate_to: "{{ mysql_replication_master }}"
   when: >
     not slave_needs_configuration|skipped
     and not role_is_valid_slave|skipped
 - name: put dump file
   copy:
-    src=/tmp/mysqldump-oncontrol.sql.gz
-    dest=/tmp/mysqldump-onslave.sql.gz
+    src: "{{ m_tmp }}/mysqldump-oncontrol.sql.gz"
+    dest: "{{ m_tmp }}/mysqldump-onslave.sql.gz"
   when: >
     not slave_needs_configuration|skipped
     and not role_is_valid_slave|skipped
@@ -128,7 +128,7 @@
   mysql_db:
     state: import
     name: all
-    target: /tmp/mysqldump-onslave.sql.gz
+    target: "{{ m_tmp }}/mysqldump-onslave.sql.gz"
   when: >
     not slave_needs_configuration|skipped
     and not role_is_valid_slave|skipped

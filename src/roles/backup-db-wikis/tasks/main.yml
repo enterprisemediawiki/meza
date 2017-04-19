@@ -29,7 +29,7 @@
 - name: Copy SQL files to backups
   synchronize:
     # copy from server A
-    src: "/tmp/{{ env }}_{{ item }}.sql"
+    src: "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
     # copy to server B
     dest: "{{ m_backups }}/{{ env }}/{{ item }}/{{ backup_timestamp }}_wiki.sql"
   # server A
@@ -37,9 +37,9 @@
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
 
 # Remove temp SQL files, only needs to be done on first backup server
-- name: Remove SQL files from DB master /tmp
+- name: Remove SQL files from DB master {{ m_tmp }}
   file:
-    path: "/tmp/{{ env }}_{{ item }}.sql"
+    path: "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
     state: absent
   delegate_to: "{{ groups['db-master'][0] }}"
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
