@@ -27,3 +27,9 @@ blender_admins: []
 local_config_repo: {}
 
 enable_wiki_emails: true
+
+# Whether to enable debug at all times
+m_force_debug: false
+
+# Whether to enable debug when using the command line
+m_command_line_debug: true

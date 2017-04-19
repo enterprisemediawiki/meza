@@ -93,8 +93,8 @@ foreach ( glob("$m_meza/config/local_app/wikis/$wikiId/preLocalSettings.d/*.php"
  *       users of a single wiki.
  *    5) Set `$mezaForceDebug = true;` to turn on debug for all users and wikis
  **/
-$mezaCommandLineDebug = true; // don't we always want debug on command line?
-$mezaForceDebug = false;
+$mezaCommandLineDebug = {{ m_command_line_debug }}; // don't we always want debug on command line?
+$mezaForceDebug = {{ m_force_debug }};
 
 
 if ( $mezaForceDebug ) {
