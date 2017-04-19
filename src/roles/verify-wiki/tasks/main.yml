@@ -425,6 +425,13 @@
     dest: "{{ m_uploads_dir }}/{{ wiki_id }}"
     recursive: yes
 
+    # If the source server has an /uploads directory with symlinks, follow
+    # the symlinks and re-assemble them on the destination server not as
+    # symlinks. This allows an old server that is running out of space to
+    # spread its data onto other partitions using symlinks, but a new server
+    # with more space to put everything back where it belongs.
+    copy_links: yes
+
     # Perhaps required due to not being able to properly specify an Ansible
     # user in synchronize
     # ref: https://github.com/ansible/ansible/issues/16215
