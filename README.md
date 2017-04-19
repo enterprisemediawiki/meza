@@ -38,7 +38,7 @@ sudo meza deploy monolith
 ```
 
 Running VirtualBox and need to get your virtual machine configured? See our
-[setting up VirtualBox](manual/1.0-SettingUpVirtualBox.md) guide.
+[setting up VirtualBox](manual/SettingUpVirtualBox.md) guide.
 
 ## What is installed?
 
@@ -126,4 +126,4 @@ This is not necessarily an exhaustive list
 
 ## Contributing
 
-If you'd like to contribute to this project, please see [this guide on how to help](CONTRIBUTING.md). 
+If you'd like to contribute to this project, please see [this guide on how to help](CONTRIBUTING.md).
