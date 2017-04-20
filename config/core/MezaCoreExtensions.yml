@@ -217,6 +217,9 @@ list:
     legacy_load: true
     config: |
       $egApprovedRevsAutomaticApprovals = false;
+  - name: ImagesLoaded
+    repo: https://github.com/enterprisemediawiki/ImagesLoaded.git
+    version: master
   - name: MasonryMainPage
     repo: https://github.com/enterprisemediawiki/MasonryMainPage.git
     version: master
