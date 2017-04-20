@@ -9,7 +9,8 @@
 # Ref: https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
 if ( ! isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 
-	wfLoadExtension( 'SimpleSamlAuth' );
+	// wfLoadExtension( 'SimpleSamlAuth' );
+	require_once "$IP/extensions/SimpleSamlAuth/SimpleSamlAuth.php";
 
 	// the base SAML config variables exist in this file, such that it's
 	// easy for the landing page to use them, too.

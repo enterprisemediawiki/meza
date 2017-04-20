@@ -407,9 +407,8 @@ Listen 8080
 	DocumentRoot /opt/meza/htdocs
 	ServerName Meza
 
-	{% if saml -%}
+	{% if saml_secret -%}
 	# Use SimpleSamlPhp to handle authentication
-	# added by saml.sh script
 	Alias /simplesaml {{ m_simplesamlphp_path }}/www
 	<Directory {{ m_simplesamlphp_path }}/www>
 		Require all granted

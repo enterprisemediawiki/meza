@@ -44,9 +44,6 @@
     # Config file used by MW extension + any other PHP app needing auth
     # (landing page, admin functions, etc)
     - filename: "SAMLConfig.php"
-      dest_path: "/opt/meza/config/local_app"
+      dest_path: "{{ m_local_public }}"
 
 
-
-memcached for sessions?
-memcahced for sessions not in MW?
