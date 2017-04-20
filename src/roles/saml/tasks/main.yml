@@ -42,6 +42,6 @@
     # Config file used by MW extension + any other PHP app needing auth
     # (landing page, admin functions, etc)
     - filename: "SAMLConfig.php"
-      dest_path: "{{ m_local_public }}"
+      dest_path: "{{ m_config_app_ansible }}"
 
 

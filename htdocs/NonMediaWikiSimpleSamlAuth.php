@@ -21,7 +21,7 @@ define( 'MEDIAWIKI', 1 );
 $wgSamlConfirmMail = false;
 
 // get SAML config, shared with MediaWiki extension SimpleSamlAuth
-require_once "/opt/meza/config/local/SAMLConfig.php";
+require_once "/opt/meza/config/core/app-ansible/SAMLConfig.php";
 
 // This class is basically a pared down version of SimpleSamlAuth.class.php, an
 // extension for MediaWiki. This allows the landing page to use the same config
