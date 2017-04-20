@@ -8,7 +8,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 /**
  *  TABLE OF CONTENTS
- *
+ *{% if saml_secret is defined %}
+ *    0) SAML AUTH{% endif %}
  *    1) WIKI-SPECIFIC SETUP
  *    2) DEBUG
  *    3) PATH SETUP
@@ -21,7 +22,17 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  *
  **/
 
+{% if saml_secret is defined %}
+/**
+ *  0) SAML AUTH
+ *
+ *  Perform authentication up front.
+ *
+ **/
+require_once "{{ m_config_app_ansible }}/samlLocalSettings.php";
 
+
+{% endif %}
 
 /**
  *  1) WIKI-SPECIFIC SETUP
