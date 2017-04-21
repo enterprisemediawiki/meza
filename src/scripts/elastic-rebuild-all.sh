@@ -6,11 +6,16 @@ cd /opt/meza/htdocs/wikis
 for d in */; do
 
     wiki_id=${d%/}
-    echo "Rebuilding index for $wiki_id"
-
 	timestamp=$(date +%s)
 
-	WIKI="$wiki_id" bash /opt/meza/src/scripts/elastic-build-index.sh > $m_logs/search-index.$wiki_id.$timestamp.log
+	out_log="$m_logs/search-index.$wiki_id.$timestamp.log"
+
+    echo "Rebuilding index for $wiki_id"
+    echo "  Output log:"
+    echo "    $out_log"
+
+
+	wiki_id="$wiki_id" bash /opt/meza/src/scripts/elastic-build-index.sh > "$out_log"
 
 	# If the above command had a failing exit code
 	if [[ $? -ne 0 ]]; then
