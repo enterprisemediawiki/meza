@@ -10,9 +10,7 @@ for d in */; do
 
 	timestamp=$(date +%s)
 
-	WIKI="$wiki_id" \
-	bash /opt/meza/src/scripts/elastic-build-index.sh \
-	> $m_logs/search-index.$wiki_id.$timestamp.log
+	WIKI="$wiki_id" bash /opt/meza/src/scripts/elastic-build-index.sh > $m_logs/search-index.$wiki_id.$timestamp.log
 
 	# If the above command had a failing exit code
 	if [[ $? -ne 0 ]]; then
@@ -22,7 +20,7 @@ for d in */; do
 
 	#if the above command had a passing exit code (e.g. zero)
 	else
-		echo "rebuildData completed for $wiki_id"
+		echo "elastic-build-index completed for $wiki_id"
 	fi
 
 done

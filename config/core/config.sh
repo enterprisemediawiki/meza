@@ -11,6 +11,7 @@ m_meza="$m_install/meza" # was: m_meza="$m_install/meza1"
 
 # config dir
 m_config="$m_meza/config"
+m_local_app="/opt/meza/config/local_app"
 
 # scripts dir
 m_scripts="$m_meza/src/scripts"
