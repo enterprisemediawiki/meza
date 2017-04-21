@@ -349,14 +349,14 @@ def meza_command_maint (argv):
 	# FIXME: This has no notion of environments
 
 	sub_command = argv[0]
-	command_fn = "meza_command_setup_" + sub_command
+	command_fn = "meza_command_maint_" + sub_command
 
 	# if command_fn is a valid Python function, pass it all remaining args
 	if command_fn in globals() and callable( globals()[command_fn] ):
 		globals()[command_fn]( argv[1:] )
 	else:
 		print
-		print sub_command + " is not a valid sub-command for setup"
+		print sub_command + " is not a valid sub-command for maint"
 		sys.exit(1)
 
 
