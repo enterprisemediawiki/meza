@@ -146,7 +146,7 @@
   delegate_to: "{{ sql_backup_server }}"
   remote_user: "{{ db_backup_server_remote_user }}"
   run_once: true
-  when: do_sql_dump
+  when: do_sql_dump and (not wiki_exists or intend_overwrite_from_backup)
 
 
 
@@ -158,6 +158,7 @@
   delegate_to: "{{ sql_backup_server }}"
   run_once: true
   remote_user: "{{ db_backup_server_remote_user }}"
+  ignore_errors: yes
   when: backup_dir_exists and (not wiki_exists or intend_overwrite_from_backup)
 
 - name: "Set fact if SQL file DOES exist"

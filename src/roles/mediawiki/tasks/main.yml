@@ -235,7 +235,7 @@
     name: smw-rebuild-data
   vars:
     wiki_id: "{{ item }}"
-  with_items: list_of_new_wikis
+  with_items: "{{ list_of_new_wikis }}"
   when: docker_skip_tasks is not defined or not docker_skip_tasks
   tags:
   - verify-wiki
@@ -245,7 +245,7 @@
     name: search-index
   vars:
     wiki_id: "{{ item }}"
-  with_items: list_of_new_wikis
+  with_items: "{{ list_of_new_wikis }}"
   when: docker_skip_tasks is not defined or not docker_skip_tasks
   tags:
   - verify-wiki
