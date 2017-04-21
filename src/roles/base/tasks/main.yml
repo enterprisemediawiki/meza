@@ -158,3 +158,11 @@
     group: wheel
     mode: 0755
     state: directory
+
+- name: "Ensure {{ m_logs }} exists"
+  file:
+    path: "{{ m_logs }}"
+    owner: meza-ansible
+    group: wheel
+    mode: 0755
+    state: directory

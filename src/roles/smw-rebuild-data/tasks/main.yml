@@ -1,0 +1,19 @@
+---
+
+- name: Run SMW's rebuildData.php
+  shell: >
+    WIKI="{{ wiki_id }}"
+    php "{{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/rebuildData.php"
+    -d 5 -v --ignore-exceptions
+    --exception-log="{{ m_logs }}/smw-rebuilddata-exceptions-{{ wiki_id }}-{{ ansible_date_time.iso8601 }}.log"
+    > {{ m_logs }}/smw-rebuilddata-out.{{ wiki_id }}.{{ ansible_date_time.iso8601 }}.log
+  run_once: true
+  ignore_errors: yes
+
+# FIXME: If smw exceptions log exists, fire off some notification
+# FIXME: If any errors, fire off notification
+
+- name: Run runJobs.php
+  shell: >
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/runJobs.php" --quick
+  run_once: true

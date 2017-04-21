@@ -488,30 +488,10 @@
   include: init-wiki.yml
   when: not wiki_exists and not sql_file_exists
 
-
-- name: Run SMW's rebuildData.php
-  shell: >
-    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/rebuildData.php"
-    -d 5 -v --ignore-exceptions --exception-log="{{ m_meza }}/logs/rebuilddata-exceptions-{{ wiki_id }}-.log"
-  run_once: true
+# Create a list of wikis that are "new" (either actually new, or that the
+# database has been rebuilt)
+- name: Update list of new wikis
+  set_fact:
+    list_of_new_wikis: "{{ list_of_new_wikis }} + [ '{{ wiki_id }}' ]"
   when: not wiki_exists or do_overwrite_db_from_backup
 
-
-# Is this "disable search update" required at this point? I'm not sure why we'd do this
-# echo "\$wgDisableSearchUpdate = true;" >> "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
-- name: Run runJobs.php
-  shell: >
-    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/runJobs.php" --quick
-  run_once: true
-  when: not wiki_exists or do_overwrite_db_from_backup
-# sed -r -i 's/\$wgDisableSearchUpdate = true;//g;' "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.php"
-
-# Generate ES index, since it is skipped in the initial create-wiki.sh
-# Ref: https://git.wikimedia.org/blob/mediawiki%2Fextensions%2FCirrusSearch.git/REL1_25/README
-- name: Running elastic-build-index.sh for demo wiki
-  shell: |
-    wiki_id="{{ wiki_id }}"
-    source "/opt/meza/config/core/config.sh"
-    source "{{ m_scripts }}/elastic-build-index.sh"
-  run_once: true
-  when: not wiki_exists or do_overwrite_db_from_backup
