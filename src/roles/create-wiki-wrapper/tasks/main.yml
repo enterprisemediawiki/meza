@@ -21,3 +21,12 @@
 - name: Use verify-wiki to make sure new wiki is setup
   include_role:
     name: verify-wiki
+
+# Not totally sure this is necessary, but maybe for imported pages?
+- name: Rebuild SemanticMediaWiki data
+  include_role:
+    name: smw-rebuild-data
+
+- name: Build search index
+  include_role:
+    name: search-index

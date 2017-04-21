@@ -489,6 +489,11 @@
   include: init-wiki.yml
   when: not wiki_exists and not sql_file_exists
 
+- name: Create list of new wikis if not exist
+  set_fact:
+    list_of_new_wikis: []
+  when: list_of_new_wikis is not defined
+
 # Create a list of wikis that are "new" (either actually new, or that the
 # database has been rebuilt)
 - name: Update list of new wikis

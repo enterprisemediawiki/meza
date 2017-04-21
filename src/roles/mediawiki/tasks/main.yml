@@ -205,15 +205,6 @@
   delegate_to: localhost
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
-# Wikis that will go in this list are either entirely new (just created) or
-# had their databases wiped out and re-sourced.
-- name: 'Initiate (currently empty) list of "new" wikis'
-  set_fact:
-    list_of_new_wikis: []
-  tags:
-  # always run this, so we're sure the list is initiated
-  - always
-
 # Check that all wikis in config are present on app and DB servers
 - name: Ensure defined wikis exist
   include_role:
@@ -229,7 +220,10 @@
   - verify-wiki
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
-# Wikis are totally built at this point, but SMW and search needs rebuilding
+- debug:
+    var: list_of_new_wikis
+
+# Wikis are totally built at this point, but SMW and search need rebuilding
 - name: Rebuild SemanticMediaWiki data for each wiki
   include_role:
     name: smw-rebuild-data
