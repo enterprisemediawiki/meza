@@ -516,7 +516,10 @@ $wgFileExtensions = array(
 	'xlsx'
 );
 
-
+// Tell Universal Language Selector not to try to guess language based upon IP
+// address. This (a) isn't likely needed in enterprise use cases and (b) fails
+// anyway due to outdated URLs or firewall rules.
+$wgULSGeoService = false;
 
 
 
