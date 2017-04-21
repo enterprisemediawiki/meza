@@ -8,7 +8,11 @@
     --exception-log="{{ m_logs }}/smw-rebuilddata-exceptions-{{ wiki_id }}-{{ ansible_date_time.iso8601 }}.log"
     > {{ m_logs }}/smw-rebuilddata-out.{{ wiki_id }}.{{ ansible_date_time.iso8601 }}.log
   run_once: true
+  async: "{{ m_search_index_async_length | int }}"
+  poll: "{{ m_search_index_poll | int }}"
+  # Ignore errors to be sure the next command runs, re-enabling search update
   ignore_errors: yes
+  register: index1
 
 # FIXME: If smw exceptions log exists, fire off some notification
 # FIXME: If any errors, fire off notification

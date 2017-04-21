@@ -1,5 +1,3 @@
-bash printTitle.sh "Begin $0"
-
 echo "******* Generating elasticsearch index *******"
 
 disable_search_file="$m_local_app/wikis/$wiki_id/postLocalSettings.d/disable-search-update.php"

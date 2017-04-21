@@ -217,25 +217,19 @@
     var: list_of_new_wikis
 
 # Wikis are totally built at this point, but SMW and search need rebuilding
+# FIXME: WILL ONLY WORK WHEN CONTROLLER AND APP-SERVER ARE THE SAME MACHINE
 - name: Rebuild SemanticMediaWiki data for each wiki
-  include_role:
-    name: smw-rebuild-data
-  vars:
-    wiki_id: "{{ item }}"
-  with_items: "{{ list_of_new_wikis }}"
+  shell: "bash /opt/meza/src/scripts/elastic-rebuild-all.sh"
   when: docker_skip_tasks is not defined or not docker_skip_tasks
+  run_once: true
   tags:
-  - verify-wiki
-
+  - search-index
 - name: (Re-)build search index for each wiki
-  include_role:
-    name: search-index
-  vars:
-    wiki_id: "{{ item }}"
-  with_items: "{{ list_of_new_wikis }}"
+  shell: "bash /opt/meza/src/scripts/smw-rebuild-all.sh"
   when: docker_skip_tasks is not defined or not docker_skip_tasks
+  run_once: true
   tags:
-  - verify-wiki
+  - smw-data
 
 
 # Run update.php (MediaWiki's database update script) against all wikis. This
