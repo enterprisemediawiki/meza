@@ -407,7 +407,14 @@ Listen 8080
 	DocumentRoot /opt/meza/htdocs
 	ServerName Meza
 
-	# ADD SPECIAL CONFIG BELOW
+	{% if saml_secret is defined -%}
+	# Use SimpleSamlPhp to handle authentication
+	Alias /simplesaml {{ m_simplesamlphp_path }}/www
+	<Directory {{ m_simplesamlphp_path }}/www>
+		Require all granted
+		Options All -Indexes
+	</Directory>
+	{%- endif %}
 
 </VirtualHost>
 
