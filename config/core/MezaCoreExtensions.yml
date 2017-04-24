@@ -198,11 +198,11 @@ list:
     legacy_load: true
   - name: HeaderTabs
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/HeaderTabs.git
-    version: REL1_27
+    version: tags/1.1
     legacy_load: true
     config: |
-      $htEditTabLink = false;
-      $htRenderSingleTab = true;
+      $wgHeaderTabsEditTabLink = false;
+      $wgHeaderTabsRenderSingleTab = true;
   - name: CopyWatchers
     repo: https://github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git
     version: master
