@@ -346,36 +346,70 @@ def meza_command_update (argv):
 #   $ meza maint createAndPromote + argv   --> create a user on all wikis
 def meza_command_maint (argv):
 
-		if argv[0] != "runJobs":
-			print "Currently the only maint command is 'runJobs'"
-			print "  meza maint runJobs"
-			sys.exit(1)
+	# FIXME: This has no notion of environments
 
-		# FIXME: This has no notion of environments
+	sub_command = argv[0]
+	command_fn = "meza_command_maint_" + sub_command
 
-		#
-		# WARNING: THIS FUNCTION SHOULD STILL WORK ON MONOLITHS, BUT HAS NOT BE
-		#          RE-TESTED SINCE MOVING TO ANSIBLE. FOR NON-MONOLITHS IT WILL
-		#          NOT WORK AND NEEDS TO BE ANSIBLE-IZED. FIXME.
-		#
+	# if command_fn is a valid Python function, pass it all remaining args
+	if command_fn in globals() and callable( globals()[command_fn] ):
+		globals()[command_fn]( argv[1:] )
+	else:
+		print
+		print sub_command + " is not a valid sub-command for maint"
+		sys.exit(1)
 
-		wikis_dir = "/opt/meza/htdocs/wikis"
-		wikis = os.listdir( wikis_dir )
-		for i in wikis:
-			if os.path.isdir(os.path.join(wikis_dir, i)):
-				anywiki=i
-				break
 
-		if not anywiki:
-			print "No wikis available to run jobs"
-			sys.exit(1)
 
-		shell_cmd = ["WIKI="+anywiki, "php", "/opt/meza/src/scripts/runAllJobs.php"]
-		if len(argv) > 1:
-			shell_cmd = shell_cmd + ["--wikis="+argv[1]]
-		rc = meza_shell_exec( shell_cmd )
+def meza_command_maint_runJobs (argv):
 
+	#
+	# WARNING: THIS FUNCTION SHOULD STILL WORK ON MONOLITHS, BUT HAS NOT BE
+	#          RE-TESTED SINCE MOVING TO ANSIBLE. FOR NON-MONOLITHS IT WILL
+	#          NOT WORK AND NEEDS TO BE ANSIBLE-IZED. FIXME.
+	#
+
+	wikis_dir = "/opt/meza/htdocs/wikis"
+	wikis = os.listdir( wikis_dir )
+	for i in wikis:
+		if os.path.isdir(os.path.join(wikis_dir, i)):
+			anywiki=i
+			break
+
+	if not anywiki:
+		print "No wikis available to run jobs"
+		sys.exit(1)
+
+	shell_cmd = ["WIKI="+anywiki, "php", "/opt/meza/src/scripts/runAllJobs.php"]
+	if len(argv) > 0:
+		shell_cmd = shell_cmd + ["--wikis="+argv[1]]
+	rc = meza_shell_exec( shell_cmd )
+
+	sys.exit(rc)
+
+def meza_command_maint_rebuild (argv):
+
+	env = argv[0]
+
+	rc = check_environment(env)
+
+	# return code != 0 means failure
+	if rc != 0:
 		sys.exit(rc)
+
+	more_extra_vars = False
+
+	# strip environment off of it
+	argv = argv[1:]
+
+	shell_cmd = playbook_cmd( 'rebuild-smw-and-index', env, more_extra_vars )
+	if len(argv) > 0:
+		shell_cmd = shell_cmd + argv
+
+	return_code = meza_shell_exec( shell_cmd )
+
+	# exit with same return code as ansible command
+	sys.exit(return_code)
 
 
 def meza_command_docker (argv):

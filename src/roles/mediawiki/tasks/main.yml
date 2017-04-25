@@ -197,13 +197,18 @@
 #
 # VERIFY WIKIS
 #
-- name: Get individual wikis dirs
+- name: Get individual wikis dirs from localhost
   find:
     paths: "{{ m_local_public }}/wikis/"
     file_type: directory
   register: wikis_dirs
   delegate_to: localhost
-  when: docker_skip_tasks is not defined or not docker_skip_tasks
+  run_once: yes
+
+- set_fact:
+    list_of_wikis: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+- debug: { var: list_of_wikis }
 
 # Check that all wikis in config are present on app and DB servers
 - name: Ensure defined wikis exist
@@ -215,10 +220,26 @@
   #   filter 1: reduce list items to just the path
   #   filter 2: then reduce to just the last part of the path
   #   filter 3: convert map object back to an Ansible-friendly list
-  with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+  with_items: "{{ list_of_wikis }}"
   tags:
   - verify-wiki
   when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+# Wikis are totally built at this point, but SMW and search need rebuilding
+# FIXME: WILL ONLY WORK WHEN CONTROLLER AND APP-SERVER ARE THE SAME MACHINE
+- name: (Re-)build search index for each wiki
+  shell: "bash /opt/meza/src/scripts/smw-rebuild-all.sh"
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+  run_once: true
+  tags:
+  - smw-data
+- name: Rebuild SemanticMediaWiki data for each wiki
+  shell: "bash /opt/meza/src/scripts/elastic-rebuild-all.sh"
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+  run_once: true
+  tags:
+  - search-index
+
 
 # Run update.php (MediaWiki's database update script) against all wikis. This
 # only needs to be done once, since the first app server that runs it will
@@ -227,9 +248,8 @@
     name: update.php
   vars:
     wiki_id: "{{ item }}"
-  with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+  with_items: "{{ list_of_wikis }}"
   run_once: true
   tags:
   - update.php
   when: docker_skip_tasks is not defined or not docker_skip_tasks
-

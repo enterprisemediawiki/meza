@@ -21,3 +21,18 @@
 - name: Use verify-wiki to make sure new wiki is setup
   include_role:
     name: verify-wiki
+
+# Wikis are totally built at this point, but SMW and search need rebuilding
+# FIXME: WILL ONLY WORK WHEN CONTROLLER AND APP-SERVER ARE THE SAME MACHINE
+# Not totally sure SMW-rebuild is necessary, but maybe for imported pages?
+- name: (Re-)build search index for each wiki
+  shell: "bash /opt/meza/src/scripts/smw-rebuild-all.sh"
+  run_once: true
+  tags:
+  - smw-data
+- name: Rebuild SemanticMediaWiki data for each wiki
+  shell: "bash /opt/meza/src/scripts/elastic-rebuild-all.sh"
+  run_once: true
+  tags:
+  - search-index
+

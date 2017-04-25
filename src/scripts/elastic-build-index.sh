@@ -1,17 +1,19 @@
-bash printTitle.sh "Begin $0"
-
 echo "******* Generating elasticsearch index *******"
+
+source /opt/meza/config/core/config.sh
+
+disable_search_file="$m_local_app/wikis/$wiki_id/postLocalSettings.d/disable-search-update.php"
 
 # disable search update in wiki-specific settings
 # FIXME: May only work in monolithic case
-echo "\$wgDisableSearchUpdate = true;" > "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.d/disable-search-update.php"
+echo -e "<?php\n\$wgDisableSearchUpdate = true;\n" > "$disable_search_file"
 
 # Run script to generate elasticsearch index
 cd "$m_mediawiki"
 WIKI="$wiki_id" php "$m_mediawiki/extensions/CirrusSearch/maintenance/updateSearchIndexConfig.php" --startOver
 
 # Remove search-update disable in wiki-specific settings
-rm -f "$m_htdocs/wikis/$wiki_id/config/postLocalSettings.d/disable-search-update.php"
+rm -f "$disable_search_file"
 
 # Bootstrap the search index
 #
