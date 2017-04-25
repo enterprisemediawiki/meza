@@ -208,8 +208,7 @@ list:
     version: master
   - name: Wiretap
     repo: https://github.com/enterprisemediawiki/Wiretap.git
-    version: extreg
-    legacy_load: true
+    version: master
   - name: ApprovedRevs
     repo: https://github.com/jamesmontalvo3/MediaWiki-ApprovedRevs.git
     version: master
