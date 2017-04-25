@@ -198,15 +198,14 @@ list:
     legacy_load: true
   - name: HeaderTabs
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/HeaderTabs.git
-    version: REL1_27
+    version: tags/1.1
     legacy_load: true
     config: |
-      $htEditTabLink = false;
-      $htRenderSingleTab = true;
+      $wgHeaderTabsEditTabLink = false;
+      $wgHeaderTabsRenderSingleTab = true;
   - name: CopyWatchers
     repo: https://github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git
-    version: extreg
-    legacy_load: true
+    version: master
   - name: Wiretap
     repo: https://github.com/enterprisemediawiki/Wiretap.git
     version: extreg
@@ -258,12 +257,9 @@ list:
       );
 
 
-  # @todo: The "official" version of this is in an SVN repository. If we need
-  #        this it should be migrated to Gerrit or an EMW managed git repo.
-  #        See https://www.mediawiki.org/wiki/Extension:Pipe_Escape
   - name: PipeEscape
-    repo: https://github.com/jamesmontalvo3/MediaWiki-PipeEscape.git
-    version: extreg
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PipeEscape.git
+    version: REL1_27
     legacy_load: true
   - name: CirrusSearch
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CirrusSearch.git
