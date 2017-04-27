@@ -164,12 +164,12 @@
 - name: "{{ wiki_id }} - Set fact if SQL file DOES exist"
   set_fact:
     sql_file_exists: True
-  when: wiki_sql_file is defined and wiki_sql_file.rc == 0
+  when: wiki_sql_file is defined and wiki_sql_file.rc is defined and wiki_sql_file.rc == 0
 
 - name: "{{ wiki_id }} - Set fact if SQL file DOES NOT exist"
   set_fact:
     sql_file_exists: False
-  when: wiki_sql_file is not defined or wiki_sql_file.rc != 0
+  when: wiki_sql_file is not defined or wiki_sql_file.rc is not defined or wiki_sql_file.rc != 0
 
 
 
