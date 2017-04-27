@@ -55,7 +55,7 @@
     (
       (slave.Is_Slave is defined and not slave.Is_Slave)
       or (slave.Is_Slave is not defined and slave|failed)
-      or (slave.Slave_IO_Running == 'No' and slave.Slave_SQL_Running == 'No')
+      or (slave.Slave_IO_Running is defined and slave.Slave_SQL_Running == 'No')
       or (mysql_force_slave_configuration)
     )
 - debug: { var: slave_needs_configuration }
