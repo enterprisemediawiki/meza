@@ -40,9 +40,9 @@ list:
   - name: SubPageList
     composer: "mediawiki/sub-page-list"
     version: "~1.1"
-  - name: Semantic Maps
-    composer: "mediawiki/semantic-maps"
-    version: "~3.2"
+  - name: Maps
+    composer: "mediawiki/maps"
+    version: "~4.1"
 
 
 
