@@ -52,7 +52,7 @@
  *  of this local meza installation. This section may be blank if no Composer
  *  extensions are required for this local installation.
  **/
-{% for ext in meza_core_extensions['list'] if ext.composer is defined and ext.config is defined %}
+{% for ext in meza_local_extensions['list'] if ext.composer is defined and ext.config is defined %}
 
 #
 # Config for Extension:{{ ext.name }}
