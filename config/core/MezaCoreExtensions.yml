@@ -131,15 +131,10 @@ list:
   - name: CollapsibleVector
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CollapsibleVector
     version: REL1_27
-  - name: Math
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Math.git
-    version: REL1_27
-    config: |
-      $wgMathValidModes[] = 'MW_MATH_MATHJAX'; // Define MathJax as one of the valid math rendering modes
-      $wgUseMathJax = true; // Enable MathJax as a math rendering option for users to pick
-      $wgDefaultUserOptions['math'] = 'MW_MATH_MATHJAX'; // Set MathJax as the default rendering option for all users (optional)
-      $wgMathDisableTexFilter = true; // or compile "texvccheck"
-      $wgDefaultUserOptions['mathJax'] = true; // Enable the MathJax checkbox option
+  - name: SimpleMathJax
+    repo: https://github.com/jamesmontalvo3/SimpleMathJax.git
+    version: master
+    legacy_load: True
   - name: ImageMap
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ImageMap
     version: REL1_27
