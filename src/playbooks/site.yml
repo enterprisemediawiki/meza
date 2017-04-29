@@ -77,6 +77,7 @@
 
 - hosts: app-servers
   become: yes
+  tags: apache-php
   roles:
     - set-vars
     - role: firewalld
@@ -97,6 +98,7 @@
 
 - hosts: memcached-servers
   become: yes
+  tags: memcached
   roles:
     - set-vars
     - role: firewalld
@@ -206,3 +208,17 @@
         # # latest version
         # - name: node-sass
     - parsoid-settings
+
+- hosts: logging-servers
+  become: yes
+  tags: logging
+  roles:
+    - set-vars
+    - meza-log
+
+- hosts: all:!exclude-all
+  become: yes
+  tags: cron
+  roles:
+    - set-vars
+    - cron

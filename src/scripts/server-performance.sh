@@ -2,31 +2,39 @@
 #
 # server-performance.sh
 #
-# Send an announcement to Slack reporting server performance
-#
-# Add this script as a scheduled task via crontab
-# */10 * * * * /opt/meza/scripts/server-performance.sh
-# Make sure permissions are set so the cron user has permission to execute this script
+# Use `top` to get performance stats, then record stats in DB and send Slack
+# notification
 
-if [ "$(whoami)" != "root" ]; then
-    echo "Try running this script with sudo: \"sudo server-performance.sh\""
-    exit 1
-fi
 
 # If /usr/local/bin is not in PATH then add it
 # Ref enterprisemediawiki/meza#68 "Run install.sh with non-root user"
 if [[ $PATH != *"/usr/local/bin"* ]]; then
-    PATH="/usr/local/bin:$PATH"
+	PATH="/usr/local/bin:$PATH"
 fi
 
 source /opt/meza/config/core/config.sh
 
-if [ -f "/opt/meza/config/local/remote-wiki-config.sh" ]; then
-    source "/opt/meza/config/local/remote-wiki-config.sh"
+# TEMPORARY method of recording slack webhooks. Should be in
+# local-secret/group_vars/all.yml and then written to a dynamic shell script
+# file.
+slack_config="/opt/meza/config/local-secret/slack.sh"
+if [ -f "$slack_config" ]; then
+	source "$slack_config"
 fi
 
-# Optional - Use this webhook instead of the one from remote-wiki-config.sh
-# slackwebhook="<webhook>"
+if [ -z "$slack_webhook_token_server_performance" ]; then
+	slack_token=""
+else
+	slack_token="$slack_webhook_token_server_performance"
+fi
+
+# If no channel in config, don't specify one in ansible-slack call, thus using
+# webhook default channel
+if [ -z "$slack_channel_server_performance" ]; then
+	slack_channel=""
+else
+	slack_channel="channel=#$slack_channel_server_performance"
+fi
 
 # get all the dataz
 datetime=$(date "+%Y%m%d%H%M%S")
@@ -40,9 +48,9 @@ jobs=0
 cd /opt/meza/htdocs/wikis
 for d in */
 do
-        wiki_id=${d%/}
-        moreJobs=$(WIKI=$wiki_id php /opt/meza/htdocs/mediawiki/maintenance/showJobs.php)
-        jobs=$(($jobs+$moreJobs))
+	wiki_id=${d%/}
+	moreJobs=$(WIKI=$wiki_id php /opt/meza/htdocs/mediawiki/maintenance/showJobs.php)
+	jobs=$(($jobs+$moreJobs))
 done
 
 topheader=$(echo "$topdata" | grep "load average")
@@ -104,8 +112,42 @@ memcachedtotalmem=$(echo "$topdata" | grep "memcach" | awk '{ sum += $10 } END {
 parsoidtotalmem=$(echo "$topdata" | grep "parsoid" | awk '{ sum += $10 } END { print sum }')
 apachetotalmem=$(echo "$topdata" | grep "apache" | awk '{ sum += $10 } END { print sum }')
 
+
+insert_sql=`cat <<EOF
+	INSERT INTO meza_server_log.performance
+	(
+		datetime,
+		loadavg1,
+		loadavg5,
+		loadavg15,
+		memorypercentused,
+		mysql,
+		es,
+		memcached,
+		parsoid,
+		apache,
+		jobs
+	)
+	VALUES
+	(
+		'$datetime',
+		$loadavg1,
+		$loadavg5,
+		$loadavg15,
+		$memorypercentused,
+		$mysqltotalmem,
+		$elastictotalmem,
+		$memcachedtotalmem,
+		$parsoidtotalmem,
+		$apachetotalmem,
+		$jobs
+	);
+EOF`
+
+
 # add data point to database
-mysql -u root "--password=${mysql_root_pass}" -e"CREATE DATABASE IF NOT EXISTS server; use server; CREATE TABLE IF NOT EXISTS performance (datetime BIGINT, PRIMARY KEY (datetime), loadavg1 FLOAT(3), loadavg5 FLOAT(3), loadavg15 FLOAT(3), memorypercentused FLOAT(4), mysql FLOAT(4), es FLOAT(4), memcached FLOAT(4), parsoid FLOAT(4), apache FLOAT(4), jobs FLOAT(4)); INSERT INTO performance (datetime, loadavg1, loadavg5, loadavg15, memorypercentused, mysql, es, memcached, parsoid, apache, jobs) VALUES ('$datetime', $loadavg1, $loadavg5, $loadavg15, $memorypercentused, $mysqltotalmem, $elastictotalmem, $memcachedtotalmem, $parsoidtotalmem, $apachetotalmem, $jobs);"
+sudo -u root mysql -e"$insert_sql"
+
 
 jsontitle="Performance Report"
 
@@ -113,54 +155,39 @@ jsontitle="Performance Report"
 warninglevel="50"
 # at what level to we display red color
 dangerlevel="75"
-jsoncolor="good"
+slack_msg_color="good"
 memoryusedtext="Mem: ${memorypercentused}%"
 alerttext=""
 if [ "$memorypercentusedrounded" -gt "$warninglevel" ]; then
-    jsoncolor="warning"
-    # bold the memory text
-    memoryusedtext="*Mem: ${memorypercentused}%*"
+	slack_msg_color="warning"
+	# bold the memory text
+	memoryusedtext="*Mem: ${memorypercentused}%*"
 fi
 if [ "$memorypercentusedrounded" -gt "$dangerlevel" ]; then
-    jsoncolor="danger"
-    # alert the channel
-    alerttext="<!everyone>"
+	slack_msg_color="danger"
+	# alert the channel
+	alerttext="<!everyone>"
 fi
 
 report="${topheader} ${memoryusedtext}\nMySQL: ${mysqltotalmem}% ES: ${elastictotalmem}% Memcached: ${memcachedtotalmem}% Parsoid: ${parsoidtotalmem}% Apache: ${apachetotalmem}%"
 
-# Manually create json
-
-json="{ 
-      \"text\": \"${alerttext}\",
-      \"attachments\": [
-          {
-              \"color\": \"${jsoncolor}\",
-              \"fallback\": \"${memorypercentused}%\",
-              \"text\": \"${report}\",
-              \"mrkdwn_in\": [\"text\"]
-          }
-      ]
-  }"
 
 # Notify slack by default
 notifyslack="true"
 
 # When good, only notify slack at 8:00 AM and 4:00 PM
-if [ "$jsoncolor" == "good" ]; then
-  notifyslack="false"
-  if [ $hour -eq 8 ] && [ $minute -eq 0 ]; then
-    notifyslack="true"
-  else
-    if [ $hour -eq 16 ] && [ $minute -eq 0 ]; then
-      notifyslack="true"
-    fi
-  fi
+if [ "$slack_msg_color" == "good" ]; then
+	notifyslack="false"
+	if [ $hour -eq 8 ] && [ $minute -eq 0 ]; then
+		notifyslack="true"
+	elif [ $hour -eq 16 ] && [ $minute -eq 0 ]; then
+		notifyslack="true"
+	fi
 fi
 
 # When warning, notify slack once per hour
-if [ "$jsoncolor" == "warning" ] && [ $minute -ne 0 ]; then
-  notifyslack="false"
+if [ "$slack_msg_color" == "warning" ] && [ $minute -ne 0 ]; then
+	notifyslack="false"
 fi
 
 # Don't notify slack on weekends
@@ -168,7 +195,17 @@ fi
 #   notifyslack="false"
 # fi
 
-if [ $notifyslack == "true" ]; then
-  curl -s -d "payload=$json" "$slackwebhook"
+if [ $notifyslack == "true" ] && [ $slack_token ]; then
+
+	ansible localhost -m slack -a \
+		"token=$slack_token $slack_channel \
+		msg='$report' \
+		username='Meza performance monitor' \
+		icon_url=https://github.com/enterprisemediawiki/meza/raw/master/src/roles/configure-wiki/files/logo.png \
+		link_names=1 \
+		color=$slack_msg_color"
+
 fi
+
+
 

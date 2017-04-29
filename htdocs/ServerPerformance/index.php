@@ -25,12 +25,7 @@ $ceiling = 110;
 $load_ceiling = $ceiling / 100;
 $avg_response_time_ceiling = $ceiling * 100;
 
-require_once "/opt/meza/config/local/preLocalSettings_allWikis.php";
-$username = $wgDBuser;
-$password = $wgDBpassword;
-
-$servername = "localhost";
-$dbname = "server";
+require_once "/opt/meza/config/core/app-ansible/server-performance-config.php";
 $dbtable = "performance";
 
 $query = "SELECT
@@ -116,7 +111,7 @@ mysqli_close($mysqli);
 
 
 foreach( $variables as $varname => $varvalue ){
-    
+
     $data[] = array(
         'key'       => $varname,                // e.g. loadavg1
         'values'    => $tempdata[$varvalue],    // e.g. {"x":1384236000000,"y":0.1},{"x":1384256000000,"y":0.2},etc
@@ -134,7 +129,7 @@ foreach( $variables as $varname => $varvalue ){
 $database = array();
 $query = "SELECT DISTINCT SCHEMA_NAME AS `database`
     FROM information_schema.SCHEMATA
-    WHERE  SCHEMA_NAME NOT IN ('information_schema', 'performance_schema', 'mysql', 'server')
+    WHERE  SCHEMA_NAME NOT IN ('information_schema', 'performance_schema', 'mysql', 'meza_server_log')
     ORDER BY SCHEMA_NAME;";
 
 $mysqli = mysqli_connect("$servername", "$username", "$password", "$dbname");
@@ -154,7 +149,7 @@ $query = "SELECT
         converted_ts AS ts,
         COUNT(converted_ts) AS hits,
         LEAST(ROUND(AVG(response_time),0), $avg_response_time_ceiling) AS avg_response_time
-    FROM 
+    FROM
         ( ";
 
 $firstdbdone = false;
@@ -163,11 +158,11 @@ foreach( $database as $db ){
         $query .= "UNION ALL ";
     } else { $firstdbdone = true; }
 
-    $query .= "SELECT 
-                hit_timestamp, 
-                DATE_FORMAT(CONVERT_TZ(hit_timestamp, '+00:00', @@global.time_zone), '%Y-%m-%d %H:%i:%s') AS converted_ts, 
-                response_time 
-            FROM $db.wiretap 
+    $query .= "SELECT
+                hit_timestamp,
+                DATE_FORMAT(CONVERT_TZ(hit_timestamp, '+00:00', @@global.time_zone), '%Y-%m-%d %H:%i:%s') AS converted_ts,
+                response_time
+            FROM $db.wiretap
             WHERE DATE_FORMAT(CONVERT_TZ(hit_timestamp, '+00:00', @@global.time_zone), '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d') - INTERVAL $daysOfData DAY ";
 }
 
@@ -235,16 +230,13 @@ $html .= "<script type='text/template-json' id='server-performance-data'>" . jso
     <title>Meza Server Performance</title>
     <link rel="stylesheet" href="css/nv.d3.css" />
 </head>
-<body><!--
+<body>
+	<?php echo $html; ?>
 
- --></body>
+	<script type='application/javascript' src='js/jquery-3.1.0.min.js'></script>
+	<script type='application/javascript' src='js/d3.js'></script>
+	<script type='application/javascript' src='js/nv.d3.js'></script>
+	<script type='application/javascript' src='js/server-performance.nvd3.js'></script>
+</body>
 </html>
 
-<?php
-echo $html;
-?>
-
-<script type='application/javascript' src='js/jquery-3.1.0.min.js'></script>
-<script type='application/javascript' src='js/d3.js'></script>
-<script type='application/javascript' src='js/nv.d3.js'></script>
-<script type='application/javascript' src='js/server-performance.nvd3.js'></script>
