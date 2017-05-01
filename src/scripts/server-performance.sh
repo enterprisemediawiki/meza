@@ -17,9 +17,9 @@ source /opt/meza/config/core/config.sh
 # TEMPORARY method of recording slack webhooks. Should be in
 # local-secret/group_vars/all.yml and then written to a dynamic shell script
 # file.
-slack_config="/opt/meza/config/local-secret/slack.sh"
-if [ -f "$slack_config" ]; then
-	source "$slack_config"
+logging_config="/opt/meza/config/core/app-ansible/logging.sh"
+if [ -f "$logging_config" ]; then
+	source "$logging_config"
 fi
 
 if [ -z "$slack_webhook_token_server_performance" ]; then
@@ -34,6 +34,13 @@ if [ -z "$slack_channel_server_performance" ]; then
 	slack_channel=""
 else
 	slack_channel="channel=#$slack_channel_server_performance"
+fi
+
+# Slack username
+if [ -z "$slack_username_server_performance" ]; then
+	slack_username="$slack_username_server_performance"
+else
+	slack_username="Meza disk space monitor"
 fi
 
 # get all the dataz
@@ -200,7 +207,7 @@ if [ $notifyslack == "true" ] && [ $slack_token ]; then
 	ansible localhost -m slack -a \
 		"token=$slack_token $slack_channel \
 		msg='$report' \
-		username='Meza performance monitor' \
+		username='$slack_username' \
 		icon_url=https://github.com/enterprisemediawiki/meza/raw/master/src/roles/configure-wiki/files/logo.png \
 		link_names=1 \
 		color=$slack_msg_color"
