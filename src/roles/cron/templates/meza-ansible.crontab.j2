@@ -1,0 +1,35 @@
+# {{ ansible_managed }}
+#
+# crontab for meza
+
+{% if 'logging-servers' in groups and inventory_hostname in groups['logging-servers'] %}
+# Cron job for logging server performance info
+# FIXME: Currently this does it every 2 minutes. Make this value configurable.
+*/10 * * * * {{ m_scripts }}/server-performance.sh
+{% endif %}
+
+#
+# COMMENTS BELOW NEED TO BE INCORPORATED AS REGULARLY RUN COMMANDS. THEY ARE
+# TAKEN FROM A PRODUCTION SERVER THAT DOESN'T HAVE CRONTAB MANAGED BY MEZA (BUT
+# SHOULD)
+#
+
+# FIXME: Run all jobs nightly on just one application server (or does doing it\
+# on all make sense?) and run it regularly (every minute? every few minutes?)
+# for just a small number of jobs on each wiki (again, on how many app servers?).
+# if inventory_hostname in groups['app-servers']
+# */3 * * * * php /opt/meza/scripts/runAllJobs.php >> /opt/meza/logs/runAllJobs_`date "+\%Y\%m\%d"`_cron.log 2>&1
+# 0 22 * * * /opt/meza/scripts/runAllJobs.sh > /opt/meza/logs/runAllJobs_`date "+\%Y\%m\%d\%H\%M\%S"`_cron.log 2>&1
+# endif
+
+# FIXME: This is a custom cron job, perhaps not applicable outside one
+# particular wiki. Make a method to handle custom cron jobs.
+# 0 12 * * 1 ~/delinquent-approved-revs-report.sh > /opt/meza/logs/delinquent-approved-revs-report_`date "+\%Y\%m\%d\%H\%M\%S"`_cron.log 2>&1
+
+# FIXME: Restart Parsoid periodically on parsoid-servers
+# 0 4 * * * /usr/sbin/service parsoid restart > /opt/meza/logs/parsoid-restart.log 2>&1
+
+# FIXME: Check server space usage. This generally should be done very
+# infrequently (nightly?) but may need to be done regularly when running out of
+# space.
+# 30 * * * * /root/opt-space-usage.sh

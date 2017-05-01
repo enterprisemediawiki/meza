@@ -44,3 +44,8 @@ localhost ansible_connection=local
 {% for server in backup_servers %}
 {{ server }}
 {% endfor %}
+
+[logging-servers]
+{% for server in logging_servers %}
+{{ server }}
+{% endfor %}

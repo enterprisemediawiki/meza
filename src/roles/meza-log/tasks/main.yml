@@ -1,0 +1,33 @@
+---
+- name: "Check if server log database exists"
+  shell: 'mysqlshow "{{ meza_server_log_db }}" | grep -v Wildcard | grep -o {{ meza_server_log_db }}'
+  register: register_server_log
+  ignore_errors: yes
+  run_once: true
+
+- name: "Set fact if server log database DOES exist"
+  set_fact:
+    server_log_exists: True
+  when: register_server_log.rc == 0
+
+- name: "Set fact if server log database DOES NOT exist"
+  set_fact:
+    server_log_exists: False
+  when: register_server_log.rc != 0
+
+- name: "Import server log database structure"
+  mysql_db:
+    name: "{{ meza_server_log_db }}"
+    state: import
+    target: "/opt/meza/src/roles/meza-log/files/meza_server_log.sql"
+  run_once: true
+  when: not server_log_exists
+
+- name: "Ensure database info in config file for performance recording"
+  template:
+    src: server-performance-config.php.j2
+    dest: /opt/meza/config/core/app-ansible/server-performance-config.php
+    owner: apache
+    group: apache
+    mode: 0755
+

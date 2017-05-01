@@ -203,7 +203,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 
 
 	server_types = ['load_balancers','app_servers','memcached_servers',
-		'db_slaves','parsoid_servers','elastic_servers','backup_servers']
+		'db_slaves','parsoid_servers','elastic_servers','backup_servers','logging_servers']
 
 
 	for stype in server_types:

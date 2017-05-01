@@ -16,6 +16,9 @@
     # Allow access to WikiBlender landing page and support files
     RewriteRule ^WikiBlender(?:/|$)(.*)$ - [L]
 
+    # Allow access to ServerPerformance plot page and support files
+    RewriteRule ^ServerPerformance(?:/|$)(.*)$ - [L]
+
     # Taken from MediaWiki.org [[Extension:Simple Farm]]
     #
     # Redirect virtual wiki path to physical wiki path. There
