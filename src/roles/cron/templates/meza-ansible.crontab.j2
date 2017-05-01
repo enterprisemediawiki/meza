@@ -8,6 +8,13 @@
 */10 * * * * {{ m_scripts }}/server-performance.sh
 {% endif %}
 
+{% if disk_space_usage_mount_name is defined and 'logging-servers' in groups and inventory_hostname in groups['logging-servers'] %}
+# Check disk space usage
+#0 1 * * * {{ m_scripts }}/disk-space-usage.sh
+# For testing, do it every minute (remove before merging to master)
+* * * * * {{ m_scripts }}/disk-space-usage.sh
+{% endif %}
+
 #
 # COMMENTS BELOW NEED TO BE INCORPORATED AS REGULARLY RUN COMMANDS. THEY ARE
 # TAKEN FROM A PRODUCTION SERVER THAT DOESN'T HAVE CRONTAB MANAGED BY MEZA (BUT
@@ -28,8 +35,3 @@
 
 # FIXME: Restart Parsoid periodically on parsoid-servers
 # 0 4 * * * /usr/sbin/service parsoid restart > /opt/meza/logs/parsoid-restart.log 2>&1
-
-# FIXME: Check server space usage. This generally should be done very
-# infrequently (nightly?) but may need to be done regularly when running out of
-# space.
-# 30 * * * * /root/opt-space-usage.sh
