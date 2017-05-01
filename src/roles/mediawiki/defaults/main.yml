@@ -33,3 +33,5 @@ m_force_debug: false
 
 # Whether to enable debug when using the command line
 m_command_line_debug: true
+
+wgPasswordSender: admin@example.com

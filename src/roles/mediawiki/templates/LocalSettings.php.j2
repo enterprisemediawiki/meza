@@ -73,6 +73,11 @@ if ( ! in_array( $wikiId, $wikis ) ) {
 
 }
 
+{% if meza_auth_type is defined %}
+// Set an all-wiki auth type, which individual wikis can override
+$mezaAuthType = '{{ meza_auth_type }}';
+{% endif %}
+
 #
 # PRE LOCAL SETTINGS
 #
@@ -84,6 +89,21 @@ foreach ( glob("$m_meza/config/local_app/preLocalSettings.d/*.php") as $filename
 foreach ( glob("$m_meza/config/local_app/wikis/$wikiId/preLocalSettings.d/*.php") as $filename) {
     require_once $filename;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -233,18 +253,25 @@ $wgResourceBasePath = $wgScriptPath;
  *
  *  Email configuration
  **/
-if ( $mezaEnableAllWikiEmail && isset( $mezaEnableWikiEmail ) && $mezaEnableWikiEmail ) {
+{% if enable_all_wiki_email is defined and enable_all_wiki_email %}
+if ( isset( $mezaEnableWikiEmail ) && $mezaEnableWikiEmail ) {
 	$wgEnableEmail = true;
 }
 else {
 	$wgEnableEmail = false;
 }
+{% else %}
+$wgEnableEmail = false;
+{% endif %}
 
 ## UPO means: this is also a user preference option
 $wgEnableUserEmail = $wgEnableEmail; # UPO
 $wgEnotifUserTalk = $wgEnableEmail; # UPO
 $wgEnotifWatchlist = $wgEnableEmail; # UPO
 $wgEmailAuthentication = $wgEnableEmail;
+
+$wgPasswordSender = '{{ wgPasswordSender }}';
+$wgEmergencyContact = '{{ wgEmergencyContact | default(wgPasswordSender) }}';
 
 
 
@@ -513,7 +540,8 @@ $wgFileExtensions = array(
 	'svg',
 	'tiff',
 	'txt',
-	'xlsx'
+	'xlsx',
+	'zip'
 );
 
 // Tell Universal Language Selector not to try to guess language based upon IP
@@ -521,7 +549,9 @@ $wgFileExtensions = array(
 // anyway due to outdated URLs or firewall rules.
 $wgULSGeoService = false;
 
+$wgNamespacesWithSubpages[NS_MAIN] = true;
 
+$wgUseRCPatrol = false;
 
 
 
