@@ -52,5 +52,5 @@ ${docker_exec_1[@]} bash /opt/meza/tests/deploys/backup-to-remote.controller.sh 
 #     specific file is present)
 # (2) Verify any files matching *_wiki.sql in demo backups. egrep command will
 #     exit-0 if something found, exit-1 (fail) if nothing found.
-${docker_exec_2[@]} ls "/opt/meza/data/backups/$env_name/demo"
-${docker_exec_2[@]} find "/opt/meza/data/backups/$env_name/demo" -name "*_wiki.sql" | egrep '.*'
+${docker_exec_2[@]} ls "/opt/data-meza/backups/$env_name/demo"
+${docker_exec_2[@]} find "/opt/data-meza/backups/$env_name/demo" -name "*_wiki.sql" | egrep '.*'

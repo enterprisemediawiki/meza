@@ -14,7 +14,7 @@ if [[ $PATH != *"/usr/local/bin"* ]]; then
 	PATH="/usr/local/bin:$PATH"
 fi
 
-source /opt/meza/config/core/config.sh
+source "/opt/.deploy-meza/config.sh"
 
 timestamp=$( date +"%Y%m%d%H%M%S" )
 skiplog="$m_meza/data/logs/skiplog$timestamp"

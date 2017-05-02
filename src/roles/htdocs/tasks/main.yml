@@ -1,0 +1,25 @@
+---
+
+# Take ServerPerformance from controller, put in app server htdocs
+- name: Ensure ServerPerformance configured
+  synchronize:
+    src: "files/ServerPerformance/"
+    dest: "{{ m_htdocs }}/ServerPerformance"
+    recursive: yes
+    delete: yes
+    rsync_opts:
+      - "--no-motd"
+      - "--exclude=.git"
+
+- name: Ensure files configured
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ m_htdocs }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+  - ".htaccess"
+  - "backupListing.php"
+  - "download-backup.php"
+  - "index.php"

@@ -5,7 +5,8 @@
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
 
-# hack to prevent notice of undefined constant NS_MAIN from /opt/meza/config/local/preLocalSettings_allWikis.php
+# hack to prevent notice of undefined constant NS_MAIN from files matching
+# /opt/.deploy-meza/public/preLocalSettings.d/*.php
 define("NS_MAIN", "");
 
 # set timezone
@@ -21,13 +22,14 @@ if( isset($_REQUEST['days']) && $_REQUEST['days'] > 0 ){
 # ceiling value to keep outlier values from skewing y axis
 $ceiling = 100;
 
-require_once "/opt/meza/config/local/preLocalSettings_allWikis.php";
-$username = $wgDBuser;
-$password = $wgDBpassword;
+// get config vars from config.php
+require_once '/opt/.deploy-meza/config.php';
+$username = $wiki_app_db_user_name;
+$password = $wiki_app_db_user_pass;
+$dbname = $m_logging_db_name;
+$servername = $m_logging_db_host;
 
-$servername = "localhost";
-$dbname = "server";
-$dbtable = "opt_space";
+$dbtable = "disk_space";
 
 $query = "SELECT
             DATE_FORMAT( datetime, '%Y-%m-%d' ) AS ts,
@@ -121,10 +123,10 @@ $numDays = 7;
 $prevValue = $data[2]["values"][$numDays]["y"] - $data[2]["values"][0]["y"];
 
 for( $i = $numDays; $i < count($data[2]["values"]); $i++ ){
-        
+
         $value = $data[2]["values"][$i]["y"] - $data[2]["values"][$i - $numDays]["y"];
 
-        if( $value > 0 ){ 
+        if( $value > 0 ){
                 $value = $prevValue;
         } else {
                 $prevValue = $value;

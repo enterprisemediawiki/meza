@@ -14,10 +14,10 @@
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
 
-$domain = trim( file_get_contents( '/opt/meza/config/local/domain' ) );
+require_once '/opt/.deploy-meza/config.php';
 
 // if there's a SAML config file, we need to authenticate with SAML, like, now.
-if ( is_file("/opt/meza/config/local/SAMLConfig.php") ) {
+if ( is_file( '/opt/.deploy-meza/SAMLConfig.php' ) ) {
   require_once __DIR__ . '/NonMediaWikiSimpleSamlAuth.php';
 }
 
@@ -33,7 +33,7 @@ $arrContextOptions=array(
     ),
 );
 
-$path = realpath('/opt/meza/data/backups');
+$path = realpath('/opt/data-meza/backups');
 $undesiredStrings = array(
   ".",
   "..",
@@ -55,8 +55,8 @@ foreach( $wikis as $wiki ){
   );
 
   // if there's a config file with a list of users allowed to download backup files, use it
-  if ( is_file("/opt/meza/data/backups/$wiki/config/backupDownloaders.php") ) {
-    require_once "/opt/meza/data/backups/$wiki/config/backupDownloaders.php";
+  if ( is_file("/opt/data-meza/backups/$wiki/config/backupDownloaders.php") ) {
+    require_once "/opt/data-meza/backups/$wiki/config/backupDownloaders.php";
   }
 
   if ( in_array($AUID, $allowedUsers) ) {
@@ -72,7 +72,7 @@ foreach( $wikis as $wiki ){
 
     // Display contents of directory with links
     foreach( $dbDumps as $dbDump ){
-      echo "<li><a href='https://$domain/download-backup.php?wiki=$wiki&file=$dbDump'>" . $dbDump . "</a></li>";
+      echo "<li><a href='https://$wiki_app_fqdn/download-backup.php?wiki=$wiki&file=$dbDump'>" . $dbDump . "</a></li>";
     }
 
     // Display config files
@@ -87,7 +87,7 @@ foreach( $wikis as $wiki ){
 
     foreach( $objects as $object ){
       // Display links to config files
-      echo "<li><a href='https://$domain/download-backup.php?wiki=$wiki&dir=config&file=$object'>$object</a></li>";
+      echo "<li><a href='https://$wiki_app_fqdn/download-backup.php?wiki=$wiki&dir=config&file=$object'>$object</a></li>";
     }
 
     echo "</ul>";

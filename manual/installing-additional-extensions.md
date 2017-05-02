@@ -8,7 +8,7 @@ Meza comes pre-built with many extensions, but additional extensions can be adde
 
 ## Adding extensions
 
-Extensions can be added to `/opt/meza/config/local-public/MezaLocalExtensions.yml` in the following ways. If adding your first extension, please make sure the part that says `list: []` (an empty list) is changed to `list:`. Then add extensions as follows.
+Extensions can be added to `/opt/conf-meza/public/MezaLocalExtensions.yml` in the following ways. If adding your first extension, please make sure the part that says `list: []` (an empty list) is changed to `list:`. Then add extensions as follows.
 
 ### Standard extension configuration
 ```yaml

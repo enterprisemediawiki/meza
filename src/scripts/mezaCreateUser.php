@@ -23,7 +23,7 @@
  * @author James Montalvo
  * @ingroup Maintenance
  */
-require_once( '/opt/meza/htdocs/mediawiki/maintenance/Maintenance.php' );
+require_once( '/opt/htdocs/mediawiki/maintenance/Maintenance.php' );
 class MezaCreateUser extends Maintenance {
 
 	protected $mPassword;

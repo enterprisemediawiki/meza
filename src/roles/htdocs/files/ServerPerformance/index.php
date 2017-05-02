@@ -5,7 +5,8 @@
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
 
-# hack to prevent notice of undefined constant NS_MAIN from /opt/meza/config/local/preLocalSettings_allWikis.php
+# hack to prevent notice of undefined constant NS_MAIN from files matching
+# /opt/.deploy-meza/public/preLocalSettings.d/*.php
 define("NS_MAIN", "");
 
 # set timezone to prevent warnings when using strtotime()
@@ -25,8 +26,15 @@ $ceiling = 110;
 $load_ceiling = $ceiling / 100;
 $avg_response_time_ceiling = $ceiling * 100;
 
-require_once "/opt/meza/config/core/app-ansible/server-performance-config.php";
+// get config vars from config.php
+require_once '/opt/.deploy-meza/config.php';
+$username = $wiki_app_db_user_name;
+$password = $wiki_app_db_user_pass;
+$dbname = $m_logging_db_name;
+$servername = $m_logging_db_host;
+
 $dbtable = "performance";
+
 
 $query = "SELECT
             DATE_FORMAT( datetime, '%Y-%m-%d %H:%i:%s' ) AS ts,

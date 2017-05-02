@@ -141,15 +141,24 @@
   notify:
     - restart ntpd
 
-# - name: Write local config shell file
-#   template:
-#     src: config.sh.j2
-#     dest: /opt/meza/config/config.sh
+- name: Ensure deploy directory in place
+  file:
+    path: "{{ m_deploy }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
 
-# - name: Write local config PHP file
-#   template:
-#     src: config.php.j2
-#     dest: /opt/meza/config/config.php
+- name: Ensure config variables available in PHP and shell files
+  template:
+    src: "config.{{ item }}.j2"
+    dest: "{{ m_deploy }}/config.{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - "php"
+    - "sh"
 
 - name: "Ensure {{ m_tmp }} exists"
   file:
@@ -166,3 +175,4 @@
     group: wheel
     mode: 0755
     state: directory
+

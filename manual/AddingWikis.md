@@ -23,7 +23,7 @@ This script will then ask for three inputs:
 With a new wiki, you'll probably want to create a new user. In the following example, you would be creating the user "Jdoe" on the wiki with the ID "mywiki" and the password "mypassword". Once your user account is set up, this user's password can be modified using Mediawiki's user profile page in the user settings. See MediaWiki's docs for [createAndPromote.php](https://www.mediawiki.org/wiki/Manual:CreateAndPromote.php) for more info.
 
 ```bash
-WIKI=mywiki php /opt/meza/htdocs/mediawiki/maintenance/createAndPromote.php --bureaucrat --sysop --custom-groups=Contributor Jdoe mypassword
+WIKI=mywiki php /opt/htdocs/mediawiki/maintenance/createAndPromote.php --bureaucrat --sysop --custom-groups=Contributor Jdoe mypassword
 ```
 
 ## Importing existing wikis
@@ -36,7 +36,7 @@ Importing wikis is done by either defining servers as sources for import files, 
 
 ### Creating the import directory
 
-If you would like to manually put files on your server to be used in an import, you'll need to put those files in the correct location in `/opt/meza/data/backups`. *This documentation requires more info here*. To get an idea of how the directory should look, try backing up your Demo Wiki by running `sudo meza backup <env>` and then looking at the directory structure.
+If you would like to manually put files on your server to be used in an import, you'll need to put those files in the correct location in `/opt/data-meza/backups`. *This documentation requires more info here*. To get an idea of how the directory should look, try backing up your Demo Wiki by running `sudo meza backup <env>` and then looking at the directory structure.
 
 ### Transferring your files to your wiki
 
@@ -54,7 +54,7 @@ A wiki can be setup as the "primary" wiki. This means that all other wikis will 
 primary_wiki_db_name: wiki_big
 ```
 
-In this example the wiki with ID "big", and thus database name "wiki_big", is being defined as the primary wiki. This statement can be added to any configuration YAML file, but the recommended is `/opt/meza/config/local-public/vars.yml`.
+In this example the wiki with ID "big", and thus database name "wiki_big", is being defined as the primary wiki. This statement can be added to any configuration YAML file, but the recommended is `/opt/conf-meza/public/vars.yml`.
 
 ## Unify user tables
 

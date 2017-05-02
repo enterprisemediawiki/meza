@@ -26,7 +26,7 @@
 #
 - name: Check if secret config on CONTROLLER has SSL keys
   stat:
-    path: "/opt/meza/config/local-secret/{{ env }}/ssl/meza.key"
+    path: "/opt/conf-meza/secret/{{ env }}/ssl/meza.key"
   register: ssl_cert_stat_result
   delegate_to: localhost
   run_once: True
@@ -45,15 +45,15 @@
   command: |
     openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
       -subj "/C=US/ST=TX/L=Houston/O=EnterpriseMediaWiki/CN=${ansible_fqdn}" \
-      -keyout /opt/meza/config/local-secret/{{ env }}/ssl/meza.key \
-      -out /opt/meza/config/local-secret/{{ env }}/ssl/meza.crt
+      -keyout /opt/conf-meza/secret/{{ env }}/ssl/meza.key \
+      -out /opt/conf-meza/secret/{{ env }}/ssl/meza.crt
   when: ssl_cert_stat_result.stat.exists == False
   delegate_to: localhost
   run_once: True
 
 - name: Ensure cert and key on load balancers
   copy:
-    src: "/opt/meza/config/local-secret/{{ env }}/ssl/{{ item }}"
+    src: "/opt/conf-meza/secret/{{ env }}/ssl/{{ item }}"
     dest: "/etc/haproxy/certs/{{ item }}"
   with_items:
   - meza.key
@@ -63,7 +63,7 @@
 
 - name: Ensure cert and key assembled into into pem file
   assemble:
-    src: "/opt/meza/config/local-secret/{{ env }}/ssl"
+    src: "/opt/conf-meza/secret/{{ env }}/ssl"
     dest: /etc/haproxy/certs/meza.pem
   notify:
     - restart haproxy

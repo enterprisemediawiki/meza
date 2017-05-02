@@ -2,12 +2,12 @@
 #
 # Get current usage of a particular partition, probably /opt, send it to slack webhook
 #
-source /opt/meza/config/core/config.sh
+source /opt/.deploy-meza/config.sh
 
 # TEMPORARY method of recording slack webhooks. Should be in
-# local-secret/group_vars/all.yml and then written to a dynamic shell script
+# secret/group_vars/all.yml and then written to a dynamic shell script
 # file.
-logging_config="/opt/meza/config/core/app-ansible/logging.sh"
+logging_config="/opt/.deploy-meza/logging.sh"
 if [ -f "$logging_config" ]; then
 	source "$logging_config"
 fi

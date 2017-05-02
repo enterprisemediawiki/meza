@@ -5,7 +5,7 @@
 #   wiki_name
 #
 # all this role needs to do is put a directory named whatever wiki_id is at
-# /opt/meza/local/wikis/<wiki_id>
+# /opt/conf-meza/public/wikis/<wiki_id>
 #
 # This role DOES NOT actually deploy the wiki to app servers or database
 # servers. It simply puts it into configuration. Subsequently it can be
@@ -20,7 +20,7 @@
 
 - name: Ensure wiki directory exists in config
   file:
-    path: "/opt/meza/config/local-public/wikis/{{ wiki_id }}"
+    path: "/opt/conf-meza/public/wikis/{{ wiki_id }}"
     state: directory
     owner: apache
     group: apache
@@ -33,7 +33,7 @@
 - name: Ensure base files are in place (but do not overwrite)
   copy:
     src: "files/{{ item }}"
-    dest: "/opt/meza/config/local-public/wikis/{{ wiki_id }}/{{ item }}"
+    dest: "/opt/conf-meza/public/wikis/{{ wiki_id }}/{{ item }}"
     # force=no: this will not overwrite
     force: no
     owner: apache
@@ -47,7 +47,7 @@
 
 - name: Ensure wiki pre/post settings directories exists in config
   file:
-    path: "/opt/meza/config/local-public/wikis/{{ wiki_id }}/{{ item }}"
+    path: "/opt/conf-meza/public/wikis/{{ wiki_id }}/{{ item }}"
     state: directory
     owner: apache
     group: apache
@@ -61,7 +61,7 @@
 - name: Ensure base templates are present (but do not overwrite)
   template:
     src: "templates/{{ item }}.j2"
-    dest: "/opt/meza/config/local-public/wikis/{{ wiki_id }}/{{ item }}"
+    dest: "/opt/conf-meza/public/wikis/{{ wiki_id }}/{{ item }}"
     # force=no: Non-default for templates. Destination files will not be overwritten
     force: no
     owner: apache

@@ -23,7 +23,7 @@
  * @author James Montalvo
  * @ingroup Maintenance
  */
-require_once( '/opt/meza/htdocs/mediawiki/maintenance/Maintenance.php' );
+require_once( '/opt/htdocs/mediawiki/maintenance/Maintenance.php' );
 class MezaUnifyUserTables extends Maintenance {
 
 	public $recordDir;
@@ -195,16 +195,16 @@ class MezaUnifyUserTables extends Maintenance {
 
 	public function checkSetup () {
 
-		global $m_htdocs, $m_config, $m_meza;
+		global $m_htdocs, $m_deploy, $m_meza;
 
-		if ( is_file( "$m_config/local/primewiki" ) ) {
-			die( "A prime wiki is already set in $m_config/local/primewiki. You cannot run this script." );
+		if ( is_file( "$m_deploy/public/primewiki" ) ) {
+			die( "A prime wiki is already set in $m_deploy/public/primewiki. You cannot run this script." );
 		}
 
 		// prime wiki ID and database name
 		$this->primeWiki = trim( $this->getOption( "prime-wiki" ) );
 
-		$this->recordDir = "$m_meza/data/logs/user-unify-" . date( "YmdHis" );
+		$this->recordDir = "$m_meza_data/logs/user-unify-" . date( "YmdHis" );
 
 	}
 
@@ -783,14 +783,14 @@ class MezaUnifyUserTables extends Maintenance {
 	}
 
 	public function closeout () {
-		global $m_htdocs, $m_config;
+		global $m_htdocs, $m_deploy;
 
 		// Declare the prime-wiki as prime! Write prime wiki's wiki ID to file
-		if ( file_put_contents( "$m_config/local/primewiki", $this->primeWiki ) ) {
-			$this->output( "\n# Primewiki written to $m_config/local/primewiki\n" );
+		if ( file_put_contents( "$m_deploy/public/primewiki", $this->primeWiki ) ) {
+			$this->output( "\n# Primewiki written to $m_deploy/public/primewiki\n" );
 		}
 		else {
-			$this->output( "\n# Primewiki not written to $m_config/local/primewiki" );
+			$this->output( "\n# Primewiki not written to $m_deploy/public/primewiki" );
 		}
 
 		// Victory!

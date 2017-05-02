@@ -33,35 +33,35 @@ docker_exec_2=( "${docker_exec[@]}" )
 # (4) Change FQDN to docker#1 IP address in group_vars/all.yml
 ${docker_exec_1[@]} git clone \
 	https://github.com/enterprisemediawiki/meza-test-config-secret.git \
-	"/opt/meza/config/local-secret/$env_name"
+	"/opt/conf-meza/secret/$env_name"
 ${docker_exec_1[@]} sed -r -i "s/localhost #backup/$docker_ip_2/g;" \
-	"/opt/meza/config/local-secret/$env_name/hosts"
+	"/opt/conf-meza/secret/$env_name/hosts"
 ${docker_exec_1[@]} sed -r -i "s/localhost/$docker_ip_1/g;" \
-	"/opt/meza/config/local-secret/$env_name/hosts"
+	"/opt/conf-meza/secret/$env_name/hosts"
 ${docker_exec_1[@]} sed -r -i "s/INSERT_FQDN/$docker_ip_1/g;" \
-	"/opt/meza/config/local-secret/$env_name/group_vars/all.yml"
+	"/opt/conf-meza/secret/$env_name/group_vars/all.yml"
 
 # CONTAINER 1
 # Add to inventory file the "db-src" and "backups-src" groups (which will both
 # be CONTAINER 2)
-${docker_exec_1[@]} bash -c "echo -e '[backup-src]\n$docker_ip_2 alt_remote_user=test-user\n' >> /opt/meza/config/local-secret/$env_name/hosts"
-${docker_exec_1[@]} bash -c "echo -e '[exclude-all]\n$docker_ip_2\n' >> /opt/meza/config/local-secret/$env_name/hosts"
+${docker_exec_1[@]} bash -c "echo -e '[backup-src]\n$docker_ip_2 alt_remote_user=test-user\n' >> /opt/conf-meza/secret/$env_name/hosts"
+${docker_exec_1[@]} bash -c "echo -e '[exclude-all]\n$docker_ip_2\n' >> /opt/conf-meza/secret/$env_name/hosts"
 
 
-${docker_exec_1[@]} bash -c "echo -e 'backups_src_uploads_path: /opt/alt/backups/<id>/uploads\n' >> /opt/meza/config/local-secret/$env_name/group_vars/all.yml"
-${docker_exec_1[@]} bash -c "echo -e 'backups_src_sql_path: /opt/alt/backups/<id>\n' >> /opt/meza/config/local-secret/$env_name/group_vars/all.yml"
+${docker_exec_1[@]} bash -c "echo -e 'backups_src_uploads_path: /opt/alt/backups/<id>/uploads\n' >> /opt/conf-meza/secret/$env_name/group_vars/all.yml"
+${docker_exec_1[@]} bash -c "echo -e 'backups_src_sql_path: /opt/alt/backups/<id>\n' >> /opt/conf-meza/secret/$env_name/group_vars/all.yml"
 
 
-${docker_exec_1[@]} cat "/opt/meza/config/local-secret/$env_name/hosts"
+${docker_exec_1[@]} cat "/opt/conf-meza/secret/$env_name/hosts"
 
 
 # CONTAINER 1: Put backup files/database on CONTAINER 2
 # ${docker_exec_2[@]} git clone \
 # 	https://github.com/jamesmontalvo3/meza-test-backups.git \
-# 	"/opt/meza/data/backups/$env_name"
+# 	"/opt/data-meza/backups/$env_name"
 ${docker_exec_1[@]} sudo -u meza-ansible ansible-playbook \
 	/opt/meza/tests/deploys/setup-alt-source-backup.yml \
-	-i "/opt/meza/config/local-secret/$env_name/hosts" \
+	-i "/opt/conf-meza/secret/$env_name/hosts" \
 	--extra-vars "{\"env\":\"$env_name\"}"
 
 
@@ -70,14 +70,14 @@ ${docker_exec_1[@]} sudo -u meza-ansible ansible-playbook \
 ${docker_exec_1[@]} bash /opt/meza/tests/deploys/import-from-remote.controller.sh "$env_name"
 
 
-${docker_exec_1[@]} bash -c "echo -e 'db_src_mysql_user: root\n' >> /opt/meza/config/local-secret/$env_name/group_vars/all.yml"
-${docker_exec_1[@]} bash -c "echo -e 'db_src_mysql_pass: 1234\n' >> /opt/meza/config/local-secret/$env_name/group_vars/all.yml"
+${docker_exec_1[@]} bash -c "echo -e 'db_src_mysql_user: root\n' >> /opt/conf-meza/secret/$env_name/group_vars/all.yml"
+${docker_exec_1[@]} bash -c "echo -e 'db_src_mysql_pass: 1234\n' >> /opt/conf-meza/secret/$env_name/group_vars/all.yml"
 
 
 # Add database source (e.g. pull direct from database) to inventory, make some
 # modifications to database and uploaded files, then deploy with overwrite
-${docker_exec_1[@]} bash -c "echo -e '[db-src]\n$docker_ip_2 alt_remote_user=test-user\n\n' >> /opt/meza/config/local-secret/$env_name/hosts"
-${docker_exec_1[@]} cat "/opt/meza/config/local-secret/$env_name/hosts"
+${docker_exec_1[@]} bash -c "echo -e '[db-src]\n$docker_ip_2 alt_remote_user=test-user\n\n' >> /opt/conf-meza/secret/$env_name/hosts"
+${docker_exec_1[@]} cat "/opt/conf-meza/secret/$env_name/hosts"
 # garbage data into database and file uploads, just to check that the changes
 # get copied to CONTAINER 1
 ${docker_exec_2[@]} mysql -u root -p1234 wiki_top -e"INSERT INTO watchlist (wl_user, wl_namespace, wl_title) VALUES (10000,0,'FAKE PAGE');"
@@ -101,9 +101,9 @@ else
 	echo "Row inserted into db-src server's database IS PRESENT in meza database AND SHOULD NOT BE"
 	exit 1
 fi
-${docker_exec_1[@]} ls /opt/meza/data/uploads
-${docker_exec_1[@]} ls /opt/meza/data/uploads/top
-${docker_exec_1[@]} cat /opt/meza/data/uploads/top/fake.png \
+${docker_exec_1[@]} ls /opt/data-meza/uploads
+${docker_exec_1[@]} ls /opt/data-meza/uploads/top
+${docker_exec_1[@]} cat /opt/data-meza/uploads/top/fake.png \
 	&& (echo "fake.png present and should not be"; exit 1) \
 	|| (echo "fake.png not present and should not be"; exit 0)
 
@@ -129,6 +129,6 @@ else
 	exit 1
 fi
 
-${docker_exec_1[@]} ls /opt/meza/data/uploads
-${docker_exec_1[@]} ls /opt/meza/data/uploads/top
-${docker_exec_1[@]} cat /opt/meza/data/uploads/top/fake.png
+${docker_exec_1[@]} ls /opt/data-meza/uploads
+${docker_exec_1[@]} ls /opt/data-meza/uploads/top
+${docker_exec_1[@]} cat /opt/data-meza/uploads/top/fake.png

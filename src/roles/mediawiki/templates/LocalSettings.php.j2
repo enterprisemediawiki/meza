@@ -29,7 +29,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  *  Perform authentication up front.
  *
  **/
-require_once "{{ m_config_app_ansible }}/samlLocalSettings.php";
+require_once "{{ m_deploy }}/samlLocalSettings.php";
 
 
 {% endif %}
@@ -43,8 +43,10 @@ require_once "{{ m_config_app_ansible }}/samlLocalSettings.php";
 
 // same value as bash variable in config.sh
 $m_meza = '{{ m_meza }}';
-$m_config = '{{ m_config }}';
+$m_config_core = '{{ m_config_core }}';
 $m_htdocs = '{{ m_htdocs }}';
+$m_deploy = '{{ m_deploy }}';
+$m_meza_data = '{{ m_meza_data }}';
 
 if( $wgCommandLineMode ) {
 
@@ -82,11 +84,11 @@ $mezaAuthType = '{{ meza_auth_type }}';
 # PRE LOCAL SETTINGS
 #
 #    (1) Load all PHP files in preLocalSettings.d for all wikis
-foreach ( glob("$m_meza/config/local_app/preLocalSettings.d/*.php") as $filename) {
+foreach ( glob("$m_deploy/public/preLocalSettings.d/*.php") as $filename) {
     require_once $filename;
 }
 #    (2) Load all PHP files in preLocalSettings.d for this wiki
-foreach ( glob("$m_meza/config/local_app/wikis/$wikiId/preLocalSettings.d/*.php") as $filename) {
+foreach ( glob("$m_deploy/public/wikis/$wikiId/preLocalSettings.d/*.php") as $filename) {
     require_once $filename;
 }
 
@@ -166,7 +168,7 @@ if ( $debug ) {
 	ini_set( 'log_errors', 1 );
 
 	// Output errors to log file
-	ini_set( 'error_log', "$m_meza/data/logs/php.log" );
+	ini_set( 'error_log', "$m_meza_data/logs/php.log" );
 
 	// MediaWiki Debug Tools
 	$wgShowExceptionDetails = true;
@@ -216,7 +218,7 @@ $wgScriptPath = "/$wikiId";
 $wgUploadPath = "$wgScriptPath/img_auth.php";
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadDirectory
-$wgUploadDirectory = "$m_meza/data/uploads/$wikiId";
+$wgUploadDirectory = "$m_meza_data/uploads/$wikiId";
 
 // https://www.mediawiki.org/wiki/Manual:$wgLogo
 $wgLogo = "/wikis/$wikiId/config/logo.png";
@@ -654,7 +656,7 @@ else if ( $mezaAuthType === 'viewer-read' ) {
  *  below.
  */
 
-require_once "{{ m_config_app_ansible }}/Extensions.php";
+require_once "{{ m_deploy }}/Extensions.php";
 
 
 /**
@@ -727,7 +729,7 @@ $wgVirtualRestConfig['modules']['parsoid'] = array(
 
 	// domain here is not really the domain. It needs to be unique to each wiki
 	// and both domain and prefix must match settings in Parsoid's settings in
-	// /opt/meza/config/core/localsettings.js
+	// /etc/parsoid/localsettings.js
 	// ref:
 	// https://www.mediawiki.org/wiki/Parsoid/Setup#Multiple_wikis_sharing_the_same_parsoid_service
 	'domain' => $wikiId,
@@ -756,10 +758,10 @@ $wgVisualEditorNamespaces = array_merge(
  *
  **/
 #    (1) Load all PHP files in postLocalSettings.d for all wikis
-foreach ( glob("$m_meza/config/local_app/postLocalSettings.d/*.php") as $filename) {
+foreach ( glob("$m_deploy/public/postLocalSettings.d/*.php") as $filename) {
     require_once $filename;
 }
 #    (2) Load all PHP files in postLocalSettings.d for this wiki
-foreach ( glob("$m_meza/config/local_app/wikis/$wikiId/postLocalSettings.d/*.php") as $filename) {
+foreach ( glob("$m_deploy/public/wikis/$wikiId/postLocalSettings.d/*.php") as $filename) {
     require_once $filename;
 }

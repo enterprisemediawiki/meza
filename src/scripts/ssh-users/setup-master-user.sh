@@ -7,7 +7,7 @@
 
 # Load config constants. Unfortunately right now have to write out full path to
 # meza since we can't be certain of consistent method of accessing install.sh.
-source "/opt/meza/config/core/config.sh"
+source "/opt/.deploy-meza/config.sh"
 
 source "$m_scripts/shell-functions/base.sh"
 rootCheck

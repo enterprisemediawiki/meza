@@ -31,10 +31,9 @@ mysql_replication_user:
   name: "db_slave_user"
   password: "db_slave_user_password"
 
-# Set in secure/secure.yml on an instance basis
-# m_wiki_app_user: wiki_app_user
-# m_wiki_app_user_password: 12345678
-# m_db_slave_user: db_slave_user
-# m_db_slave_user_password: 12345678
-
+# Why is email here and not in public config? Because whether or not email is
+# turned on is likely to be a production vs staging decision, and secret config
+# will be different for each. Public config, however, may operate as a workflow
+# where changes are applied to dev/test/staging/integration environments before
+# being pushed to production. It may be simpler to keep email out of that.
 enable_wiki_emails: true

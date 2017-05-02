@@ -24,7 +24,7 @@
  * @author Daren Welsh
  * @ingroup Maintenance
  */
-require_once( '/opt/meza/htdocs/mediawiki/maintenance/Maintenance.php' );
+require_once( '/opt/htdocs/mediawiki/maintenance/Maintenance.php' );
 
 class RunAllJobs extends Maintenance {
 
@@ -95,7 +95,7 @@ class RunAllJobs extends Maintenance {
 		foreach ($wikiIds as $wikiId) {
 
 			// remove . and .. directories, and anything that's not a directory
-			// in the /opt/meza/htdocs/wikis directory
+			// in the /opt/htdocs/wikis directory
 			if ( $wikiId === '.' || $wikiId === '..' || ! is_dir( "$m_htdocs/wikis/$wikiId" ) ) {
 				continue;
 			}

@@ -29,7 +29,8 @@ curl_args=( curl --write-out %{http_code} --silent --output /dev/null )
 
 ${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh
 
-${docker_exec[@]} mv /opt/mediawiki /opt/meza/htdocs/mediawiki || true
+${docker_exec[@]} mkdir /opt/htdocs || true
+${docker_exec[@]} mv /opt/mediawiki /opt/htdocs/mediawiki || true
 
 # Get IP of docker image
 docker_ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" "$container_id")

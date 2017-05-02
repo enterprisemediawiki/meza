@@ -7,7 +7,7 @@
 # Output command to screen and to log files
 #
 timestamp=$(date "+%Y%m%d%H%M%S")
-logpath="/opt/meza/data/logs" # @fixme: not DRY
+logpath="/opt/data-meza/logs" # @fixme: not DRY
 outlog="$logpath/${timestamp}_out.log"
 errlog="$logpath/${timestamp}_err.log"
 cmdlog="$logpath/${timestamp}_cmd.log"
