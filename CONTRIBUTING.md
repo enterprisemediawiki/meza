@@ -25,7 +25,7 @@ At any given time there are several new builds being considered for approval in 
 
 These tests should be performed on all changes
 
-* Set `$mezaForceDebug = true;` in `LocalSettings.php`
+* Set `$mezaForceDebug = true;` in `LocalSettings.php.j2`
 * Create page with wikitext editor
 * Create page with VisualEditor
 * Verify adding images to pages with VisualEditor
@@ -46,7 +46,7 @@ The following tests should be performed if time allows, or if a change is likely
   * Test access to images when not logged into the wiki (use another browser)
     * Go to a file page with a logged in user and click the image and open in a new tab; verify you can view the image
     * Open that same image in another browser without being logged in; verify you can view the image
-  * Add to `LocalSettings.php` to remove anonymous viewing:
+  * Add to `LocalSettings.php.j2` to remove anonymous viewing:
     * `$wgGroupPermissions['*']['read'] = false;`
   * Test access to images from both browsers:
     * Verify logged in user can view image
