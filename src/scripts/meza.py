@@ -34,11 +34,12 @@ def main (argv):
 		display_docs('base')
 		sys.exit(0) # asking for help doesn't give error code
 	elif argv[0] in ('-v', '--version'):
-		version, rc = meza_shell_exec( ["git", "--git-dir=/opt/meza/.git", "describe", "--tags" ], True )
+		import subprocess
+		version = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "describe", "--tags" ] )
 		print "Meza " + version.strip()
 		print "Mediawiki EZ Admin"
 		print
-		sys.exit(rc)
+		sys.exit(0)
 
 
 	# Every command has a sub-command. No second param, no sub-command. Display
@@ -470,7 +471,7 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 
 # FIXME install --> setup dev-networking, setup docker, deploy monolith (special case)
 
-def meza_shell_exec ( shell_cmd, return_output=False ):
+def meza_shell_exec ( shell_cmd ):
 
 	# FIXME
 	# Get errors with user meza-ansible trying to write to the calling-user's
@@ -494,10 +495,7 @@ def meza_shell_exec ( shell_cmd, return_output=False ):
 	# FIXME: See above
 	os.chdir( starting_wd )
 
-	if return_output:
-		return ( output, rc )
-	else:
-		return rc
+	return rc
 
 
 def display_docs(name):

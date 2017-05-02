@@ -19,5 +19,19 @@
     group: wheel
     mode: 0755
 
+# Make sure sudo can be used in cron jobs
+- lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^Defaults\s+requiretty'
+    line: '#Defaults requiretty'
+    validate: 'visudo -cf %s'
+- lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^Defaults\s+!visiblepw'
+    line: '#Defaults !visiblepw'
+    validate: 'visudo -cf %s'
+
 - name: Ensure crontab up-to-date from file
   shell: crontab -u meza-ansible /home/meza-ansible/.ansible-cronfile

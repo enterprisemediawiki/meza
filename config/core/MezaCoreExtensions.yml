@@ -13,10 +13,8 @@ list:
 
       // allows adding semantic properties to Templates themselves
       // (not just on pages via templates).
-      // ENABLE THIS AFTER ALL TEMPLATES HAVE BEEN CHECKED FOR PROPER FORM
-      // i.e. using <noinclude> and <includeonly> properly
-      // $smwgNamespacesWithSemanticLinks[NS_TEMPLATE] = true;
       $smwgNamespacesWithSemanticLinks[NS_TALK] = true;
+      $smwgNamespacesWithSemanticLinks[NS_TEMPLATE] = true;
 
   - name: Semantic Result Formats
     composer: "mediawiki/semantic-result-formats"
