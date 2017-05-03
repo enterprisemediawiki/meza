@@ -47,7 +47,7 @@
 - name: Ensure NonMediaWikiSimpleSamlAuth.php in place
   copy:
     src: files/NonMediaWikiSimpleSamlAuth.php
-    dest: "{{ m_htdocs }}/diaWikiSimpleSamlAuth.php"
+    dest: "{{ m_htdocs }}/NonMediaWikiSimpleSamlAuth.php"
     owner: root
     group: root
     mode: 0755
