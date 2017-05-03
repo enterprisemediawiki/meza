@@ -4,7 +4,7 @@
 
 
 # Initiate container
-docker_repo="jamesmontalvo3/meza-docker-full:latest"
+docker_repo="jamesmontalvo3/meza-docker-full:reorg"
 source "$m_meza_host/tests/docker/init-container.sh" "none"
 
 
