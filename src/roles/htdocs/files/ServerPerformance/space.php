@@ -112,7 +112,7 @@ foreach( $variables as $varname => $varvalue ){
 }
 
 
-//*
+/*
 *
 * Add data for usage rate trend
 *
