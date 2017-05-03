@@ -12,12 +12,12 @@ if [[ $PATH != *"/usr/local/bin"* ]]; then
 	PATH="/usr/local/bin:$PATH"
 fi
 
-source /opt/meza/config/core/config.sh
+source "/opt/.deploy-meza/config.sh"
 
 # TEMPORARY method of recording slack webhooks. Should be in
-# local-secret/group_vars/all.yml and then written to a dynamic shell script
+# secret/group_vars/all.yml and then written to a dynamic shell script
 # file.
-logging_config="/opt/meza/config/core/app-ansible/logging.sh"
+logging_config="/opt/.deploy-meza/logging.sh"
 if [ -f "$logging_config" ]; then
 	source "$logging_config"
 fi
@@ -52,11 +52,11 @@ topdata=$(top -b -n 1)
 
 jobs=0
 
-cd /opt/meza/htdocs/wikis
+cd /opt/htdocs/wikis
 for d in */
 do
 	wiki_id=${d%/}
-	moreJobs=$(WIKI=$wiki_id php /opt/meza/htdocs/mediawiki/maintenance/showJobs.php)
+	moreJobs=$(WIKI=$wiki_id php /opt/htdocs/mediawiki/maintenance/showJobs.php)
 	jobs=$(($jobs+$moreJobs))
 done
 

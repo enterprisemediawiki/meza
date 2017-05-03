@@ -9,7 +9,7 @@ m_install="{{ m_install }}"
 m_meza="{{ m_meza }}"
 
 # config dir
-m_config="{{ m_config }}"
+m_config_core="{{ m_config_core }}"
 
 # scripts dir
 m_scripts="{{ m_scripts }}"
@@ -19,23 +19,25 @@ m_test="{{ m_test }}"
 
 # data dir
 m_meza_data="{{ m_meza_data }}"
+m_logs="{{ m_logs }}"
 
 # webserver variables
 m_htdocs="{{ m_htdocs }}"
 m_mediawiki="{{ m_mediawiki }}"
 
-### CONFIG FILES ###
-m_local_config_file="{{ m_local_config_file }}"
-
-### SLACK ANNOUNCEMENT ###.
-slackwebhook="{{ slackwebhook }}"
+# app locations
+m_apache="{{ m_apache }}"
 
 ### DATABASE DATA AND CREDENTIALS ###
 db_master="{{ groups['db-master'][0] }}"
-m_wiki_app_user="{{ m_wiki_app_user }}"
-m_wiki_app_user_password="{{ m_wiki_app_user_password }}"
-m_db_slave_user="{{ m_db_slave_user }}"
-m_db_slave_user_password="{{ m_db_slave_user_password }}"
+wiki_app_db_user_name='{{ wiki_app_db_user.name }}'
+wiki_app_db_user_pass='{{ wiki_app_db_user.password }}'
+
+# Replication
+m_db_replication_dump_file="{{ m_db_replication_dump_file }}"
+m_db_replication_log_file="{{ m_db_replication_log_file }}"
+m_db_replication_log_pos="{{ m_db_replication_log_pos }}"
 
 ### LANGUAGE ###
 m_language="{{ m_language }}"
+m_i18n="{{ m_i18n }}"

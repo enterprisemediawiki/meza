@@ -1,8 +1,8 @@
 echo "******* Generating elasticsearch index *******"
 
-source /opt/meza/config/core/config.sh
+source /opt/.deploy-meza/config.sh
 
-disable_search_file="$m_local_app/wikis/$wiki_id/postLocalSettings.d/disable-search-update.php"
+disable_search_file="$m_deploy/public/wikis/$wiki_id/postLocalSettings.d/disable-search-update.php"
 
 # disable search update in wiki-specific settings
 # FIXME: May only work in monolithic case

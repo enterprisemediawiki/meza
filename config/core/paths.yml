@@ -5,14 +5,13 @@ m_install: /opt
 m_meza: /opt/meza
 
 # config dir
-m_config: /opt/meza/config
-m_local_secret: /opt/meza/config/local-secret
-m_local_public: /opt/meza/config/local-public
-m_local_app: /opt/meza/config/local_app
+m_config_core: /opt/meza/config/core
+m_local_secret: /opt/conf-meza/secret
+m_local_public: /opt/conf-meza/public
 
-# Config files written by Ansible which need a place to live. See README.md in
-# this directory for more info.
-m_config_app_ansible: /opt/meza/config/core/app-ansible
+# Config files written by Ansible which need a place to live on non-controller
+# nodes.
+m_deploy: /opt/.deploy-meza
 
 # scripts dir
 m_scripts: /opt/meza/src/scripts
@@ -21,25 +20,25 @@ m_scripts: /opt/meza/src/scripts
 m_test: /opt/meza/test
 
 # data dir
-m_meza_data: /opt/meza/data
-m_tmp: /opt/meza/data/tmp
-m_logs: /opt/meza/data/logs
+m_meza_data: /opt/data-meza
+m_tmp: /opt/data-meza/tmp
+m_logs: /opt/data-meza/logs
 
 # uploads dir. In order to support both app-server-based uploads and
 # GlusterFS-based uploads (or other alternatives) it may be necessary to be
 # able to specify this path, with options like:
-#   - /opt/meza/data/uploads    (app-server based)
-#   - /opt/meza/data/glusterfs  (GlusterFS based)
-#   - /opt/meza/data/other (something really cool that I don't even know about)
-m_uploads_dir: /opt/meza/data/uploads
+#   - /opt/data-meza/uploads    (app-server based)
+#   - /opt/data-meza/glusterfs  (GlusterFS based)
+#   - /opt/data-meza/other (something really cool that I don't even know about)
+m_uploads_dir: /opt/data-meza/uploads
 
 # Location where backups will go, specified by environment, e.g.
-# /opt/meza/data/backups/prod for "prod" environment
-m_backups: /opt/meza/data/backups
+# /opt/data-meza/backups/prod for "prod" environment
+m_backups: /opt/data-meza/backups
 
 # webserver variables
-m_htdocs: /opt/meza/htdocs
-m_mediawiki: /opt/meza/htdocs/mediawiki
+m_htdocs: /opt/htdocs
+m_mediawiki: /opt/htdocs/mediawiki
 m_cert_private: /etc/pki/tls/private/meza.key
 m_cert_public: /etc/pki/tls/certs/meza.crt
 m_ca_cert: /etc/pki/tls/certs/meza-ca.crt
@@ -54,11 +53,10 @@ m_parsoid_path: /etc/parsoid
 m_simplesamlphp_path: /opt/simplesamlphp
 
 # files
-m_local_config_file: /opt/meza/config/local/config.local.sh
 m_i18n: /opt/meza/config/core/i18n
-m_db_replication_dump_file: /opt/meza/data/db_master_for_replication.sql
-m_db_replication_log_file: /opt/meza/data/db_master_log_file
-m_db_replication_log_pos: /opt/meza/data/db_master_log_pos
+m_db_replication_dump_file: /opt/data-meza/db_master_for_replication.sql
+m_db_replication_log_file: /opt/data-meza/db_master_log_file
+m_db_replication_log_pos: /opt/data-meza/db_master_log_pos
 
 
 # FIXME: this is not a "path" but it's the best place to keep it for now
@@ -68,3 +66,7 @@ m_db_replication_log_pos: /opt/meza/data/db_master_log_pos
 m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
 
 meza_server_log_db: meza_server_log
+
+ntp_server: [0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org, 3.pool.ntp.org]
+
+m_language: en

@@ -39,7 +39,7 @@ $wiki       = $_REQUEST['wiki'];
 $directory  = $_REQUEST['dir'];
 
 // Assemble file path
-$file_path  = '/opt/meza/data/backups/' . $wiki . '/';
+$file_path  = '/opt/data-meza/backups/' . $wiki . '/';
 if( isset($directory) ){
 	$file_path .= $directory . "/";
 }
@@ -49,7 +49,7 @@ $file_path .= $file_name;
 $is_attachment = isset($_REQUEST['stream']) ? false : true;
 
 // if there's a SAML config file, we need to authenticate with SAML, like, now.
-if ( is_file("/opt/meza/config/local/SAMLConfig.php") ) {
+if ( is_file( '/opt/.deploy-meza/SAMLConfig.php' ) ) {
     require_once __DIR__ . '/NonMediaWikiSimpleSamlAuth.php';
 }
 
@@ -64,8 +64,8 @@ $allowedUsers = array(
 );
 
 // if there's a config file with a list of users allowed to download backup files, use it
-if ( is_file("/opt/meza/data/backups/$wiki/config/backupDownloaders.php") ) {
-	require_once "/opt/meza/data/backups/$wiki/config/backupDownloaders.php";
+if ( is_file("/opt/data-meza/backups/$wiki/config/backupDownloaders.php") ) {
+	require_once "/opt/data-meza/backups/$wiki/config/backupDownloaders.php";
 }
 
 // make sure the file exists, user has permission, and user isn't trying to snoop

@@ -8,6 +8,7 @@
 
 - name: Make apache own htdocs directory
   file:
+    state: directory
     path: "{{ m_htdocs }}"
     owner: apache
     group: apache
@@ -30,7 +31,7 @@
 
 # FIXME: required?
 # create logrotate file
-# ln -s " $m_config/core/logrotated_httpd" /etc/logrotate.d/httpd
+# ln -s " $m_config_core/logrotated_httpd" /etc/logrotate.d/httpd
 
 
 # FIXME: apache.sh had commented-out SELinux commands for services

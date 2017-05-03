@@ -39,6 +39,15 @@ fi
 ret=false
 getent passwd meza-ansible >/dev/null 2>&1 && ret=true
 
+# Create .deploy-meza directory and very basic config.sh if they don't exist
+# This is done to make the user setup script(s) work
+if [ ! -d /opt/.deploy-meza ]; then
+	mkdir /opt/.deploy-meza
+fi
+if [ ! -f /opt/.deploy-meza/config.sh ]; then
+	echo "m_scripts='/opt/meza/src/scripts'; ansible_user='meza-ansible';" > /opt/.deploy-meza/config.sh
+fi
+
 if $ret; then
 	echo "meza-ansible already exists"
 else
@@ -46,8 +55,6 @@ else
 	echo "Add ansible master user"
 	source "/opt/meza/src/scripts/ssh-users/setup-master-user.sh"
 fi
-
-
 
 echo "meza command installed. Use it:"
 echo "  sudo meza deploy monolith"

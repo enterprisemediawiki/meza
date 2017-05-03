@@ -2,7 +2,7 @@
 - name: Ensure config vars for logging in place
   template:
     src: logging.sh.j2
-    dest: "{{ m_config_app_ansible }}/logging.sh"
+    dest: "{{ m_deploy }}/logging.sh"
     owner: meza-ansible
     group: wheel
     mode: 0750
@@ -31,13 +31,6 @@
   run_once: true
   when: not server_log_exists
 
-- name: "Ensure database info in config file for performance recording"
-  template:
-    src: server-performance-config.php.j2
-    dest: /opt/meza/config/core/app-ansible/server-performance-config.php
-    owner: apache
-    group: apache
-    mode: 0755
 
 #
 # Disk space usage

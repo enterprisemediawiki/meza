@@ -54,6 +54,15 @@ $(document).ready(function(){
         console.log(hitsData);
         window.chart = nv.models.lineWithFocusChart();
 
+        for(var i = 0; i < hitsData.dailyHits.length; i++){
+            if ( ! Array.isArray( hitsData.dailyHits[i].values ) ) {
+                console.log( "No values for " + hitsData.dailyHits[i].key );
+                console.log( hitsData.dailyHits[i] );
+                console.log( "Converting .values to empty array" );
+                hitsData.dailyHits[i].values = [];
+            }
+        }
+
         chart.xAxis
             .tickFormat(function(d) {
                 return d3.time.format('%x %X')(new Date(d))

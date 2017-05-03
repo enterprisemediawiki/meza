@@ -6,8 +6,8 @@ To setup a multi-server environment, do:
 
 $ meza setup env # Setup the environment, following prompts
 # Edit config as required:
-$ sudo vi /opt/meza/config/local-secret/<env-name>/hosts
-$ sudo vi /opt/meza/config/local-secret/<env-name>/group_vars/all.yml
+$ sudo vi /opt/conf-meza/secret/<env-name>/hosts
+$ sudo vi /opt/conf-meza/secret/<env-name>/group_vars/all.yml
 $ sudo meza deploy <env-name>
 
 Commands    Directives           Description

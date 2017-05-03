@@ -40,19 +40,19 @@ docker_exec_2=( "${docker_exec[@]}" )
 # (4) Change FQDN to docker#1 IP address in group_vars/all.yml
 ${docker_exec_1[@]} git clone \
 	https://github.com/enterprisemediawiki/meza-test-config-secret.git \
-	"/opt/meza/config/local-secret/$env_name"
+	"/opt/conf-meza/secret/$env_name"
 ${docker_exec_1[@]} sed -r -i "s/localhost #backup/$docker_ip_2/g;" \
-	"/opt/meza/config/local-secret/$env_name/hosts"
+	"/opt/conf-meza/secret/$env_name/hosts"
 ${docker_exec_1[@]} sed -r -i "s/localhost/$docker_ip_1/g;" \
-	"/opt/meza/config/local-secret/$env_name/hosts"
+	"/opt/conf-meza/secret/$env_name/hosts"
 ${docker_exec_1[@]} sed -r -i "s/INSERT_FQDN/$docker_ip_1/g;" \
-	"/opt/meza/config/local-secret/$env_name/group_vars/all.yml"
+	"/opt/conf-meza/secret/$env_name/group_vars/all.yml"
 
 
 # CONTAINER 2: get backup files
 ${docker_exec_2[@]} git clone \
 	https://github.com/jamesmontalvo3/meza-test-backups.git \
-	"/opt/meza/data/backups/$env_name"
+	"/opt/data-meza/backups/$env_name"
 
 
 # Run script on controller to `meza deploy`, `meza create wiki` and

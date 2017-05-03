@@ -37,11 +37,17 @@
 
     # Config files for SimpleSamlAuth (MediaWiki extension)
     - filename: "samlLocalSettings.php"
-      dest_path: "{{ m_config_app_ansible }}"
+      dest_path: "{{ m_deploy }}"
 
     # Config file used by MW extension + any other PHP app needing auth
     # (landing page, admin functions, etc)
     - filename: "SAMLConfig.php"
-      dest_path: "{{ m_config_app_ansible }}"
+      dest_path: "{{ m_deploy }}"
 
-
+- name: Ensure NonMediaWikiSimpleSamlAuth.php in place
+  copy:
+    src: files/NonMediaWikiSimpleSamlAuth.php
+    dest: "{{ m_htdocs }}/NonMediaWikiSimpleSamlAuth.php"
+    owner: root
+    group: root
+    mode: 0755

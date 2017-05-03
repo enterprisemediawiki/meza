@@ -17,7 +17,7 @@ fqdn="$1"
 meza setup env monolith --fqdn="${fqdn}" --db_pass=1234 --enable_email=false --private_net_zone=public
 
 echo "print hosts file"
-cat /opt/meza/config/local-secret/monolith/hosts
+cat /opt/conf-meza/secret/monolith/hosts
 
 # Now that environment monolith is setup, deploy/install it
 meza deploy monolith

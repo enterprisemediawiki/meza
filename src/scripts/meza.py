@@ -139,10 +139,13 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	else:
 		env = argv[0]
 
-	if not os.path.isdir( "/opt/meza/config/local-secret" ):
-		os.mkdir( "/opt/meza/config/local-secret" )
+	if not os.path.isdir( "/opt/conf-meza" ):
+		os.mkdir( "/opt/conf-meza" )
 
-	if os.path.isdir( "/opt/meza/config/local-secret/" + env ):
+	if not os.path.isdir( "/opt/conf-meza/secret" ):
+		os.mkdir( "/opt/conf-meza/secret" )
+
+	if os.path.isdir( "/opt/conf-meza/secret/" + env ):
 		print
 		print "Environment {} already exists".format(env)
 		sys.exit(1)
@@ -228,11 +231,11 @@ def meza_command_setup_env (argv, return_not_exit=False):
 
 	json_env_vars = json.dumps(env_vars)
 
-	# Create temporary extra vars file in local-secret directory so passwords
-	# are not written to command line. Putting in local-secret should make
+	# Create temporary extra vars file in secret directory so passwords
+	# are not written to command line. Putting in secret should make
 	# permissions acceptable since this dir will hold secret info, though it's
 	# sort of an odd place for a temporary file. Perhaps /root instead?
-	extra_vars_file = "/opt/meza/config/local-secret/temp_vars.json"
+	extra_vars_file = "/opt/conf-meza/secret/temp_vars.json"
 	if os.path.isfile(extra_vars_file):
 		os.remove(extra_vars_file)
 	f = open(extra_vars_file, 'w')
@@ -246,8 +249,8 @@ def meza_command_setup_env (argv, return_not_exit=False):
 
 	print
 	print "Please review your config files. Run commands:"
-	print "  sudo vi /opt/meza/config/local-secret/{}/hosts".format(env)
-	print "  sudo vi /opt/meza/config/local-secret/{}/group_vars/all.yml".format(env)
+	print "  sudo vi /opt/conf-meza/secret/{}/hosts".format(env)
+	print "  sudo vi /opt/conf-meza/secret/{}/group_vars/all.yml".format(env)
 
 	if return_not_exit:
 		return rc
@@ -370,7 +373,7 @@ def meza_command_maint_runJobs (argv):
 	#          NOT WORK AND NEEDS TO BE ANSIBLE-IZED. FIXME.
 	#
 
-	wikis_dir = "/opt/meza/htdocs/wikis"
+	wikis_dir = "/opt/htdocs/wikis"
 	wikis = os.listdir( wikis_dir )
 	for i in wikis:
 		if os.path.isdir(os.path.join(wikis_dir, i)):
@@ -452,7 +455,7 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 	command = ['sudo', '-u', 'meza-ansible', 'ansible-playbook',
 		'/opt/meza/src/playbooks/{}.yml'.format(playbook)]
 	if env:
-		host_file = "/opt/meza/config/local-secret/{}/hosts".format(env)
+		host_file = "/opt/conf-meza/secret/{}/hosts".format(env)
 		command = command + [ '-i', host_file ]
 		extra_vars = { 'env': env }
 
@@ -560,7 +563,7 @@ def random_string(**params):
 def check_environment(env):
 	import os
 
-	conf_dir = "/opt/meza/config/local-secret"
+	conf_dir = "/opt/conf-meza/secret"
 
 	env_dir = os.path.join( conf_dir, env )
 	if not os.path.isdir( env_dir ):

@@ -91,7 +91,8 @@ if [ "$is_minion" == "no" ]; then
 	# several extensions pre-cloned, but not in the correct location. Move them
 	# into place. For some reason gives exit code 129 on Travis sometimes. Force
 	# non-failing exit code.
-	${docker_exec[@]} mv /opt/mediawiki /opt/meza/htdocs/mediawiki || true
+	${docker_exec[@]} mkdir /opt/htdocs || true
+	${docker_exec[@]} mv /opt/mediawiki /opt/htdocs/mediawiki || true
 
 	# If not mounting the host's meza directory, copy it to the container
 	if [ "$host_meza_dir_method" = "copy" ]; then

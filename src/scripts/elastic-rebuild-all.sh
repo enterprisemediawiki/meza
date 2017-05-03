@@ -1,8 +1,8 @@
 #!/bin/sh
 
-source "/opt/meza/config/core/config.sh"
+source "/opt/.deploy-meza/config.sh"
 
-cd /opt/meza/htdocs/wikis
+cd /opt/htdocs/wikis
 for d in */; do
 
     wiki_id=${d%/}

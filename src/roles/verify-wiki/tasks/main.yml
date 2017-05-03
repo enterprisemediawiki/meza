@@ -291,7 +291,7 @@
 - name: "{{ wiki_id }} - Ensure wiki config symlink in place"
   file:
     # dest = symlink, src = dir linked to
-    src: "{{ m_local_app }}/wikis/{{ wiki_id }}"
+    src: "{{ m_deploy }}/public/wikis/{{ wiki_id }}"
     dest: "{{ m_htdocs }}/wikis/{{ wiki_id }}/config"
     state: link
     owner: apache

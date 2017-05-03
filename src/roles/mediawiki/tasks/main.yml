@@ -9,6 +9,7 @@
 
 
 
+
 #
 # MEDIAWIKI CORE
 #
@@ -38,7 +39,7 @@
 #
 - name: Set variable holding list of core extensions
   include_vars:
-    file: "{{ m_config }}/core/MezaCoreExtensions.yml"
+    file: "{{ m_config_core }}/MezaCoreExtensions.yml"
     name: meza_core_extensions
 
 - name: Set variable holding list of local extensions
@@ -49,7 +50,7 @@
 - name: Ensure core meza extensions installed (non-Composer)
   git:
     repo: "{{ item.repo }}"
-    dest: "/opt/meza/htdocs/mediawiki/extensions/{{ item.name }}"
+    dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
     version: "{{ item.version }}"
   with_items: "{{ meza_core_extensions.list }}"
   when: meza_core_extensions.list[0] is defined and item.repo is defined
@@ -61,7 +62,7 @@
 - name: Ensure local meza extensions installed (non-Composer)
   git:
     repo: "{{ item.repo }}"
-    dest: "/opt/meza/htdocs/mediawiki/extensions/{{ item.name }}"
+    dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
     version: "{{ item.version }}"
   with_items: "{{ meza_local_extensions.list }}"
   when: meza_local_extensions.list[0] is defined and item.repo is defined
@@ -74,7 +75,7 @@
 - name: Ensure Extensions.php in place
   template:
     src: Extensions.php.j2
-    dest: "{{ m_config_app_ansible }}/Extensions.php"
+    dest: "{{ m_deploy }}/Extensions.php"
 
 # Adds extensions with composer param from MezaCoreExtensions.yml and
 # MezaLocalExtensions.yml

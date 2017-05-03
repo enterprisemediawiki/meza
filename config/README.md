@@ -1,8 +1,8 @@
 Meza configuration directories
 ==============================
 
-/opt/meza/config/local-secret
------------------------------
+/opt/conf-meza/secret
+---------------------
 
 Contains secret information about environments managed by meza. This includes the list of hosts for each environment (IP addresses and what they're assigned to) as well as passwords and other secret information.
 
@@ -13,23 +13,19 @@ Contains secret information about environments managed by meza. This includes th
 * `dev`: A
 
 
-/opt/meza/config/local-public
------------------------------
+/opt/conf-meza/public
+---------------------
 
 This contains non-secret information about environments. This includes TBD.
 
 
-/opt/meza/config/local_app
---------------------------
+/opt/.deploy-meza/public
+------------------------
+
+A copy of `/opt/conf-meza/public` (confirm perfect copy? Doesn't include `.git` for speed purposes) which is accessible to app servers regardless of whether the app server is the controller (`/opt/conf-meza/public` is only present on the controller).
 
 
-
-/opt/meza/config/i18n
+/opt/meza/config/core
 ---------------------
 
-
-
-/opt/meza/config/baselines
---------------------------
-
-
+Core configuration for meza. This shouldn't be edited, but can be overridden in the above directories. May get renamed `/opt/meza/config` or `/opt/meza/core.conf` or something since there's not really anything else in `/opt/meza/config` currently (besides this file).

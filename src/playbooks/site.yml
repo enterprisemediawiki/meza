@@ -180,7 +180,7 @@
   tags: mediawiki
   roles:
     - set-vars
-    - composer
+    - htdocs
     - mediawiki
 
 
