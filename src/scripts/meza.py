@@ -139,6 +139,9 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	else:
 		env = argv[0]
 
+	if not os.path.isdir( "/opt/conf-meza" ):
+		os.mkdir( "/opt/conf-meza" )
+
 	if not os.path.isdir( "/opt/conf-meza/secret" ):
 		os.mkdir( "/opt/conf-meza/secret" )
 
