@@ -14,6 +14,10 @@
 //ini_set('display_startup_errors', 1);
 //error_reporting(E_ALL);
 
+// load meza config
+require_once '/opt/.deploy-meza/config.php';
+
+
 // get the file request, throw error if nothing supplied
 
 // hide notices
@@ -38,8 +42,33 @@ $file_ext   = $path_parts['extension'];
 $wiki       = $_REQUEST['wiki'];
 $directory  = $_REQUEST['dir'];
 
+// get environment
+if ( isset( $backups_environment ) ) {
+    $env = $backups_environment;
+}
+else {
+	$undesiredStrings = array(
+		".",
+		"..",
+		".DS_Store",
+		".htaccess",
+		"README",
+	);
+
+    $envs = array_diff( scandir( $m_backups ), $undesiredStrings );
+
+    // if there are multiple environments backed up to this server, and
+    // $backups_environment isn't specified for which environment to disply in
+    // backupListing.php, then just guess the first one.
+    // FIXME: This probably is all totally broken in a polylithic setup.
+    $env = $envs[0];
+}
+
+// path to backups is backups directory + environment
+$path = realpath( "$m_backups/$env" );
+
 // Assemble file path
-$file_path  = '/opt/data-meza/backups/' . $wiki . '/';
+$file_path  = "$m_backups/$env/$wiki/";
 if( isset($directory) ){
 	$file_path .= $directory . "/";
 }
@@ -48,29 +77,39 @@ $file_path .= $file_name;
 // allow a file to be streamed instead of sent as an attachment
 $is_attachment = isset($_REQUEST['stream']) ? false : true;
 
+
 // if there's a SAML config file, we need to authenticate with SAML, like, now.
-if ( is_file( '/opt/.deploy-meza/SAMLConfig.php' ) ) {
-    require_once __DIR__ . '/NonMediaWikiSimpleSamlAuth.php';
+if ( is_file( $m_deploy.'/SAMLConfig.php' ) ) {
+	require_once $m_htdocs.'/NonMediaWikiSimpleSamlAuth.php';
+}
+else {
+	header('HTTP/1.0 403 Forbidden');
+	echo "Backup downloading is not permitted without Single Sign On";
 }
 
 $as = new SimpleSAML_Auth_Simple('default-sp');
 $as->requireAuth();
 $attributes = $as->getAttributes();
-$AUID = $attributes['AUID'][0];
+$userID = $attributes[ $saml_idp_username_attr ][0];
 
-// Array of users allowed to see backup directory listing
-// Empty by default; Names are added for each wiki if a config file exists
-$allowedUsers = array(
-);
 
-// if there's a config file with a list of users allowed to download backup files, use it
-if ( is_file("/opt/data-meza/backups/$wiki/config/backupDownloaders.php") ) {
-	require_once "/opt/data-meza/backups/$wiki/config/backupDownloaders.php";
+// wiki_backup_downloaders and all_backup_downloaders from config.php if set
+// FIXME: this is a lot of duplication with backupListing.php
+if ( ! isset( $wiki_backup_downloaders ) || ! is_array( $wiki_backup_downloaders ) ) {
+    $wiki_backup_downloaders = array();
+}
+if ( ! isset( $all_backup_downloaders ) || ! is_array( $all_backup_downloaders ) ) {
+    $all_backup_downloaders = array();
+}
+if ( ! isset( $wiki_backup_downloaders[ $wiki ] ) ) {
+    $wiki_backup_downloaders[ $wiki ] = array();
 }
 
+$allowedUsers = array_merge( $all_backup_downloaders, $wiki_backup_downloaders[ $wiki ] );
+
 // make sure the file exists, user has permission, and user isn't trying to snoop
-if ( is_file($file_path) && in_array($AUID, $allowedUsers) && !strpos($file_path, "..") )
-{
+if ( is_file($file_path) && in_array($userID, $allowedUsers) && !strpos($file_path, "..") ) {
+
 	$file_size = filesize($file_path);
 	$file = @fopen($file_path,"rb");
 	if ($file)

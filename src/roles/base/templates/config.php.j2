@@ -21,6 +21,8 @@ $m_test = "{{ m_test }}";
 # data dir
 $m_meza_data = "{{ m_meza_data }}";
 
+$m_backups="{{ m_backups }}";
+
 # webserver variables
 $m_htdocs = "{{ m_htdocs }}";
 $m_mediawiki = "{{ m_mediawiki }}";
@@ -42,3 +44,51 @@ $m_language = "{{ m_language }}";
 #
 $m_logging_db_name = 'meza_server_log';
 $m_logging_db_host = 'localhost';
+
+
+{% if server_admins is defined %}
+#
+# Server admins only
+#
+$server_admins = array();
+{% for sadmin in server_admins %}
+$server_admins[] = '{{ sadmin }}';
+{% endfor %}
+{% endif %}
+
+{% if saml_public is defined %}
+#
+# SAML
+#
+$saml_idp_username_attr = '{{ saml_public.idp_username_attr }}';
+
+{% endif %}
+
+#
+# Downloading backups
+#
+{% if backups_environment is defined %}
+# Allow downloading backups from this environment
+$backups_environment = '{{ backups_environment }}';
+{% endif %}
+
+{% if wiki_backup_downloaders is defined %}
+# Users allowed to download specific wikis
+$wiki_backup_downloaders = array();
+{% for wiki, users in wiki_backup_downloaders.iteritems() %}
+$wiki_backup_downloaders['{{ wiki }}'] = array(
+	{% for user in users %}
+	'{{ user }}',
+	{% endfor %}
+);
+{% endfor %}
+{% endif %}
+
+{% if all_backup_downloaders is defined %}
+// users allowed ot download from all wikis
+$all_backup_downloaders = array(
+	{% for user in all_backup_downloaders %}
+	'{{ user }}',
+	{% endfor %}
+);
+{% endif %}
