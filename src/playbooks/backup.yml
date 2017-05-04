@@ -49,4 +49,6 @@
   roles:
     - set-vars
     - backup-uploads
-  tags: uploads
+  tags:
+    - uploads
+    - upload
