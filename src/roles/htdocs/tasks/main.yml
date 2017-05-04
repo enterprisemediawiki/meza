@@ -12,7 +12,7 @@
       - "--exclude=.git"
 
 - name: Ensure BackupDownload configured
-  file:
+  synchronize:
     src: "files/BackupDownload/"
     dest: "{{ m_htdocs }}/BackupDownload"
     recursive: yes
