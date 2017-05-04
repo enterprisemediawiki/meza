@@ -48,7 +48,7 @@ else {
     // $backups_environment isn't specified for which environment to disply in
     // backupListing.php, then just guess the first one.
     // FIXME: This probably is all totally broken in a polylithic setup.
-    $env = $envs[0];
+    $env = array_pop( $envs );
 }
 
 // path to backups is backups directory + environment
@@ -65,7 +65,7 @@ if ( ! isset( $all_backup_downloaders ) || ! is_array( $all_backup_downloaders )
     $all_backup_downloaders = array();
 }
 
-$urlBase = "https://$wiki_app_fqdn/download-backup.php";
+$urlBase = "https://$wiki_app_fqdn/BackupDownload/download.php";
 
 foreach( $wikis as $wiki ){
 

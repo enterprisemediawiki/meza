@@ -61,7 +61,7 @@ else {
     // $backups_environment isn't specified for which environment to disply in
     // backupListing.php, then just guess the first one.
     // FIXME: This probably is all totally broken in a polylithic setup.
-    $env = $envs[0];
+    $env = array_pop( $envs );
 }
 
 // path to backups is backups directory + environment
