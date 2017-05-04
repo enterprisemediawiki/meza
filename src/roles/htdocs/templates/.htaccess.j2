@@ -19,6 +19,11 @@
     # Allow access to ServerPerformance plot page and support files
     RewriteRule ^ServerPerformance(?:/|$)(.*)$ - [L]
 
+    {% if allow_backup_downloads %}
+    # Allow access to BackupDownload function
+    RewriteRule ^BackupDownload(?:/|$)(.*)$ - [L]
+    {% endif %}
+
     # Taken from MediaWiki.org [[Extension:Simple Farm]]
     #
     # Redirect virtual wiki path to physical wiki path. There
