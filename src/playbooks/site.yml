@@ -60,6 +60,7 @@
     - set-vars
     - base
     # FIXME: add "security" module here
+  tags: base
 
 # FIXME: why is controller init on all app servers?
 - hosts: app-servers

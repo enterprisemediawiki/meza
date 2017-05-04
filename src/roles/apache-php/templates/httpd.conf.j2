@@ -418,6 +418,16 @@ Listen 8080
 
 </VirtualHost>
 
+# Use port 8090 to access mod_status. Not accessible outside firewall.
+ExtendedStatus on
+Listen 8090
+<VirtualHost *:8090>
+        <Location /server-status>
+                SetHandler server-status
+                Require all granted
+        </Location>
+</VirtualHost>
+
 
 #
 # Handle files ending in .php, .php5, .php6, etc with PHP

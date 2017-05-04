@@ -11,6 +11,25 @@
       - "--no-motd"
       - "--exclude=.git"
 
+- name: Ensure BackupDownload configured
+  synchronize:
+    src: "files/BackupDownload/"
+    dest: "{{ m_htdocs }}/BackupDownload"
+    recursive: yes
+    delete: yes
+    rsync_opts:
+      - "--no-motd"
+      - "--exclude=.git"
+  when: allow_backup_downloads
+
+# In case people change their mind and don't want to offer backup downloads,
+# remove files
+- name: Ensure BackupDownload NOT configured
+  file:
+    path: "{{ m_htdocs }}/BackupDownload"
+    state: absent
+  when: not allow_backup_downloads
+
 - name: Ensure files configured
   template:
     src: "{{ item }}.j2"
@@ -20,6 +39,4 @@
     mode: 0755
   with_items:
   - ".htaccess"
-  - "backupListing.php"
-  - "download-backup.php"
   - "index.php"
