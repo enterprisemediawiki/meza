@@ -51,7 +51,7 @@ To transfer files to your server you can use SCP (or PSCP on Windows):
 A wiki can be setup as the "primary" wiki. This means that all other wikis will use its user and interwiki tables. If all wikis are related, and are going to have similar users, you should do this. To make one wiki the primary wiki edit your configuration:
 
 ```yaml
-primary_wiki_db_name: wiki_big
+primary_wiki_id: big
 ```
 
 In this example the wiki with ID "big", and thus database name "wiki_big", is being defined as the primary wiki. This statement can be added to any configuration YAML file, but the recommended is `/opt/conf-meza/public/vars.yml`.

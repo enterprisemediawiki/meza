@@ -341,7 +341,7 @@ $wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
 $wgDBmysql5 = false;
 
 
-{% if primary_wiki_db_name is defined %}
+{% if primary_wiki_id is defined %}
 /**
  *  If a primewiki is defined then every wiki will use that wiki db for certain
  *  tables. The shared `interwiki` table allows users to use the same interwiki
@@ -350,10 +350,9 @@ $wgDBmysql5 = false;
  *  not affect the user groups, so a user can be a sysop on one wiki and just a
  *  user on another.
  *
- *  To enable a primewiki add the `primary_wiki_db_name` variable to the config
- *  with the value being the database name. For example, if your primewiki's ID
- *  is "main", your database name is wiki_main unless you have manually changed
- *  it to something else.
+ *  To enable a primewiki add the `primary_wiki_id` variable to the config with
+ *  the value being the wiki ID of the prime wiki (e.g. the 1st part of the URL
+ *  after the domain, e.g. https://example.com/<wiki_id>)
  *
  *  In order for this to work properly the wikis need to have been created with
  *  a single user table in mind. If you're starting a new wiki farm then you're
@@ -361,7 +360,7 @@ $wgDBmysql5 = false;
  *  tables, then you'll need to use the unifyUserTables.php script. Please test
  *  this script extensively before use. Unifying user tables is complicated.
  **/
-$wgSharedDB = '{{ primary_wiki_db_name }}';
+$wgSharedDB = 'wiki_{{ primary_wiki_id }}';
 $wgSharedTables = array(
 	'user',            // default
 	'user_properties', // default
