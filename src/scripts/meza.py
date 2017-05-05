@@ -250,10 +250,11 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	# Now that the env is setup, generate a vault password file and use it to
 	# encrypt all.yml
 	vault_pass_file = get_vault_pass_file( env )
-	os.system([ 'ansible-vault', 'encrypt',
-		"/opt/conf-meza/secret/{}/group_vars/all.yml".format(env),
-		"--vault-password-file", vault_pass_file
-	])
+	all_yml = "/opt/conf-meza/secret/{}/group_vars/all.yml".format(env)
+	cmd = "ansible-vault encrypt {} --vault-password-file {}".format(all_yml, vault_pass_file)
+	os.system(cmd)
+
+
 
 	print
 	print "Please review your config files. Run commands:"
@@ -512,10 +513,11 @@ def meza_shell_exec ( shell_cmd ):
 	return rc
 
 def get_vault_pass_file ( env ):
-	vault_pass_file = '/home/meza-ansible/.vault-pass-' + env + '.txt'
+	vault_pass_file = '/home/meza-ansible/.vault-pass-{}.txt'.format(env)
 	if not os.path.isfile( vault_pass_file ):
-		f = open( vault_pass_file, 'w' )
-		f.write( random_string( num_chars=64 ) )
+		with open( vault_pass_file, 'w' ) as f:
+			f.write( random_string( num_chars=64 ) )
+			f.close()
 	return vault_pass_file
 
 def display_docs(name):
