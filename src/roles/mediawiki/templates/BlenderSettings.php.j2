@@ -8,8 +8,8 @@ $blenderScriptPath = '/WikiBlender';
 
 {% if primary_wiki_id is defined %}
 // If there is a prime wiki, use its favicon as the landing page favicon
-$primeWiki = '{{ prime_wiki_id }}';
-$blenderFavicon = "/wikis/{{ prime_wiki_id }}/config/favicon.ico";
+$primeWiki = '{{ primary_wiki_id }}';
+$blenderFavicon = "/wikis/{{ primary_wiki_id }}/config/favicon.ico";
 {% endif %}
 
 // Location of wikis directory
