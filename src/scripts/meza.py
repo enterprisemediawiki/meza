@@ -16,7 +16,7 @@ def load_yaml ( filepath ):
 			print(exc)
 
 
-paths = load_yaml( "/opt/meza/config/core/paths.yml" )
+paths = load_yaml( "/opt/meza/config/core/defaults.yml" )
 
 # Hard-coded for now, because I'm not sure where to set it yet
 language = "en"
