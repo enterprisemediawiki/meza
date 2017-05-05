@@ -251,7 +251,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	# encrypt all.yml
 	vault_pass_file = get_vault_pass_file( env )
 	os.system([ 'ansible-vault', 'encrypt',
-		"/opt/conf-meza/secret/{}/group_vars/all.yml".format(env)
+		"/opt/conf-meza/secret/{}/group_vars/all.yml".format(env),
 		"--vault-password-file", vault_pass_file
 	])
 
