@@ -1,4 +1,5 @@
 ---
+# Meza default config file
 
 # meza install location
 m_install: /opt
