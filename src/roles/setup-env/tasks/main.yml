@@ -40,10 +40,3 @@
 
     # don't overwrite existing
     force: no
-
-- name: Ensure all.yml encrypted
-  shell: >
-    ansible-vault encrypt
-    {{ m_local_secret }}/{{ env }}/group_vars/all.yml
-    --vault-password-file /home/meza-ansible/.vault-pass-{{ env }}.txt
-  ignore_errors: True

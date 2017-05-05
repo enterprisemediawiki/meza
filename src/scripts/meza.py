@@ -460,10 +460,7 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 		extra_vars = { 'env': env }
 
 		# Setup password file if not exists (environment info is encrypted)
-		vault_pass_file = '/home/meza-ansible/.vault-pass-' + env + '.txt'
-		if not os.path.isfile( vault_pass_file ):
-			f = open( vault_pass_file, 'w' )
-			f.write( random_string( num_chars=64 ) )
+		vault_pass_file = get_vault_pass_file( env )
 
 	else:
 		extra_vars = {}
@@ -506,6 +503,12 @@ def meza_shell_exec ( shell_cmd ):
 
 	return rc
 
+def get_vault_pass_file ( env ):
+	vault_pass_file = '/home/meza-ansible/.vault-pass-' + env + '.txt'
+	if not os.path.isfile( vault_pass_file ):
+		f = open( vault_pass_file, 'w' )
+		f.write( random_string( num_chars=64 ) )
+	return vault_pass_file
 
 def display_docs(name):
 	f = open('/opt/meza/manual/meza-cmd/{}.txt'.format(name),'r')
