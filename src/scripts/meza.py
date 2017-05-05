@@ -466,6 +466,12 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 	if env:
 		host_file = "/opt/conf-meza/secret/{}/hosts".format(env)
 
+		# Meza _needs_ to be able to load this file. Be perhaps a little
+		# overzealous and chown/chmod it everytime
+		secret_file = '/opt/conf-meza/secret/{}/group_vars/all.yml'.format(env)
+		meza_chown( secret_file, 'meza-ansible', 'wheel' )
+		os.chmod( secret_file, 0o660 )
+
 		# Setup password file if not exists (environment info is encrypted)
 		vault_pass_file = get_vault_pass_file( env )
 
@@ -524,18 +530,17 @@ def get_vault_pass_file ( env ):
 
 	# Run this everytime, since it should be fast and if meza-ansible can't
 	# read this then you're stuck!
-	uid = pwd.getpwnam("meza-ansible").pw_uid
-	gid = grp.getgrnam("wheel").gr_gid
-	os.chown( vault_pass_file, uid, gid )
+	meza_chown( vault_pass_file, 'meza-ansible', 'wheel' )
+	os.chmod( vault_pass_file, 0o600 )
 
 	return vault_pass_file
 
-
-
-
-
-
-
+def meza_chown ( path, username, groupname ):
+	import pwd
+	import grp
+	uid = pwd.getpwnam( username ).pw_uid
+	gid = grp.getgrnam( groupname ).gr_gid
+	os.chown( path, uid, gid )
 
 def display_docs(name):
 	f = open('/opt/meza/manual/meza-cmd/{}.txt'.format(name),'r')
