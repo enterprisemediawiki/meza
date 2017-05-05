@@ -19,6 +19,12 @@ meza setup env monolith --fqdn="${fqdn}" --db_pass=1234 --enable_email=false --p
 echo "print hosts file"
 cat /opt/conf-meza/secret/monolith/hosts
 
+ls -la /opt/conf-meza/secret
+ls -la /opt/conf-meza/secret/monolith
+ls -la /opt/conf-meza/secret/monolith/group_vars
+
+ls -la /home/meza-ansible
+
 # Now that environment monolith is setup, deploy/install it
 meza deploy monolith
 
