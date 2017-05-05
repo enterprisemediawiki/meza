@@ -197,6 +197,8 @@ class MezaUnifyUserTables extends Maintenance {
 
 		global $m_htdocs, $m_deploy, $m_meza;
 
+		// FIXME:
+		die( "user unify needs to be rethought for new meza" );
 		if ( is_file( "$m_deploy/public/primewiki" ) ) {
 			die( "A prime wiki is already set in $m_deploy/public/primewiki. You cannot run this script." );
 		}

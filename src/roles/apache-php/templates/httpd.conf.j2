@@ -188,32 +188,19 @@ ErrorLog "logs/error_log"
 LogLevel warn
 
 <IfModule log_config_module>
-	#
-	# The following directives define some format nicknames for use with
-	# a CustomLog directive (see below).
-	#
+
 	LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
-	LogFormat "%h %l %u %t \"%r\" %>s %b" common
+	LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" proxy
+	SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded
+	CustomLog "logs/access_log" combined env=!forwarded
+	CustomLog "logs/access_log" proxy env=forwarded
 
-	<IfModule logio_module>
-	  # You need to enable mod_logio.c to use %I and %O
-	  LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio
-	</IfModule>
+	# FIXME: Either use this or delete. Issue #631
+	#<IfModule logio_module>
+	#  # You need to enable mod_logio.c to use %I and %O
+	#  LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio
+	#</IfModule>
 
-	#
-	# The location and format of the access logfile (Common Logfile Format).
-	# If you do not define any access logfiles within a <VirtualHost>
-	# container, they will be logged here.  Contrariwise, if you *do*
-	# define per-<VirtualHost> access logfiles, transactions will be
-	# logged therein and *not* in this file.
-	#
-	CustomLog "logs/access_log" common
-
-	#
-	# If you prefer a logfile with access, agent, and referer information
-	# (Combined Logfile Format) you can use the following directive.
-	#
-	#CustomLog "logs/access_log" combined
 </IfModule>
 
 <IfModule alias_module>
