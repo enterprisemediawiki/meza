@@ -86,7 +86,7 @@ ${docker_exec_2[@]} bash -c "echo 'fake data' > /opt/alt/backups/top/uploads/fak
 #
 # Re-deploy without --overwrite
 #
-${docker_exec_1[@]} meza deploy "$env_name" --tags "mediawiki" --skip-tags "latest"
+${docker_exec_1[@]} meza deploy "$env_name" --tags "mediawiki" --skip-tags "latest" -vvv
 
 
 #
