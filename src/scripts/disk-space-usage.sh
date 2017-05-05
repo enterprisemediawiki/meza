@@ -27,7 +27,7 @@ else
 fi
 
 # Slack username
-if [ -z "$slack_username_disk_usage" ]; then
+if [ ! -z "$slack_username_disk_usage" ]; then
 	slack_username="$slack_username_disk_usage"
 else
 	slack_username="Meza disk space monitor"

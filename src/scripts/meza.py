@@ -247,6 +247,15 @@ def meza_command_setup_env (argv, return_not_exit=False):
 
 	os.remove(extra_vars_file)
 
+	# Now that the env is setup, generate a vault password file and use it to
+	# encrypt all.yml
+	vault_pass_file = get_vault_pass_file( env )
+	all_yml = "/opt/conf-meza/secret/{}/group_vars/all.yml".format(env)
+	cmd = "ansible-vault encrypt {} --vault-password-file {}".format(all_yml, vault_pass_file)
+	os.system(cmd)
+
+
+
 	print
 	print "Please review your config files. Run commands:"
 	print "  sudo vi /opt/conf-meza/secret/{}/hosts".format(env)
@@ -456,7 +465,17 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 		'/opt/meza/src/playbooks/{}.yml'.format(playbook)]
 	if env:
 		host_file = "/opt/conf-meza/secret/{}/hosts".format(env)
-		command = command + [ '-i', host_file ]
+
+		# Meza _needs_ to be able to load this file. Be perhaps a little
+		# overzealous and chown/chmod it everytime
+		secret_file = '/opt/conf-meza/secret/{}/group_vars/all.yml'.format(env)
+		meza_chown( secret_file, 'meza-ansible', 'wheel' )
+		os.chmod( secret_file, 0o660 )
+
+		# Setup password file if not exists (environment info is encrypted)
+		vault_pass_file = get_vault_pass_file( env )
+
+		command = command + [ '-i', host_file, '--vault-password-file', vault_pass_file ]
 		extra_vars = { 'env': env }
 
 	else:
@@ -500,6 +519,28 @@ def meza_shell_exec ( shell_cmd ):
 
 	return rc
 
+def get_vault_pass_file ( env ):
+	import pwd
+	import grp
+	vault_pass_file = '/home/meza-ansible/.vault-pass-{}.txt'.format(env)
+	if not os.path.isfile( vault_pass_file ):
+		with open( vault_pass_file, 'w' ) as f:
+			f.write( random_string( num_chars=64 ) )
+			f.close()
+
+	# Run this everytime, since it should be fast and if meza-ansible can't
+	# read this then you're stuck!
+	meza_chown( vault_pass_file, 'meza-ansible', 'wheel' )
+	os.chmod( vault_pass_file, 0o600 )
+
+	return vault_pass_file
+
+def meza_chown ( path, username, groupname ):
+	import pwd
+	import grp
+	uid = pwd.getpwnam( username ).pw_uid
+	gid = grp.getgrnam( groupname ).gr_gid
+	os.chown( path, uid, gid )
 
 def display_docs(name):
 	f = open('/opt/meza/manual/meza-cmd/{}.txt'.format(name),'r')
