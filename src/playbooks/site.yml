@@ -52,7 +52,7 @@
   - name: Ensure all.yml encrypted
     shell: >
       ansible-vault encrypt
-      /opt/conf-meza/secret/group_vars/all.yml
+      /opt/conf-meza/secret/{{ env }}/group_vars/all.yml
       --vault-password-file /home/meza-ansible/.vault-pass-{{ env }}.txt
     ignore_errors: True
 

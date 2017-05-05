@@ -514,12 +514,28 @@ def meza_shell_exec ( shell_cmd ):
 	return rc
 
 def get_vault_pass_file ( env ):
+	import pwd
+	import grp
 	vault_pass_file = '/home/meza-ansible/.vault-pass-{}.txt'.format(env)
 	if not os.path.isfile( vault_pass_file ):
 		with open( vault_pass_file, 'w' ) as f:
 			f.write( random_string( num_chars=64 ) )
 			f.close()
+
+	# Run this everytime, since it should be fast and if meza-ansible can't
+	# read this then you're stuck!
+	uid = pwd.getpwnam("meza-ansible").pw_uid
+	gid = grp.getgrnam("wheel").gr_gid
+	os.chown( vault_pass_file, uid, gid )
+
 	return vault_pass_file
+
+
+
+
+
+
+
 
 def display_docs(name):
 	f = open('/opt/meza/manual/meza-cmd/{}.txt'.format(name),'r')

@@ -37,7 +37,7 @@ else
 fi
 
 # Slack username
-if [ -z "$slack_username_server_performance" ]; then
+if [ ! -z "$slack_username_server_performance" ]; then
 	slack_username="$slack_username_server_performance"
 else
 	slack_username="Meza performance monitor"
