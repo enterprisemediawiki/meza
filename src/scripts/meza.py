@@ -456,8 +456,14 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 		'/opt/meza/src/playbooks/{}.yml'.format(playbook)]
 	if env:
 		host_file = "/opt/conf-meza/secret/{}/hosts".format(env)
-		command = command + [ '-i', host_file ]
+		command = command + [ '-i', host_file, '--vault-password-file', vault_pass_file ]
 		extra_vars = { 'env': env }
+
+		# Setup password file if not exists (environment info is encrypted)
+		vault_pass_file = '/home/meza-ansible/.vault-pass-' + env + '.txt'
+		if not os.path.isfile( vault_pass_file ):
+			f = open( vault_pass_file, 'w' )
+			f.write( random_string( num_chars=64 ) )
 
 	else:
 		extra_vars = {}

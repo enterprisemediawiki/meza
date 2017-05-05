@@ -49,6 +49,13 @@
     - name: known_hosts
       mode: "0600"
 
+  - name: Ensure all.yml encrypted
+    shell: >
+      ansible-vault encrypt
+      /opt/conf-meza/secret/group_vars/all.yml
+      --vault-password-file /home/meza-ansible/.vault-pass-{{ env }}.txt
+    ignore_errors: True
+
 
 # Ensure proper base setup on all servers in inventory, with the exception of
 # servers in "exclude-all" group. At present, the intent of this group is to

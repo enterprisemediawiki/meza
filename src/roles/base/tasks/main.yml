@@ -141,6 +141,12 @@
   notify:
     - restart ntpd
 
+# Speed up encrypt/decrypt operations
+# ref: http://docs.ansible.com/ansible/playbooks_vault.html#speeding-up-vault-operations
+- name: Ensure PIP cryptography package installed
+  pip:
+    name: cryptography
+
 - name: Ensure deploy directory in place
   file:
     path: "{{ m_deploy }}"

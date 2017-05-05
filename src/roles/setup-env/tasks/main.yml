@@ -30,8 +30,20 @@
     src: hosts.j2
     dest: "{{ m_local_secret }}/{{ env }}/hosts"
 
+    # We don't want to overwrite an existing hosts file with the default
+    force: no
+
 - name: Ensure all.yml configured
   template:
     src: all.yml.j2
     dest: "{{ m_local_secret }}/{{ env }}/group_vars/all.yml"
 
+    # don't overwrite existing
+    force: no
+
+- name: Ensure all.yml encrypted
+  shell: >
+    ansible-vault encrypt
+    {{ m_local_secret }}/{{ env }}/group_vars/all.yml
+    --vault-password-file /home/meza-ansible/.vault-pass-{{ env }}.txt
+  ignore_errors: True
