@@ -189,17 +189,36 @@ LogLevel warn
 
 <IfModule log_config_module>
 
-	LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
-	LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" proxy
+	# Logging format:
+	#   ref: http://httpd.apache.org/docs/current/mod/mod_log_config.html
+	#
+	#   %h -  IP address of requester. For normal requests this will be the IP
+	#         address of the HAProxy load balancer, which is mostly useless.
+	#   %{X-Forwarded-For}i - IP address of client as seen by HAProxy. This is
+	#         forwarded on by HAProxy.
+	#   %l -  Remote logname (from identd, if supplied). This will return a
+	#         dash unless mod_ident is present and IdentityCheck is set On.
+	#   %u -  Remote user if the request was authenticated. May be bogus if
+	#         return status (%s) is 401 (unauthorized).
+	#   %t -  Time the request was received
+	#   %D -  The time taken to serve the request, in microseconds.
+	#   %r -  First line of request.
+	#   %>s - The final status. Just %s would be the initial status
+	#   %{Referer}i - Referer
+	#   %{User-Agent}i - User agent (browser) of client
+	#   %I -  Bytes received, including request and headers, cannot be zero.
+	#   %O -  Bytes sent, including headers, cannot be zero.
+
+	# Logging for normal requests from clients
+	LogFormat "%{X-Forwarded-For}i %h %l %u %t %D \"%r\" %>s \"%{Referer}i\" \"%{User-Agent}i\" %I %O" proxy
+
+	# This is for non-proxied requests, meaning requests made from within the
+	# server itself or by other non-HAProxy nodes (if that's possible)
+	LogFormat             "noproxy %h %l %u %t %D \"%r\" %>s \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combined
+
 	SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded
 	CustomLog "logs/access_log" combined env=!forwarded
 	CustomLog "logs/access_log" proxy env=forwarded
-
-	# FIXME: Either use this or delete. Issue #631
-	#<IfModule logio_module>
-	#  # You need to enable mod_logio.c to use %I and %O
-	#  LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio
-	#</IfModule>
 
 </IfModule>
 
