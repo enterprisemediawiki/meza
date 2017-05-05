@@ -63,22 +63,67 @@
     - "{{ m_local_secret }}/{{ env }}/ssl/meza.key"
     - "{{ m_local_secret }}/{{ env }}/ssl/meza.crt"
 
-- name: Ensure cert and key on load balancers
+- name: Read SSL key into variable
+  shell: >
+    ansible-vault view
+    /opt/conf-meza/secret/{{ env }}/ssl/meza.key
+    --vault-password-file /home/meza-ansible/.vault-pass-{{ env }}.txt
+  register: decrypted_key
+  delegate_to: localhost
+  run_once: True
+
+- debug: { var: decrypted_key }
+
+- name: Read SSL cert into variable
+  shell: >
+    ansible-vault view
+    /opt/conf-meza/secret/{{ env }}/ssl/meza.crt
+    --vault-password-file /home/meza-ansible/.vault-pass-{{ env }}.txt
+  register: decrypted_cert
+  delegate_to: localhost
+  run_once: True
+
+- debug: { var: decrypted_cert }
+
+# - name: Ensure cert and key on load balancers
+#   copy:
+#     src: "{{ m_local_secret }}/{{ env }}/ssl/{{ item }}"
+#     dest: "/etc/haproxy/certs/{{ item }}"
+#   with_items:
+#     - meza.key
+#     - meza.crt
+#   notify:
+#     - restart haproxy
+
+- name: Ensure SSL cert on load balancers
   copy:
-    src: "{{ m_local_secret }}/{{ env }}/ssl/{{ item }}"
-    dest: "/etc/haproxy/certs/{{ item }}"
-  with_items:
-    - meza.key
-    - meza.crt
+    content: "{{ decrypted_cert.stdout }}"
+    dest: "/etc/haproxy/certs/meza.crt"
+  notify:
+    - restart haproxy
+
+- name: Ensure SSL key on load balancers
+  copy:
+    content: "{{ decrypted_key.stdout }}"
+    dest: "/etc/haproxy/certs/meza.key"
   notify:
     - restart haproxy
 
 - name: Ensure cert and key assembled into into pem file
-  assemble:
-    src: "/opt/conf-meza/secret/{{ env }}/ssl"
+  copy:
+    content: |
+      {{ decrypted_cert.stdout }}
+      {{ decrypted_key.stdout }}
     dest: /etc/haproxy/certs/meza.pem
   notify:
     - restart haproxy
+
+# - name: Ensure cert and key assembled into into pem file
+#   assemble:
+#     src: "/opt/conf-meza/secret/{{ env }}/ssl"
+#     dest: /etc/haproxy/certs/meza.pem
+#   notify:
+#     - restart haproxy
 
 - name: Ensure haproxy certs have secure permissions
   file:
