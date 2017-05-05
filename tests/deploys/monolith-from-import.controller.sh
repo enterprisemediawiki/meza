@@ -15,8 +15,8 @@ env_name="imported"
 
 # Get test "secret" config, make meza-ansible own it
 git clone https://github.com/enterprisemediawiki/meza-test-config-secret.git "/opt/conf-meza/secret/$env_name"
-chown meza-ansible:wheel /opt/conf-meza/secret
-chmod 640 /opt/conf-meza/secret
+# chown meza-ansible:wheel /opt/conf-meza/secret
+# chmod 640 /opt/conf-meza/secret
 
 # Write the docker containers IP as the FQDN for the test config (the only
 # config setting we can't know ahead of time)
