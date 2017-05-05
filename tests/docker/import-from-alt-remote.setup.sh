@@ -47,9 +47,11 @@ ${docker_exec_1[@]} sed -r -i "s/INSERT_FQDN/$docker_ip_1/g;" \
 ${docker_exec_1[@]} bash -c "echo -e '[backup-src]\n$docker_ip_2 alt_remote_user=test-user\n' >> /opt/conf-meza/secret/$env_name/hosts"
 ${docker_exec_1[@]} bash -c "echo -e '[exclude-all]\n$docker_ip_2\n' >> /opt/conf-meza/secret/$env_name/hosts"
 
-
+# all.yml is encrypted. decrypt first, make edits, re-encrypt.
+${docker_exec_1[@]} bash -c "ansible-vault decrypt /opt/conf-meza/secret/$env_name/group_vars/all.yml --vault-password-file /home/meza-ansible/.vault-pass-$env_name.txt"
 ${docker_exec_1[@]} bash -c "echo -e 'backups_src_uploads_path: /opt/alt/backups/<id>/uploads\n' >> /opt/conf-meza/secret/$env_name/group_vars/all.yml"
 ${docker_exec_1[@]} bash -c "echo -e 'backups_src_sql_path: /opt/alt/backups/<id>\n' >> /opt/conf-meza/secret/$env_name/group_vars/all.yml"
+${docker_exec_1[@]} bash -c "ansible-vault encrypt /opt/conf-meza/secret/$env_name/group_vars/all.yml --vault-password-file /home/meza-ansible/.vault-pass-$env_name.txt"
 
 
 ${docker_exec_1[@]} cat "/opt/conf-meza/secret/$env_name/hosts"
@@ -69,10 +71,11 @@ ${docker_exec_1[@]} sudo -u meza-ansible ansible-playbook \
 # `meza backup`
 ${docker_exec_1[@]} bash /opt/meza/tests/deploys/import-from-remote.controller.sh "$env_name"
 
-
+# all.yml is encrypted. decrypt first, make edits, re-encrypt.
+${docker_exec_1[@]} bash -c "ansible-vault decrypt /opt/conf-meza/secret/$env_name/group_vars/all.yml --vault-password-file /home/meza-ansible/.vault-pass-$env_name.txt"
 ${docker_exec_1[@]} bash -c "echo -e 'db_src_mysql_user: root\n' >> /opt/conf-meza/secret/$env_name/group_vars/all.yml"
 ${docker_exec_1[@]} bash -c "echo -e 'db_src_mysql_pass: 1234\n' >> /opt/conf-meza/secret/$env_name/group_vars/all.yml"
-
+${docker_exec_1[@]} bash -c "ansible-vault encrypt /opt/conf-meza/secret/$env_name/group_vars/all.yml --vault-password-file /home/meza-ansible/.vault-pass-$env_name.txt"
 
 # Add database source (e.g. pull direct from database) to inventory, make some
 # modifications to database and uploaded files, then deploy with overwrite
