@@ -41,7 +41,6 @@ ${docker_exec_1[@]} sed -r -i "s/localhost/$docker_ip_1/g;" \
 ${docker_exec_1[@]} sed -r -i "s/INSERT_FQDN/$docker_ip_1/g;" \
 	"/opt/conf-meza/secret/$env_name/group_vars/all.yml"
 
-
 # CONTAINER 1
 # Add to inventory file the "db-src" and "backups-src" groups (which will both
 # be CONTAINER 2)

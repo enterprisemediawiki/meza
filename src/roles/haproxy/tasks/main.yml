@@ -72,8 +72,6 @@
   delegate_to: localhost
   run_once: True
 
-- debug: { var: decrypted_key }
-
 - name: Read SSL cert into variable
   shell: >
     ansible-vault view
@@ -82,8 +80,6 @@
   register: decrypted_cert
   delegate_to: localhost
   run_once: True
-
-- debug: { var: decrypted_cert }
 
 # - name: Ensure cert and key on load balancers
 #   copy:
