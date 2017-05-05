@@ -50,11 +50,9 @@ ${docker_exec_1[@]} sed -r -i "s/INSERT_FQDN/$docker_ip_1/g;" "$all_yml"
 ${docker_exec_1[@]} bash -c "echo -e '[backup-src]\n$docker_ip_2 alt_remote_user=test-user\n' >> $hosts_file"
 ${docker_exec_1[@]} bash -c "echo -e '[exclude-all]\n$docker_ip_2\n' >> $hosts_file"
 
-# all.yml is encrypted. decrypt first, make edits, re-encrypt.
-${docker_exec_1[@]} bash -c "ansible-vault decrypt $all_yml --vault-password-file $vault_pass"
+# Note: all.yml is __not__ encrypted yet at this point in the test
 ${docker_exec_1[@]} bash -c "echo -e 'backups_src_uploads_path: /opt/alt/backups/<id>/uploads\n' >> $all_yml"
 ${docker_exec_1[@]} bash -c "echo -e 'backups_src_sql_path: /opt/alt/backups/<id>\n' >> $all_yml"
-${docker_exec_1[@]} bash -c "ansible-vault encrypt $all_yml --vault-password-file $vault_pass"
 
 
 ${docker_exec_1[@]} cat "$hosts_file"
