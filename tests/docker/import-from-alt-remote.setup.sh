@@ -40,9 +40,6 @@ ${docker_exec_1[@]} sed -r -i "s/localhost/$docker_ip_1/g;" \
 	"/opt/conf-meza/secret/$env_name/hosts"
 ${docker_exec_1[@]} sed -r -i "s/INSERT_FQDN/$docker_ip_1/g;" \
 	"/opt/conf-meza/secret/$env_name/group_vars/all.yml"
-# Encrypted files won't play nice unless meza-ansible owns them
-${docker_exec_1[@]} chown meza-ansible:wheel /opt/conf-meza/secret
-${docker_exec_1[@]} chmod 640 /opt/conf-meza/secret
 
 
 # CONTAINER 1
