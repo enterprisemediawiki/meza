@@ -61,14 +61,17 @@ $config = array(
 
 	'default-wsfed-idp' => 'urn:federation:pingfederate:localhost',
 	'shib13.signresponse' => true,
-	'session.duration' => 8 * (60 * 60), // 8 hours.
+
+	# This should be _less_ than memcache_store.expires. See below.
+	'session.duration' => {{ session_duration_hours }} * (60 * 60),
+
 	'session.datastore.timeout' => (4 * 60 * 60), // 4 hours
 	'session.state.timeout' => (60 * 60), // 1 hour
 	'session.cookie.name' => 'SimpleSAMLSessionID',
 	'session.cookie.lifetime' => 0,
 	'session.cookie.path' => '/',
 	'session.cookie.domain' => null,
-	'session.cookie.secure' => false,
+	'session.cookie.secure' => true,
 	'session.phpsession.cookiename' => null,
 	'session.phpsession.savepath' => null,
 	'session.phpsession.httponly' => true,
@@ -90,8 +93,11 @@ $config = array(
 		),
 	),
 	'memcache_store.prefix' => 'simpleSAMLphp',
-	'memcache_store.expires' => 36 * (60 * 60), // 36 hours.
 
+	# This value should always be larger than the 'session.duration'
+	# option. Not doing this may result in the session being deleted from
+	# the memcache servers while it is still in use.
+	'memcache_store.expires' => {{ memcache_session_store_hours }} * (60 * 60),
 
 
 	'language.available' => array(
