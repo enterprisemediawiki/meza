@@ -477,7 +477,11 @@ $wgExternalLinkTarget = '_blank';
 
 // added this line to allow linking. specifically to Imagery Online.
 $wgAllowExternalImages = true;
+{% if allow_image_tags is defined and allow_image_tags %}
 $wgAllowImageTag = true;
+{% else %}
+$wgAllowImageTag = false;
+{% endif %}
 
 $wgVectorUseSimpleSearch = true;
 
