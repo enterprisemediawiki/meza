@@ -1,0 +1,10 @@
+---
+
+# Restart Parsoid periodically on parsoid-servers
+parsoid_periodic_restart: True
+
+parsoid_restart_minute: 0
+parsoid_restart_hour: 2
+parsoid_restart_day: "*"
+parsoid_restart_month: "*"
+parsoid_restart_day_of_week: "*"
