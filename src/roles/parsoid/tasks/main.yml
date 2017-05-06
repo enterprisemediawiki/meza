@@ -3,16 +3,20 @@
 
 # Get Parsoid
 #
-# Notes:
-#   "Force: no" will make it so changes to working directory will not be
-#   overwritten. Long-term we may want this, but right now we have to modify
-#   Parsoid for it to display external images.
+# Due to #149 (VE doesn't allow image tags) we set force:yes so this repo's
+# working directory is wiped out on each run. Then We can immediately patch
+# the repo in the following step (optionally, if we want <img> tags)
 - name: Get Parsoid repository
   git:
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/services/parsoid
     dest: "{{ m_parsoid_path }}"
     version: "{{ m_parsoid_version }}"
-    force: no
+    force: yes
+
+# FIXME: Get MW-core and Parsoid patched so this isn't required anymore
+- name: Patch Parsoid so it allows image tags
+  shell: "sed -i -e 's/JSUtils.deepFreeze(WikitextConstants);/WikitextConstants.Sanitizer.TagWhiteList.add( \"IMG\" );\\nJSUtils.deepFreeze(WikitextConstants);/' /etc/parsoid/lib/config/WikitextConstants.js"
+  when: allow_image_tags is defined and allow_image_tags
 
 - name: Ensure parsoid group exists
   group:
