@@ -64,10 +64,7 @@ class RunAllJobs extends Maintenance {
 	public function execute () {
 
 		$totalmaxtime = (int) $this->getOption( 'totalmaxtime', 0 );
-		if ( $totalmaxtime > 0 ) {
-			// override default script timeout
-			set_time_limit( $totalmaxtime );
-		}
+		$startTime = time();
 
 		$maxtime = (int) $this->getOption( 'maxtime', 0 );
 		$maxtime = $maxtime > 0 ? " --maxtime=$maxtime " : '';
@@ -95,6 +92,7 @@ class RunAllJobs extends Maintenance {
 		// put keys in random order so wikis starting with A don't always get their
 		// jobs prioritized over wikis starting with Z.
 		shuffle( $wikiIds );
+		echo "\nRunning jobs in order: " . implode( ',', $wikiIds ) . "\n";
 
 		foreach ($wikiIds as $wikiId) {
 
@@ -113,6 +111,10 @@ class RunAllJobs extends Maintenance {
 
 			}
 
+			if ( $totalmaxtime > 0 && ( time() - $startTime ) > $totalmaxtime ) {
+				echo "Script exceeded total max time of $totalmaxtime\n";
+				break;
+			}
 		}
 
 	}

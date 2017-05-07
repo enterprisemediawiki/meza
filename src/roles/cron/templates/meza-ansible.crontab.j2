@@ -27,12 +27,14 @@
 #
 # Run a small set of jobs across all wikis periodically
 #
-{{ run_jobs_freq_crontime }} php {{ m_deploy }}/runAllJobs.php --maxload={{ run_jobs_freq_maxload }} --maxjobs={{ run_jobs_freq_maxjobs }} --totalmaxtime={{ run_jobs_freq_totalmaxtime }} --maxtime={{ run_jobs_freq_maxtime }} >> {{ m_logs }}/jobs_`date "+\%Y\%m\%d"`_cron.log 2>&1
+{{ run_jobs_freq_crontime }} WIKI={{ list_of_wikis[0] }} php {{ m_deploy }}/runAllJobs.php --maxload={{ run_jobs_freq_maxload }} --maxjobs={{ run_jobs_freq_maxjobs }} --totalmaxtime={{ run_jobs_freq_totalmaxtime }} --maxtime={{ run_jobs_freq_maxtime }} >> {{ m_logs }}/jobs_`date "+\%Y\%m\%d"`_cron.log 2>&1
 
 #
 # Run all jobs on all wikis
+# Note: WIKI=<wiki_id> does not matter which wiki. Just needs one to load
+# settings.
 #
-{{ run_all_jobs_crontime }} php {{ m_deploy }}/runAllJobs.php >> {{ m_logs }}/jobs_`date "+\%Y\%m\%d"`_cron.log 2>&1
+{{ run_all_jobs_crontime }} WIKI={{ list_of_wikis[0] }} php {{ m_deploy }}/runAllJobs.php >> {{ m_logs }}/jobs_`date "+\%Y\%m\%d"`_cron.log 2>&1
 
 {% endif %}
 

@@ -19,14 +19,16 @@ parsoid_restart_crontime: "0 2 * * *"
 # How often to run small frequent job runs
 run_jobs_freq_crontime: "*/3 * * * *"
 
-# Max CPU and IO load, above which the script won't run
-run_jobs_freq_maxload: ""
+# Max CPU and IO load, above which the script won't run; default 50%
+run_jobs_freq_maxload: "50"
 
 # Max number of jobs to run PER WIKI
-run_jobs_freq_maxjobs: ""
+run_jobs_freq_maxjobs: "30"
 
 # Max execution time for the script
-run_jobs_freq_totalmaxtime: ""
+run_jobs_freq_totalmaxtime: "150"
 
 # Max execution time PER WIKI
-run_jobs_freq_maxtime: ""
+run_jobs_freq_maxtime: "30"
+
+
