@@ -5,7 +5,6 @@
 {% if 'logging-servers' in groups and inventory_hostname in groups['logging-servers'] and server_performance_crontime %}
 #
 # Cron job for logging server performance info
-# FIXME: Currently this does it every 2 minutes. Make this value configurable.
 #
 {{ server_performance_crontime }} {{ m_scripts }}/server-performance.sh
 {% endif %}
@@ -24,7 +23,7 @@
 {{ parsoid_restart_crontime }} systemctl restart parsoid > /opt/data-meza/logs/parsoid-restart.log 2>&1
 {% endif %}
 
-{% inventory_hostname in groups['app-servers'] %}
+{% if inventory_hostname in groups['app-servers'] %}
 #
 # Run a small set of jobs across all wikis periodically
 #
