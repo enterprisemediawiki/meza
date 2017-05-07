@@ -1,0 +1,52 @@
+<?php
+#
+# Wrapper for mediawiki/maintenance/runJobs.php
+# Allows cron to run jobs for all wikis periodically
+#
+
+// script start time
+$startTime = time();
+
+// Argument positions when calling script
+$maxtime_pos = 1;
+$totalmaxtime_pos = 2;
+$maxjobs_pos = 3;
+$maxload_pos = 4;
+$wikis_pos = 5;
+
+$allWikis = array(
+	{% for wiki in list_of_wikis %}
+	'{{ wiki }}',
+	{% endfor %}
+);
+
+$maxtime      = isset( $argv[$maxtime_pos] )      ? ' --maxtime=' . $argv[$maxtime_pos] . ' ' : '';
+$totalmaxtime = isset( $argv[$totalmaxtime_pos] ) ? (int) $argv[$totalmaxtime_pos]            : 0;
+$maxjobs      = isset( $argv[$maxjobs_pos] )      ? ' --maxjobs=' . $argv[$maxjobs_pos] . ' ' : '';
+$maxload      = isset( $argv[$maxload_pos] )      ? (int) $argv[$maxload_pos]                 : 1000;
+$wikis        = isset( $argv[$wikis_pos] )        ? explode( ',', $argv[$wikis_pos] )         : $allWikis;
+
+foreach ($wikis as $wiki_id) {
+
+	if ( ! in_array( $wiki_id, $allWikis ) ) {
+		echo "Wiki ID $wiki_id is not a valid wiki";
+		continue;
+	}
+
+	// see if max load in the last minute is higher than desired to run script
+	if ( sys_getloadavg()[0] < $maxload ) {
+
+		echo "Running jobs for $wiki_id\n";
+		$command = "WIKI=$wiki_id php {{ m_mediawiki }}/maintenance/runJobs.php $maxtime $maxjobs";
+		$output = shell_exec( $command );
+		echo $output . "\n";
+
+	}
+
+	if ( $totalmaxtime > 0 && ( time() - $startTime ) > $totalmaxtime ) {
+		echo "Script exceeded total max time of $totalmaxtime\n";
+		break;
+	}
+
+}
+

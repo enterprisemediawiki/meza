@@ -19,6 +19,14 @@
     group: wheel
     mode: 0755
 
+- name: Ensure runAllJobs.php in place
+  template:
+    src: runAllJobs.php.j2
+    dest: /opt/.deploy-meza/runAllJobs.php
+    owner: meza-ansible
+    group: wheel
+    mode: 0755
+
 # Make sure sudo can be used in cron jobs
 - lineinfile:
     dest: /etc/sudoers
