@@ -2,53 +2,50 @@
 #
 # crontab for meza
 
-{% if 'logging-servers' in groups and inventory_hostname in groups['logging-servers'] %}
+{% if 'logging-servers' in groups and inventory_hostname in groups['logging-servers'] and server_performance_crontime %}
+#
 # Cron job for logging server performance info
 # FIXME: Currently this does it every 2 minutes. Make this value configurable.
-*/10 * * * * {{ m_scripts }}/server-performance.sh
+#
+{{ server_performance_crontime }} {{ m_scripts }}/server-performance.sh
 {% endif %}
 
 {% if disk_space_usage_mount_name is defined and 'logging-servers' in groups and inventory_hostname in groups['logging-servers'] %}
+#
 # Check disk space usage
-0 1 * * * {{ m_scripts }}/disk-space-usage.sh
+#
+{{ disk_space_usage_crontime }} {{ m_scripts }}/disk-space-usage.sh
 {% endif %}
 
-{% if parsoid_periodic_restart and inventory_hostname in groups['parsoid-servers'] %}
+{% if parsoid_restart_crontime and inventory_hostname in groups['parsoid-servers'] %}
+#
 # Restart Parsoid periodically on parsoid-servers
-{{ parsoid_restart_minute }} {{ parsoid_restart_hour}} {{ parsoid_restart_day }} {{ parsoid_restart_month }} {{ parsoid_restart_day_of_week }} systemctl restart parsoid > /opt/data-meza/logs/parsoid-restart.log 2>&1
+#
+{{ parsoid_restart_crontime }} systemctl restart parsoid > /opt/data-meza/logs/parsoid-restart.log 2>&1
+{% endif %}
+
+{% inventory_hostname in groups['app-servers'] %}
+#
+# Run a small set of jobs across all wikis periodically
+#
+{{ run_jobs_freq_crontime }} php {{ m_deploy }}/runAllJobs.php --maxload={{ run_jobs_freq_maxload }} --maxjobs={{ run_jobs_freq_maxjobs }} --totalmaxtime={{ run_jobs_freq_totalmaxtime }} --maxtime={{ run_jobs_freq_maxtime }} >> {{ m_logs }}/jobs_`date "+\%Y\%m\%d"`_cron.log 2>&1
+
+#
+# Run all jobs on all wikis
+#
+{{ run_all_jobs_crontime }} php {{ m_deploy }}/runAllJobs.php >> {{ m_logs }}/jobs_`date "+\%Y\%m\%d"`_cron.log 2>&1
+
 {% endif %}
 
 
-
-
-{% if custom_crons is defined %}
+{% if custom_crons is defined  %}
 #
 # The following jobs are custom definitions from this meza-instance's config
 #
-
-{% for cron in custom_crons %}
-
-{% if inventory_hostname in groups[cron.server_type] %}
+{% for cron in custom_crons %}{% if inventory_hostname in groups[cron.server_type] %}
 {{ cron.time }} {{ cron.job }}
-{% endif %}
 
-{% endfor %}
+{% endif %}{% endfor %}
 
 # END custom crons
 {% endif %}
-
-
-#
-# COMMENTS BELOW NEED TO BE INCORPORATED AS REGULARLY RUN COMMANDS. THEY ARE
-# TAKEN FROM A PRODUCTION SERVER THAT DOESN'T HAVE CRONTAB MANAGED BY MEZA (BUT
-# SHOULD)
-#
-
-# FIXME: Run all jobs nightly on just one application server (or does doing it\
-# on all make sense?) and run it regularly (every minute? every few minutes?)
-# for just a small number of jobs on each wiki (again, on how many app servers?).
-# if inventory_hostname in groups['app-servers']
-# */3 * * * * php /opt/meza/scripts/runAllJobs.php >> /opt/meza/logs/runAllJobs_`date "+\%Y\%m\%d"`_cron.log 2>&1
-# 0 22 * * * /opt/meza/scripts/runAllJobs.sh > /opt/meza/logs/runAllJobs_`date "+\%Y\%m\%d\%H\%M\%S"`_cron.log 2>&1
-# endif
-

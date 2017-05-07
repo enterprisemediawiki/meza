@@ -24,7 +24,7 @@
  * @author Daren Welsh
  * @ingroup Maintenance
  */
-require_once( '/opt/htdocs/mediawiki/maintenance/Maintenance.php' );
+require_once( '{{ m_mediawiki }}/maintenance/Maintenance.php' );
 
 class RunAllJobs extends Maintenance {
 
@@ -63,8 +63,6 @@ class RunAllJobs extends Maintenance {
 
 	public function execute () {
 
-		global $m_htdocs;
-
 		$totalmaxtime = (int) $this->getOption( 'totalmaxtime', 0 );
 		if ( $totalmaxtime > 0 ) {
 			// override default script timeout
@@ -79,9 +77,15 @@ class RunAllJobs extends Maintenance {
 
 		$maxload = (float) $this->getOption( 'maxload', 100 ); // default big number, load always lower
 
+		$allWikis = array(
+			{% for wiki in list_of_wikis %}
+			'{{ wiki }}',
+			{% endfor %}
+		);
+
 		$wikiIds = $this->getOption( 'wikis', false );
 		if ( ! $wikiIds ) {
-			$wikiIds = scandir( "$m_htdocs/wikis" );
+			$wikiIds = $allWikis;
 		}
 		else {
 			// split comma-separate list of wiki IDs, trim whitespace from each
@@ -94,9 +98,8 @@ class RunAllJobs extends Maintenance {
 
 		foreach ($wikiIds as $wikiId) {
 
-			// remove . and .. directories, and anything that's not a directory
-			// in the /opt/htdocs/wikis directory
-			if ( $wikiId === '.' || $wikiId === '..' || ! is_dir( "$m_htdocs/wikis/$wikiId" ) ) {
+			if ( ! in_array( $wikiId, $allWikis) ) {
+				echo "Wiki ID $wikiId is not a valid wiki";
 				continue;
 			}
 
@@ -104,7 +107,7 @@ class RunAllJobs extends Maintenance {
 			if ( sys_getloadavg()[0] < $maxload ) {
 
 				echo "Running jobs for $wikiId\n";
-				$command = "WIKI=$wikiId php $m_htdocs/mediawiki/maintenance/runJobs.php $maxtime $maxjobs";
+				$command = "WIKI=$wikiId php {{ m_mediawiki }}/maintenance/runJobs.php $maxtime $maxjobs";
 				$output = shell_exec( $command );
 				echo $output . "\n";
 
