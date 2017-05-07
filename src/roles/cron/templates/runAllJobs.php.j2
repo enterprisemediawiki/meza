@@ -23,7 +23,7 @@ $allWikis = array(
 $maxtime      = isset( $argv[$maxtime_pos] )      ? ' --maxtime=' . $argv[$maxtime_pos] . ' ' : '';
 $totalmaxtime = isset( $argv[$totalmaxtime_pos] ) ? (int) $argv[$totalmaxtime_pos]            : 0;
 $maxjobs      = isset( $argv[$maxjobs_pos] )      ? ' --maxjobs=' . $argv[$maxjobs_pos] . ' ' : '';
-$maxload      = isset( $argv[$maxload_pos] )      ? (int) $argv[$maxload_pos]                 : 0;
+$maxload      = isset( $argv[$maxload_pos] )      ? (int) $argv[$maxload_pos]                 : 1000;
 $wikis        = isset( $argv[$wikis_pos] )        ? explode( ',', $argv[$wikis_pos] )         : $allWikis;
 
 foreach ($wikis as $wiki_id) {
