@@ -11,7 +11,8 @@ if ( $_SERVER['HTTP_X_SKIP_SAML'] ) {
 
 	# But allow them to access the login page or else there will be no way to log in!
 	# (You also might want to add access to "Main Page", "Help:Contents", etc.)
-	$wgWhitelistRead = array ("Special:Userlogin");
+	// WILL API LOGIN WORK WITHOUT THIS?
+	// $wgWhitelistRead = array ("Special:Userlogin");
 
 	# Disable anonymous editing
 	$wgGroupPermissions['*']['edit'] = false;
@@ -19,6 +20,19 @@ if ( $_SERVER['HTTP_X_SKIP_SAML'] ) {
 	# Prevent new user registrations except by sysops
 	$wgGroupPermissions['*']['createaccount'] = false;
 
+	# Disable API modules that could allow someone to circumvent SAML auth
+	# ref: https://www.mediawiki.org/wiki/API:Restricting_API_usage
+	# ref: https://www.mediawiki.org/wiki/API:Changing_wiki_content
+	$wgAPIModules['createaccount'] = 'ApiDisabled';
+	$wgAPIModules['options'] = 'ApiDisabled';
+	$wgAPIModules['resetpassword'] = 'ApiDisabled';
+
+	// A bit heavy handed:
+	// $wgEnableWriteAPI = false;
+
+	// consider an extension that basically just allows this hook to check who
+	// a user is and check if they're in a list of allowed API users.
+	// $wgHooks['UserLoggedIn'][] = 'MyExtensionHooks::onUserLoggedIn';
 }
 
 #
