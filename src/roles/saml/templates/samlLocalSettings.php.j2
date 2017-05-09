@@ -1,6 +1,27 @@
 <?php
 
 #
+# If X-SKIP-SAML header is present, disallow anonymous viewing and editing and
+# skip SAML login. Allow standard MediaWiki login.
+#
+if ( $_SERVER['HTTP_X_SKIP_SAML'] ) {
+
+	# Disable reading by anonymous users
+	$wgGroupPermissions['*']['read'] = false;
+
+	# But allow them to access the login page or else there will be no way to log in!
+	# (You also might want to add access to "Main Page", "Help:Contents", etc.)
+	$wgWhitelistRead = array ("Special:Userlogin");
+
+	# Disable anonymous editing
+	$wgGroupPermissions['*']['edit'] = false;
+
+	# Prevent new user registrations except by sysops
+	$wgGroupPermissions['*']['createaccount'] = false;
+
+}
+
+#
 # Extension:SimpleSamlAuth
 #
 # Only do auth on requests from outside the server. Requests from inside are a
@@ -9,7 +30,7 @@
 #
 # Ref: https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
 # Ref: https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
-if ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 
 	// wfLoadExtension( 'SimpleSamlAuth' );
 	require_once "$IP/extensions/SimpleSamlAuth/SimpleSamlAuth.php";
