@@ -6,19 +6,11 @@
 #
 if ( $_SERVER['HTTP_X_SKIP_SAML'] ) {
 
-	# Disable reading by anonymous users
+	# Disable reading, editing and account creation by anonymous users
 	$wgGroupPermissions['*']['read'] = false;
-
-	# But allow them to access the login page or else there will be no way to log in!
-	# (You also might want to add access to "Main Page", "Help:Contents", etc.)
-	// WILL API LOGIN WORK WITHOUT THIS?
-	// $wgWhitelistRead = array ("Special:Userlogin");
-
-	# Disable anonymous editing
 	$wgGroupPermissions['*']['edit'] = false;
-
-	# Prevent new user registrations except by sysops
 	$wgGroupPermissions['*']['createaccount'] = false;
+	# Note: account creation disabled for everyone at bottom of this file
 
 	# Disable API modules that could allow someone to circumvent SAML auth
 	# ref: https://www.mediawiki.org/wiki/API:Restricting_API_usage
@@ -27,12 +19,78 @@ if ( $_SERVER['HTTP_X_SKIP_SAML'] ) {
 	$wgAPIModules['options'] = 'ApiDisabled';
 	$wgAPIModules['resetpassword'] = 'ApiDisabled';
 
-	// A bit heavy handed:
+	// A bit heavy-handed:
 	// $wgEnableWriteAPI = false;
 
-	// consider an extension that basically just allows this hook to check who
-	// a user is and check if they're in a list of allowed API users.
-	// $wgHooks['UserLoggedIn'][] = 'MyExtensionHooks::onUserLoggedIn';
+	// Add to config like:
+	//
+	// allow_skip_saml_users: "*"
+	//  -- or --
+	// allow_skip_saml_users:
+	//   - James: ["192.168.56.62","23.243.32.123"]
+	//   - Daren: "*"
+	//   - Lauren:
+	//     - "192.54.43.13"
+	//     - "3.3.2.1"
+	//   - Willa: "192.169.34.23"
+	//
+	// FIXME: The indenting below will be heinous when Ansible does its templating
+	{% if allow_skip_saml_users is defined and isinstance(allow_skip_saml_users, basestring) %}
+	$wgMezaAllowSkipSamlUsers = '{{ allow_skip_saml_users }}';
+	{% else %}
+		$wgMezaAllowSkipSamlUsers = array();
+		{% for user, ipaddrs in allow_skip_saml_users.iteritems() %}
+			{% if isinstance(ipaddrs, basestring) %}
+			$wgMezaAllowSkipSamlUsers['{{ user }}'] = '{{ ipaddrs }}';
+			{% else %}
+				$wgMezaAllowSkipSamlUsers['{{ user }}'] = array();
+				{% for ipaddr in ipaddrs %}
+				$wgMezaAllowSkipSamlUsers['{{ user }}']][] = '{{ ipaddr }}';
+				{% endfor %}
+			{% endif %}
+		{% endfor %}
+	{% endif %}
+
+	// Upon login if user is allowed to skip SAML (and therefore use the API
+	// externally)
+	$wgHooks['UserLoggedIn'][] = function ( $user ) {
+		global $wgMezaAllowSkipSamlUsers;
+
+		$username = $user->getName();
+		$ipaddr = $_SERVER['HTTP_X_FORWARDED_FOR'];
+
+		// allow option to greenlight all users
+		if ( $wgMezaAllowSkipSamlUsers === '*' ) {
+			return true;
+		}
+
+		elseif ( is_array( $wgMezaAllowSkipSamlUsers )
+			&& in_array( $username, array_keys( $wgMezaAllowSkipSamlUsers ) ) )
+		{
+
+			// user allowed from all IP addresses
+			if ( $wgMezaAllowSkipSamlUsers[$username] === '*' ) {
+				return true;
+			}
+
+			// user allowed from this IP address only -OR- this IP address is one of many allowed
+			elseif ( $wgMezaAllowSkipSamlUsers[$username] === $ipaddr
+				||  in_array( $ipaddr, $wgMezaAllowSkipSamlUsers[$username] ) )
+			{
+				return true;
+			}
+		}
+
+		// lightly copied from MediaWiki's img_auth.php
+		HttpStatus::header( 403 );
+		header( 'Cache-Control: no-cache' );
+		header( 'Content-Type: text/html; charset=utf-8' );
+		echo "You do not have rights to access this wiki in this way."
+		die();
+
+		// not really necessary due to die.
+		return false;
+	};
 }
 
 #
