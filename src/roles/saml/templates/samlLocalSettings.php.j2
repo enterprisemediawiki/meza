@@ -37,7 +37,7 @@ if ( $_SERVER['HTTP_X_SKIP_SAML'] ) {
 	// FIXME: The indenting below will be heinous when Ansible does its templating
 	{% if allow_skip_saml_users is defined and isinstance(allow_skip_saml_users, basestring) %}
 	$wgMezaAllowSkipSamlUsers = '{{ allow_skip_saml_users }}';
-	{% else %}
+	{% elif allow_skip_saml_users is defined %}
 		$wgMezaAllowSkipSamlUsers = array();
 		{% for user, ipaddrs in allow_skip_saml_users.iteritems() %}
 			{% if isinstance(ipaddrs, basestring) %}
@@ -49,6 +49,8 @@ if ( $_SERVER['HTTP_X_SKIP_SAML'] ) {
 				{% endfor %}
 			{% endif %}
 		{% endfor %}
+	{% else %}
+	$wgMezaAllowSkipSamlUsers = false;
 	{% endif %}
 
 	// Upon login if user is allowed to skip SAML (and therefore use the API
