@@ -56,13 +56,13 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 		$username = $user->getName();
 		$ipaddr = $_SERVER['HTTP_X_FORWARDED_FOR'];
 
-		$forbidden = function () {
+		$forbidden = function ($msg='') {
 			// lightly copied from MediaWiki's img_auth.php
 			HttpStatus::header( 403 );
 			header( 'Cache-Control: no-cache' );
 			header( 'Content-Type: text/html; charset=utf-8' );
 			echo "You do not have rights to access this wiki in this way.";
-			die();
+			die($msg);
 		};
 
 		if ( ! is_array( $wgMezaAllowSkipSamlUsers ) ) {
@@ -71,15 +71,15 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 		}
 
 		// allow option to greenlight all users
-		if ( isset( $wgMezaAllowSkipSamlUsers['*'] ) ) {
+		if ( isset( $wgMezaAllowSkipSamlUsers['__allusers'] ) ) {
 
 			// if * users can access via * ip addresses
-			if ( $wgMezaAllowSkipSamlUsers['*'][0] === '*' ) {
+			if ( $wgMezaAllowSkipSamlUsers['__allusers'][0] === '*' ) {
 				return true;
 			}
 
 			// if * users can access via the current IP address
-			elseif ( in_array( $ipaddr, $wgMezaAllowSkipSamlUsers['*'] ) ) {
+			elseif ( in_array( $ipaddr, $wgMezaAllowSkipSamlUsers['__allusers'] ) ) {
 				return true;
 			}
 		}
