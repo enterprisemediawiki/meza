@@ -39,9 +39,9 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 	{% if allow_skip_saml_users is defined -%}
 		$wgMezaAllowSkipSamlUsers = array();
 		{% for user, ipaddrs in allow_skip_saml_users.iteritems() -%}
-			$wgMezaAllowSkipSamlUsers['{{ user }}'] = array(
-				{% for ipaddr in ipaddrs %}'{{ ipaddr }}',{% endfor %}
-			);
+		$wgMezaAllowSkipSamlUsers['{{ user }}'] = array(
+			{%- for ipaddr in ipaddrs -%}'{{ ipaddr }}',{%- endfor -%}
+		);
 		{%- endfor %}
 	{% else -%}
 		$wgMezaAllowSkipSamlUsers = false;
@@ -56,14 +56,35 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 		$username = $user->getName();
 		$ipaddr = $_SERVER['HTTP_X_FORWARDED_FOR'];
 
-		// allow option to greenlight all users
-		if ( $wgMezaAllowSkipSamlUsers === '*' ) {
-			return true;
+		$forbidden = function () {
+			// lightly copied from MediaWiki's img_auth.php
+			HttpStatus::header( 403 );
+			header( 'Cache-Control: no-cache' );
+			header( 'Content-Type: text/html; charset=utf-8' );
+			echo "You do not have rights to access this wiki in this way.";
+			die();
+		};
+
+		if ( ! is_array( $wgMezaAllowSkipSamlUsers ) ) {
+			$forbidden();
+			return false; // pointless due to die() in forbidden
 		}
 
-		elseif ( is_array( $wgMezaAllowSkipSamlUsers )
-			&& in_array( $username, array_keys( $wgMezaAllowSkipSamlUsers ) ) )
-		{
+		// allow option to greenlight all users
+		if ( isset( $wgMezaAllowSkipSamlUsers['*'] ) ) {
+
+			// if * users can access via * ip addresses
+			if ( $wgMezaAllowSkipSamlUsers['*'][0] === '*' ) {
+				return true
+			}
+
+			// if * users can access via the current IP address
+			elseif ( in_array( $ipaddr, $wgMezaAllowSkipSamlUsers['*'] ) ) {
+				return true;
+			}
+		}
+
+		if ( isset( $wgMezaAllowSkipSamlUsers[$username] ) ) {
 
 			// user allowed from all IP addresses
 			if ( $wgMezaAllowSkipSamlUsers[$username] === '*' ) {
@@ -71,22 +92,13 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 			}
 
 			// user allowed from this IP address only -OR- this IP address is one of many allowed
-			elseif ( $wgMezaAllowSkipSamlUsers[$username] === $ipaddr
-				||  in_array( $ipaddr, $wgMezaAllowSkipSamlUsers[$username] ) )
-			{
+			elseif ( in_array( $ipaddr, $wgMezaAllowSkipSamlUsers[$username] ) ) {
 				return true;
 			}
 		}
 
-		// lightly copied from MediaWiki's img_auth.php
-		HttpStatus::header( 403 );
-		header( 'Cache-Control: no-cache' );
-		header( 'Content-Type: text/html; charset=utf-8' );
-		echo "You do not have rights to access this wiki in this way."
-		die();
-
-		// not really necessary due to die.
-		return false;
+		$forbidden();
+		return false; // pointless due to die() in forbidden
 	};
 }
 
