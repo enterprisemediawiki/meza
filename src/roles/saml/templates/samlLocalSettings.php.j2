@@ -24,9 +24,8 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 
 	// Add to config like:
 	//
-	// allow_skip_saml_users: "*"
-	//  -- or --
 	// allow_skip_saml_users:
+	//   - __allusers: ["*"]
 	//   - James: ["192.168.56.62","23.243.32.123"]
 	//   - Daren: ["*"]
 	//   - Lauren:
