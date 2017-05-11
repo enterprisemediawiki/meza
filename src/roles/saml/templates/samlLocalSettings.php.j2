@@ -75,7 +75,7 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 
 			// if * users can access via * ip addresses
 			if ( $wgMezaAllowSkipSamlUsers['*'][0] === '*' ) {
-				return true
+				return true;
 			}
 
 			// if * users can access via the current IP address
@@ -87,7 +87,7 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 		if ( isset( $wgMezaAllowSkipSamlUsers[$username] ) ) {
 
 			// user allowed from all IP addresses
-			if ( $wgMezaAllowSkipSamlUsers[$username] === '*' ) {
+			if ( $wgMezaAllowSkipSamlUsers[$username][0] === '*' ) {
 				return true;
 			}
 
