@@ -4,7 +4,7 @@
 # If X-SKIP-SAML header is present, disallow anonymous viewing and editing and
 # skip SAML login. Allow standard MediaWiki login.
 #
-if ( $_SERVER['HTTP_X_SKIP_SAML'] ) {
+if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 
 	# Disable reading, editing and account creation by anonymous users
 	$wgGroupPermissions['*']['read'] = false;
@@ -28,30 +28,25 @@ if ( $_SERVER['HTTP_X_SKIP_SAML'] ) {
 	//  -- or --
 	// allow_skip_saml_users:
 	//   - James: ["192.168.56.62","23.243.32.123"]
-	//   - Daren: "*"
+	//   - Daren: ["*"]
 	//   - Lauren:
 	//     - "192.54.43.13"
 	//     - "3.3.2.1"
-	//   - Willa: "192.169.34.23"
+	//   - Willa:
+	//     - "192.169.34.23"
 	//
 	// FIXME: The indenting below will be heinous when Ansible does its templating
-	{% if allow_skip_saml_users is defined and isinstance(allow_skip_saml_users, basestring) %}
-	$wgMezaAllowSkipSamlUsers = '{{ allow_skip_saml_users }}';
-	{% elif allow_skip_saml_users is defined %}
+	{% if allow_skip_saml_users is defined -%}
 		$wgMezaAllowSkipSamlUsers = array();
-		{% for user, ipaddrs in allow_skip_saml_users.iteritems() %}
-			{% if isinstance(ipaddrs, basestring) %}
-			$wgMezaAllowSkipSamlUsers['{{ user }}'] = '{{ ipaddrs }}';
-			{% else %}
-				$wgMezaAllowSkipSamlUsers['{{ user }}'] = array();
-				{% for ipaddr in ipaddrs %}
-				$wgMezaAllowSkipSamlUsers['{{ user }}']][] = '{{ ipaddr }}';
-				{% endfor %}
-			{% endif %}
-		{% endfor %}
-	{% else %}
-	$wgMezaAllowSkipSamlUsers = false;
-	{% endif %}
+		{% for user, ipaddrs in allow_skip_saml_users.iteritems() -%}
+			$wgMezaAllowSkipSamlUsers['{{ user }}'] = array(
+				{% for ipaddr in ipaddrs %}'{{ ipaddr }}',{% endfor %}
+			);
+		{%- endfor %}
+	{% else -%}
+		$wgMezaAllowSkipSamlUsers = false;
+	{%- endif %}
+
 
 	// Upon login if user is allowed to skip SAML (and therefore use the API
 	// externally)
