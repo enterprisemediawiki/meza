@@ -74,7 +74,7 @@ list:
     version: REL1_27
   - name: PageForms
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PageForms.git
-    version: tags/4.1
+    version: tags/4.1.1
   - name: DismissableSiteNotice
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DismissableSiteNotice.git
     version: REL1_27
