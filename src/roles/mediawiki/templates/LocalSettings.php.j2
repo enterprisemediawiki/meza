@@ -378,6 +378,18 @@ $wgSharedTables = array(
  *
  *
  **/
+// proxy setup
+$wgUsePrivateIPs = true;
+$wgSquidServersNoPurge = array(
+	{% for server in groups['load-balancers'] -%}
+	{%- if server == inventory_hostname or server == 'localhost' -%}
+	'localhost','127.0.0.1',
+	{%- else -%}
+	'{{ server }}',
+	{%- endif -%}
+	{%- endfor %}
+);
+
 // memcached settings
 $wgMainCacheType = CACHE_MEMCACHED;
 // If parser cache set to CACHE_MEMCACHED, templates used to format SMW query
