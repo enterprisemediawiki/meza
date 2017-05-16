@@ -1,9 +1,10 @@
 ---
 
-- name: Ensure cron installed
-  yum:
-    name: cronie
-    state: installed
+# Handled in role:base now
+# - name: Ensure cron installed
+#   yum:
+#     name: cronie
+#     state: installed
 
 - name: Ensure cron is running (and enable it at boot)
   service:
