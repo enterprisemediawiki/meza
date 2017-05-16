@@ -105,6 +105,7 @@
     - rsyslog
     - jq
     - tree
+    - cronie
 - name: put SELinux in permissive mode
   selinux:
     policy: targeted
@@ -187,3 +188,8 @@
     mode: 0755
     state: directory
 
+# Prevent runJobs and other scripts from running when application may be in
+# indeterminate state
+- name: Ensure crontab empty for meza-ansible when overwriting wikis
+  shell: crontab -u meza-ansible -r
+  when: force_overwrite_from_backup is defined and force_overwrite_from_backup == true
