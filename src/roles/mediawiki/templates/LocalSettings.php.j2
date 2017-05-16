@@ -255,7 +255,7 @@ $wgResourceBasePath = $wgScriptPath;
  *
  *  Email configuration
  **/
-{% if enable_all_wiki_email is defined and enable_all_wiki_email %}
+{% if enable_wiki_emails is defined and enable_wiki_emails %}
 if ( isset( $mezaEnableWikiEmail ) && $mezaEnableWikiEmail ) {
 	$wgEnableEmail = true;
 }
