@@ -3,7 +3,7 @@ list:
 
   - name: Semantic MediaWiki
     composer: "mediawiki/semantic-media-wiki"
-    version: "~2.4"
+    version: "2.5.x-dev"
     config: |
       // Enable Semantic MediaWiki semantics
       enableSemantics( $wikiId );
@@ -18,7 +18,7 @@ list:
 
   - name: Semantic Result Formats
     composer: "mediawiki/semantic-result-formats"
-    version: "~2.0"
+    version: "2.4.x"
     config: |
       // SemanticResultFormats formats enabled (beyond defaults)
       // These are disabled by default because they send data to external
