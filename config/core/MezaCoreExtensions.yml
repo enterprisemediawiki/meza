@@ -131,7 +131,7 @@ list:
     version: REL1_27
   - name: SimpleMathJax
     repo: https://github.com/jamesmontalvo3/SimpleMathJax.git
-    version: master
+    version: e94afaffcdde8d926b166fdd166162f9519beaa1
     legacy_load: True
   - name: ImageMap
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ImageMap
