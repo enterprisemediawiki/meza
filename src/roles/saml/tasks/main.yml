@@ -12,7 +12,11 @@
   git:
     repo: https://github.com/jornane/mwSimpleSamlAuth.git
     dest: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
-    version: "v0.7"
+    
+    # Use hash for now, until version greater than v0.7 is released that fixes
+    # issues with MW 1.27 user creation.
+    # Ref: https://github.com/jornane/mwSimpleSamlAuth/issues/31#issuecomment-302759940
+    version: "2e0e7b7b6d08de2d97741a0561ea4a6b3c58d4f9"
   tags:
     - latest
 
