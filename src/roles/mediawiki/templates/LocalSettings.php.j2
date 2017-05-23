@@ -383,7 +383,7 @@ $wgUsePrivateIPs = true;
 $wgSquidServersNoPurge = array(
 	{% for server in groups['load-balancers'] -%}
 	{%- if server == inventory_hostname or server == 'localhost' -%}
-	'localhost','127.0.0.1',
+	'127.0.0.1',
 	{%- else -%}
 	'{{ server }}',
 	{%- endif -%}
