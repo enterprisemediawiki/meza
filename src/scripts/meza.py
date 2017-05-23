@@ -36,7 +36,9 @@ def main (argv):
 	elif argv[0] in ('-v', '--version'):
 		import subprocess
 		version = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "describe", "--tags" ] )
+		commit = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "rev-parse", "HEAD" ] )
 		print "Meza " + version.strip()
+		print "Commit " + commit.strip()
 		print "Mediawiki EZ Admin"
 		print
 		sys.exit(0)
