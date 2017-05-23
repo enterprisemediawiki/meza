@@ -73,3 +73,5 @@ ntp_server: [0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org, 3.pool.ntp.org]
 m_language: en
 
 allow_backup_downloads: false
+
+enable_wiki_emails: true

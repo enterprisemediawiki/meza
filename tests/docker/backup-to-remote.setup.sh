@@ -35,7 +35,7 @@ docker_exec_2=( "${docker_exec[@]}" )
 # backups on CONTAINER 2
 ${docker_exec_1[@]} default_servers="localhost" backup_servers="$docker_ip_2" \
 	meza setup env "$env_name" \
-	--fqdn="$docker_ip_1" --db_pass=1234 --enable_email=false --private_net_zone=public
+	--fqdn="$docker_ip_1" --db_pass=1234 --private_net_zone=public
 
 
 # Run script on controller to `meza deploy`, `meza create wiki` and
