@@ -209,6 +209,13 @@
 - set_fact:
     list_of_wikis: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
 
+# Sort list of wikis so primary wiki is first. Need to have primary wiki's
+# `user` table in place before other wikis are imported, otherwise will get
+# errors when running update.php and such
+- set_fact:
+    list_of_wikis: "['{{ primary_wiki_id }}'] + {{ list_of_wikis | difference([primary_wiki_id]) }}"
+  when: primary_wiki_id is defined
+
 - debug: { var: list_of_wikis }
 
 # Check that all wikis in config are present on app and DB servers

@@ -193,3 +193,7 @@
 - name: Ensure crontab empty for meza-ansible when overwriting wikis
   shell: crontab -u meza-ansible -r
   when: force_overwrite_from_backup is defined and force_overwrite_from_backup == true
+
+  # Ignore errors due issue #699: If a crontab doesn't exist yet this command
+  # will fail
+  ignore_errors: yes
