@@ -26,8 +26,6 @@ blender_admins: []
 
 local_config_repo: {}
 
-enable_wiki_emails: true
-
 # Whether to enable debug at all times
 m_force_debug: false
 

@@ -47,7 +47,7 @@ Vagrant.configure("2") do |config|
   if not ENV["deploy"] || ENV["deploy"] == "basic"
 
     config.vm.provision "deploy", type: "shell", inline: <<-SHELL
-      meza setup env monolith --fqdn=192.168.56.56 --db_pass=1234 --enable_email=true
+      meza setup env monolith --fqdn=192.168.56.56 --db_pass=1234
       meza deploy monolith
     SHELL
 

@@ -152,9 +152,9 @@ def meza_command_setup_env (argv, return_not_exit=False):
 		print "Environment {} already exists".format(env)
 		sys.exit(1)
 
-	fqdn = db_pass = enable_email = private_net_zone = False
+	fqdn = db_pass = private_net_zone = False
 	try:
-		opts, args = getopt.getopt(argv[1:],"",["fqdn=","db_pass=","enable_email=","private_net_zone="])
+		opts, args = getopt.getopt(argv[1:],"",["fqdn=","db_pass=","private_net_zone="])
 	except Exception as e:
 		print str(e)
 		print 'meza setup env <env> [options]'
@@ -166,8 +166,6 @@ def meza_command_setup_env (argv, return_not_exit=False):
 			# This will put the DB password on the command line, so should
 			# only be done in testing cases
 			db_pass = arg
-		elif opt == "--enable_email":
-			enable_email = arg
 		elif opt == "--private_net_zone":
 			private_net_zone = arg
 		else:
@@ -180,9 +178,6 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	if not db_pass:
 		db_pass = prompt_secure("db_pass")
 
-	if not enable_email:
-		enable_email = prompt("enable_email")
-
 	# No need for private networking. Set to public.
 	if env == "monolith":
 		private_net_zone = "public"
@@ -194,7 +189,6 @@ def meza_command_setup_env (argv, return_not_exit=False):
 		'env': env,
 
 		'fqdn': fqdn,
-		'enable_email': enable_email,
 		'private_net_zone': private_net_zone,
 
 		# Set all db passwords the same

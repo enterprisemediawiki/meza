@@ -28,11 +28,6 @@ mysql_replication_user:
   name: "db_slave_user"
   password: "{{ db_slave_pass }}"
 
-# Do you want your wiki to be able to email?
-# must be either:
-#   true
-#   false
-enable_wiki_emails: {{ enable_email }}
 
 # May be required for certain cryptographic functions
 wg_secret_key: {{ wg_secret_key }}
