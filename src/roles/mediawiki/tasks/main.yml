@@ -245,14 +245,14 @@
 # FIXME: WILL ONLY WORK WHEN CONTROLLER AND APP-SERVER ARE THE SAME MACHINE
 - name: "(Re-)build search index for: {{ wikis_to_rebuild_data | join(', ') }}"
   shell: "bash /opt/meza/src/scripts/elastic-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
-  when: docker_skip_tasks is not defined or not docker_skip_tasks
+  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0)
   run_once: true
   tags:
   - search-index
 
 - name: "(Re-)build SemanticMediaWiki data for: {{ wikis_to_rebuild_data | join(', ') }}"
   shell: "bash /opt/meza/src/scripts/smw-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
-  when: docker_skip_tasks is not defined or not docker_skip_tasks
+  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0)
   run_once: true
   tags:
   - smw-data

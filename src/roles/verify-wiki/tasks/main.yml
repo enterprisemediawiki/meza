@@ -263,6 +263,11 @@
 - name: Did DB import?
   debug: { var: did_db_import }
 
+- name: Initiate wikis_to_rebuild_data if not exists
+  set_fact:
+    wikis_to_rebuild_data: []
+  when: wikis_to_rebuild_data is not defined
+
 - name: Add wiki to list of DB-imported wikis if required
   set_fact:
     wikis_to_rebuild_data: "{{ wikis_to_rebuild_data + [ wiki_id ] }}"
