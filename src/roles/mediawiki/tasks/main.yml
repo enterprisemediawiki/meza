@@ -206,8 +206,17 @@
   delegate_to: localhost
   run_once: yes
 
-- set_fact:
+- name: Set fact - list of wikis
+  set_fact:
     list_of_wikis: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+# Sort list of wikis so primary wiki is first. Need to have primary wiki's
+# `user` table in place before other wikis are imported, otherwise will get
+# errors when running update.php and such
+- name: Set fact - list of wikis ordered with primary wiki first (if primary_wiki_id set)
+  set_fact:
+    list_of_wikis: "['{{ primary_wiki_id }}'] + {{ list_of_wikis | difference([primary_wiki_id]) }}"
+  when: primary_wiki_id is defined
 
 - debug: { var: list_of_wikis }
 
