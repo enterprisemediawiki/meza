@@ -256,8 +256,17 @@
     state: import
     target: "{{ m_tmp }}/wiki.sql"
   run_once: true
+  register: did_db_import
   delegate_to: "{{ groups['db-master'][0] }}"
   when: not wiki_exists or do_overwrite_db_from_backup
+
+- name: Did DB import?
+  debug: { var: did_db_import }
+
+- name: Add wiki to list of DB-imported wikis if required
+  set_fact:
+    wikis_to_rebuild_data: "{{ wikis_to_rebuild_data + [ wiki_id ] }}"
+  when: did_db_import is defined and did_db_import.changed is defined and did_db_import.changed
 
 - name: "{{ wiki_id }} - Remove SQL file from master DB"
   file:

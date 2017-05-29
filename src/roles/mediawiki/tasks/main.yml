@@ -220,6 +220,10 @@
 
 - debug: { var: list_of_wikis }
 
+- name: Set fact - initiate empty list of wikis to rebuild smw and search data
+  set_fact:
+    wikis_to_rebuild_data: []
+
 # Check that all wikis in config are present on app and DB servers
 - name: Ensure defined wikis exist
   include_role:
@@ -235,17 +239,19 @@
   - verify-wiki
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
+- debug: { var: wikis_to_rebuild_data }
+
 # Wikis are totally built at this point, but SMW and search need rebuilding
 # FIXME: WILL ONLY WORK WHEN CONTROLLER AND APP-SERVER ARE THE SAME MACHINE
-- name: (Re-)build search index for each wiki
-  shell: "bash /opt/meza/src/scripts/elastic-rebuild-all.sh"
+- name: "(Re-)build search index for: {{ wikis_to_rebuild_data | join(', ') }}"
+  shell: "bash /opt/meza/src/scripts/elastic-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
   when: docker_skip_tasks is not defined or not docker_skip_tasks
   run_once: true
   tags:
   - search-index
 
-- name: Rebuild SemanticMediaWiki data for each wiki
-  shell: "bash /opt/meza/src/scripts/smw-rebuild-all.sh"
+- name: "(Re-)build SemanticMediaWiki data for: {{ wikis_to_rebuild_data | join(', ') }}"
+  shell: "bash /opt/meza/src/scripts/smw-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
   when: docker_skip_tasks is not defined or not docker_skip_tasks
   run_once: true
   tags:

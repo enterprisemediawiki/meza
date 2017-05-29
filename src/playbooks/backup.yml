@@ -20,7 +20,7 @@
 #
 
 # Define a timestamp fact to persist throughout this playbook
-- hosts: all
+- hosts: all:!exclude-all:!load-balancers-unmanaged
   tasks:
     - set_fact:
         backup_timestamp: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
