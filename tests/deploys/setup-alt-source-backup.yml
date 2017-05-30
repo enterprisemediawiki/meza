@@ -8,6 +8,7 @@
   become: yes
   vars:
     alt_source_backups_dir: /opt/alt/backups
+    m_home: /opt/conf-meza/users
 
   tasks:
     - name: Ensure packages installed
