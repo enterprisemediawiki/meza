@@ -2,6 +2,9 @@
 #
 # Shell functions to add and modify linux users
 
+# Don't create meza application users under /home, ref: #727
+meza_user_dir="/opt/conf-meza/users"
+
 mf_user_exists() {
 	ret=false
 	getent passwd $1 >/dev/null 2>&1 && ret=true
@@ -16,18 +19,18 @@ mf_user_exists() {
 
 mf_add_ssh_user() {
 	if ! mf_user_exists "$1"; then
-		useradd "$1"
+		useradd "$1" --home-dir "$meza_user_dir/$1"
 	fi
 
-	mkdir -p "/home/$1/.ssh"
-	chown -R "$1:$1" "/home/$1/.ssh"
-	chmod 700 "/home/$1/.ssh"
+	mkdir -p "$meza_user_dir/$1/.ssh"
+	chown -R "$1:$1" "$meza_user_dir/$1/.ssh"
+	chmod 700 "$meza_user_dir/$1/.ssh"
 }
 
 mf_add_ssh_user_with_private_key() {
 	mf_add_ssh_user "$1"
-	ssh-keygen -f "/home/$1/.ssh/id_rsa" -t rsa -N '' -C "$1@`hostname`"
-	chown -R "$1:$1" "/home/$1/.ssh"
+	ssh-keygen -f "$meza_user_dir/$1/.ssh/id_rsa" -t rsa -N '' -C "$1@`hostname`"
+	chown -R "$1:$1" "$meza_user_dir/$1/.ssh"
 }
 
 mf_add_public_user_with_public_key () {
@@ -52,7 +55,7 @@ mf_add_public_user_with_public_key () {
 		exit 1;
 	fi
 
-	echo "$2" >> "/home/$1/.ssh/authorized_keys"
-	chmod 600 "/home/$1/.ssh/authorized_keys"
-	chown -R "$1:$1" "/home/$1/.ssh"
+	echo "$2" >> "$meza_user_dir/$1/.ssh/authorized_keys"
+	chmod 600 "$meza_user_dir/$1/.ssh/authorized_keys"
+	chown -R "$1:$1" "$meza_user_dir/$1/.ssh"
 }

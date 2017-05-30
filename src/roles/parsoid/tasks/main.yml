@@ -27,6 +27,7 @@
   user:
     name: parsoid
     group: parsoid
+    createhome: no
     append: yes
 
 - name: Ensure parsoid directory permissions

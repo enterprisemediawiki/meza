@@ -14,6 +14,8 @@
 #        don't necessarily require the whole repo, and if they do they will be
 #        controlled by the master.
 #
+meza_user_dir="/opt/conf-meza/users"
+
 rootCheck() {
 	# must be root or sudoer
 	if [ "$(whoami)" != "root" ]; then
@@ -34,12 +36,12 @@ rootCheck() {
 #
 mf_add_ssh_user() {
 	if ! mf_user_exists "$1"; then
-		useradd "$1"
+		useradd "$1" --home-dir "$meza_user_dir/$1"
 	fi
 
-	mkdir -p "/home/$1/.ssh"
-	chown -R "$1:$1" "/home/$1/.ssh"
-	chmod 700 "/home/$1/.ssh"
+	mkdir -p "$meza_user_dir/$1/.ssh"
+	chown -R "$1:$1" "$meza_user_dir/$1/.ssh"
+	chmod 700 "$meza_user_dir/$1/.ssh"
 }
 mf_user_exists() {
 	ret=false
@@ -63,7 +65,7 @@ mf_add_ssh_user "meza-ansible"
 
 
 if [ -f /tmp/meza-ansible.id_rsa.pub ]; then
-	cat /tmp/meza-ansible.id_rsa.pub >> /home/meza-ansible/.ssh/authorized_keys
+	cat /tmp/meza-ansible.id_rsa.pub >> /opt/conf-meza/users/meza-ansible/.ssh/authorized_keys
 	passwd --delete meza-ansible
 else
 	echo

@@ -1,7 +1,7 @@
 ---
 - name: "Revoke keys from delegated server {{ revoke_keys_from_server }}"
   file:
-    path: "/home/{{ alt_remote_user }}/.ssh/{{ item }}"
+    path: "{{ alt_remote_user_home }}/.ssh/{{ item }}"
     state: absent
   delegate_to: "{{ revoke_keys_from_server }}"
   remote_user: "{{ alt_remote_user }}"

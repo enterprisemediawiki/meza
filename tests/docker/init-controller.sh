@@ -10,11 +10,11 @@ source "$m_meza_host/tests/docker/init-container.sh" "none"
 
 # Copy SSH public key from user "meza-ansible" to host
 # This will allow putting the key onto minion servers
-docker cp "$container_id:/home/meza-ansible/.ssh/id_rsa.pub" /tmp/controller.id_rsa.pub
+docker cp "$container_id:{{ m_home }}/meza-ansible/.ssh/id_rsa.pub" /tmp/controller.id_rsa.pub
 
 
 # Turn off host key checking for user meza-ansible, to avoid prompts
-${docker_exec[@]} bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > /home/meza-ansible/.ssh/config'
+${docker_exec[@]} bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > {{ m_home }}/meza-ansible/.ssh/config'
 
 
 # Allow SSH login, in case this server SSHs into itself

@@ -13,12 +13,14 @@
   - name: Ensure controller has user alt-meza-ansible
     user:
       name: alt-meza-ansible
+      move_home: yes
+      home: "{{ m_home }}/alt-meza-ansible"
       # primary group
       group: wheel
 
   - name: Ensure user alt-meza-ansible .ssh dir configured
     file:
-      path: "/home/alt-meza-ansible/.ssh"
+      path: "{{ m_home }}/alt-meza-ansible/.ssh"
       owner: alt-meza-ansible
       group: wheel
       mode: 0700
@@ -26,8 +28,8 @@
 
   - name: Copy meza-ansible keys to alt-meza-ansible
     copy:
-      src: "/home/meza-ansible/.ssh/{{ item.name }}"
-      dest: "/home/alt-meza-ansible/.ssh/{{ item.name }}"
+      src: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
+      dest: "{{ m_home }}/alt-meza-ansible/.ssh/{{ item.name }}"
       owner: alt-meza-ansible
       group: wheel
       mode: "{{ item.mode }}"
@@ -39,8 +41,8 @@
 
   - name: Copy meza-ansible known_hosts to alt-meza-ansible
     copy:
-      src: "/home/meza-ansible/.ssh/{{ item.name }}"
-      dest: "/home/alt-meza-ansible/.ssh/{{ item.name }}"
+      src: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
+      dest: "{{ m_home }}/alt-meza-ansible/.ssh/{{ item.name }}"
       owner: alt-meza-ansible
       group: wheel
       mode: "{{ item.mode }}"
@@ -53,7 +55,7 @@
     shell: >
       ansible-vault encrypt
       /opt/conf-meza/secret/{{ env }}/group_vars/all.yml
-      --vault-password-file /home/meza-ansible/.vault-pass-{{ env }}.txt
+      --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
     ignore_errors: True
 
 

@@ -102,9 +102,24 @@
     sql_backup_server is defined
     and 'alt_remote_user' not in hostvars[sql_backup_server]
 
+
+# WHEN: do_sql_dump is True
+# Get home directory for {{db_backup_server_remote_user}}@{{sql_backup_server}}
+- name: "Get {{ db_backup_server_remote_user }} home directory on {{ sql_backup_server }}"
+  debug: { msg: "{{ lookup('env','HOME') }}" }
+  register: remote_user_home_dir
+  delegate_to: "{{ sql_backup_server }}"
+  remote_user: "{{ db_backup_server_remote_user }}"
+  run_once: true
+  when: do_sql_dump
+
+- name: TEMPORARY DEBUG remote_user_home_dir
+  debug: { var: "{{ remote_user_home_dir }}" }
+  when: do_sql_dump
+
 - name: "{{ wiki_id }} - If doing a SQL dump, need to set path to SQL file based on remote user"
   set_fact:
-    sql_dir_path: "/home/{{ db_backup_server_remote_user }}"
+    sql_dir_path: "{{ remote_user_home_dir }}"
   when: do_sql_dump
 
 
@@ -389,6 +404,29 @@
     and 'alt_remote_user' not in hostvars[uploads_backup_server]
 
 
+
+# WHEN: do_sql_dump is True
+# Get home directory for {{db_backup_server_remote_user}}@{{sql_backup_server}}
+- name: "Get {{ uploads_backup_server_remote_user }} home directory on {{ uploads_backup_server }}"
+  debug: { msg: "{{ lookup('env','HOME') }}" }
+  register: uploads_remote_user_home_dir
+  delegate_to: "{{ uploads_backup_server }}"
+  remote_user: "{{ uploads_backup_server_remote_user }}"
+  run_once: true
+
+- name: TEMPORARY DEBUG uploads_remote_user_home_dir
+  debug: { var: "{{ uploads_remote_user_home_dir }}" }
+
+- name: "{{ wiki_id }} - Check if wiki's uploads backup dir exists on backups.0"
+  stat:
+    path: "{{ uploads_backup_dir_path }}"
+  register: images_backup_dir
+  delegate_to: "{{ uploads_backup_server }}"
+  remote_user: "{{ uploads_backup_server_remote_user }}"
+  run_once: true
+
+
+
 #
 # Check if uploads backups exist on defined server
 #
@@ -425,6 +463,7 @@
   vars:
     grant_keys_to_server: "{{ uploads_backup_server }}"
     alt_remote_user: "{{ uploads_backup_server_remote_user }}"
+    alt_remote_user_home: "{{ uploads_remote_user_home_dir }}"
   when:
     images_backup_dir.stat.exists
     and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
@@ -464,9 +503,10 @@
 - name: "{{ wiki_id }} - If no uploads dir, but backup dir exists, revoke keys"
   include_role:
     name: revoke-keys
-    alt_remote_user: "{{ uploads_backup_server_remote_user }}"
   vars:
     revoke_keys_from_server: "{{ uploads_backup_server }}"
+    alt_remote_user: "{{ uploads_backup_server_remote_user }}"
+    alt_remote_user_home: "{{ uploads_remote_user_home_dir }}"
   when:
     images_backup_dir.stat.exists
     and (not uploads_dir.stat.exists or do_overwrite_uploads_from_backup)
