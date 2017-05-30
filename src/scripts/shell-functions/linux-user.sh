@@ -21,7 +21,7 @@ mf_add_ssh_user() {
 	if [ ! -d "$meza_user_dir" ]; then
 		mkdir -p "$meza_user_dir"
 		chown root:root "$meza_user_dir"
-		chmod 700 "$meza_user_dir"
+		chmod 755 "$meza_user_dir"
 	fi
 
 	if ! mf_user_exists "$1"; then

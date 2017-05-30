@@ -15,7 +15,7 @@
 - name: Ensure crontab file up-to-date
   template:
     src: meza-ansible.crontab.j2
-    dest: {{ m_home }}/meza-ansible/.ansible-cronfile
+    dest: "{{ m_home }}/meza-ansible/.ansible-cronfile"
     owner: meza-ansible
     group: wheel
     mode: 0755

@@ -3,8 +3,11 @@
 # cd /opt/meza/ansible
 # sudo -u meza-ansible ansible-playbook site.yml
 
+# FIXME #729: Move this into a role
 - hosts: localhost
   become: yes
+  vars:
+    m_home: "/opt/conf-meza/users"
   tasks:
   - name: Ensure no password on meza-ansible user on controller
     shell: passwd --delete meza-ansible
