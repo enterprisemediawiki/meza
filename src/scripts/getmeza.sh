@@ -50,6 +50,11 @@ fi
 
 if $ret; then
 	echo "meza-ansible already exists"
+	homedir=$( getent passwd "meza-ansible" | cut -d: -f6 )
+	if [ "$homedir" == "/home/meza-ansible" ]; then
+		echo "meza-ansible home directory not correct. moving."
+		usermod -m -d "/opt/conf-meza/users/meza-ansible" "meza-ansible"
+	fi
 else
 	echo
 	echo "Add ansible master user"
