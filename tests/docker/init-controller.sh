@@ -39,7 +39,7 @@ ${docker_exec[@]} rm -rf /opt/conf-meza/public || true
 # Docker image has these pre-installed with Composer, which conflicts with
 # attempts to install them with Git. Remove SMM from composer.local.json then
 # run composer update.
-# FIXME: Update the Docker image to have these preinstalled with Git (not
+# FIXME #728: Update the Docker image to have these preinstalled with Git (not
 # Composer), then remove these lines.
 ${docker_exec[@]} sed -i '/semantic-meeting-minutes/d' /opt/htdocs/mediawiki/composer.local.json || true
 ${docker_exec[@]} bash -c 'cd /opt/htdocs/mediawiki && /usr/local/bin/composer update'
