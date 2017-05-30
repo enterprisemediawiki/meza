@@ -114,8 +114,12 @@
   when: do_sql_dump
 
 - name: TEMPORARY DEBUG remote_user_home_dir
-  debug: { var: "{{ remote_user_home_dir }}" }
+  debug: { var: remote_user_home_dir }
   when: do_sql_dump
+
+- name: "Set remote_user_home_dir fact"
+  set_fact:
+    remote_user_home_dir: "{{ remote_user_home_dir.msg }}"
 
 - name: "{{ wiki_id }} - If doing a SQL dump, need to set path to SQL file based on remote user"
   set_fact:
@@ -415,7 +419,11 @@
   run_once: true
 
 - name: TEMPORARY DEBUG uploads_remote_user_home_dir
-  debug: { var: "{{ uploads_remote_user_home_dir }}" }
+  debug: { var: uploads_remote_user_home_dir }
+
+- name: "Set uploads_remote_user_home_dir fact"
+  set_fact:
+    uploads_remote_user_home_dir: "{{ uploads_remote_user_home_dir.msg }}"
 
 - name: "{{ wiki_id }} - Check if wiki's uploads backup dir exists on backups.0"
   stat:
