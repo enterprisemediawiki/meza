@@ -35,6 +35,12 @@ rootCheck() {
 # included here due to [1] above.
 #
 mf_add_ssh_user() {
+	if [ ! -d "$meza_user_dir" ]; then
+		mkdir -p "$meza_user_dir"
+		chown root:root "$meza_user_dir"
+		chmod 700 "$meza_user_dir"
+	fi
+
 	if ! mf_user_exists "$1"; then
 		useradd "$1" --home-dir "$meza_user_dir/$1"
 	fi
