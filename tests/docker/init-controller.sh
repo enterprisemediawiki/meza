@@ -25,7 +25,7 @@ ${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh
 
 
 # Turn off host key checking for user meza-ansible, to avoid prompts
-${docker_exec[@]} bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > {{ m_home }}/meza-ansible/.ssh/config'
+${docker_exec[@]} bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > /opt/conf-meza/users/meza-ansible/.ssh/config'
 
 
 # Allow SSH login, in case this server SSHs into itself
