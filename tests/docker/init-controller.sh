@@ -7,12 +7,6 @@
 docker_repo="jamesmontalvo3/meza-docker-full:latest"
 source "$m_meza_host/tests/docker/init-container.sh" "none"
 
-
-# Copy SSH public key from user "meza-ansible" to host
-# This will allow putting the key onto minion servers
-docker cp "$container_id:/opt/conf-meza/users/meza-ansible/.ssh/id_rsa.pub" /tmp/controller.id_rsa.pub
-
-
 # Turn off host key checking for user meza-ansible, to avoid prompts
 ${docker_exec[@]} bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > {{ m_home }}/meza-ansible/.ssh/config'
 
@@ -30,6 +24,19 @@ ${docker_exec[@]} systemctl restart sshd
 ${docker_exec[@]} bash -c "cd /opt/meza && git fetch origin && git reset --hard origin/master"
 ${docker_exec[@]} bash /opt/meza/tests/travis/git-setup.sh "$TRAVIS_EVENT_TYPE" \
 	"$TRAVIS_COMMIT" "$TRAVIS_PULL_REQUEST_SHA" "$TRAVIS_BRANCH" "$TRAVIS_PULL_REQUEST_BRANCH"
+
+
+# FIXME #728: Test band-aid. This is run in init-container.sh above, but at
+# that time the meza version is whatever is on the Docker container (possibly
+# very old). After checking out the correct version via git above, re-run
+# getmeza.sh, which moves /home/meza-ansible to /opt/conf-meza/users/meza-ansible
+${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh
+
+
+# Copy SSH public key from user "meza-ansible" to host
+# This will allow putting the key onto minion servers
+docker cp "$container_id:/opt/conf-meza/users/meza-ansible/.ssh/id_rsa.pub" /tmp/controller.id_rsa.pub
+
 
 
 # Remove existing config info
