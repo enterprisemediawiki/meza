@@ -7,15 +7,6 @@
 docker_repo="jamesmontalvo3/meza-docker-full:latest"
 source "$m_meza_host/tests/docker/init-container.sh" "none"
 
-# Turn off host key checking for user meza-ansible, to avoid prompts
-${docker_exec[@]} bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > {{ m_home }}/meza-ansible/.ssh/config'
-
-
-# Allow SSH login, in case this server SSHs into itself
-# WARNING: This is INSECURE and for test environment only
-${docker_exec[@]} sed -r -i 's/UsePAM yes/UsePAM no/g;' /etc/ssh/sshd_config
-${docker_exec[@]} systemctl restart sshd
-
 
 # Checkout the correct version of meza on the container
 # What's present on the pre-built container is not the latest. Need to pull
@@ -33,10 +24,19 @@ ${docker_exec[@]} bash /opt/meza/tests/travis/git-setup.sh "$TRAVIS_EVENT_TYPE" 
 ${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh
 
 
+# Turn off host key checking for user meza-ansible, to avoid prompts
+${docker_exec[@]} bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > {{ m_home }}/meza-ansible/.ssh/config'
+
+
+# Allow SSH login, in case this server SSHs into itself
+# WARNING: This is INSECURE and for test environment only
+${docker_exec[@]} sed -r -i 's/UsePAM yes/UsePAM no/g;' /etc/ssh/sshd_config
+${docker_exec[@]} systemctl restart sshd
+
+
 # Copy SSH public key from user "meza-ansible" to host
 # This will allow putting the key onto minion servers
 docker cp "$container_id:/opt/conf-meza/users/meza-ansible/.ssh/id_rsa.pub" /tmp/controller.id_rsa.pub
-
 
 
 # Remove existing config info
