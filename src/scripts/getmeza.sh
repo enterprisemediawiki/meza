@@ -60,6 +60,8 @@ if $ret; then
 		ls -la /opt/conf-meza/users
 		ls -la /opt/conf-meza/users/meza-ansible
 		ls -la /opt/conf-meza/users/meza-ansible/.ssh
+	else
+		echo "meza-ansible home-dir in correct location"
 	fi
 else
 	echo
