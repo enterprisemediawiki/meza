@@ -119,6 +119,7 @@
 - name: "Set remote_user_home_dir fact"
   set_fact:
     remote_user_home_dir: "{{ remote_user_home_dir.stdout }}"
+  when: do_sql_dump
 
 - name: "{{ wiki_id }} - If doing a SQL dump, need to set path to SQL file based on remote user"
   set_fact:
