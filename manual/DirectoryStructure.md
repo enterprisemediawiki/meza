@@ -101,6 +101,8 @@ Meza application directory. This should never change except if you upgrade meza 
 
 Location of configuration setup for meza. This is split into `secret` and `public` config. Secret config is intended for sensitive info like passwords. It also houses your `hosts` file which declares which servers have which components installed (e.g. Parsoid is installed on `192.168.56.80`). The `hosts` file may or may not be considered sensitive, but it resides in `secret` nonetheless. Some non-sensitive items may be more convenient to put in `secret`. These include things like `enable_wiki_emails`, which you may only want set to `true` on your production setup and no others. Since the `hosts` file resides in `secret` those environment-specific settings may be better to keep in `secret`.
 
+Additionally, the user `meza-ansible` is used by meza to perform most actions. Some other actions are performed by the `alt-meza-ansible` user. However, we don't create these users in `/home` due to possible conflicts with other user systems. Ref #727.
+
 * `public`:
   * `MezaLocalExtensions.yml`: Use to define extra extensions for your meza installation
   * `vars.yml`: MAIN CONFIGURATION VARIABLES FILE!
@@ -129,20 +131,14 @@ Location of configuration setup for meza. This is split into `secret` and `publi
       * `meza.crt`: SSL certificate for this environment. Encrypted by vault password
       * `meza.key`: Private key for this environment. Encrypted by vault password
   * (more enviroments if you so choose)
-
-## `/home/meza-ansible`
-
-The user `meza-ansible` is used by meza to perform most actions. Some other actions are performed by the `alt-meza-ansible` user.
-
-* `meza-ansible`:
-  * `.ssh`:
-    * `id_rsa`: secret key file on controller only. KEEP SAFE!
-    * `id_rsa.pub`: public key file. This needs to be put on any minion servers.
-  * `.vault-pass-monolith.txt`: vault password file for monolith environment. See /opt/conf-meza above. On controller only
-  * `.vault-pass-<env>.txt`: (vault password file for other environments)
-* `alt-meza-ansible`: alternate user for some operations to avoid conflicts
-* (other users)
-
+* `users`
+  * `meza-ansible`:
+    * `.ssh`:
+      * `id_rsa`: secret key file on controller only. KEEP SAFE!
+      * `id_rsa.pub`: public key file. This needs to be put on any minion servers.
+    * `.vault-pass-monolith.txt`: vault password file for monolith environment. See /opt/conf-meza above. On controller only
+    * `.vault-pass-<env>.txt`: (vault password file for other environments)
+  * `alt-meza-ansible`: alternate user for some operations to avoid conflicts
 
 ## `/opt/data-meza`
 

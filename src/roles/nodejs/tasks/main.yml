@@ -30,6 +30,7 @@
   user:
     name: "{{ nodejs_install_npm_user }}"
     group: "{{ nodejs_install_npm_user }}"
+    createhome: no
     append: yes
 
 - name: Create npm global directory

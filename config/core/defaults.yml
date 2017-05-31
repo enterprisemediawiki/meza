@@ -9,6 +9,7 @@ m_meza: /opt/meza
 m_config_core: /opt/meza/config/core
 m_local_secret: /opt/conf-meza/secret
 m_local_public: /opt/conf-meza/public
+m_home: /opt/conf-meza/users
 
 # Config files written by Ansible which need a place to live on non-controller
 # nodes.

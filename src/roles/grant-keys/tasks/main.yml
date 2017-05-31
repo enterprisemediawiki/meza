@@ -1,8 +1,8 @@
 ---
 - name: "Grant keys to delegated server {{ grant_keys_to_server }}"
   copy:
-    src: "/home/meza-ansible/.ssh/{{ item.file }}"
-    dest: "/home/{{ alt_remote_user }}/.ssh/{{ item.file }}"
+    src: "{{ m_home }}/meza-ansible/.ssh/{{ item.file }}"
+    dest: "{{ alt_remote_user_home }}/.ssh/{{ item.file }}"
     owner: "{{ alt_remote_user }}"
     group: wheel
     mode: "{{ item.mode }}"
@@ -20,8 +20,8 @@
 # so ignore_errors.
 - name: "Copy known_hosts to delegated server {{ grant_keys_to_server }}"
   copy:
-    src: "/home/meza-ansible/.ssh/known_hosts"
-    dest: "/home/{{ alt_remote_user }}/.ssh/known_hosts"
+    src: "{{ m_home }}/meza-ansible/.ssh/known_hosts"
+    dest: "{{ alt_remote_user_home }}/.ssh/known_hosts"
     owner: "{{ alt_remote_user }}"
     group: wheel
     mode: "0644"
