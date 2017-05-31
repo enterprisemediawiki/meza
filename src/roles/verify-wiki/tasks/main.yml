@@ -106,10 +106,9 @@
 # WHEN: do_sql_dump is True
 # Get home directory for {{db_backup_server_remote_user}}@{{sql_backup_server}}
 - name: "Get {{ db_backup_server_remote_user }} home directory on {{ sql_backup_server }}"
-  debug: { msg: "{{ lookup('env','HOME') }}" }
+  shell: "getent passwd '{{ db_backup_server_remote_user }}' | cut -d: -f6"
   register: remote_user_home_dir
   delegate_to: "{{ sql_backup_server }}"
-  remote_user: "{{ db_backup_server_remote_user }}"
   run_once: true
   when: do_sql_dump
 
@@ -119,7 +118,7 @@
 
 - name: "Set remote_user_home_dir fact"
   set_fact:
-    remote_user_home_dir: "{{ remote_user_home_dir.msg }}"
+    remote_user_home_dir: "{{ remote_user_home_dir.stdout }}"
 
 - name: "{{ wiki_id }} - If doing a SQL dump, need to set path to SQL file based on remote user"
   set_fact:
@@ -412,10 +411,9 @@
 # WHEN: do_sql_dump is True
 # Get home directory for {{db_backup_server_remote_user}}@{{sql_backup_server}}
 - name: "Get {{ uploads_backup_server_remote_user }} home directory on {{ uploads_backup_server }}"
-  debug: { msg: "{{ lookup('env','HOME') }}" }
+  shell: "getent passwd '{{ uploads_backup_server_remote_user }}' | cut -d: -f6"
   register: uploads_remote_user_home_dir
   delegate_to: "{{ uploads_backup_server }}"
-  remote_user: "{{ uploads_backup_server_remote_user }}"
   run_once: true
 
 - name: TEMPORARY DEBUG uploads_remote_user_home_dir
@@ -423,7 +421,7 @@
 
 - name: "Set uploads_remote_user_home_dir fact"
   set_fact:
-    uploads_remote_user_home_dir: "{{ uploads_remote_user_home_dir.msg }}"
+    uploads_remote_user_home_dir: "{{ uploads_remote_user_home_dir.stdout }}"
 
 - name: "{{ wiki_id }} - Check if wiki's uploads backup dir exists on backups.0"
   stat:
