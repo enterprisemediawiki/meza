@@ -34,6 +34,11 @@ m_logs: /opt/data-meza/logs
 #   - /opt/data-meza/other (something really cool that I don't even know about)
 m_uploads_dir: /opt/data-meza/uploads
 
+# GlusterFS vars
+gluster_mount_dir: /opt/data-meza/uploads-gluster
+gluster_brick_dir: /opt/data-meza/gluster/brick
+gluster_brick_name: gluster
+
 # Location where backups will go, specified by environment, e.g.
 # /opt/data-meza/backups/prod for "prod" environment
 m_backups: /opt/data-meza/backups
