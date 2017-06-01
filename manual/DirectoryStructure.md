@@ -92,7 +92,7 @@ Meza application directory. This should never change except if you upgrade meza 
 * `.travis.yml`: Config file for Travis CI automated testing
 * `Vagrantfile`: Create VMs with Vagrant. Ref: https://www.vagrantup.com/docs/vagrantfile/
 
-[1] These items need to be moved into Ansible roles for maintenance and multi-server deployment
+[1] These items need to be moved into Ansible roles for maintenance and multi-server deployment. FIXME #625 #662 #735
 
 [2] These are shell scripts used to create users. FIXME #713: Consolidate
 
