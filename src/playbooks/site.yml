@@ -123,6 +123,7 @@
   tags: gluster
   vars:
     gluster_replicas: "{{ groups['app-servers'] | length }}"
+  when: "groups['app-servers']|length|int > 1"
   roles:
     - set-vars
 
