@@ -7,7 +7,7 @@
 - name: If using gluster (app-servers > 1), override m_uploads_dir
   set_fact:
     m_uploads_dir: "{{ gluster_mount_dir }}"
-  when: "{{ groups['app-servers'] | length }}"
+  when: "groups['app-servers']|length|int > 1"
 
 - name: Set meza-local variables
   include_vars:
