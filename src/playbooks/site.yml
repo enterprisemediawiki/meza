@@ -123,7 +123,6 @@
   tags: gluster
   vars:
     gluster_replicas: "{{ groups['app-servers'] | length }}"
-  when: "groups['app-servers']|length|int > 1"
   roles:
     - set-vars
 
@@ -140,13 +139,13 @@
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'app-servers' in groups"
+      when: "groups['app-servers']|length|int > 1"
     - role: firewalld
       firewalld_port: 111
       firewalld_protocol: udp
       firewalld_servers: "{{ groups['app-servers'] }}"
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'app-servers' in groups"
+      when: "groups['app-servers']|length|int > 1"
 
     # All gluster servers, Gluster Daemon
     # maybe also: 24009, 24010, 24011
@@ -165,13 +164,13 @@
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'app-servers' in groups"
+      when: "groups['app-servers']|length|int > 1"
     - role: firewalld
       firewalld_port: 24008
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'app-servers' in groups"
+      when: "groups['app-servers']|length|int > 1"
 
     # One port required for each brick (in meza, this equals each server (one
     # brick per server))
@@ -181,29 +180,30 @@
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'app-servers' in groups"
+      when: "groups['app-servers']|length|int > 1"
     - role: firewalld
       firewalld_port: 49153
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'app-servers' in groups"
+      when: "groups['app-servers']|length|int > 1"
     - role: firewalld
       firewalld_port: 49154
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'app-servers' in groups"
+      when: "groups['app-servers']|length|int > 1"
     - role: firewalld
       firewalld_port: 49155
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'app-servers' in groups"
+      when: "groups['app-servers']|length|int > 1"
 
     # Needed?: Gluster inline NFS server: 38465, 38466, 38467
 
-    - gluster
+    - role: gluster
+      when: "groups['app-servers']|length|int > 1"
 
 
 - hosts: memcached-servers
