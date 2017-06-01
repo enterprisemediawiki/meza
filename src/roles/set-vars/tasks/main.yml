@@ -4,9 +4,10 @@
   include_vars:
     file: /opt/meza/config/core/defaults.yml
 
-- name: If using gluster, override m_uploads_dir (was /opt/data-meza/uploads)
+- name: If using gluster (app-servers > 1), override m_uploads_dir
   set_fact:
     m_uploads_dir: "{{ gluster_mount_dir }}"
+  when: "{{ groups['app-servers'] | length }}"
 
 - name: Set meza-local variables
   include_vars:
