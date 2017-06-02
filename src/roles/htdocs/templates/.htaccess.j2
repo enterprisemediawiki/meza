@@ -6,6 +6,12 @@
 
     RewriteBase /
 
+    # This is needed for Links inside MS Office documents to resolve properly
+    # when using single sign on.
+    # Ref: https://groups.google.com/forum/#!topic/simplesamlphp/LcykPSQj_IQ
+    RewriteCond %{HTTP_USER_AGENT} ms-office [NC]
+    RewriteRule ^ - [L,R=200]
+
     # Allow access to root index.php
     RewriteRule ^index.php(.*) - [L]
 
