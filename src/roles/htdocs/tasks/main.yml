@@ -40,3 +40,4 @@
   with_items:
   - ".htaccess"
   - "index.php"
+  - "office.html"
