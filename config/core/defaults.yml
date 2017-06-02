@@ -26,12 +26,9 @@ m_meza_data: /opt/data-meza
 m_tmp: /opt/data-meza/tmp
 m_logs: /opt/data-meza/logs
 
-# uploads dir. In order to support both app-server-based uploads and
-# GlusterFS-based uploads (or other alternatives) it may be necessary to be
-# able to specify this path, with options like:
-#   - /opt/data-meza/uploads    (app-server based)
-#   - /opt/data-meza/glusterfs  (GlusterFS based)
-#   - /opt/data-meza/other (something really cool that I don't even know about)
+# uploads dir. This WILL BE OVERIDDEN if multiple app servers are used, and
+# instead will use /opt/data-meza/uploads-gluster to use GlusterFS distributed
+# file system.
 m_uploads_dir: /opt/data-meza/uploads
 
 # GlusterFS vars
