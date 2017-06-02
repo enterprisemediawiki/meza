@@ -115,6 +115,97 @@
     - apache-php
     - composer
 
+# Keeping this as a separate play, since at some point it will make sense to
+# configure app-servers as gluster clients and have separate gluster servers
+# (which can also be app-servers, of course, like everything else in meza)
+- hosts: app-servers
+  become: yes
+  tags: gluster
+  vars:
+    gluster_replicas: "{{ groups['app-servers'] | length }}"
+  roles:
+    - set-vars
+
+    # Portmap tcp and udp
+    #
+    # From docs:
+    # ref: http://gluster.readthedocs.io/en/latest/Administrator%20Guide/Troubleshooting/?highlight=38465
+    #
+    # Check your firewall setting to open ports 111 for portmap
+    # requests/replies and Gluster NFS server requests/replies. Gluster NFS
+    # server operates over the following port numbers: 38465, 38466, and 38467.
+    - role: firewalld
+      firewalld_port: 111
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+      when: "groups['app-servers']|length|int > 1"
+    - role: firewalld
+      firewalld_port: 111
+      firewalld_protocol: udp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+      when: "groups['app-servers']|length|int > 1"
+
+    # All gluster servers, Gluster Daemon
+    # maybe also: 24009, 24010, 24011
+    #
+    # From the docs
+    # ref: https://gluster.readthedocs.io/en/latest/Administrator%20Guide/Setting%20Up%20Clients/
+    #
+    # Ensure that TCP and UDP ports 24007 and 24008 are open on all Gluster
+    # servers. Apart from these ports, you need to open one port for each brick
+    # starting from port 49152 (instead of 24009 onwards as with previous
+    # releases). The brick ports assignment scheme is now compliant with IANA
+    # guidelines. For example: if you have five bricks, you need to have ports
+    # 49152 to 49156 open.
+    - role: firewalld
+      firewalld_port: 24007
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+      when: "groups['app-servers']|length|int > 1"
+    - role: firewalld
+      firewalld_port: 24008
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+      when: "groups['app-servers']|length|int > 1"
+
+    # One port required for each brick (in meza, this equals each server (one
+    # brick per server))
+    # FIXME: currently hard-coded four ports open allowing four app-servers
+    - role: firewalld
+      firewalld_port: 49152
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+      when: "groups['app-servers']|length|int > 1"
+    - role: firewalld
+      firewalld_port: 49153
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+      when: "groups['app-servers']|length|int > 1"
+    - role: firewalld
+      firewalld_port: 49154
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+      when: "groups['app-servers']|length|int > 1"
+    - role: firewalld
+      firewalld_port: 49155
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+      when: "groups['app-servers']|length|int > 1"
+
+    # Needed?: Gluster inline NFS server: 38465, 38466, 38467
+
+    - role: gluster
+      when: "groups['app-servers']|length|int > 1"
+
+
 - hosts: memcached-servers
   become: yes
   tags: memcached
