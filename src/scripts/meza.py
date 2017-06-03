@@ -253,9 +253,10 @@ def meza_command_setup_env (argv, return_not_exit=False):
 
 
 	print
-	print "Please review your config files. Run commands:"
+	print "Please review your host file. Run command:"
 	print "  sudo vi /opt/conf-meza/secret/{}/hosts".format(env)
-	print "  sudo vi /opt/conf-meza/secret/{}/group_vars/all.yml".format(env)
+	print "Please review your secret config. It is encrypted, so edit by running:"
+    print "  sudo ansible-vault edit /opt/conf-meza/secret/{}/group_vars/all.yml --vault-password-file /opt/conf-meza/users/meza-ansible/.vault-pass-{}.txt".format(env)
 
 	if return_not_exit:
 		return rc
