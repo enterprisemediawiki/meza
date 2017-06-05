@@ -703,19 +703,9 @@ $wgCirrusSearchClusters['default'][] = '{{ host }}';
  * Extension:VisualEditor
  *
  * Parsoid servers are defined based upon Ansible hosts file and thus
- * cannot be easily added to base-extensions.yml. As such, VisualEditor config
+ * cannot be easily added to MezaCoreExtensions.yml. As such, VisualEditor config
  * is included directly in LocalSettings.php.j2
  */
-// Allow read and edit permission for requests from the server (e.g. Parsoid)
-// Ref: https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
-// Ref: https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
-$mezaValidParsoidServers = [];
-{% for host in groups['parsoid-servers'] %}
-{% if host == inventory_hostname %}
-$mezaValidParsoidServers[] = '127.0.0.1';
-{% endif %}
-$mezaValidParsoidServers[] = '{{ host }}';
-{% endfor %}
 
 /**
  * HTTP_X_FORWARDED_FOR is set by HAProxy when users request pages via
@@ -723,7 +713,11 @@ $mezaValidParsoidServers[] = '{{ host }}';
  * other services (e.g. Parsoid) should directly access webservers. In
  * order to allow services to access MediaWiki with full permissions,
  * if HTTP_X_FORWARDED_FOR does NOT exist then assume it's not a regular
- * user and grant permissions
+ * user and grant permissions.
+ *
+ * Refs:
+ * https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
+ * https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
  **/
 if ( ! isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 	$wgGroupPermissions['*']['read'] = true;
@@ -739,13 +733,33 @@ $wgHiddenPrefs[] = 'visualeditor-enable';
 // OPTIONAL: Enable VisualEditor's experimental code features
 #$wgDefaultUserOptions['visualeditor-enable-experimental'] = 1;
 
-// URL to the Parsoid instance MUST NOT end in a slash due to Parsoid bug
-if ( in_array( '127.0.0.1', $mezaValidParsoidServers ) ) {
+
+{% if groups['app-servers']|length|int == 1 and groups['parsoid-servers']|length|int == 1 and groups['app-servers'][0] == groups['parsoid-servers'][0] %}
+
+	// One and only Parsoid server is localhost
 	$parsoidDomain = '127.0.0.1';
-}
-else {
+
+{% elif groups['parsoid-servers']|length|int == 1 %}
+
+	// Since there is only one Parsoid server, always use that one
+	$parsoidDomain = '{{ groups["parsoid-servers"][0] }}';
+
+{% elif inventory_hostname in groups['parsoid-servers'] %}
+
+	// Since this app-server is also a Parsoid server, always use this
+	$parsoidDomain = '{{ inventory_hostname }}';
+
+{% else %}
+
+	// Randomly choose which parsoid server to use
+	$mezaValidParsoidServers = [];
+	{% for host in groups['parsoid-servers'] %}
+	$mezaValidParsoidServers[] = '{{ host }}';
+	{% endfor %}
 	$parsoidDomain = $mezaValidParsoidServers[ array_rand( $mezaValidParsoidServers ) ];
-}
+
+{% endif %}
+
 $wgVirtualRestConfig['modules']['parsoid'] = array(
 	'url' => "http://$parsoidDomain:8000",
 

@@ -96,9 +96,19 @@ exports.setup = function(parsoidConfig) {
 	// OR by defining your own performanceTimer properties
 	//parsoidConfig.heapUsageSampleInterval = 5 * 60 * 1000;
 
-	// Allow override of port/interface:
+	// Allow override of port:
 	//parsoidConfig.serverPort = 8000;
+
+	{% if groups['app-servers']|length|int == 1 and groups['parsoid-servers']|length|int == 1 and groups['app-servers'][0] == groups['parsoid-servers'][0] %}
+
+	// One and only Parsoid server is one and only app-server
 	parsoidConfig.serverInterface = '127.0.0.1';
+
+	{% else %}
+
+	parsoidConfig.serverInterface = '{{ inventory_hostname }}';
+
+	{% endif %}
 
 	// The URL of your LintBridge API endpoint
 	//parsoidConfig.linterAPI = 'http://lintbridge.wmflabs.org/add';
