@@ -5,26 +5,39 @@ exports.setup = function(parsoidConfig) {
 	// Otherwise, defaults to "Parsoid/<current-version-defined-in-package.json>"
 	//parsoidConfig.userAgent = "My-User-Agent-String";
 
-	// The URL of your MediaWiki API endpoint.
+	// The URL  f your MediaWiki API endpoint.
 	// uri like:
 	//     http://192.168.56.56/wiki/api.php
 	//     http://enterprisemediawiki.org/wiki/api.php
 
-	// for all wiki ID and app-server combinations and do setMwApi
-	{% for appserver in groups['app-servers'] %}
+
+
+	// for all wiki IDs do setMwApi
 	{% for wiki in list_of_wikis %}
 
-	// {{ wiki }} on {{ appserver }}
-	parsoidConfig.setMwApi( {
-		prefix: '{{ wiki }}',
-		uri: 'http://{{ appserver }}:8080/{{ wiki }}/api.php',
+	parsoidConfig.setMwApi({
+
+		{% if groups['app-servers']|length|int == 1 and groups['parsoid-servers']|length|int == 1 and groups['app-servers'][0] == groups['parsoid-servers'][0] -%}
+
+			uri: 'http://127.0.0.1:8080/{{ wiki }}/api.php',
+
+		{%- elif 'load-balancers' not in groups or groups['load-balancers']|length|int == 0 -%}
+
+			uri: 'http://{{ groups["load-balancers-unmanaged"][0] }}:8081/{{ wiki }}/api.php',
+
+		{%- else -%}
+
+			uri: 'http://{{ groups["load-balancers"][0] }}:8081/{{ wiki }}/api.php',
+
+		{%- endif %}
 
 		// not really the domain, needs to be specific to each wiki
-		domain: '{{ wiki }}'
+		domain: '{{ wiki }}',
+		prefix: '{{ wiki }}'
 	} );
 
 	{% endfor %}
-	{% endfor %}
+
 
 	// To specify a proxy (or proxy headers) specific to this prefix (which
 	// overrides defaultAPIProxyURI) use:
@@ -50,7 +63,11 @@ exports.setup = function(parsoidConfig) {
 	//parsoidConfig.defaultAPIProxyURI = 'http://proxy.example.org:8080';
 
 	// Enable debug mode (prints extra debugging messages)
-	//parsoidConfig.debug = true;
+	{% if m_force_debug %}
+	parsoidConfig.debug = true;
+	{% else %}
+	parsoidConfig.debug = false;
+	{% endif %}
 
 	// Use the PHP preprocessor to expand templates via the MW API (default true)
 	//parsoidConfig.usePHPPreProcessor = false;

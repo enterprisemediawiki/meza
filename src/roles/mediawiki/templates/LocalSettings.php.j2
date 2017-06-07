@@ -737,31 +737,20 @@ $wgHiddenPrefs[] = 'visualeditor-enable';
 {% if groups['app-servers']|length|int == 1 and groups['parsoid-servers']|length|int == 1 and groups['app-servers'][0] == groups['parsoid-servers'][0] %}
 
 	// One and only Parsoid server is localhost
-	$parsoidDomain = '127.0.0.1';
+	$parsoidURL = 'http://127.0.0.1:8000';
 
-{% elif groups['parsoid-servers']|length|int == 1 %}
+{% elif 'load-balancers' not in groups or groups['load-balancers']|length|int == 0 %}
 
-	// Since there is only one Parsoid server, always use that one
-	$parsoidDomain = '{{ groups["parsoid-servers"][0] }}';
-
-{% elif inventory_hostname in groups['parsoid-servers'] %}
-
-	// Since this app-server is also a Parsoid server, always use this
-	$parsoidDomain = '{{ inventory_hostname }}';
+        $parsoidURL = '{{ groups["load-balancers-unmanaged"][0] }}:8001';
 
 {% else %}
 
-	// Randomly choose which parsoid server to use
-	$mezaValidParsoidServers = [];
-	{% for host in groups['parsoid-servers'] %}
-	$mezaValidParsoidServers[] = '{{ host }}';
-	{% endfor %}
-	$parsoidDomain = $mezaValidParsoidServers[ array_rand( $mezaValidParsoidServers ) ];
+	$parsoidURL = '{{ groups["load-balancers"][0] }}:8001';
 
 {% endif %}
 
 $wgVirtualRestConfig['modules']['parsoid'] = array(
-	'url' => "http://$parsoidDomain:8000",
+	'url' => $parsoidURL,
 
 	// domain here is not really the domain. It needs to be unique to each wiki
 	// and both domain and prefix must match settings in Parsoid's settings in
