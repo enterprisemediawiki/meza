@@ -24,10 +24,12 @@ exports.setup = function(parsoidConfig) {
 		{%- elif 'load-balancers' not in groups or groups['load-balancers']|length|int == 0 -%}
 
 			uri: 'http://{{ groups["load-balancers-unmanaged"][0] }}:8081/{{ wiki }}/api.php',
+			proxy: { uri: 'http://{{ groups["load-balancers-unmanaged"][0] }}:8081/' },
 
 		{%- else -%}
 
 			uri: 'http://{{ groups["load-balancers"][0] }}:8081/{{ wiki }}/api.php',
+			proxy: { uri: 'http://{{ groups["load-balancers"][0] }}:8081/' },
 
 		{%- endif %}
 
@@ -107,6 +109,7 @@ exports.setup = function(parsoidConfig) {
 	// Allow override of port:
 	//parsoidConfig.serverPort = 8000;
 
+
 	{% if groups['app-servers']|length|int == 1 and groups['parsoid-servers']|length|int == 1 and groups['app-servers'][0] == groups['parsoid-servers'][0] %}
 
 	// One and only Parsoid server is one and only app-server
@@ -117,6 +120,7 @@ exports.setup = function(parsoidConfig) {
 	parsoidConfig.serverInterface = '{{ inventory_hostname }}';
 
 	{% endif %}
+
 
 	// The URL of your LintBridge API endpoint
 	//parsoidConfig.linterAPI = 'http://lintbridge.wmflabs.org/add';
