@@ -98,6 +98,26 @@ listen mediawiki-internal
 
 	{% endfor %}
 
+listen stats
+	bind *:1936 ssl crt /etc/haproxy/certs/meza.pem
+	stats enable
+	stats hide-version
+	stats realm Haproxy\ Statistics
+	stats uri /haproxy
+	# FIXME FIXME FIXME FIXME
+	# FIXME FIXME FIXME FIXME
+	# FIXME FIXME FIXME FIXME
+	# FIXME FIXME FIXME FIXME
+	# FIXME FIXME FIXME FIXME
+	# FIXME FIXME FIXME FIXME
+	stats auth user:password
+	# FIXME FIXME FIXME FIXME
+	# FIXME FIXME FIXME FIXME
+	# FIXME FIXME FIXME FIXME
+	# FIXME FIXME FIXME FIXME
+	# FIXME FIXME FIXME FIXME
+	# FIXME FIXME FIXME FIXME
+	stats refresh 30s
 
 # backend letsencrypt-backend
 # 	server letsencrypt 127.0.0.1:54321

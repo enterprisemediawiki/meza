@@ -741,18 +741,17 @@ $wgVirtualRestConfig['modules']['parsoid'] = array(
 
 	// One and only Parsoid server is localhost
 	'url' => 'http://127.0.0.1:8000',
-	'HTTPProxy' => 'http://192.168.56.80:8001',
 
 
 {% elif 'load-balancers' not in groups or groups['load-balancers']|length|int == 0 %}
 
 	'url' => 'http://{{ groups["load-balancers-unmanaged"][0] }}:8001',
-	'HTTPProxy' => 'http://192.168.56.80:8001',
+	//'HTTPProxy' => 'http://{{ groups["load-balancers-unmanaged"][0] }}:8001',
 
 {% else %}
 
 	'url' => 'http://{{ groups["load-balancers"][0] }}:8001',
-	'HTTPProxy' => 'http://192.168.56.80:8001',
+	//'HTTPProxy' => 'http://{{ groups["load-balancers"][0] }}:8001',
 
 {% endif %}
 

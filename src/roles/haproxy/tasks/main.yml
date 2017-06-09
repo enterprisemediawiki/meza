@@ -208,6 +208,7 @@
   with_items:
     - 80
     - 443
+    - 1936
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 
