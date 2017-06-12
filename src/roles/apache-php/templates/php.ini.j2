@@ -898,6 +898,7 @@ default_socket_timeout = 60
 {% if m_setup_php_profiling %}
 ; Enable profiling capabilities for PHP
 extension=xhprof.so
+xhprof.output_dir={{ m_profiling_directory }}
 {% endif %}
 
 ;;;;;;;;;;;;;;;;;;;
