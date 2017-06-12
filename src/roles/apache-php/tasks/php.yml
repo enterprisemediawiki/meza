@@ -73,6 +73,8 @@
   pear:
     name: "{{ item }}"
     state: latest
+  tags:
+  - latest
   with_items:
   - Mail
   - Net_SMTP
