@@ -388,6 +388,7 @@ $wgSharedTables = array(
  *
  **/
 // proxy setup
+$wgUseSquid = true;
 $wgUsePrivateIPs = true;
 $wgSquidServersNoPurge = array(
 	{% for server in groups['load-balancers'] -%}
