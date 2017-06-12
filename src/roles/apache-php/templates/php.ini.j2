@@ -895,6 +895,11 @@ default_socket_timeout = 60
 ;extension=php_xmlrpc.dll
 ;extension=php_xsl.dll
 
+{% if m_setup_php_profiling %}
+; Enable profiling capabilities for PHP
+extension=xhprof.so
+{% endif %}
+
 ;;;;;;;;;;;;;;;;;;;
 ; Module Settings ;
 ;;;;;;;;;;;;;;;;;;;
