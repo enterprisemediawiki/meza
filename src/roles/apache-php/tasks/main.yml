@@ -38,11 +38,41 @@
 
 - name: Install PHP
   include: php.yml
+  # http://docs.ansible.com/ansible/playbooks_roles.html#dynamic-versus-static-includes
   static: yes
+
+
+
+# Only required for developers and performance testing
+- name: Install XHProf PECL package for profiling
+  pear:
+    name: pecl/xhprof-beta
+    state: present
+  when: m_setup_php_profiling
+
+- name: "Ensure {{ m_profiling_directory }} exists"
+  file:
+    path: "{{ m_profiling_directory }}"
+    owner: apache
+    group: apache
+    mode: 0755
+    state: directory
+  when: m_setup_php_profiling
+
+- name: Install graphviz packages
+  yum:
+    name: graphviz
+    state: installed
+  when: m_setup_php_profiling
+
+
 
 # Now that PHP is installed, start apache
 - name: ensure apache is running (and enable it at boot)
-  service: name=httpd state=started enabled=yes
+  service:
+    name: httpd
+    state: started
+    enabled: yes
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 

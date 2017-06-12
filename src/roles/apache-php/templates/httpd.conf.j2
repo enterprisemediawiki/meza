@@ -422,6 +422,15 @@ Listen 8080
 	</Directory>
 	{%- endif %}
 
+	{% if m_setup_php_profiling -%}
+	# Use SimpleSamlPhp to handle authentication
+	Alias /xhprof-ui {{ m_profiling_ui_directory }}
+	<Directory {{ m_profiling_ui_directory }}>
+		Require all granted
+		Options All -Indexes
+	</Directory>
+	{%- endif %}
+
 </VirtualHost>
 
 # Use port 8090 to access mod_status. Not accessible outside firewall.
