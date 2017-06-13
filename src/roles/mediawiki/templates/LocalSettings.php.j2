@@ -189,10 +189,11 @@ else {
 // See https://www.mediawiki.org/wiki/Manual:Profiling for more info.
 // Output options are udp, text (onto page, probably doesn't work for JS/CSS),
 // db (requires addtional DB setup), and dump (to files)
-$wgProfiler['class'] = 'ProfilerXhprof';
-$wgProfiler['output'] = array( 'ProfilerOutputDump' );
-$wgProfiler['outputDir'] = '{{ m_profiling_directory }}';
-$wgProfiler['visible'] = true;
+//
+// $wgProfiler['class'] = 'ProfilerXhprof';
+// $wgProfiler['output'] = array( 'ProfilerOutputDump' );
+// $wgProfiler['outputDir'] = '{{ m_profiling_directory }}';
+// $wgProfiler['visible'] = true;
 {% endif %}
 
 

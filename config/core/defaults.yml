@@ -59,6 +59,7 @@ m_memcached_conf: /etc/sysconfig/memcached
 m_parsoid_path: /etc/parsoid
 m_simplesamlphp_path: /opt/simplesamlphp
 m_profiling_ui_directory: /usr/share/pear/xhprof_html
+m_profiling_xhgui_directory: /opt/xhgui
 
 # files
 m_i18n: /opt/meza/config/core/i18n
