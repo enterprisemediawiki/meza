@@ -79,6 +79,13 @@ backend www-backend
 
 	{% endfor %}
 
+{% if m_setup_php_profiling %}
+listen php-profiling
+	bind *:8088
+	{% for host in groups['app-servers'] -%}
+		server profiling{{ loop.index }} {{ host }}:8089 check
+	{% endfor %}
+{% endif %}
 
 listen parsoid-internal
 	bind *:8001

@@ -124,7 +124,6 @@
     - base-extras
     - imagemagick
     - apache-php
-    - composer
 
 # Keeping this as a separate play, since at some point it will make sense to
 # configure app-servers as gluster clients and have separate gluster servers
