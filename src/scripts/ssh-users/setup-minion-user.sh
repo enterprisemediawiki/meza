@@ -71,7 +71,9 @@ mf_add_ssh_user "meza-ansible"
 
 
 if [ -f /tmp/meza-ansible.id_rsa.pub ]; then
-	cat /tmp/meza-ansible.id_rsa.pub >> /opt/conf-meza/users/meza-ansible/.ssh/authorized_keys
+	cat /tmp/meza-ansible.id_rsa.pub >> "$meza_user_dir/meza-ansible/.ssh/authorized_keys"
+	chown meza-ansible:meza-ansible "$meza_user_dir/meza-ansible/.ssh/authorized_keys"
+	chmod 644 "$meza_user_dir/meza-ansible/.ssh/authorized_keys"
 	passwd --delete meza-ansible
 else
 	echo
