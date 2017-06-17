@@ -208,7 +208,18 @@
   with_items:
     - 80
     - 443
+    - 1936
   when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+
+- name: Configure firewalld for haproxy stats via port 1936
+  firewalld:
+    port: "1936/tcp"
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and enable_haproxy_stats
 
 
 # FIXME: haproxy will need to handle reverse proxy for Elasticsearch plugins

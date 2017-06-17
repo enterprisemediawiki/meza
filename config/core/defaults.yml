@@ -80,3 +80,7 @@ allow_backup_downloads: false
 m_force_debug: false
 
 enable_wiki_emails: true
+
+enable_haproxy_stats: false
+haproxy_stats_user: admin
+haproxy_stats_password: password
