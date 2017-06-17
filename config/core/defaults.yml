@@ -77,4 +77,6 @@ m_language: en
 
 allow_backup_downloads: false
 
+m_force_debug: false
+
 enable_wiki_emails: true
