@@ -14,6 +14,15 @@
 #      - eventually need method to force-rsync from backup
 
 
+- name: Ensure localization cache directory exists for this wiki
+  file:
+    state: directory
+    path: "{{ m_cache_directory }}/{{ wiki_id }}"
+    owner: apache
+    group: apache
+    mode: 0700
+
+
 
 # Check if databases starting with "wiki_" exist
 #   if database exists: wiki_database.rc == 0
