@@ -93,3 +93,8 @@ haproxy_stats_password: password
 
 # Only useful for developers and testing performance issues
 m_setup_php_profiling: false
+
+# Enable slow query log
+mysql_slow_query_log_enabled: yes
+mysql_slow_query_time: "5"
+mysql_slow_query_log_file: /var/log/mariadb/slow-queries.log
