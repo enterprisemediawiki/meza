@@ -23,6 +23,7 @@ m_test: /opt/meza/test
 
 # data dir
 m_meza_data: /opt/data-meza
+m_cache_directory: /opt/data-meza/cache
 m_tmp: /opt/data-meza/tmp
 m_logs: /opt/data-meza/logs
 
