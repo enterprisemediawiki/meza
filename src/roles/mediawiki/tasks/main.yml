@@ -163,6 +163,21 @@
   when: saml_public is defined
 
 
+#
+# Cache (at this time) for localization caching. Also can be used for caching
+# page contents, but this isn't as necessary for enterprise cases where
+# generally users are always logged in.
+#
+- name: Ensure localization cache root directory exists (each wiki with sub-directory)
+  file:
+    state: directory
+    path: "{{ m_cache_directory }}"
+    owner: apache
+    group: apache
+    mode: 0700
+
+
+
 
 #
 # DEMO WIKI (if needed)
