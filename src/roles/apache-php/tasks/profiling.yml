@@ -15,12 +15,6 @@
     state: installed
   run_once: yes
 
-# Not used for xhgui, just built in xhprof-ui
-- name: Install graphviz package
-  yum:
-    name: graphviz
-    state: installed
-
 - name: Ensure MongoDB conf file in place
   template:
     src: mongod.conf.j2
@@ -106,12 +100,3 @@
     firewalld_protocol: tcp
     firewalld_servers: "{{ groups['load-balancers'] }}"
     firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-
-- name: "Ensure {{ m_profiling_directory }} exists"
-  file:
-    path: "{{ m_profiling_directory }}"
-    owner: apache
-    group: apache
-    mode: 0755
-    state: directory
-
