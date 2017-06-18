@@ -98,3 +98,8 @@ m_setup_php_profiling: false
 mysql_slow_query_log_enabled: yes
 mysql_slow_query_time: "5"
 mysql_slow_query_log_file: /var/log/mariadb/slow-queries.log
+
+# If using a load balancer not managed by meza, on what port should you
+# access Parsoid and MediaWiki internal services?
+unmanaged_load_balancer_parsoid_port: 8001
+unmanaged_load_balancer_mediawiki_port: 8081
