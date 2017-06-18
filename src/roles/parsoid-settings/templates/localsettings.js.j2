@@ -23,8 +23,8 @@ exports.setup = function(parsoidConfig) {
 
 		{%- elif 'load-balancers' not in groups or groups['load-balancers']|length|int == 0 -%}
 
-			uri: 'http://{{ groups["load-balancers-unmanaged"][0] }}:8081/{{ wiki }}/api.php',
-			// proxy: { uri: 'http://{{ groups["load-balancers-unmanaged"][0] }}:8081/' },
+			uri: 'http://{{ groups["load-balancers-unmanaged"][0] }}:{{ unmanaged_load_balancer_mediawiki_port }}/{{ wiki }}/api.php',
+			// proxy: { uri: 'http://{{ groups["load-balancers-unmanaged"][0] }}:{{ unmanaged_load_balancer_mediawiki_port }}/' },
 
 		{%- else -%}
 
