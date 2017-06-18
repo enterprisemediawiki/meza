@@ -233,6 +233,14 @@
   when: m_setup_php_profiling and (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 # FIXME: disable port 8088 when profiling not enabled
+- name: CLOSE port 8088 when profiling DISABLED
+  firewalld:
+    port: "8088/tcp"
+    permanent: true
+    immediate: true
+    state: disabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  when: not m_setup_php_profiling and (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 
 # FIXME #747: haproxy will need to handle reverse proxy for Elasticsearch plugins
