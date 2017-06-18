@@ -772,8 +772,8 @@ $wgVirtualRestConfig['modules']['parsoid'] = array(
 
 {% elif 'load-balancers' not in groups or groups['load-balancers']|length|int == 0 %}
 
-	'url' => 'http://{{ groups["load-balancers-unmanaged"][0] }}:8001',
-	//'HTTPProxy' => 'http://{{ groups["load-balancers-unmanaged"][0] }}:8001',
+	'url' => 'http://{{ groups["load-balancers-unmanaged"][0] }}:{{ load_balancer_unmanaged_parsoid_port }}',
+	//'HTTPProxy' => 'http://{{ groups["load-balancers-unmanaged"][0] }}:{{ load_balancer_unmanaged_parsoid_port }}',
 
 {% else %}
 
