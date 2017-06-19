@@ -491,6 +491,22 @@ wfLoadSkin( 'Vector' );
 $wgRestrictDisplayTitle = false;
 
 
+/**
+ * Directory for caching data in the local filesystem. Should not be accessible
+ * from the web. Meza's usage of this is for localization cache
+ *
+ * Note: if multiple wikis share the same localisation cache directory, they
+ * must all have the same set of extensions.
+ *
+ * Refs:
+ *  - mediawiki/includes/DefaultSettings.php
+ *  - https://www.mediawiki.org/wiki/Localisation#Caching
+ *  - https://www.mediawiki.org/wiki/Manual:$wgCacheDirectory
+ *  - https://www.mediawiki.org/wiki/Manual:$wgLocalisationCacheConf
+ */
+$wgCacheDirectory = "{{ m_cache_directory }}/$wikiId";
+
+
 
 
 
