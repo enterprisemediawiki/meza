@@ -210,20 +210,27 @@
   with_items:
     - 80
     - 443
-    - 1936
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
-- name: Configure firewalld for haproxy stats via port 1936
+- name: Ensure firewalld port 1936 OPEN when haproxy stats ENABLED
   firewalld:
     port: "1936/tcp"
     permanent: true
     immediate: true
     state: enabled
     zone: "{{m_public_networking_zone|default('public')}}"
-  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and enable_haproxy_stats
+  when: enable_haproxy_stats and (docker_skip_tasks is not defined or not docker_skip_tasks)
 
+- name: Ensure firewalld port 1936 CLOSED when haproxy stats DISABLED
+  firewalld:
+    port: "1936/tcp"
+    permanent: true
+    immediate: true
+    state: disabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  when: not enable_haproxy_stats and (docker_skip_tasks is not defined or not docker_skip_tasks)
 
-- name: Open port 8088 when profiling enabled
+- name: Ensure firewalld port 8088 OPEN when PHP profiling ENABLED
   firewalld:
     port: "8088/tcp"
     permanent: true
@@ -232,8 +239,7 @@
     zone: "{{m_public_networking_zone|default('public')}}"
   when: m_setup_php_profiling and (docker_skip_tasks is not defined or not docker_skip_tasks)
 
-# FIXME: disable port 8088 when profiling not enabled
-- name: CLOSE port 8088 when profiling DISABLED
+- name: Ensure firewalld port 8088 CLOSED when PHP profiling DISABLED
   firewalld:
     port: "8088/tcp"
     permanent: true
