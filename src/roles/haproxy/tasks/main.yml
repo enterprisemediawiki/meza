@@ -1,5 +1,5 @@
 ---
-# FIXME: Eventually add the ability to get SSL cert from letsencrypt
+# FIXME #748: Eventually add the ability to get SSL cert from letsencrypt
 #     ref: https://www.digitalocean.com/community/tutorials/how-to-secure-haproxy-with-let-s-encrypt-on-centos-7
 # Other refs:
 #     https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Load_Balancer_Administration/install_haproxy_example1.html
@@ -152,7 +152,7 @@
   file:
     path: /etc/haproxy/errors
     state: directory
-    # FIXME: permissions?
+    # FIXME #530: permissions?
 
 
 - name: Ensure error pages in place
@@ -160,7 +160,7 @@
     src: "errors/{{ item }}.http.j2"
     dest: "/etc/haproxy/errors/{{ item }}.http"
   with_items:
-    # FIXME: add the others, make the 500 error one good
+    # FIXME #663: add the others, make the 500 error one good
     # - 400
     # - 403
     # - 408
@@ -169,6 +169,8 @@
     # - 503
     # - 504
 
+# FIXME #746: Why does HAProxy specify this different method for firewall? Is
+# it an SELinux thing (which at present we don't have in enforcing)?
 - name: Ensure firewalld haproxy service files in place
   template:
     src: "haproxy-{{ item }}.firewalld.xml.j2"
@@ -208,10 +210,32 @@
   with_items:
     - 80
     - 443
+    - 1936
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
+- name: Configure firewalld for haproxy stats via port 1936
+  firewalld:
+    port: "1936/tcp"
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and enable_haproxy_stats
 
-# FIXME: haproxy will need to handle reverse proxy for Elasticsearch plugins
+
+- name: Open port 8088 when profiling enabled
+  firewalld:
+    port: "8088/tcp"
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  when: m_setup_php_profiling and (docker_skip_tasks is not defined or not docker_skip_tasks)
+
+# FIXME: disable port 8088 when profiling not enabled
+
+
+# FIXME #747: haproxy will need to handle reverse proxy for Elasticsearch plugins
 # - name: Configure firewalld for Elasticsearch reverse proxy
 #   firewalld:
 #     port: 8008/tcp

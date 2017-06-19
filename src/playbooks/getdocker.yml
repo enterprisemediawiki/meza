@@ -50,6 +50,8 @@
         name: "docker-ce"
         state: latest
       notify: Restart Docker
+      tags:
+      - latest
 
     - name: Ensure Docker is running (and enable it at boot)
       service:

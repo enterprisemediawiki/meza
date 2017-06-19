@@ -26,6 +26,9 @@ m_meza_data: /opt/data-meza
 m_tmp: /opt/data-meza/tmp
 m_logs: /opt/data-meza/logs
 
+# Only if m_setup_php_profiling: true
+m_profiling_directory: /opt/data-meza/logs/profiling
+
 # uploads dir. This WILL BE OVERIDDEN if multiple app servers are used, and
 # instead will use /opt/data-meza/uploads-gluster to use GlusterFS distributed
 # file system.
@@ -55,6 +58,8 @@ m_php_ini: /etc/php.ini
 m_memcached_conf: /etc/sysconfig/memcached
 m_parsoid_path: /etc/parsoid
 m_simplesamlphp_path: /opt/simplesamlphp
+m_profiling_ui_directory: /usr/share/pear/xhprof_html
+m_profiling_xhgui_directory: /opt/xhgui
 
 # files
 m_i18n: /opt/meza/config/core/i18n
@@ -77,4 +82,13 @@ m_language: en
 
 allow_backup_downloads: false
 
+m_force_debug: false
+
 enable_wiki_emails: true
+
+enable_haproxy_stats: false
+haproxy_stats_user: admin
+haproxy_stats_password: password
+
+# Only useful for developers and testing performance issues
+m_setup_php_profiling: false
