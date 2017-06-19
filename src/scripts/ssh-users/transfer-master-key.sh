@@ -17,10 +17,6 @@ source "$m_scripts/shell-functions/linux-user.sh"
 echo "Type space-separated list of minions to copy SSH"
 read -e minions
 
-if [ -z "$ansible_user" ]; then 
-	ansible_user="meza-ansible"
-fi
-
 for minion in $minions; do
 
 	# Copy id_rsa.pub to each minion

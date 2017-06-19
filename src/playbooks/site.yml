@@ -86,17 +86,6 @@
   tags: load-balancer
   roles:
     - set-vars
-    - role: firewalld
-      firewalld_port: 8001
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewalld
-      firewalld_port: 8081
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['parsoid-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-    # NOTE: firewalld ports 80 and 443 opened to ALL within haproxy role
     - haproxy
 
 - hosts: app-servers
@@ -318,17 +307,6 @@
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewalld
-      firewalld_port: 8000
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['load-balancers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewalld
-      firewalld_port: 8000
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['load-balancers-unmanaged'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'load-balancers-unmanaged' in groups"
     - nodejs
     - role: parsoid
       nodejs_install_npm_user: "nodejs"
