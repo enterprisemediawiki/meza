@@ -744,7 +744,10 @@ $parsoidServers = array(
 	{% endfor %}
 );
 $xffPresent = isset( $_SERVER['HTTP_X_FORWARDED_FOR'] );
-$remoteAddrIsValidParsoid = in_array( $_SERVER['REMOTE_ADDR'], array('127.0.0.1','localhost');
+$remoteAddrIsValidParsoid = in_array(
+	$_SERVER['REMOTE_ADDR'],
+	array('127.0.0.1','localhost')
+);
 
 if ( (! $xffPresent && $remoteAddrIsValidParsoid)
 	|| ( $xffPresent && in_array($_SERVER['HTTP_X_FORWARDED_FOR'],$parsoidServers) )
