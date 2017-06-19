@@ -738,27 +738,39 @@ $wgCirrusSearchClusters['default'][] = '{{ host }}';
  * https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
  * https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
  **/
-$parsoidServers = array(
-	{% for parsoid in groups['parsoid-servers'] %}
-	'{{ parsoid }}',
-	{% endfor %}
-);
-$xffPresent = isset( $_SERVER['HTTP_X_FORWARDED_FOR'] );
-$remoteAddrIsValidParsoid = in_array(
-	$_SERVER['REMOTE_ADDR'],
-	array('127.0.0.1','localhost')
-);
+// initially assume we're not granting special rights
+$grantParsoidReadWrite = false;
 
-if ( (! $xffPresent && $remoteAddrIsValidParsoid)
-	|| ( $xffPresent && in_array($_SERVER['HTTP_X_FORWARDED_FOR'],$parsoidServers) )
-) {
+// if X-Forwarded-For HTTP header exists
+if ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 
-	// xff = X-Forwarded-For HTTP header (see above)
-	// If no xff and remote address is "localhost" or "127.0.0.1"
-	// If yes xff and xff in [list,of,parsoid,servers]
+	$parsoidServers = array(
+		{% for parsoid in groups['parsoid-servers'] %}
+		'{{ parsoid }}',
+		{% endfor %}
+	);
+
+	// if request originated at a Parsoid server
+	if ( in_array( $_SERVER['HTTP_X_FORWARDED_FOR'], $parsoidServers ) ) {
+		$grantParsoidReadWrite = true;
+	}
+
+}
+
+// no X-Forwarded-For HTTP Header
+else if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+
+	// if remote address is this server
+	if ( $_SERVER['REMOTE_ADDR'] === 'localhost' || $_SERVER['REMOTE_ADDR'] === '127.0.0.1' ) {
+		$grantParsoidReadWrite = true;
+	}
+
+}
+
+// if the logic above resulted in granting access
+if ( $grantParsoidReadWrite ) {
 	$wgGroupPermissions['*']['read'] = true;
 	$wgGroupPermissions['*']['edit'] = true;
-
 }
 
 // Enable by default for everybody
