@@ -16,11 +16,11 @@ def load_yaml ( filepath ):
 			print(exc)
 
 
-paths = load_yaml( "/opt/meza/config/core/paths.yml" )
+defaults = load_yaml( "/opt/meza/config/core/defaults.yml" )
 
 # Hard-coded for now, because I'm not sure where to set it yet
 language = "en"
-i18n = load_yaml( os.path.join( paths['m_i18n'], language+".yml" ) )
+i18n = load_yaml( os.path.join( defaults['m_i18n'], language+".yml" ) )
 
 
 def main (argv):
@@ -34,11 +34,14 @@ def main (argv):
 		display_docs('base')
 		sys.exit(0) # asking for help doesn't give error code
 	elif argv[0] in ('-v', '--version'):
-		version, rc = meza_shell_exec( ["git", "--git-dir=/opt/meza/.git", "describe", "--tags" ], True )
+		import subprocess
+		version = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "describe", "--tags" ] )
+		commit = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "rev-parse", "HEAD" ] )
 		print "Meza " + version.strip()
+		print "Commit " + commit.strip()
 		print "Mediawiki EZ Admin"
 		print
-		sys.exit(rc)
+		sys.exit(0)
 
 
 	# Every command has a sub-command. No second param, no sub-command. Display
@@ -138,17 +141,20 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	else:
 		env = argv[0]
 
-	if not os.path.isdir( "/opt/meza/config/local-secret" ):
-		os.mkdir( "/opt/meza/config/local-secret" )
+	if not os.path.isdir( "/opt/conf-meza" ):
+		os.mkdir( "/opt/conf-meza" )
 
-	if os.path.isdir( "/opt/meza/config/local-secret/" + env ):
+	if not os.path.isdir( "/opt/conf-meza/secret" ):
+		os.mkdir( "/opt/conf-meza/secret" )
+
+	if os.path.isdir( "/opt/conf-meza/secret/" + env ):
 		print
 		print "Environment {} already exists".format(env)
 		sys.exit(1)
 
-	fqdn = db_pass = enable_email = private_net_zone = False
+	fqdn = db_pass = private_net_zone = False
 	try:
-		opts, args = getopt.getopt(argv[1:],"",["fqdn=","db_pass=","enable_email=","private_net_zone="])
+		opts, args = getopt.getopt(argv[1:],"",["fqdn=","db_pass=","private_net_zone="])
 	except Exception as e:
 		print str(e)
 		print 'meza setup env <env> [options]'
@@ -160,8 +166,6 @@ def meza_command_setup_env (argv, return_not_exit=False):
 			# This will put the DB password on the command line, so should
 			# only be done in testing cases
 			db_pass = arg
-		elif opt == "--enable_email":
-			enable_email = arg
 		elif opt == "--private_net_zone":
 			private_net_zone = arg
 		else:
@@ -174,9 +178,6 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	if not db_pass:
 		db_pass = prompt_secure("db_pass")
 
-	if not enable_email:
-		enable_email = prompt("enable_email")
-
 	# No need for private networking. Set to public.
 	if env == "monolith":
 		private_net_zone = "public"
@@ -188,7 +189,6 @@ def meza_command_setup_env (argv, return_not_exit=False):
 		'env': env,
 
 		'fqdn': fqdn,
-		'enable_email': enable_email,
 		'private_net_zone': private_net_zone,
 
 		# Set all db passwords the same
@@ -203,7 +203,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 
 
 	server_types = ['load_balancers','app_servers','memcached_servers',
-		'db_slaves','parsoid_servers','elastic_servers','backup_servers']
+		'db_slaves','parsoid_servers','elastic_servers','backup_servers','logging_servers']
 
 
 	for stype in server_types:
@@ -227,11 +227,11 @@ def meza_command_setup_env (argv, return_not_exit=False):
 
 	json_env_vars = json.dumps(env_vars)
 
-	# Create temporary extra vars file in local-secret directory so passwords
-	# are not written to command line. Putting in local-secret should make
+	# Create temporary extra vars file in secret directory so passwords
+	# are not written to command line. Putting in secret should make
 	# permissions acceptable since this dir will hold secret info, though it's
 	# sort of an odd place for a temporary file. Perhaps /root instead?
-	extra_vars_file = "/opt/meza/config/local-secret/temp_vars.json"
+	extra_vars_file = "/opt/conf-meza/secret/temp_vars.json"
 	if os.path.isfile(extra_vars_file):
 		os.remove(extra_vars_file)
 	f = open(extra_vars_file, 'w')
@@ -243,11 +243,20 @@ def meza_command_setup_env (argv, return_not_exit=False):
 
 	os.remove(extra_vars_file)
 
-	print
-	print "Please review your config files. Run commands:"
-	print "  sudo vi /opt/meza/config/local-secret/{}/hosts".format(env)
-	print "  sudo vi /opt/meza/config/local-secret/{}/group_vars/all.yml".format(env)
+	# Now that the env is setup, generate a vault password file and use it to
+	# encrypt all.yml
+	vault_pass_file = get_vault_pass_file( env )
+	all_yml = "/opt/conf-meza/secret/{}/group_vars/all.yml".format(env)
+	cmd = "ansible-vault encrypt {} --vault-password-file {}".format(all_yml, vault_pass_file)
+	os.system(cmd)
 
+
+
+	print
+	print "Please review your host file. Run command:"
+	print "  sudo vi /opt/conf-meza/secret/{}/hosts".format(env)
+	print "Please review your secret config. It is encrypted, so edit by running:"
+	print "  sudo ansible-vault edit /opt/conf-meza/secret/{}/group_vars/all.yml --vault-password-file /opt/conf-meza/users/meza-ansible/.vault-pass-{}.txt".format(env,env)
 	if return_not_exit:
 		return rc
 	else:
@@ -346,36 +355,70 @@ def meza_command_update (argv):
 #   $ meza maint createAndPromote + argv   --> create a user on all wikis
 def meza_command_maint (argv):
 
-		if argv[0] != "runJobs":
-			print "Currently the only maint command is 'runJobs'"
-			print "  meza maint runJobs"
-			sys.exit(1)
+	# FIXME: This has no notion of environments
 
-		# FIXME: This has no notion of environments
+	sub_command = argv[0]
+	command_fn = "meza_command_maint_" + sub_command
 
-		#
-		# WARNING: THIS FUNCTION SHOULD STILL WORK ON MONOLITHS, BUT HAS NOT BE
-		#          RE-TESTED SINCE MOVING TO ANSIBLE. FOR NON-MONOLITHS IT WILL
-		#          NOT WORK AND NEEDS TO BE ANSIBLE-IZED. FIXME.
-		#
+	# if command_fn is a valid Python function, pass it all remaining args
+	if command_fn in globals() and callable( globals()[command_fn] ):
+		globals()[command_fn]( argv[1:] )
+	else:
+		print
+		print sub_command + " is not a valid sub-command for maint"
+		sys.exit(1)
 
-		wikis_dir = "/opt/meza/htdocs/wikis"
-		wikis = os.listdir( wikis_dir )
-		for i in wikis:
-			if os.path.isdir(os.path.join(wikis_dir, i)):
-				anywiki=i
-				break
 
-		if not anywiki:
-			print "No wikis available to run jobs"
-			sys.exit(1)
 
-		shell_cmd = ["WIKI="+anywiki, "php", "/opt/meza/src/scripts/runAllJobs.php"]
-		if len(argv) > 1:
-			shell_cmd = shell_cmd + ["--wikis="+argv[1]]
-		rc = meza_shell_exec( shell_cmd )
+def meza_command_maint_runJobs (argv):
 
+	#
+	# WARNING: THIS FUNCTION SHOULD STILL WORK ON MONOLITHS, BUT HAS NOT BE
+	#          RE-TESTED SINCE MOVING TO ANSIBLE. FOR NON-MONOLITHS IT WILL
+	#          NOT WORK AND NEEDS TO BE ANSIBLE-IZED. FIXME.
+	#
+
+	wikis_dir = "/opt/htdocs/wikis"
+	wikis = os.listdir( wikis_dir )
+	for i in wikis:
+		if os.path.isdir(os.path.join(wikis_dir, i)):
+			anywiki=i
+			break
+
+	if not anywiki:
+		print "No wikis available to run jobs"
+		sys.exit(1)
+
+	shell_cmd = ["WIKI="+anywiki, "php", "/opt/meza/src/scripts/runAllJobs.php"]
+	if len(argv) > 0:
+		shell_cmd = shell_cmd + ["--wikis="+argv[1]]
+	rc = meza_shell_exec( shell_cmd )
+
+	sys.exit(rc)
+
+def meza_command_maint_rebuild (argv):
+
+	env = argv[0]
+
+	rc = check_environment(env)
+
+	# return code != 0 means failure
+	if rc != 0:
 		sys.exit(rc)
+
+	more_extra_vars = False
+
+	# strip environment off of it
+	argv = argv[1:]
+
+	shell_cmd = playbook_cmd( 'rebuild-smw-and-index', env, more_extra_vars )
+	if len(argv) > 0:
+		shell_cmd = shell_cmd + argv
+
+	return_code = meza_shell_exec( shell_cmd )
+
+	# exit with same return code as ansible command
+	sys.exit(return_code)
 
 
 def meza_command_docker (argv):
@@ -417,8 +460,18 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 	command = ['sudo', '-u', 'meza-ansible', 'ansible-playbook',
 		'/opt/meza/src/playbooks/{}.yml'.format(playbook)]
 	if env:
-		host_file = "/opt/meza/config/local-secret/{}/hosts".format(env)
-		command = command + [ '-i', host_file ]
+		host_file = "/opt/conf-meza/secret/{}/hosts".format(env)
+
+		# Meza _needs_ to be able to load this file. Be perhaps a little
+		# overzealous and chown/chmod it everytime
+		secret_file = '/opt/conf-meza/secret/{}/group_vars/all.yml'.format(env)
+		meza_chown( secret_file, 'meza-ansible', 'wheel' )
+		os.chmod( secret_file, 0o660 )
+
+		# Setup password file if not exists (environment info is encrypted)
+		vault_pass_file = get_vault_pass_file( env )
+
+		command = command + [ '-i', host_file, '--vault-password-file', vault_pass_file ]
 		extra_vars = { 'env': env }
 
 	else:
@@ -436,7 +489,7 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 
 # FIXME install --> setup dev-networking, setup docker, deploy monolith (special case)
 
-def meza_shell_exec ( shell_cmd, return_output=False ):
+def meza_shell_exec ( shell_cmd ):
 
 	# FIXME
 	# Get errors with user meza-ansible trying to write to the calling-user's
@@ -460,11 +513,31 @@ def meza_shell_exec ( shell_cmd, return_output=False ):
 	# FIXME: See above
 	os.chdir( starting_wd )
 
-	if return_output:
-		return ( output, rc )
-	else:
-		return rc
+	return rc
 
+def get_vault_pass_file ( env ):
+	import pwd
+	import grp
+	home_dir = defaults['m_home']
+	vault_pass_file = '{}/meza-ansible/.vault-pass-{}.txt'.format(home_dir,env)
+	if not os.path.isfile( vault_pass_file ):
+		with open( vault_pass_file, 'w' ) as f:
+			f.write( random_string( num_chars=64 ) )
+			f.close()
+
+	# Run this everytime, since it should be fast and if meza-ansible can't
+	# read this then you're stuck!
+	meza_chown( vault_pass_file, 'meza-ansible', 'wheel' )
+	os.chmod( vault_pass_file, 0o600 )
+
+	return vault_pass_file
+
+def meza_chown ( path, username, groupname ):
+	import pwd
+	import grp
+	uid = pwd.getpwnam( username ).pw_uid
+	gid = grp.getgrnam( groupname ).gr_gid
+	os.chown( path, uid, gid )
 
 def display_docs(name):
 	f = open('/opt/meza/manual/meza-cmd/{}.txt'.format(name),'r')
@@ -528,7 +601,7 @@ def random_string(**params):
 def check_environment(env):
 	import os
 
-	conf_dir = "/opt/meza/config/local-secret"
+	conf_dir = "/opt/conf-meza/secret"
 
 	env_dir = os.path.join( conf_dir, env )
 	if not os.path.isdir( env_dir ):

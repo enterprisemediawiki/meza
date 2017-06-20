@@ -3,7 +3,7 @@ list:
 
   - name: Semantic MediaWiki
     composer: "mediawiki/semantic-media-wiki"
-    version: "~2.4"
+    version: "2.5.2"
     config: |
       // Enable Semantic MediaWiki semantics
       enableSemantics( $wikiId );
@@ -13,14 +13,12 @@ list:
 
       // allows adding semantic properties to Templates themselves
       // (not just on pages via templates).
-      // ENABLE THIS AFTER ALL TEMPLATES HAVE BEEN CHECKED FOR PROPER FORM
-      // i.e. using <noinclude> and <includeonly> properly
-      // $smwgNamespacesWithSemanticLinks[NS_TEMPLATE] = true;
       $smwgNamespacesWithSemanticLinks[NS_TALK] = true;
+      $smwgNamespacesWithSemanticLinks[NS_TEMPLATE] = true;
 
   - name: Semantic Result Formats
     composer: "mediawiki/semantic-result-formats"
-    version: "~2.0"
+    version: "2.4.x"
     config: |
       // SemanticResultFormats formats enabled (beyond defaults)
       // These are disabled by default because they send data to external
@@ -40,9 +38,9 @@ list:
   - name: SubPageList
     composer: "mediawiki/sub-page-list"
     version: "~1.1"
-  - name: Semantic Maps
-    composer: "mediawiki/semantic-maps"
-    version: "~3.2"
+  - name: Maps
+    composer: "mediawiki/maps"
+    version: "~4.1"
 
 
 
@@ -74,9 +72,9 @@ list:
   - name: CharInsert
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CharInsert.git
     version: REL1_27
-  - name: SemanticForms
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticForms.git
-    version: tags/3.5
+  - name: PageForms
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PageForms.git
+    version: tags/4.1.1
   - name: DismissableSiteNotice
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DismissableSiteNotice.git
     version: REL1_27
@@ -131,15 +129,10 @@ list:
   - name: CollapsibleVector
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CollapsibleVector
     version: REL1_27
-  - name: Math
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Math.git
-    version: REL1_27
-    config: |
-      $wgMathValidModes[] = 'MW_MATH_MATHJAX'; // Define MathJax as one of the valid math rendering modes
-      $wgUseMathJax = true; // Enable MathJax as a math rendering option for users to pick
-      $wgDefaultUserOptions['math'] = 'MW_MATH_MATHJAX'; // Set MathJax as the default rendering option for all users (optional)
-      $wgMathDisableTexFilter = true; // or compile "texvccheck"
-      $wgDefaultUserOptions['mathJax'] = true; // Enable the MathJax checkbox option
+  - name: SimpleMathJax
+    repo: https://github.com/jamesmontalvo3/SimpleMathJax.git
+    version: e94afaffcdde8d926b166fdd166162f9519beaa1
+    legacy_load: True
   - name: ImageMap
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ImageMap
     version: REL1_27
@@ -198,19 +191,17 @@ list:
     legacy_load: true
   - name: HeaderTabs
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/HeaderTabs.git
-    version: REL1_27
+    version: tags/1.1
     legacy_load: true
     config: |
-      $htEditTabLink = false;
-      $htRenderSingleTab = true;
+      $wgHeaderTabsEditTabLink = false;
+      $wgHeaderTabsRenderSingleTab = true;
   - name: CopyWatchers
     repo: https://github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git
-    version: extreg
-    legacy_load: true
+    version: master
   - name: Wiretap
     repo: https://github.com/enterprisemediawiki/Wiretap.git
-    version: extreg
-    legacy_load: true
+    version: master
   - name: ApprovedRevs
     repo: https://github.com/jamesmontalvo3/MediaWiki-ApprovedRevs.git
     version: master
@@ -258,12 +249,9 @@ list:
       );
 
 
-  # @todo: The "official" version of this is in an SVN repository. If we need
-  #        this it should be migrated to Gerrit or an EMW managed git repo.
-  #        See https://www.mediawiki.org/wiki/Extension:Pipe_Escape
   - name: PipeEscape
-    repo: https://github.com/jamesmontalvo3/MediaWiki-PipeEscape.git
-    version: extreg
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PipeEscape.git
+    version: REL1_27
     legacy_load: true
   - name: CirrusSearch
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CirrusSearch.git

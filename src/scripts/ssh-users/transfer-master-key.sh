@@ -7,7 +7,7 @@
 
 # Load config constants. Unfortunately right now have to write out full path to
 # meza since we can't be certain of consistent method of accessing install.sh.
-source "/opt/meza/config/core/config.sh"
+source "/opt/.deploy-meza/config.sh"
 
 source "$m_scripts/shell-functions/base.sh"
 rootCheck
@@ -16,6 +16,10 @@ source "$m_scripts/shell-functions/linux-user.sh"
 
 echo "Type space-separated list of minions to copy SSH"
 read -e minions
+
+if [ -z "$ansible_user" ]; then 
+	ansible_user="meza-ansible"
+fi
 
 for minion in $minions; do
 

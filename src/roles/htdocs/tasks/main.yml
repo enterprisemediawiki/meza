@@ -1,0 +1,43 @@
+---
+
+# Take ServerPerformance from controller, put in app server htdocs
+- name: Ensure ServerPerformance configured
+  synchronize:
+    src: "files/ServerPerformance/"
+    dest: "{{ m_htdocs }}/ServerPerformance"
+    recursive: yes
+    delete: yes
+    rsync_opts:
+      - "--no-motd"
+      - "--exclude=.git"
+
+- name: Ensure BackupDownload configured
+  synchronize:
+    src: "files/BackupDownload/"
+    dest: "{{ m_htdocs }}/BackupDownload"
+    recursive: yes
+    delete: yes
+    rsync_opts:
+      - "--no-motd"
+      - "--exclude=.git"
+  when: allow_backup_downloads
+
+# In case people change their mind and don't want to offer backup downloads,
+# remove files
+- name: Ensure BackupDownload NOT configured
+  file:
+    path: "{{ m_htdocs }}/BackupDownload"
+    state: absent
+  when: not allow_backup_downloads
+
+- name: Ensure files configured
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ m_htdocs }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+  - ".htaccess"
+  - "index.php"
+  - "office.html"

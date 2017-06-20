@@ -1,6 +1,8 @@
 ---
 - name: Install php dependency packages
-  yum: name={{item}} state=installed
+  yum:
+    name: "{{ item }}"
+    state: installed
   with_items:
     - zlib-devel
     - sqlite-devel
@@ -28,10 +30,14 @@
     - m4
     - xz-libs
     - mariadb-libs
+
 - name: Get IUS repository
   include: ius.yml
+
 - name: Ensure PHP IUS packages installed
-  yum: name={{item}} state=installed
+  yum:
+    name: "{{item}}"
+    state: installed
   with_items:
     - php56u
     - php56u-cli
@@ -55,11 +61,20 @@
     - php56u-soap
     - php56u-mbstring
     - php56u-mcrypt
+
 - name: Write php.ini file
-  template: "src=php.ini.j2 dest={{ m_php_ini }}"
+  template:
+    src: php.ini.j2
+    dest: "{{ m_php_ini }}"
   notify:
   - restart apache
-- name: ensure PEAR Mail package installed
+
+- name: Ensure PEAR Mail and Net_SMTP packages installed
   pear:
-    name: Mail
+    name: "{{ item }}"
     state: latest
+  tags:
+  - latest
+  with_items:
+  - Mail
+  - Net_SMTP

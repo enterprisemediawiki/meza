@@ -29,7 +29,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  *  Perform authentication up front.
  *
  **/
-require_once "{{ m_config_app_ansible }}/samlLocalSettings.php";
+require_once "{{ m_deploy }}/samlLocalSettings.php";
 
 
 {% endif %}
@@ -43,8 +43,10 @@ require_once "{{ m_config_app_ansible }}/samlLocalSettings.php";
 
 // same value as bash variable in config.sh
 $m_meza = '{{ m_meza }}';
-$m_config = '{{ m_config }}';
+$m_config_core = '{{ m_config_core }}';
 $m_htdocs = '{{ m_htdocs }}';
+$m_deploy = '{{ m_deploy }}';
+$m_meza_data = '{{ m_meza_data }}';
 
 if( $wgCommandLineMode ) {
 
@@ -73,17 +75,37 @@ if ( ! in_array( $wikiId, $wikis ) ) {
 
 }
 
+{% if meza_auth_type is defined %}
+// Set an all-wiki auth type, which individual wikis can override
+$mezaAuthType = '{{ meza_auth_type }}';
+{% endif %}
+
 #
 # PRE LOCAL SETTINGS
 #
 #    (1) Load all PHP files in preLocalSettings.d for all wikis
-foreach ( glob("$m_meza/config/local_app/preLocalSettings.d/*.php") as $filename) {
+foreach ( glob("$m_deploy/public/preLocalSettings.d/*.php") as $filename) {
     require_once $filename;
 }
 #    (2) Load all PHP files in preLocalSettings.d for this wiki
-foreach ( glob("$m_meza/config/local_app/wikis/$wikiId/preLocalSettings.d/*.php") as $filename) {
+foreach ( glob("$m_deploy/public/wikis/$wikiId/preLocalSettings.d/*.php") as $filename) {
     require_once $filename;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -146,7 +168,7 @@ if ( $debug ) {
 	ini_set( 'log_errors', 1 );
 
 	// Output errors to log file
-	ini_set( 'error_log', "$m_meza/data/logs/php.log" );
+	ini_set( 'error_log', "$m_meza_data/logs/php.log" );
 
 	// MediaWiki Debug Tools
 	$wgShowExceptionDetails = true;
@@ -162,7 +184,6 @@ else {
 	ini_set("display_errors", 0);
 
 }
-
 
 
 
@@ -196,7 +217,7 @@ $wgScriptPath = "/$wikiId";
 $wgUploadPath = "$wgScriptPath/img_auth.php";
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadDirectory
-$wgUploadDirectory = "$m_meza/data/uploads/$wikiId";
+$wgUploadDirectory = "{{ m_uploads_dir }}/$wikiId";
 
 // https://www.mediawiki.org/wiki/Manual:$wgLogo
 $wgLogo = "/wikis/$wikiId/config/logo.png";
@@ -233,18 +254,25 @@ $wgResourceBasePath = $wgScriptPath;
  *
  *  Email configuration
  **/
-if ( $mezaEnableAllWikiEmail && isset( $mezaEnableWikiEmail ) && $mezaEnableWikiEmail ) {
+{% if enable_wiki_emails is defined and enable_wiki_emails %}
+if ( isset( $mezaEnableWikiEmail ) && $mezaEnableWikiEmail ) {
 	$wgEnableEmail = true;
 }
 else {
 	$wgEnableEmail = false;
 }
+{% else %}
+$wgEnableEmail = false;
+{% endif %}
 
 ## UPO means: this is also a user preference option
 $wgEnableUserEmail = $wgEnableEmail; # UPO
 $wgEnotifUserTalk = $wgEnableEmail; # UPO
 $wgEnotifWatchlist = $wgEnableEmail; # UPO
 $wgEmailAuthentication = $wgEnableEmail;
+
+$wgPasswordSender = '{{ wgPasswordSender }}';
+$wgEmergencyContact = '{{ wgEmergencyContact | default(wgPasswordSender) }}';
 
 
 
@@ -312,7 +340,7 @@ $wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
 $wgDBmysql5 = false;
 
 
-{% if primary_wiki_db_name is defined %}
+{% if primary_wiki_id is defined %}
 /**
  *  If a primewiki is defined then every wiki will use that wiki db for certain
  *  tables. The shared `interwiki` table allows users to use the same interwiki
@@ -321,10 +349,9 @@ $wgDBmysql5 = false;
  *  not affect the user groups, so a user can be a sysop on one wiki and just a
  *  user on another.
  *
- *  To enable a primewiki add the `primary_wiki_db_name` variable to the config
- *  with the value being the database name. For example, if your primewiki's ID
- *  is "main", your database name is wiki_main unless you have manually changed
- *  it to something else.
+ *  To enable a primewiki add the `primary_wiki_id` variable to the config with
+ *  the value being the wiki ID of the prime wiki (e.g. the 1st part of the URL
+ *  after the domain, e.g. https://example.com/<wiki_id>)
  *
  *  In order for this to work properly the wikis need to have been created with
  *  a single user table in mind. If you're starting a new wiki farm then you're
@@ -332,7 +359,7 @@ $wgDBmysql5 = false;
  *  tables, then you'll need to use the unifyUserTables.php script. Please test
  *  this script extensively before use. Unifying user tables is complicated.
  **/
-$wgSharedDB = '{{ primary_wiki_db_name }}';
+$wgSharedDB = 'wiki_{{ primary_wiki_id }}';
 $wgSharedTables = array(
 	'user',            // default
 	'user_properties', // default
@@ -350,6 +377,26 @@ $wgSharedTables = array(
  *
  *
  **/
+// proxy setup
+$wgUseSquid = true;
+$wgUsePrivateIPs = true;
+$wgSquidServersNoPurge = array(
+	{% for server in groups['load-balancers'] -%}
+	{%- if server == inventory_hostname or server == 'localhost' -%}
+	'127.0.0.1',
+	{%- else -%}
+	'{{ server }}',
+	{%- endif -%}
+	{%- endfor %}
+	{% if 'load-balancers-unmanaged' in groups and groups['load-balancers-unmanaged']|length|int > 0 %}
+	# unmanaged load-balancers, e.g. load balancers not maintained by meza,
+	# such as AWS or Digital Ocean
+	{% for server in groups['load-balancers-unmanaged'] -%}
+	'{{ server }}',
+	{%- endfor %}
+	{% endif %}
+);
+
 // memcached settings
 $wgMainCacheType = CACHE_MEMCACHED;
 // If parser cache set to CACHE_MEMCACHED, templates used to format SMW query
@@ -433,6 +480,22 @@ wfLoadSkin( 'Vector' );
 $wgRestrictDisplayTitle = false;
 
 
+/**
+ * Directory for caching data in the local filesystem. Should not be accessible
+ * from the web. Meza's usage of this is for localization cache
+ *
+ * Note: if multiple wikis share the same localisation cache directory, they
+ * must all have the same set of extensions.
+ *
+ * Refs:
+ *  - mediawiki/includes/DefaultSettings.php
+ *  - https://www.mediawiki.org/wiki/Localisation#Caching
+ *  - https://www.mediawiki.org/wiki/Manual:$wgCacheDirectory
+ *  - https://www.mediawiki.org/wiki/Manual:$wgLocalisationCacheConf
+ */
+$wgCacheDirectory = "{{ m_cache_directory }}/$wikiId";
+
+
 
 
 
@@ -449,7 +512,11 @@ $wgExternalLinkTarget = '_blank';
 
 // added this line to allow linking. specifically to Imagery Online.
 $wgAllowExternalImages = true;
+{% if allow_image_tags is defined and allow_image_tags %}
 $wgAllowImageTag = true;
+{% else %}
+$wgAllowImageTag = false;
+{% endif %}
 
 $wgVectorUseSimpleSearch = true;
 
@@ -513,7 +580,8 @@ $wgFileExtensions = array(
 	'svg',
 	'tiff',
 	'txt',
-	'xlsx'
+	'xlsx',
+	'zip'
 );
 
 // Tell Universal Language Selector not to try to guess language based upon IP
@@ -521,7 +589,9 @@ $wgFileExtensions = array(
 // anyway due to outdated URLs or firewall rules.
 $wgULSGeoService = false;
 
+$wgNamespacesWithSubpages[NS_MAIN] = true;
 
+$wgUseRCPatrol = false;
 
 
 
@@ -624,7 +694,7 @@ else if ( $mezaAuthType === 'viewer-read' ) {
  *  below.
  */
 
-require_once "{{ m_config_app_ansible }}/Extensions.php";
+require_once "{{ m_deploy }}/Extensions.php";
 
 
 /**
@@ -649,29 +719,56 @@ $wgCirrusSearchClusters['default'][] = '{{ host }}';
  * Extension:VisualEditor
  *
  * Parsoid servers are defined based upon Ansible hosts file and thus
- * cannot be easily added to base-extensions.yml. As such, VisualEditor config
+ * cannot be easily added to MezaCoreExtensions.yml. As such, VisualEditor config
  * is included directly in LocalSettings.php.j2
  */
-// Allow read and edit permission for requests from the server (e.g. Parsoid)
-// Ref: https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
-// Ref: https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
-$mezaValidParsoidServers = [];
-{% for host in groups['parsoid-servers'] %}
-{% if host == inventory_hostname %}
-$mezaValidParsoidServers[] = '127.0.0.1';
-{% endif %}
-$mezaValidParsoidServers[] = '{{ host }}';
-{% endfor %}
 
 /**
- * HTTP_X_FORWARDED_FOR is set by HAProxy when users request pages via
- * the load balancer. No users should directly access webservers. Only
- * other services (e.g. Parsoid) should directly access webservers. In
- * order to allow services to access MediaWiki with full permissions,
- * if HTTP_X_FORWARDED_FOR does NOT exist then assume it's not a regular
- * user and grant permissions
+ * HTTP_X_FORWARDED_FOR (XFF) is set by HAProxy when users request pages via
+ * the load balancer. Users always access via the load balancer. Parsoid may or
+ * may not access via the load balancer (it will if Parsoid is not on the same
+ * server as the one and only load balancer). In order to allow Parsoid to
+ * access MediaWiki with full permissions, grant access to server if:
+ *
+ *   No XFF (e.g. is a request internal to the server) and REMOTE_ADDR is local
+ *   - or -
+ *   Yes XFF and XFF is a parsoid server
+ *
+ * Refs:
+ * https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
+ * https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
  **/
-if ( ! isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+// initially assume we're not granting special rights
+$grantParsoidReadWrite = false;
+
+// if X-Forwarded-For HTTP header exists
+if ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+
+	$parsoidServers = array(
+		{% for parsoid in groups['parsoid-servers'] %}
+		'{{ parsoid }}',
+		{% endfor %}
+	);
+
+	// if request originated at a Parsoid server
+	if ( in_array( $_SERVER['HTTP_X_FORWARDED_FOR'], $parsoidServers ) ) {
+		$grantParsoidReadWrite = true;
+	}
+
+}
+
+// no X-Forwarded-For HTTP Header
+else if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+
+	// if remote address is this server
+	if ( $_SERVER['REMOTE_ADDR'] === 'localhost' || $_SERVER['REMOTE_ADDR'] === '127.0.0.1' ) {
+		$grantParsoidReadWrite = true;
+	}
+
+}
+
+// if the logic above resulted in granting access
+if ( $grantParsoidReadWrite ) {
 	$wgGroupPermissions['*']['read'] = true;
 	$wgGroupPermissions['*']['edit'] = true;
 }
@@ -685,19 +782,35 @@ $wgHiddenPrefs[] = 'visualeditor-enable';
 // OPTIONAL: Enable VisualEditor's experimental code features
 #$wgDefaultUserOptions['visualeditor-enable-experimental'] = 1;
 
-// URL to the Parsoid instance MUST NOT end in a slash due to Parsoid bug
-if ( in_array( '127.0.0.1', $mezaValidParsoidServers ) ) {
-	$parsoidDomain = '127.0.0.1';
-}
-else {
-	$parsoidDomain = $mezaValidParsoidServers[ array_rand( $mezaValidParsoidServers ) ];
-}
+
+
 $wgVirtualRestConfig['modules']['parsoid'] = array(
-	'url' => "http://$parsoidDomain:8000",
+
+{% if groups['app-servers']|length|int == 1 and groups['parsoid-servers']|length|int == 1 and groups['app-servers'][0] == groups['parsoid-servers'][0] %}
+
+	// One and only Parsoid server is localhost
+	'url' => 'http://127.0.0.1:8000',
+
+
+{% elif 'load-balancers' not in groups or groups['load-balancers']|length|int == 0 %}
+
+	'url' => 'http://{{ groups["load-balancers-unmanaged"][0] }}:{{ load_balancer_unmanaged_parsoid_port }}',
+	//'HTTPProxy' => 'http://{{ groups["load-balancers-unmanaged"][0] }}:{{ load_balancer_unmanaged_parsoid_port }}',
+
+{% else %}
+
+	'url' => 'http://{{ groups["load-balancers"][0] }}:8001',
+	//'HTTPProxy' => 'http://{{ groups["load-balancers"][0] }}:8001',
+
+{% endif %}
+
+
+
+
 
 	// domain here is not really the domain. It needs to be unique to each wiki
 	// and both domain and prefix must match settings in Parsoid's settings in
-	// /opt/meza/config/core/localsettings.js
+	// /etc/parsoid/localsettings.js
 	// ref:
 	// https://www.mediawiki.org/wiki/Parsoid/Setup#Multiple_wikis_sharing_the_same_parsoid_service
 	'domain' => $wikiId,
@@ -726,10 +839,10 @@ $wgVisualEditorNamespaces = array_merge(
  *
  **/
 #    (1) Load all PHP files in postLocalSettings.d for all wikis
-foreach ( glob("$m_meza/config/local_app/postLocalSettings.d/*.php") as $filename) {
+foreach ( glob("$m_deploy/public/postLocalSettings.d/*.php") as $filename) {
     require_once $filename;
 }
 #    (2) Load all PHP files in postLocalSettings.d for this wiki
-foreach ( glob("$m_meza/config/local_app/wikis/$wikiId/postLocalSettings.d/*.php") as $filename) {
+foreach ( glob("$m_deploy/public/wikis/$wikiId/postLocalSettings.d/*.php") as $filename) {
     require_once $filename;
 }

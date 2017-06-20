@@ -1,0 +1,60 @@
+---
+- name: Ensure config vars for logging in place
+  template:
+    src: logging.sh.j2
+    dest: "{{ m_deploy }}/logging.sh"
+    owner: meza-ansible
+    group: wheel
+    mode: 0750
+
+- name: "Check if server log database exists"
+  shell: 'mysqlshow "{{ meza_server_log_db }}" | grep -v Wildcard | grep -o {{ meza_server_log_db }}'
+  register: register_server_log
+  ignore_errors: yes
+  run_once: true
+
+- name: "Set fact if server log database DOES exist"
+  set_fact:
+    server_log_exists: True
+  when: register_server_log.rc == 0
+
+- name: "Set fact if server log database DOES NOT exist"
+  set_fact:
+    server_log_exists: False
+  when: register_server_log.rc != 0
+
+- name: "Import server log database structure"
+  mysql_db:
+    name: "{{ meza_server_log_db }}"
+    state: import
+    target: "/opt/meza/src/roles/meza-log/files/meza_server_log.sql"
+  run_once: true
+  when: not server_log_exists
+
+
+#
+# Disk space usage
+#
+- name: "Check if disk_space table exists"
+  shell: "sudo mysql -e\"USE {{ meza_server_log_db }}; SHOW TABLES LIKE 'disk_space'\" | grep disk_space"
+  register: register_disk_space
+  ignore_errors: yes
+  run_once: true
+
+- name: "Set fact if disk_space table DOES exist"
+  set_fact:
+    disk_space_exists: True
+  when: register_disk_space.rc == 0
+
+- name: "Set fact if disk_space table DOES NOT exist"
+  set_fact:
+    disk_space_exists: False
+  when: register_disk_space.rc != 0
+
+- name: "Create table disk_space if not exists"
+  mysql_db:
+    name: "{{ meza_server_log_db }}"
+    state: import
+    target: "/opt/meza/src/roles/meza-log/files/table_disk_space.sql"
+  run_once: true
+  when: not disk_space_exists

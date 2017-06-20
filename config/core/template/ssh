@@ -1,6 +1,0 @@
-
-# Ciphers allowed in order of preference
-Ciphers aes256-ctr,aes192-ctr,aes128-ctr,aes256-cbc,aes192-cbc,aes128-cbc
-
-# MAC algorithms in order of preference
-MACs hmac-sha2-256,hmac-sha2-512,hmac-sha1

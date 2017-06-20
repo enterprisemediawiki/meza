@@ -2,7 +2,7 @@
 
 - name: Ensure app servers have local config directory
   file:
-    path: "{{ m_local_app }}"
+    path: "{{ m_deploy }}/public"
     state: directory
     owner: root
     group: root
@@ -15,20 +15,21 @@
 - name: Ensure app servers have config from controller
   synchronize:
     src: "{{ m_local_public }}/"
-    dest: "{{ m_local_app }}"
+    dest: "{{ m_deploy }}/public"
     recursive: yes
     delete: yes
     rsync_opts:
       - "--no-motd"
       - "--exclude=.git"
 
-# The commands above seemed to be putting the files in m_local_app without
+# The commands above seemed to be putting the files in m_deploy without
 # properly setting` file modes. This does a recursive setting of those modes.
 - name: Ensure app servers local config directory and contents configured
   file:
-    path: "{{ m_local_app }}"
+    path: "{{ m_deploy }}"
     state: directory
     owner: root
     group: root
     mode: 0755
     recurse: yes
+

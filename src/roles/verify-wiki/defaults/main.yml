@@ -25,5 +25,3 @@ blender_admins: []
 #   name: Sally Example
 
 local_config_repo: {}
-
-enable_wiki_emails: true

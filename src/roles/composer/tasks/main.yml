@@ -34,6 +34,11 @@
   changed_when: "'Updating to version' in composer_update.stdout"
   when: composer_keep_updated
 
+- name: Ensure composer cache is clear
+  shell: "{{ composer_path }} clear-cache"
+  when: "'Updating to version' in composer_update.stdout"
+
+
 - name: Ensure composer directory exists.
   file:
     path: "{{ composer_home_path }}"

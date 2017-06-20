@@ -1,0 +1,101 @@
+---
+# Meza default config file
+
+# meza install location
+m_install: /opt
+m_meza: /opt/meza
+
+# config dir
+m_config_core: /opt/meza/config/core
+m_local_secret: /opt/conf-meza/secret
+m_local_public: /opt/conf-meza/public
+m_home: /opt/conf-meza/users
+
+# Config files written by Ansible which need a place to live on non-controller
+# nodes.
+m_deploy: /opt/.deploy-meza
+
+# scripts dir
+m_scripts: /opt/meza/src/scripts
+
+# test dir
+m_test: /opt/meza/test
+
+# data dir
+m_meza_data: /opt/data-meza
+m_cache_directory: /opt/data-meza/cache
+m_tmp: /opt/data-meza/tmp
+m_logs: /opt/data-meza/logs
+
+# uploads dir. This WILL BE OVERIDDEN if multiple app servers are used, and
+# instead will use /opt/data-meza/uploads-gluster to use GlusterFS distributed
+# file system.
+m_uploads_dir: /opt/data-meza/uploads
+
+# GlusterFS vars
+gluster_mount_dir: /opt/data-meza/uploads-gluster
+gluster_brick_dir: /opt/data-meza/gluster/brick
+gluster_brick_name: gluster
+
+# Location where backups will go, specified by environment, e.g.
+# /opt/data-meza/backups/prod for "prod" environment
+m_backups: /opt/data-meza/backups
+
+# webserver variables
+m_htdocs: /opt/htdocs
+m_mediawiki: /opt/htdocs/mediawiki
+m_cert_private: /etc/pki/tls/private/meza.key
+m_cert_public: /etc/pki/tls/certs/meza.crt
+m_ca_cert: /etc/pki/tls/certs/meza-ca.crt
+
+
+# app locations
+m_apache: /etc/httpd
+m_apache_conf: /etc/httpd/conf/httpd.conf
+m_php_ini: /etc/php.ini
+m_memcached_conf: /etc/sysconfig/memcached
+m_parsoid_path: /etc/parsoid
+m_simplesamlphp_path: /opt/simplesamlphp
+m_profiling_xhgui_directory: /opt/xhgui
+
+# files
+m_i18n: /opt/meza/config/core/i18n
+m_db_replication_dump_file: /opt/data-meza/db_master_for_replication.sql
+m_db_replication_log_file: /opt/data-meza/db_master_log_file
+m_db_replication_log_pos: /opt/data-meza/db_master_log_pos
+
+
+# FIXME: this is not a "path" but it's the best place to keep it for now
+# Set Parsoid version.
+# This commit is closest to MW 1.27 release date of 28 June 2016
+# Default = "master"
+m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
+
+meza_server_log_db: meza_server_log
+
+ntp_server: [0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org, 3.pool.ntp.org]
+
+m_language: en
+
+allow_backup_downloads: false
+
+m_force_debug: false
+
+enable_wiki_emails: true
+
+enable_haproxy_stats: false
+haproxy_stats_user: admin
+haproxy_stats_password: password
+
+# Only useful for developers and testing performance issues
+m_setup_php_profiling: false
+
+# Enable slow query log
+mysql_slow_query_log_enabled: yes
+mysql_slow_query_time: "5"
+mysql_slow_query_log_file: /var/log/mariadb/slow-queries.log
+
+# If using a load balancer not managed by meza, on what port should you
+# access Parsoid and MediaWiki internal services?
+unmanaged_load_balancer_parsoid_port: 8001
+unmanaged_load_balancer_mediawiki_port: 8081

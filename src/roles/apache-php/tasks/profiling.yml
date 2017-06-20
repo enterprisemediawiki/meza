@@ -1,0 +1,96 @@
+---
+
+
+
+# Only required for developers and performance testing
+- name: add mongo repo file
+  template:
+    src: mongo.repo.j2
+    dest: /etc/yum.repos.d/mongo.repo
+  run_once: yes
+
+- name: Install mongodb-org package
+  yum:
+    name: mongodb-org
+    state: installed
+  run_once: yes
+
+- name: Ensure MongoDB conf file in place
+  template:
+    src: mongod.conf.j2
+    dest: /etc/mongod.conf
+
+- name: run mongodb
+  service:
+    name: mongod
+    state: started
+    enabled: yes
+  run_once: yes
+
+# FIXME #753: Setup indexes for MongoDB used for profiling
+
+- name: Install XHProf and mongo PECL packages for profiling
+  pear:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - pecl/xhprof-beta
+    - pecl/mongo
+
+- name: Ensure XHGui present
+  git:
+    repo: https://github.com/perftools/xhgui.git
+    dest: "{{ m_profiling_xhgui_directory }}"
+    version: master
+    force: yes
+
+- name: Ensure XHGui directory owned by Apache
+  file:
+    path: "{{ m_profiling_xhgui_directory }}"
+    owner: apache
+    group: apache
+    mode: 0755
+    recurse: yes
+    state: directory
+
+- name: Ensure XHGui packages present
+  composer:
+    command: install
+    prefer_dist: True
+    working_dir: "{{ m_profiling_xhgui_directory }}"
+
+- name: Ensure XHGui using correct Mongo DB instance (on first app server)
+  template:
+    src: xhgui.config.php.j2
+    dest: "{{ m_profiling_xhgui_directory }}/config/config.php"
+
+- name: "Ensure XHGui cache directory configured"
+  file:
+    path: "{{ m_profiling_xhgui_directory }}/cache"
+    # owner: who?
+    # group: who?
+
+    # FIXME: suggested per docs, but c'mon
+    mode: 0777
+    recurse: yes
+    state: directory
+
+- name: Open port 27017 for MongoDB on all but first app server
+  include_role:
+    name: firewalld
+  vars:
+    # firewalld_service: http
+    firewalld_port: 27017
+    firewalld_protocol: tcp
+    firewalld_servers: "{{ groups['app-servers'] }}"
+    firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+
+- name: Open port 8089 to load balancer
+  include_role:
+    name: firewalld
+  vars:
+    # firewalld_service: http
+    firewalld_port: 8089
+    firewalld_protocol: tcp
+    firewalld_servers: "{{ groups['load-balancers'] }}"
+    firewalld_zone: "{{m_private_networking_zone|default('public')}}"

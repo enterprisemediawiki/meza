@@ -12,7 +12,11 @@
   git:
     repo: https://github.com/jornane/mwSimpleSamlAuth.git
     dest: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
-    version: "v0.7"
+    
+    # Use hash for now, until version greater than v0.7 is released that fixes
+    # issues with MW 1.27 user creation.
+    # Ref: https://github.com/jornane/mwSimpleSamlAuth/issues/31#issuecomment-302759940
+    version: "2e0e7b7b6d08de2d97741a0561ea4a6b3c58d4f9"
   tags:
     - latest
 
@@ -37,11 +41,17 @@
 
     # Config files for SimpleSamlAuth (MediaWiki extension)
     - filename: "samlLocalSettings.php"
-      dest_path: "{{ m_config_app_ansible }}"
+      dest_path: "{{ m_deploy }}"
 
     # Config file used by MW extension + any other PHP app needing auth
     # (landing page, admin functions, etc)
     - filename: "SAMLConfig.php"
-      dest_path: "{{ m_config_app_ansible }}"
+      dest_path: "{{ m_deploy }}"
 
-
+- name: Ensure NonMediaWikiSimpleSamlAuth.php in place
+  copy:
+    src: files/NonMediaWikiSimpleSamlAuth.php
+    dest: "{{ m_htdocs }}/NonMediaWikiSimpleSamlAuth.php"
+    owner: root
+    group: root
+    mode: 0755

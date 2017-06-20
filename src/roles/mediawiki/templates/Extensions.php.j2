@@ -52,7 +52,7 @@
  *  of this local meza installation. This section may be blank if no Composer
  *  extensions are required for this local installation.
  **/
-{% for ext in meza_core_extensions['list'] if ext.composer is defined and ext.config is defined %}
+{% for ext in meza_local_extensions['list'] if ext.composer is defined and ext.config is defined %}
 
 #
 # Config for Extension:{{ ext.name }}
@@ -69,7 +69,7 @@
  *
  *  Extensions configured by this installation of Meza, but not included in
  *  core meza. These extensions are defined in MezaLocalExtensions.yml in
- *  config/local-public. This section may be blank if no additional extensions
+ *  /opt/conf-meza/public. This section may be blank if no additional extensions
  *  are required for this local installation.
  **/
 {% for ext in meza_local_extensions['list'] if ext.composer is not defined %}

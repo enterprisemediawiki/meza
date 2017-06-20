@@ -8,6 +8,7 @@
 
 - name: Make apache own htdocs directory
   file:
+    state: directory
     path: "{{ m_htdocs }}"
     owner: apache
     group: apache
@@ -30,18 +31,44 @@
 
 # FIXME: required?
 # create logrotate file
-# ln -s " $m_config/core/logrotated_httpd" /etc/logrotate.d/httpd
+# ln -s " $m_config_core/logrotated_httpd" /etc/logrotate.d/httpd
 
 
 # FIXME: apache.sh had commented-out SELinux commands for services
 
 - name: Install PHP
   include: php.yml
+  # http://docs.ansible.com/ansible/playbooks_roles.html#dynamic-versus-static-includes
   static: yes
+
+- name: Ensure Composer configured
+  include_role:
+    name: composer
+
+- name: Ensure PHP profiling configured
+  include: profiling.yml
+  # http://docs.ansible.com/ansible/playbooks_roles.html#dynamic-versus-static-includes
+  static: yes
+  when: m_setup_php_profiling
+
+# If profiling not enabled, disable MongoDB if it exists (e.g. profiling had
+# previously been enabled)
+- name: Check if MongoDB service exists
+  stat: path=/etc/init.d/mongod
+  register: mongo_service_status
+- name: Stop MongoDB service if profiling is disabled
+  service:
+    name: mongod
+    state: stopped
+  when: mongo_service_status.stat.exists and not m_setup_php_profiling
+
 
 # Now that PHP is installed, start apache
 - name: ensure apache is running (and enable it at boot)
-  service: name=httpd state=started enabled=yes
+  service:
+    name: httpd
+    state: started
+    enabled: yes
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 

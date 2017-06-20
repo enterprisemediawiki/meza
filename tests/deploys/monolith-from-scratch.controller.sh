@@ -14,10 +14,10 @@ fqdn="$1"
 # Since we want to make the monolith environment without prompts, need to do
 # `meza setup env monolith` with values for required args included (fqdn,
 # db_pass, email, private_net_zone).
-meza setup env monolith --fqdn="${fqdn}" --db_pass=1234 --enable_email=false --private_net_zone=public
+meza setup env monolith --fqdn="${fqdn}" --db_pass=1234 --private_net_zone=public
 
 echo "print hosts file"
-cat /opt/meza/config/local-secret/monolith/hosts
+cat /opt/conf-meza/secret/monolith/hosts
 
 # Now that environment monolith is setup, deploy/install it
 meza deploy monolith

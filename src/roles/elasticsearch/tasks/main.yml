@@ -84,7 +84,7 @@
 # INSTALL PLUGINS: kopf, head, bigdesk
 # FIXME: need to put ignore_errors here because otherwise on subsequent running
 #        of this play you get errors like:
-#        >> plugin directory /opt/meza/data/elasticsearch/plugins/head already
+#        >> plugin directory /opt/data-meza/elasticsearch/plugins/head already
 #           exists. To update the plugin, uninstall it first using --remove
 #           mobz/elasticsearch-head command"
 #        Need to make it check for that directory and only run if the directory

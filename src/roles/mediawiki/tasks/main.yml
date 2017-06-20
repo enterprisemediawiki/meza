@@ -9,6 +9,7 @@
 
 
 
+
 #
 # MEDIAWIKI CORE
 #
@@ -38,7 +39,7 @@
 #
 - name: Set variable holding list of core extensions
   include_vars:
-    file: "{{ m_config }}/core/MezaCoreExtensions.yml"
+    file: "{{ m_config_core }}/MezaCoreExtensions.yml"
     name: meza_core_extensions
 
 - name: Set variable holding list of local extensions
@@ -49,7 +50,7 @@
 - name: Ensure core meza extensions installed (non-Composer)
   git:
     repo: "{{ item.repo }}"
-    dest: "/opt/meza/htdocs/mediawiki/extensions/{{ item.name }}"
+    dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
     version: "{{ item.version }}"
   with_items: "{{ meza_core_extensions.list }}"
   when: meza_core_extensions.list[0] is defined and item.repo is defined
@@ -61,7 +62,7 @@
 - name: Ensure local meza extensions installed (non-Composer)
   git:
     repo: "{{ item.repo }}"
-    dest: "/opt/meza/htdocs/mediawiki/extensions/{{ item.name }}"
+    dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
     version: "{{ item.version }}"
   with_items: "{{ meza_local_extensions.list }}"
   when: meza_local_extensions.list[0] is defined and item.repo is defined
@@ -74,7 +75,7 @@
 - name: Ensure Extensions.php in place
   template:
     src: Extensions.php.j2
-    dest: "{{ m_config_app_ansible }}/Extensions.php"
+    dest: "{{ m_deploy }}/Extensions.php"
 
 # Adds extensions with composer param from MezaCoreExtensions.yml and
 # MezaLocalExtensions.yml
@@ -162,6 +163,21 @@
   when: saml_public is defined
 
 
+#
+# Cache (at this time) for localization caching. Also can be used for caching
+# page contents, but this isn't as necessary for enterprise cases where
+# generally users are always logged in.
+#
+- name: Ensure localization cache root directory exists (each wiki with sub-directory)
+  file:
+    state: directory
+    path: "{{ m_cache_directory }}"
+    owner: apache
+    group: apache
+    mode: 0700
+
+
+
 
 #
 # DEMO WIKI (if needed)
@@ -197,13 +213,31 @@
 #
 # VERIFY WIKIS
 #
-- name: Get individual wikis dirs
+- name: Get individual wikis dirs from localhost
   find:
     paths: "{{ m_local_public }}/wikis/"
     file_type: directory
   register: wikis_dirs
   delegate_to: localhost
-  when: docker_skip_tasks is not defined or not docker_skip_tasks
+  run_once: yes
+
+- name: Set fact - list of wikis
+  set_fact:
+    list_of_wikis: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+# Sort list of wikis so primary wiki is first. Need to have primary wiki's
+# `user` table in place before other wikis are imported, otherwise will get
+# errors when running update.php and such
+- name: Set fact - list of wikis ordered with primary wiki first (if primary_wiki_id set)
+  set_fact:
+    list_of_wikis: "['{{ primary_wiki_id }}'] + {{ list_of_wikis | difference([primary_wiki_id]) }}"
+  when: primary_wiki_id is defined
+
+- debug: { var: list_of_wikis }
+
+- name: Set fact - initiate empty list of wikis to rebuild smw and search data
+  set_fact:
+    wikis_to_rebuild_data: []
 
 # Check that all wikis in config are present on app and DB servers
 - name: Ensure defined wikis exist
@@ -215,10 +249,30 @@
   #   filter 1: reduce list items to just the path
   #   filter 2: then reduce to just the last part of the path
   #   filter 3: convert map object back to an Ansible-friendly list
-  with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+  with_items: "{{ list_of_wikis }}"
   tags:
   - verify-wiki
   when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- debug: { var: wikis_to_rebuild_data }
+
+# Wikis are totally built at this point, but SMW and search need rebuilding
+# FIXME: WILL ONLY WORK WHEN CONTROLLER AND APP-SERVER ARE THE SAME MACHINE
+- name: "(Re-)build search index for: {{ wikis_to_rebuild_data | join(', ') }}"
+  shell: "bash /opt/meza/src/scripts/elastic-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
+  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0)
+  run_once: true
+  tags:
+  - search-index
+
+- name: "(Re-)build SemanticMediaWiki data for: {{ wikis_to_rebuild_data | join(', ') }}"
+  shell: "bash /opt/meza/src/scripts/smw-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
+  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0)
+  run_once: true
+  tags:
+  - smw-data
+
+
 
 # Run update.php (MediaWiki's database update script) against all wikis. This
 # only needs to be done once, since the first app server that runs it will
@@ -227,9 +281,8 @@
     name: update.php
   vars:
     wiki_id: "{{ item }}"
-  with_items: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+  with_items: "{{ list_of_wikis }}"
   run_once: true
   tags:
   - update.php
   when: docker_skip_tasks is not defined or not docker_skip_tasks
-

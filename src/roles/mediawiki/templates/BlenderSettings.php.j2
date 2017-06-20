@@ -6,15 +6,14 @@ $blenderServer = "https://{{ wiki_app_fqdn }}/";
 // Script path
 $blenderScriptPath = '/WikiBlender';
 
+{% if primary_wiki_id is defined %}
 // If there is a prime wiki, use its favicon as the landing page favicon
-$primeWikiFile = '/opt/meza/config/local/primewiki';
-if ( file_exists( $primeWikiFile ) ) {
-	$primeWiki = file_get_contents( $primeWikiFile );
-	$blenderFavicon = "/wikis/$primeWiki/config/favicon.ico";
-}
+$primeWiki = '{{ primary_wiki_id }}';
+$blenderFavicon = "/wikis/{{ primary_wiki_id }}/config/favicon.ico";
+{% endif %}
 
 // Location of wikis directory
-$blenderWikisDir = '/opt/meza/htdocs/wikis';
+$blenderWikisDir = '{{ m_htdocs }}/wikis';
 
 //
 // Everything above is standard for all meza. This file has server-specific settings.

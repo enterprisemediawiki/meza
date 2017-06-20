@@ -77,7 +77,7 @@
 
 - name: Ensure pre/post settings directories exists in config
   file:
-    path: "/opt/meza/config/local-public/{{ item }}"
+    path: "/opt/conf-meza/public/{{ item }}"
     state: directory
     owner: root
     group: root
@@ -87,7 +87,6 @@
   with_items:
     - preLocalSettings.d
     - postLocalSettings.d
-
 
 
 - name: "Ensure base files present, do NOT overwrite"
@@ -102,7 +101,4 @@
   run_once: true
   with_items:
     - MezaLocalExtensions.yml
-    - preLocalSettings.d/email.php
-    - preLocalSettings.d/README.md
-    - postLocalSettings.d/README.md
     - vars.yml

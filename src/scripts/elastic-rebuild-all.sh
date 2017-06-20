@@ -1,0 +1,51 @@
+#!/bin/sh
+
+source "/opt/.deploy-meza/config.sh"
+
+if [ -z "$1" ]; then
+	do_wikis="*/"
+else
+	do_wikis="$1"
+fi
+
+wiki_dir="$m_htdocs/wikis"
+
+cd "$wiki_dir"
+for d in $do_wikis; do
+
+	if [ -z "$1" ]; then
+		wiki_id=${d%/}
+	else
+		wiki_id="$d"
+	fi
+
+	if [ ! -d "$wiki_dir/$wiki_id" ]; then
+		echo "\"$wiki_id\" not a valid wiki ID"
+		continue
+	fi
+
+	timestamp=$(date +"%F_%T")
+
+	out_log="$m_logs/search-index.$wiki_id.$timestamp.log"
+
+	echo "Rebuilding index for $wiki_id"
+	echo "  Output log:"
+	echo "    $out_log"
+
+
+	wiki_id="$wiki_id" bash /opt/meza/src/scripts/elastic-build-index.sh > "$out_log"  2>&1
+
+	endtimestamp=$(date +"%F_%T")
+
+	# If the above command had a failing exit code
+	if [[ $? -ne 0 ]]; then
+
+		# FIXME: add notification/warning system here
+		echo "elastic-build-index FAILED for \"$wiki_id\" at $endtimestamp"
+
+	#if the above command had a passing exit code (e.g. zero)
+	else
+		echo "elastic-build-index completed for \"$wiki_id\" at $endtimestamp"
+	fi
+
+done

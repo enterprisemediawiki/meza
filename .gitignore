@@ -1,29 +1,4 @@
 .DS_Store
-config/config.local.sh
-
-# Ignore all files or directories starting with local, as the
-# place that users will modify their local meza configuration
-config/local*
-
-# Ignore all files or directories in the core directory that
-# start with app. These files/dirs are configuration written
-# by the meza application based upon inputs from core and
-# local user settings
-config/core/app*
-
-# data directory used to hold MariaDB and Elasticsearch data
-# which should not be added to this repo. However, there are
-# some README files as placeholders in this directory which
-# have been explicitly added to the repo. Also includes logs
-# and backups.
-data/*
-
-# ignore wiki blender landing page
-htdocs/WikiBlender
-
-htdocs/mediawiki
-htdocs/wikis/*
-
-simplesamlphp/
 
 .vagrant/*
+vagrantconf.yml

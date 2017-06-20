@@ -10,18 +10,18 @@
 
 - name: Ensure user alt-meza-ansible .ssh dir configured
   file:
-    path: "/home/alt-meza-ansible/.ssh"
+    path: "{{ m_home }}/alt-meza-ansible/.ssh"
     owner: alt-meza-ansible
     group: wheel
     mode: 0700
     state: directory
 
 - name: Copy meza-ansible authorized_keys to alt-meza-ansible
-  shell: cp /home/meza-ansible/.ssh/authorized_keys /home/alt-meza-ansible/.ssh/authorized_keys
+  shell: cp {{ m_home }}/meza-ansible/.ssh/authorized_keys {{ m_home }}/alt-meza-ansible/.ssh/authorized_keys
 
 - name: Ensure user meza-ansible and alt-meza-ansible authorized_keys configured
   file:
-    path: "/home/{{ item }}/.ssh/authorized_keys"
+    path: "{{ m_home }}/{{ item }}/.ssh/authorized_keys"
     owner: "{{ item }}"
     group: wheel
     mode: 0644
@@ -33,7 +33,7 @@
   authorized_key:
     user: alt-meza-ansible
     state: present
-    key: "{{ lookup('file', '/home/meza-ansible/.ssh/id_rsa.pub') }}"
+    key: "{{ lookup('file', '{{ m_home }}/meza-ansible/.ssh/id_rsa.pub') }}"
 
 - name: Ensure no password on alt-meza-ansible user
   shell: passwd --delete alt-meza-ansible
@@ -48,9 +48,14 @@
     validate: 'visudo -cf %s'
 
 - name: ensure deltarpm is installed and latest
-  yum: name=deltarpm state=installed
+  yum: name=deltarpm state=latest
+  tags:
+  - latest
+
 - name: upgrade all packages
   yum: name=* state=latest
+  tags:
+  - latest
 
 # FIXME: for RedHat may need to enable "Optional RPMs"
 - name: ensure EPEL installed
@@ -105,6 +110,7 @@
     - rsyslog
     - jq
     - tree
+    - cronie
 - name: put SELinux in permissive mode
   selinux:
     policy: targeted
@@ -141,15 +147,35 @@
   notify:
     - restart ntpd
 
-# - name: Write local config shell file
-#   template:
-#     src: config.sh.j2
-#     dest: /opt/meza/config/config.sh
+# Speed up encrypt/decrypt operations
+# ref: http://docs.ansible.com/ansible/playbooks_vault.html#speeding-up-vault-operations
+#
+# FIXME: NEED TO INSTALL PIP FIRST, WHICH HAS DEPENDENCIES. BEFORE DOING THIS
+# FIGURE OUT IF THIS PACKAGE IS NEEDED ON ALL HOSTS, OR JUST ON CONTROLLER, TO
+# GET CRYPTO-SPEED-INCREASES
+#
+# - name: Ensure PIP cryptography package installed
+#   pip:
+#     name: cryptography
 
-# - name: Write local config PHP file
-#   template:
-#     src: config.php.j2
-#     dest: /opt/meza/config/config.php
+- name: Ensure deploy directory in place
+  file:
+    path: "{{ m_deploy }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Ensure config variables available in PHP and shell files
+  template:
+    src: "config.{{ item }}.j2"
+    dest: "{{ m_deploy }}/config.{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - "php"
+    - "sh"
 
 - name: "Ensure {{ m_tmp }} exists"
   file:
@@ -158,3 +184,21 @@
     group: wheel
     mode: 0755
     state: directory
+
+- name: "Ensure {{ m_logs }} exists"
+  file:
+    path: "{{ m_logs }}"
+    owner: meza-ansible
+    group: wheel
+    mode: 0755
+    state: directory
+
+# Prevent runJobs and other scripts from running when application may be in
+# indeterminate state
+- name: Ensure crontab empty for meza-ansible when overwriting wikis
+  shell: crontab -u meza-ansible -r
+  when: force_overwrite_from_backup is defined and force_overwrite_from_backup == true
+
+  # Ignore errors due issue #699: If a crontab doesn't exist yet this command
+  # will fail
+  ignore_errors: yes

@@ -32,20 +32,23 @@ Standard MediaWiki is easy to install, but increasingly its newer and better fea
 Login to your server and run the following (should take 15-30 minutes depending on your connection):
 
 ```bash
-curl -L getmeza.org > doit
-sudo bash doit
+sudo yum install -y git
+sudo git clone https://github.com/enterprisemediawiki/meza /opt/meza
+sudo bash /opt/meza/src/scripts/getmeza.sh
 sudo meza deploy monolith
 ```
+
+This will setup a demo wiki with the user `Admin` with password `adminpass`. Update this password or remove this user for production environments. To add wikis see [these docs](manual/AddingWikis.md).
 
 Running VirtualBox and need to get your virtual machine configured? See our
 [setting up VirtualBox](manual/SettingUpVirtualBox.md) guide.
 
 ## What is installed?
 
-Everything can be installed on a single server (a monolith, `meza install monolith`) or can be configured to install different components on different servers. For example, you may have the following setup:
+Everything can be installed on a single server (a monolith, `meza deploy monolith`) or can be configured to install different components on different servers. For example, you may have the following setup:
 
-* 2 load balancers
-* 3 app servers (NOTE: this is still in development, and app servers do not yet have the ability to share uploads (a pretty major limitation))
+* 2 load balancers (multiple meza-installed load balancers still in development. multiple external load-balancers possible)
+* 3 app servers
 * 3 memcached servers
 * 1 database master
 * 3 database replicas
@@ -54,19 +57,19 @@ Everything can be installed on a single server (a monolith, `meza install monoli
 * 2 backup servers
 
 ### Software and versions
-* MediaWiki 1.27.1
+* MediaWiki 1.27
 * PHP 5.6
 * Apache 2.4
 * MariaDB 5.5, configurable optionally with multiple replica servers
 * Load Balancer: HAProxy 1.5
 * Memcached 1.4
 * Elasticsearch 1.6
-* Node.JS 6.9.4
+* Node.JS 6.9
 
 ### MediaWiki extensions
 This is not necessarily an exhaustive list
 
-* [Semantic MediaWiki](https://www.semantic-mediawiki.org) v2.4.6
+* [Semantic MediaWiki](https://www.semantic-mediawiki.org)
 * [Semantic Compound Queries](https://www.mediawiki.org/wiki/Extension:Semantic_Compound_Queries)
 * [Semantic Internal Objects](https://www.mediawiki.org/wiki/Extension:Semantic_Internal_Objects)
 * [Semantic Maps](https://github.com/SemanticMediaWiki/SemanticMaps/blob/master/README.md#semantic-maps)

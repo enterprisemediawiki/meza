@@ -20,7 +20,7 @@
 #
 
 # Define a timestamp fact to persist throughout this playbook
-- hosts: all
+- hosts: all:!exclude-all:!load-balancers-unmanaged
   tasks:
     - set_fact:
         backup_timestamp: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
@@ -32,14 +32,23 @@
   roles:
     - set-vars
     - dump-db-wikis
-
+  tags: db
 
 - hosts: backup-servers
   become: yes
   roles:
     - set-vars
     - backup-db-wikis
-    - backup-uploads
     # FIXME: add role to specify current configuration state, such that it's
     #        possible to redeploy entirely from backup.
     # - backup-config-state
+  tags: db
+
+- hosts: backup-servers
+  become: yes
+  roles:
+    - set-vars
+    - backup-uploads
+  tags:
+    - uploads
+    - upload

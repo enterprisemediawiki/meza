@@ -35,7 +35,7 @@ docker_exec_2=( "${docker_exec[@]}" )
 # backups on CONTAINER 2
 ${docker_exec_1[@]} default_servers="localhost" backup_servers="$docker_ip_2" \
 	meza setup env "$env_name" \
-	--fqdn="$docker_ip_1" --db_pass=1234 --enable_email=false --private_net_zone=public
+	--fqdn="$docker_ip_1" --db_pass=1234 --private_net_zone=public
 
 
 # Run script on controller to `meza deploy`, `meza create wiki` and
@@ -52,5 +52,5 @@ ${docker_exec_1[@]} bash /opt/meza/tests/deploys/backup-to-remote.controller.sh 
 #     specific file is present)
 # (2) Verify any files matching *_wiki.sql in demo backups. egrep command will
 #     exit-0 if something found, exit-1 (fail) if nothing found.
-${docker_exec_2[@]} ls "/opt/meza/data/backups/$env_name/demo"
-${docker_exec_2[@]} find "/opt/meza/data/backups/$env_name/demo" -name "*_wiki.sql" | egrep '.*'
+${docker_exec_2[@]} ls "/opt/data-meza/backups/$env_name/demo"
+${docker_exec_2[@]} find "/opt/data-meza/backups/$env_name/demo" -name "*_wiki.sql" | egrep '.*'

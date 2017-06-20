@@ -4,7 +4,18 @@
 # Config file for putting non-secure items needed for configuration during
 # deploy of the application
 
+# Set a default authentication method for all wikis that don't specify one
+# FIXME: List types, and descriptions
+# meza_auth_type: "viewer-read"
+
 blender_landing_page_title: Test of Meza Wikis
+
+# Email senders
+# Refs:
+#   https://www.mediawiki.org/wiki/Manual:$wgPasswordSender
+#   https://www.mediawiki.org/wiki/Manual:$wgEmergencyContact
+wgPasswordSender: "admin@example.com"
+# wgEmergencyContact = "another.email@example.com" # defaults to wgPassword Sender
 
 # blender_header_wiki_title: Top row wikis
 

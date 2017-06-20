@@ -1,0 +1,20 @@
+---
+
+- hosts: app-servers
+  become: yes
+  roles:
+    - set-vars
+
+  tasks:
+
+  - name: (Re-)build search index for each wiki
+    shell: "bash /opt/meza/src/scripts/elastic-rebuild-all.sh"
+    run_once: true
+    tags:
+    - search-index
+
+  - name: Rebuild SemanticMediaWiki data for each wiki
+    shell: "bash /opt/meza/src/scripts/smw-rebuild-all.sh"
+    run_once: true
+    tags:
+    - smw-data

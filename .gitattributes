@@ -1,0 +1,26 @@
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# When using Vagrant on Windows, whatever git has checked out gets transferred
+# to the guest OS. If, for example, a shell script is transferred with Windows
+# CRLF line endings then errors like the following will occur:
+#
+# /opt/meza/src/scripts/getmeza.sh: line 6: $'\r': command not found
+#
+# To avoid this, always checkout many files out with LF line endings. The
+# downside to this (I think) is that Windows users editing code and submitting
+# changes will have to make sure their text editors respect line endings.
+*.sh text eol=lf
+*.py text eol=lf
+*.js text eol=lf
+*.php text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.cfg text eol=lf
+*.j2 text eol=lf
+*.sh text eol=lf
+
+# Denote all files that are truly binary and should not be modified.
+*.png binary
+*.jpg binary
+*.gif binary
