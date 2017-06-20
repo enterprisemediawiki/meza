@@ -7,8 +7,9 @@
 3. Boot your VM, and type these in (without SSH you can't copy-paste)
 ```bash
 sudo ifup enp0s3
-curl -L getmeza.org > doit
-sudo bash doit
+sudo yum install -y git
+sudo git clone https://github.com/enterprisemediawiki/meza /opt/meza
+sudo bash /opt/meza/src/scripts/getmeza.sh
 sudo meza setup dev-networking
 ```
 4. Now SSH into your machine and run `sudo meza deploy monolith`.
