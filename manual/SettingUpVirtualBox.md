@@ -7,11 +7,14 @@
 3. Boot your VM, and type these in (without SSH you can't copy-paste)
 ```bash
 sudo ifup enp0s3
-curl -L getmeza.org > doit
-sudo bash doit
+sudo yum install -y git
+sudo git clone https://github.com/enterprisemediawiki/meza /opt/meza
+sudo bash /opt/meza/src/scripts/getmeza.sh
 sudo meza setup dev-networking
 ```
 4. Now SSH into your machine and run `sudo meza deploy monolith`.
+
+This will setup a demo wiki with the user `Admin` with password `adminpass`. Update this password or remove this user for production environments. To add wikis see [these docs](manual/AddingWikis.md).
 
 ## Detailed steps
 
@@ -37,8 +40,9 @@ Below are detailed steps to get meza running on your machine.
 
 ```bash
 sudo ifup enp0s3
-curl -L getmeza.org > doit
-sudo bash doit
+sudo yum install -y git
+sudo git clone https://github.com/enterprisemediawiki/meza /opt/meza
+sudo bash /opt/meza/src/scripts/getmeza.sh
 sudo meza setup dev-networking
 ```
 
@@ -61,6 +65,8 @@ These steps do the following:
 1. Start your VM
 2. SSH into the VM
 3. Run `sudo meza deploy monolith` to install your wiki server.
+
+This will setup a demo wiki with the user `Admin` with password `adminpass`. Update this password or remove this user for production environments. To add wikis see [these docs](manual/AddingWikis.md).
 
 ## Red Hat
 
