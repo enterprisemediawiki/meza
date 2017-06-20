@@ -9,6 +9,7 @@ m_meza: /opt/meza
 m_config_core: /opt/meza/config/core
 m_local_secret: /opt/conf-meza/secret
 m_local_public: /opt/conf-meza/public
+m_home: /opt/conf-meza/users
 
 # Config files written by Ansible which need a place to live on non-controller
 # nodes.
@@ -22,16 +23,19 @@ m_test: /opt/meza/test
 
 # data dir
 m_meza_data: /opt/data-meza
+m_cache_directory: /opt/data-meza/cache
 m_tmp: /opt/data-meza/tmp
 m_logs: /opt/data-meza/logs
 
-# uploads dir. In order to support both app-server-based uploads and
-# GlusterFS-based uploads (or other alternatives) it may be necessary to be
-# able to specify this path, with options like:
-#   - /opt/data-meza/uploads    (app-server based)
-#   - /opt/data-meza/glusterfs  (GlusterFS based)
-#   - /opt/data-meza/other (something really cool that I don't even know about)
+# uploads dir. This WILL BE OVERIDDEN if multiple app servers are used, and
+# instead will use /opt/data-meza/uploads-gluster to use GlusterFS distributed
+# file system.
 m_uploads_dir: /opt/data-meza/uploads
+
+# GlusterFS vars
+gluster_mount_dir: /opt/data-meza/uploads-gluster
+gluster_brick_dir: /opt/data-meza/gluster/brick
+gluster_brick_name: gluster
 
 # Location where backups will go, specified by environment, e.g.
 # /opt/data-meza/backups/prod for "prod" environment
@@ -52,6 +56,7 @@ m_php_ini: /etc/php.ini
 m_memcached_conf: /etc/sysconfig/memcached
 m_parsoid_path: /etc/parsoid
 m_simplesamlphp_path: /opt/simplesamlphp
+m_profiling_xhgui_directory: /opt/xhgui
 
 # files
 m_i18n: /opt/meza/config/core/i18n
@@ -74,4 +79,23 @@ m_language: en
 
 allow_backup_downloads: false
 
+m_force_debug: false
+
 enable_wiki_emails: true
+
+enable_haproxy_stats: false
+haproxy_stats_user: admin
+haproxy_stats_password: password
+
+# Only useful for developers and testing performance issues
+m_setup_php_profiling: false
+
+# Enable slow query log
+mysql_slow_query_log_enabled: yes
+mysql_slow_query_time: "5"
+mysql_slow_query_log_file: /var/log/mariadb/slow-queries.log
+
+# If using a load balancer not managed by meza, on what port should you
+# access Parsoid and MediaWiki internal services?
+unmanaged_load_balancer_parsoid_port: 8001
+unmanaged_load_balancer_mediawiki_port: 8081

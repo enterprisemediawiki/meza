@@ -10,18 +10,18 @@
 
 - name: Ensure user alt-meza-ansible .ssh dir configured
   file:
-    path: "/home/alt-meza-ansible/.ssh"
+    path: "{{ m_home }}/alt-meza-ansible/.ssh"
     owner: alt-meza-ansible
     group: wheel
     mode: 0700
     state: directory
 
 - name: Copy meza-ansible authorized_keys to alt-meza-ansible
-  shell: cp /home/meza-ansible/.ssh/authorized_keys /home/alt-meza-ansible/.ssh/authorized_keys
+  shell: cp {{ m_home }}/meza-ansible/.ssh/authorized_keys {{ m_home }}/alt-meza-ansible/.ssh/authorized_keys
 
 - name: Ensure user meza-ansible and alt-meza-ansible authorized_keys configured
   file:
-    path: "/home/{{ item }}/.ssh/authorized_keys"
+    path: "{{ m_home }}/{{ item }}/.ssh/authorized_keys"
     owner: "{{ item }}"
     group: wheel
     mode: 0644
@@ -33,7 +33,7 @@
   authorized_key:
     user: alt-meza-ansible
     state: present
-    key: "{{ lookup('file', '/home/meza-ansible/.ssh/id_rsa.pub') }}"
+    key: "{{ lookup('file', '{{ m_home }}/meza-ansible/.ssh/id_rsa.pub') }}"
 
 - name: Ensure no password on alt-meza-ansible user
   shell: passwd --delete alt-meza-ansible
@@ -48,9 +48,14 @@
     validate: 'visudo -cf %s'
 
 - name: ensure deltarpm is installed and latest
-  yum: name=deltarpm state=installed
+  yum: name=deltarpm state=latest
+  tags:
+  - latest
+
 - name: upgrade all packages
   yum: name=* state=latest
+  tags:
+  - latest
 
 # FIXME: for RedHat may need to enable "Optional RPMs"
 - name: ensure EPEL installed

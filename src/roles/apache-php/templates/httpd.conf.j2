@@ -422,7 +422,29 @@ Listen 8080
 	</Directory>
 	{%- endif %}
 
+	{% if m_setup_php_profiling -%}
+	# Prepends file all files to initiate profiling
+	php_admin_value auto_prepend_file "{{ m_profiling_xhgui_directory }}/external/header.php"
+	{% endif %}
+
 </VirtualHost>
+
+{% if m_setup_php_profiling -%}
+# Enable profiling for PHP
+Listen 8089
+<VirtualHost *:8089>
+
+	<Directory {{ m_profiling_xhgui_directory }}/webroot>
+		Options Indexes MultiViews FollowSymLinks
+		AllowOverride All
+		Require all granted
+	</Directory>
+
+	DocumentRoot {{ m_profiling_xhgui_directory }}/webroot
+	ServerName MezaProfiling
+
+</VirtualHost>
+{% endif %}
 
 # Use port 8090 to access mod_status. Not accessible outside firewall.
 ExtendedStatus on

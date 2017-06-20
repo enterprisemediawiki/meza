@@ -30,6 +30,7 @@
   user:
     name: "{{ nodejs_install_npm_user }}"
     group: "{{ nodejs_install_npm_user }}"
+    createhome: no
     append: yes
 
 - name: Create npm global directory
@@ -70,3 +71,5 @@
     NODE_PATH: "{{ npm_config_prefix }}/lib/node_modules"
     NPM_CONFIG_UNSAFE_PERM: "{{ npm_config_unsafe_perm }}"
   with_items: "{{ nodejs_npm_global_packages }}"
+  tags:
+  - latest

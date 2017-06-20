@@ -47,8 +47,8 @@ Running VirtualBox and need to get your virtual machine configured? See our
 
 Everything can be installed on a single server (a monolith, `meza deploy monolith`) or can be configured to install different components on different servers. For example, you may have the following setup:
 
-* 2 load balancers
-* 3 app servers (NOTE: this is still in development, and app servers do not yet have the ability to share uploads (a pretty major limitation))
+* 2 load balancers (multiple meza-installed load balancers still in development. multiple external load-balancers possible)
+* 3 app servers
 * 3 memcached servers
 * 1 database master
 * 3 database replicas

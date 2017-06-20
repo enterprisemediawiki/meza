@@ -3,6 +3,8 @@
   yum:
     name: "{{ item }}"
     state: latest
+  tags:
+  - latest
   with_items:
   - memcached
   - nmap-ncat

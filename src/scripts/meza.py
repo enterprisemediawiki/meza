@@ -16,11 +16,11 @@ def load_yaml ( filepath ):
 			print(exc)
 
 
-paths = load_yaml( "/opt/meza/config/core/defaults.yml" )
+defaults = load_yaml( "/opt/meza/config/core/defaults.yml" )
 
 # Hard-coded for now, because I'm not sure where to set it yet
 language = "en"
-i18n = load_yaml( os.path.join( paths['m_i18n'], language+".yml" ) )
+i18n = load_yaml( os.path.join( defaults['m_i18n'], language+".yml" ) )
 
 
 def main (argv):
@@ -256,8 +256,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	print "Please review your host file. Run command:"
 	print "  sudo vi /opt/conf-meza/secret/{}/hosts".format(env)
 	print "Please review your secret config. It is encrypted, so edit by running:"
-	print "  sudo ansible-vault edit /opt/conf-meza/secret/{}/group_vars/all.yml --vault-password-file /home/meza-ansible/.vault-pass-{}.txt".format(env,env)
-
+	print "  sudo ansible-vault edit /opt/conf-meza/secret/{}/group_vars/all.yml --vault-password-file /opt/conf-meza/users/meza-ansible/.vault-pass-{}.txt".format(env,env)
 	if return_not_exit:
 		return rc
 	else:
@@ -519,7 +518,8 @@ def meza_shell_exec ( shell_cmd ):
 def get_vault_pass_file ( env ):
 	import pwd
 	import grp
-	vault_pass_file = '/home/meza-ansible/.vault-pass-{}.txt'.format(env)
+	home_dir = defaults['m_home']
+	vault_pass_file = '{}/meza-ansible/.vault-pass-{}.txt'.format(home_dir,env)
 	if not os.path.isfile( vault_pass_file ):
 		with open( vault_pass_file, 'w' ) as f:
 			f.write( random_string( num_chars=64 ) )

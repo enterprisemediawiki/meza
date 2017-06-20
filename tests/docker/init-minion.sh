@@ -15,7 +15,7 @@ docker cp "$m_meza_host/src/scripts/ssh-users/setup-minion-user.sh" "$container_
 ${docker_exec[@]} bash /tmp/setup-minion-user.sh
 
 # Turn off host key checking for user meza-ansible, to avoid prompts
-${docker_exec[@]} bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > /home/meza-ansible/.ssh/config'
+${docker_exec[@]} bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > /opt/conf-meza/users/meza-ansible/.ssh/config'
 
 # Allow SSH login
 # WARNING: This is INSECURE and for test environment only

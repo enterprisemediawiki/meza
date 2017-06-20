@@ -70,13 +70,51 @@ frontend www-https
 
 backend www-backend
 	redirect scheme https if !{ ssl_fc }
-	{% for host in groups['app-servers'] %}
-	{% if host == inventory_hostname %}
-	server apache{{ loop.index }} 127.0.0.1:8080 check
-	{% else %}
-	server apache{{ loop.index }} {{ host }}:8080 check
-	{% endif %}
+	{% for host in groups['app-servers'] -%}
+		{%- if host == inventory_hostname -%}
+			server apache{{ loop.index }} 127.0.0.1:8080 check
+		{%- else -%}
+			server apache{{ loop.index }} {{ host }}:8080 check
+		{%- endif %}
+
 	{% endfor %}
+
+{% if m_setup_php_profiling %}
+listen php-profiling
+	bind *:8088
+	{% for host in groups['app-servers'] -%}
+		server profiling{{ loop.index }} {{ host }}:8089 check
+	{% endfor %}
+{% endif %}
+
+listen parsoid-internal
+	bind *:8001
+	{% for host in groups['parsoid-servers'] -%}
+		server parsoid{{ loop.index }} {{ host }}:8000 check
+	{% endfor %}
+
+
+listen mediawiki-internal
+	bind *:8081
+	{% for host in groups['app-servers'] -%}
+		{%- if host == inventory_hostname -%}
+			server mediawiki{{ loop.index }} 127.0.0.1:8080 check
+		{%- else -%}
+			server mediawiki{{ loop.index }} {{ host }}:8080 check
+		{%- endif %}
+
+	{% endfor %}
+
+{% if enable_haproxy_stats %}
+listen stats
+	bind *:1936 ssl crt /etc/haproxy/certs/meza.pem
+	stats enable
+	stats hide-version
+	stats realm Haproxy\ Statistics
+	stats uri /haproxy
+	stats auth {{ haproxy_stats_user }}:{{ haproxy_stats_password }}
+	stats refresh 30s
+{% endif %}
 
 # backend letsencrypt-backend
 # 	server letsencrypt 127.0.0.1:54321

@@ -1,5 +1,5 @@
 ---
-# FIXME: Eventually add the ability to get SSL cert from letsencrypt
+# FIXME #748: Eventually add the ability to get SSL cert from letsencrypt
 #     ref: https://www.digitalocean.com/community/tutorials/how-to-secure-haproxy-with-let-s-encrypt-on-centos-7
 # Other refs:
 #     https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Load_Balancer_Administration/install_haproxy_example1.html
@@ -55,7 +55,7 @@
   shell: >
     ansible-vault encrypt
     {{ item }}
-    --vault-password-file /home/meza-ansible/.vault-pass-{{ env }}.txt
+    --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
   ignore_errors: True
   delegate_to: localhost
   run_once: True
@@ -67,7 +67,7 @@
   shell: >
     ansible-vault view
     /opt/conf-meza/secret/{{ env }}/ssl/meza.key
-    --vault-password-file /home/meza-ansible/.vault-pass-{{ env }}.txt
+    --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
   register: decrypted_key
   delegate_to: localhost
   run_once: True
@@ -76,7 +76,7 @@
   shell: >
     ansible-vault view
     /opt/conf-meza/secret/{{ env }}/ssl/meza.crt
-    --vault-password-file /home/meza-ansible/.vault-pass-{{ env }}.txt
+    --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
   register: decrypted_cert
   delegate_to: localhost
   run_once: True
@@ -152,7 +152,7 @@
   file:
     path: /etc/haproxy/errors
     state: directory
-    # FIXME: permissions?
+    # FIXME #530: permissions?
 
 
 - name: Ensure error pages in place
@@ -160,7 +160,7 @@
     src: "errors/{{ item }}.http.j2"
     dest: "/etc/haproxy/errors/{{ item }}.http"
   with_items:
-    # FIXME: add the others, make the 500 error one good
+    # FIXME #663: add the others, make the 500 error one good
     # - 400
     # - 403
     # - 408
@@ -169,6 +169,8 @@
     # - 503
     # - 504
 
+# FIXME #746: Why does HAProxy specify this different method for firewall? Is
+# it an SELinux thing (which at present we don't have in enforcing)?
 - name: Ensure firewalld haproxy service files in place
   template:
     src: "haproxy-{{ item }}.firewalld.xml.j2"
@@ -210,8 +212,44 @@
     - 443
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
+- name: Ensure firewalld port 1936 OPEN when haproxy stats ENABLED
+  firewalld:
+    port: "1936/tcp"
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  when: enable_haproxy_stats and (docker_skip_tasks is not defined or not docker_skip_tasks)
 
-# FIXME: haproxy will need to handle reverse proxy for Elasticsearch plugins
+- name: Ensure firewalld port 1936 CLOSED when haproxy stats DISABLED
+  firewalld:
+    port: "1936/tcp"
+    permanent: true
+    immediate: true
+    state: disabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  when: not enable_haproxy_stats and (docker_skip_tasks is not defined or not docker_skip_tasks)
+
+- name: Ensure firewalld port 8088 OPEN when PHP profiling ENABLED
+  firewalld:
+    port: "8088/tcp"
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  when: m_setup_php_profiling and (docker_skip_tasks is not defined or not docker_skip_tasks)
+
+- name: Ensure firewalld port 8088 CLOSED when PHP profiling DISABLED
+  firewalld:
+    port: "8088/tcp"
+    permanent: true
+    immediate: true
+    state: disabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  when: not m_setup_php_profiling and (docker_skip_tasks is not defined or not docker_skip_tasks)
+
+
+# FIXME #747: haproxy will need to handle reverse proxy for Elasticsearch plugins
 # - name: Configure firewalld for Elasticsearch reverse proxy
 #   firewalld:
 #     port: 8008/tcp

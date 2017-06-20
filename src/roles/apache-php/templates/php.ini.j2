@@ -572,7 +572,7 @@ html_errors = On
 ; empty.
 ; http://php.net/error-log
 ; Example:
-;error_log = php_errors.log
+error_log = {{ m_logs }}/php_errors.log
 ; Log errors to syslog (Event Log on Windows).
 ;error_log = syslog
 
@@ -894,6 +894,14 @@ default_socket_timeout = 60
 ;extension=php_tidy.dll
 ;extension=php_xmlrpc.dll
 ;extension=php_xsl.dll
+
+{% if m_setup_php_profiling %}
+; Enable profiling capabilities for PHP
+extension=xhprof.so
+
+; Enable MongoDB to use XHGUI for XHProf
+extension=mongo.so
+{% endif %}
 
 ;;;;;;;;;;;;;;;;;;;
 ; Module Settings ;
@@ -1919,13 +1927,13 @@ opcache.revalidate_freq=30
 opcache.force_restart_timeout=3600
 
 ; OPcache error_log file name. Empty string assumes "stderr".
-; opcache.error_log=/opt/data-meza/logs/opcache_error.log
+opcache.error_log=/opt/data-meza/logs/opcache_error.log
 
 ; All OPcache errors go to the Web server log.
 ; By default, only fatal errors (level 0) or errors (level 1) are logged.
 ; You can also enable warnings (level 2), info messages (level 3) or
 ; debug messages (level 4).
-;opcache.log_verbosity_level=1
+opcache.log_verbosity_level=2
 
 ; Preferred Shared Memory back-end. Leave empty and let the system decide.
 ;opcache.preferred_memory_model=
