@@ -8,7 +8,7 @@ else
 	do_wikis="$1"
 fi
 
-wiki_dir="$m_htdocs/wikis"
+wiki_dir="{{ m_htdocs }}/wikis"
 
 cd "$wiki_dir"
 for d in $do_wikis; do
@@ -25,8 +25,8 @@ for d in $do_wikis; do
 	fi
 
 	timestamp=$(date +"%F_%T")
-	exception_log="$m_logs/smw-rebuilddata-exceptions-$wiki_id-$timestamp.log"
-	out_log="$m_logs/smw-rebuilddata-out.$wiki_id.$timestamp.log"
+	exception_log="{{ m_logs }}/smw-rebuilddata-exceptions-$wiki_id-$timestamp.log"
+	out_log="{{ m_logs }}/smw-rebuilddata-out.$wiki_id.$timestamp.log"
 
 	echo "Start rebuilding SMW data for \"$wiki_id\" at $timestamp"
 	echo "  Exception log (if req'd):"
@@ -35,7 +35,7 @@ for d in $do_wikis; do
 	echo "    $out_log"
 
 	WIKI="$wiki_id" \
-	php "$m_mediawiki/extensions/SemanticMediaWiki/maintenance/rebuildData.php" \
+	php "{{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/rebuildData.php" \
 	-d 5 -v --ignore-exceptions \
 	--exception-log="$exception_log" \
 	> "$out_log" 2>&1

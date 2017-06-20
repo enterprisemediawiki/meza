@@ -52,11 +52,8 @@ Meza application directory. This should never change except if you upgrade meza 
   * `scripts`
     * Run on hosts: `create-vm.sh`: Create a Vbox VM; remove when `vagrant up` mature? Or keep for RedHat
     * Setup dev VMs: `dev-networking.sh`: Setup host-only network on Vbox VM; Remove after Vagrant? Keep for RedHat setup?
-    * Move to Ansible role [1]: `disk-space-usage.sh`: (needs to be within role on any server that needs disk space alerts)
-    * Move to Ansible role [1]: `server-performance.sh`: (needs to be within role on any server that needs performance alerts)
-    * Move to Ansible role [1]: `elastic-build-index.sh`: (On app servers; maybe reduce number of scripts)
-    * Move to Ansible role [1]: `elastic-rebuild-all.sh`: (On app servers; maybe reduce number of scripts)
-    * Move to Ansible role [1]: `elastic-rebuild-index.sh`: (On app servers; maybe reduce number of scripts)
+    * Move to Ansible role [1]: `disk-space-usage.sh`: (needs to be within role on any server that needs disk space alerts. Currently requires MariaDB and Ansible present on logging servers)
+    * Move to Ansible role [1]: `server-performance.sh`: (needs to be within role on any server that needs performance alerts. Currently requires MariaDB and Ansible present on logging servers)
     * Run on controller: `getmeza.sh`: (Used to install `meza` command)
     * Run on controller: `meza.py`: (Entry point for `meza` command)
     * Consolidate [2]: `shell-functions`:
@@ -176,6 +173,9 @@ This directory is a hidden directory (e.g. starts with a period) because it real
 * `config.sh`: Bash config variable file written based off defaults, secret and public config
 * `Extensions.php`: Extensions to load, written based off core and local extensions
 * `logging.sh`: Config variables specific to logging. FIXME #715: merge into config.sh
+* `elastic-build-index.sh`: Rebuild Elasticsearch index for a wiki. Deployed by `role:mediawiki`
+* `elastic-rebuild-all.sh`: Wrapper for `elastic-build-index.sh`. Deployed by `role:mediawiki`
+* `smw-rebuild-all.sh`: Rebuild SMW data for all wikis. Deployed by `role:mediawiki`
 * `public`: A copy of /opt/conf-meza/public, but present on all app-servers, as opposed to `/opt/conf-meza` which is only present on the controller
   * `MezaLocalExtensions.yml`: present but not used within .deploy-meza (controller only)
   * `postLocalSettings.d`: gives app servers access to these files
