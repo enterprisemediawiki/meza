@@ -724,18 +724,51 @@ $wgCirrusSearchClusters['default'][] = '{{ host }}';
  */
 
 /**
- * HTTP_X_FORWARDED_FOR is set by HAProxy when users request pages via
- * the load balancer. No users should directly access webservers. Only
- * other services (e.g. Parsoid) should directly access webservers. In
- * order to allow services to access MediaWiki with full permissions,
- * if HTTP_X_FORWARDED_FOR does NOT exist then assume it's not a regular
- * user and grant permissions.
+ * HTTP_X_FORWARDED_FOR (XFF) is set by HAProxy when users request pages via
+ * the load balancer. Users always access via the load balancer. Parsoid may or
+ * may not access via the load balancer (it will if Parsoid is not on the same
+ * server as the one and only load balancer). In order to allow Parsoid to
+ * access MediaWiki with full permissions, grant access to server if:
+ *
+ *   No XFF (e.g. is a request internal to the server) and REMOTE_ADDR is local
+ *   - or -
+ *   Yes XFF and XFF is a parsoid server
  *
  * Refs:
  * https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
  * https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
  **/
-if ( ! isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+// initially assume we're not granting special rights
+$grantParsoidReadWrite = false;
+
+// if X-Forwarded-For HTTP header exists
+if ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+
+	$parsoidServers = array(
+		{% for parsoid in groups['parsoid-servers'] %}
+		'{{ parsoid }}',
+		{% endfor %}
+	);
+
+	// if request originated at a Parsoid server
+	if ( in_array( $_SERVER['HTTP_X_FORWARDED_FOR'], $parsoidServers ) ) {
+		$grantParsoidReadWrite = true;
+	}
+
+}
+
+// no X-Forwarded-For HTTP Header
+else if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+
+	// if remote address is this server
+	if ( $_SERVER['REMOTE_ADDR'] === 'localhost' || $_SERVER['REMOTE_ADDR'] === '127.0.0.1' ) {
+		$grantParsoidReadWrite = true;
+	}
+
+}
+
+// if the logic above resulted in granting access
+if ( $grantParsoidReadWrite ) {
 	$wgGroupPermissions['*']['read'] = true;
 	$wgGroupPermissions['*']['edit'] = true;
 }
