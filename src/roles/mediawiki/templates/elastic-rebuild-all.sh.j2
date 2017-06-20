@@ -1,14 +1,12 @@
 #!/bin/sh
 
-source "/opt/.deploy-meza/config.sh"
-
 if [ -z "$1" ]; then
 	do_wikis="*/"
 else
 	do_wikis="$1"
 fi
 
-wiki_dir="$m_htdocs/wikis"
+wiki_dir="{{ m_htdocs }}/wikis"
 
 cd "$wiki_dir"
 for d in $do_wikis; do
@@ -26,14 +24,14 @@ for d in $do_wikis; do
 
 	timestamp=$(date +"%F_%T")
 
-	out_log="$m_logs/search-index.$wiki_id.$timestamp.log"
+	out_log="{{ m_logs }}/search-index.$wiki_id.$timestamp.log"
 
 	echo "Rebuilding index for $wiki_id"
 	echo "  Output log:"
 	echo "    $out_log"
 
 
-	wiki_id="$wiki_id" bash /opt/meza/src/scripts/elastic-build-index.sh > "$out_log"  2>&1
+	wiki_id="$wiki_id" bash "{{ m_deploy }}/elastic-build-index.sh" > "$out_log"  2>&1
 
 	endtimestamp=$(date +"%F_%T")
 
