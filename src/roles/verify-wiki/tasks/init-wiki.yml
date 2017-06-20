@@ -19,7 +19,7 @@
 # Create an admin user for Demo Wiki only if the wiki was just created
 - name: Create "Admin" user on Demo Wiki
   shell: >
-    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/createAndPromote.php" --force --custom-groups="sysop bureaucrat" Admin adminpass
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/createAndPromote.php" --force --sysop --bureaucrat Admin adminpass
   run_once: true
   when: wiki_id == "demo"
 
