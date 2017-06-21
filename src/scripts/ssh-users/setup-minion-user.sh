@@ -82,5 +82,9 @@ else
 	passwd "meza-ansible"
 fi
 
+# Don't require TTY or visible password for sudo. Ref #769
+sed -r -i "s/Defaults\\s+requiretty/#Defaults requiretty/g;" /etc/sudoers
+sed -r -i "s/Defaults\\s+\!visiblepw/#Defaults \\!visiblepw/g;" /etc/sudoers
+
 # Add $ansible_user to sudoers as a passwordless user
 bash -c "echo 'meza-ansible ALL=(ALL) NOPASSWD: ALL' | (EDITOR='tee -a' visudo)"
