@@ -69,5 +69,9 @@ else
 	source "/opt/meza/src/scripts/ssh-users/setup-master-user.sh"
 fi
 
+# Don't require TTY or visible password for sudo. Ref #769
+sed -r -i "s/^Defaults\\s+requiretty/#Defaults requiretty/g;" /etc/sudoers
+sed -r -i "s/^Defaults\\s+\!visiblepw/#Defaults \\!visiblepw/g;" /etc/sudoers
+
 echo "meza command installed. Use it:"
 echo "  sudo meza deploy monolith"
