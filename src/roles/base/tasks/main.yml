@@ -4,6 +4,8 @@
     name: "{{ item }}"
     # primary group
     group: wheel
+    move_home: yes
+    home: "{{ m_home }}/{{ item }}"
   with_items:
   - meza-ansible
   - alt-meza-ansible
