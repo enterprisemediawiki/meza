@@ -28,11 +28,8 @@ Vagrant.configure("2") do |config|
 
     config.vm.define "app2" do |app2|
 
-      # app2.vm.box = "centos/7"
       app2.vm.box = "bento/centos-7.3"
-      # app2.vm.box = "geerlingguy/centos7"
       app2.vm.hostname = 'app2'
-      # app2.vm.box_url = "ubuntu/precise64"
 
       app2.vm.network :private_network, ip: "192.168.56.57"
 
@@ -57,6 +54,57 @@ Vagrant.configure("2") do |config|
       # Setup SSH user and unsafe testing config
       #
       app2.vm.provision "minion-ssh", type: "shell", preserve_order: true, binary: true, inline: <<-SHELL
+        if [ ! -f /opt/conf-meza/public/vars.yml ]; then
+
+          bash /tmp/minion.sh
+
+          # Turn off host key checking for user meza-ansible, to avoid prompts
+          echo "setup .ssh/config"
+          bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > /opt/conf-meza/users/meza-ansible/.ssh/config'
+          sudo chown meza-ansible:meza-ansible /opt/conf-meza/users/meza-ansible/.ssh/config
+          sudo chmod 600 /opt/conf-meza/users/meza-ansible/.ssh/config
+
+          # Allow password auth
+          echo "setup sshd_config password auth"
+          sed -r -i 's/PasswordAuthentication no/PasswordAuthentication yes/g;' /etc/ssh/sshd_config
+          systemctl restart sshd
+        fi
+      SHELL
+    end
+
+  end
+
+  # Gross...copy-paste of above. FIXME.
+  if configuration.key?("db2")
+
+    config.vm.define "db2" do |db2|
+
+      db2.vm.box = "bento/centos-7.3"
+      db2.vm.hostname = 'db2'
+
+      db2.vm.network :private_network, ip: "192.168.56.58"
+
+      db2.vm.provider :virtualbox do |v|
+        v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        v.customize ['modifyvm', :id, '--cableconnected1', 'on']
+        v.customize ["modifyvm", :id, "--memory", configuration["db2"]["memory"] ]
+        v.customize ["modifyvm", :id, "--cpus", configuration["db2"]["cpus"] ]
+        v.customize ["modifyvm", :id, "--name", "db2"]
+      end
+
+      # Non-controlling server should not have meza
+      db2.vm.synced_folder ".", "/vagrant", disabled: true
+      # db2.vm.synced_folder ".", "/opt/meza", type: "rsync",
+      #   rsync__args: ["--verbose", "--archive", "--delete", "-z"]
+
+      # Transfer setup-minion-user.sh script to db2
+      db2.vm.provision "file", source: "./src/scripts/ssh-users/setup-minion-user.sh", destination: "/tmp/minion.sh"
+      db2.vm.provision "file", source: "./.vagrant/id_rsa.pub", destination: "/tmp/meza-ansible.id_rsa.pub"
+
+      #
+      # Setup SSH user and unsafe testing config
+      #
+      db2.vm.provision "minion-ssh", type: "shell", preserve_order: true, binary: true, inline: <<-SHELL
         if [ ! -f /opt/conf-meza/public/vars.yml ]; then
 
           bash /tmp/minion.sh
@@ -127,23 +175,29 @@ Vagrant.configure("2") do |config|
     SHELL
 
     #
-    # Setup meza environment, either monolithic or 2app
+    # Setup meza environment, either monolithic, with 2 app servers, and/or 2 db servers
     #
-    if not configuration.key?("app2")
-
-      app1.vm.provision "setupenv", type: "shell", preserve_order: true, inline: <<-SHELL
-        meza setup env vagrant --fqdn=192.168.56.56 --db_pass=1234 --private_net_zone=public
-      SHELL
-
-    else
-
-      # FIXME: should have a less fragile method to check if env exists
-      app1.vm.provision "setupenv", type: "shell", preserve_order: true, inline: <<-SHELL
-        if [ ! -d /opt/conf-meza/secret/vagrant ]; then
-          default_servers=192.168.56.56 app_servers=192.168.56.56,192.168.56.57 meza setup env vagrant --fqdn=192.168.56.56 --db_pass=1234 --private_net_zone=public
-        fi
-      SHELL
+    envvars = {}
+    if configuration.key?("app2") || configuration.key?("db2")
+      envvars[:default_servers] = "192.168.56.56"
     end
+
+    if configuration.key?("app2")
+      envvars[:app_servers] = "192.168.56.56,192.168.56.57"
+    end
+
+    if configuration.key?("db2")
+      envvars[:db_master] = "192.168.56.56"
+      envvars[:db_slaves] = "192.168.56.58"
+    end
+
+
+    # FIXME: should have a less fragile method to check if env exists
+    app1.vm.provision "setupenv", type: "shell", preserve_order: true, env: envvars, inline: <<-SHELL
+      if [ ! -d /opt/conf-meza/secret/vagrant ]; then
+        meza setup env vagrant --fqdn=192.168.56.56 --db_pass=1234 --private_net_zone=public
+      fi
+    SHELL
 
     #
     # Setup meza public config
@@ -166,11 +220,9 @@ EOL
     SHELL
 
     #
-    # If multi-app: transfer key to second app server
+    # If multi-app: turn off hostkey checking
     #
-    if configuration.key?("app2")
-
-
+    if configuration.key?("app2") || configuration.key?("db2")
 
       app1.vm.provision "keytransfer", type: "shell", preserve_order: true, inline: <<-SHELL
 
@@ -184,12 +236,13 @@ EOL
         sed -r -i 's/UsePAM yes/UsePAM no/g;' /etc/ssh/sshd_config
         systemctl restart sshd
 
-        echo "switch user"
-        sudo su meza-ansible
+        # Stuff below would be more secure if it worked...FIXME.
+
+        # echo "switch user"
+        # sudo su meza-ansible
 
         # Copy id_rsa.pub to each minion
         # sshpass -p 1234 ssh meza-ansible@192.168.56.57 "echo \"$pubkey\" >> /opt/conf-meza/users/meza-ansible/.ssh/authorized_keys"
-
 
         # Remove password-based authentication for $ansible_user
         #echo "delete password"
