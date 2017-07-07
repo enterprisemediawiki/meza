@@ -170,10 +170,34 @@ if ( $debug ) {
 	// Output errors to log file
 	ini_set( 'error_log', "$m_meza_data/logs/php.log" );
 
-	// MediaWiki Debug Tools
-	$wgShowExceptionDetails = true;
-	$wgDebugToolbar = true;
+
+	// Displays debug data at the bottom of the content area in a formatted
+	// list below a horizontal line.
 	$wgShowDebug = true;
+
+	// A more elaborative debug toolbar with interactive panels.
+	$wgDebugToolbar = true;
+
+	// Uncaught exceptions will print a complete stack trace to output (instead
+	// of just to logs)
+	$wgShowExceptionDetails = true;
+
+	// SQL statements are dumped to the $wgDebugLogFile (if set) /and/or to
+	// HTML output (if $wgDebugComments is true)
+	$wgDebugDumpSql  = true;
+
+	// If on, some debug items may appear in comments in the HTML output.
+	$wgDebugComments = false;
+
+	// The file name of the debug log, or empty if disabled. wfDebug() appends
+	// to this file.
+	$wgDebugLogFile = "/opt/data-meza/logs/mw-debug.log";
+
+	// If true, show a backtrace for database errors.
+	$wgShowDBErrorBacktrace = true;
+
+	// Shows the actual query when errors occur (in HTML, I think. Not logs)
+	$wgShowSQLErrors = true;
 
 }
 
@@ -323,7 +347,7 @@ foreach( $mezaDatabaseServers as $databaseServer ) {
 		'user' => $mezaDatabaseUser,
 		'password' => $mezaDatabasePassword,
 		'type' => "mysql",
-		'flags' => DBO_DEFAULT,
+		'flags' => $debug ? DBO_DEFAULT | DBO_DEBUG : DBO_DEFAULT,
 		'load' => $databaseReadLoadRatio,
 	);
 	$databaseReadLoadRatio = 10; // every server after the first gets the same loading
