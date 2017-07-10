@@ -110,3 +110,13 @@ m_uploads_dir_mode: "0775"
 m_uploads_dir_owner: apache
 m_uploads_dir_group: apache
 
+# Per [1] this should not be accessible from the web and should have mode of
+# 0700. However, we need it to be accessible by apache httpd for page requests
+# but also allow command line scripts to run it, specifically for running jobs.
+# Fortunately jobs are run by the meza-ansible user, who is in group "apache"
+# and therefore we'll use mode=0770.
+#
+# [1] https://www.mediawiki.org/wiki/Manual:$wgCacheDirectory
+m_cache_directory_mode: "0770"
+m_cache_directory_owner: apache
+m_cache_directory_group: apache

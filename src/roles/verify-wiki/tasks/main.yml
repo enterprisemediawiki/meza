@@ -18,9 +18,9 @@
   file:
     state: directory
     path: "{{ m_cache_directory }}/{{ wiki_id }}"
-    owner: apache
-    group: apache
-    mode: 0700
+    owner: "{{ m_cache_directory_owner }}"
+    group: "{{ m_cache_directory_group }}"
+    mode: "{{ m_cache_directory_mode }}"
 
 
 
