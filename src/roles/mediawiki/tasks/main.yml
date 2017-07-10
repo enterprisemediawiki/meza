@@ -214,7 +214,13 @@
     group: apache
     mode: 0700
 
-
+- name: "Ensure root uploads dir configured"
+  file:
+    path: "{{ m_uploads_dir }}"
+    state: directory
+    mode: "{{ m_uploads_dir_mode }}"
+    owner: "{{ m_uploads_dir_owner }}"
+    group: "{{ m_uploads_dir_group }}"
 
 
 #

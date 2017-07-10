@@ -97,5 +97,16 @@ mysql_slow_query_log_file: /var/log/mariadb/slow-queries.log
 
 # If using a load balancer not managed by meza, on what port should you
 # access Parsoid and MediaWiki internal services?
-unmanaged_load_balancer_parsoid_port: 8001
-unmanaged_load_balancer_mediawiki_port: 8081
+load_balancer_unmanaged_parsoid_port: 8001
+load_balancer_unmanaged_mediawiki_port: 8081
+
+
+#
+# FILE MODES, OWNERS, GROUPS
+#
+
+# uploads directory. Note: user meza-ansible is in group "apache"
+m_uploads_dir_mode: "0775"
+m_uploads_dir_owner: apache
+m_uploads_dir_group: apache
+
