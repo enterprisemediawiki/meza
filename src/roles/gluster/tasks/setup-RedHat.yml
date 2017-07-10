@@ -1,10 +1,21 @@
 ---
-- name: Install Prerequisites
+
+- name: Ensure repo in place for RHEL
+  template:
+    src: Gluster.repo.j2
+    dest: /etc/yum.repos.d/Gluster.repo
+  vars:
+    rhel_gluster_minor_version: "10"
+  when: ansible_distribution == "RedHat"
+
+- name: Ensure CentOS prerequisites in place
   yum:
     name: "{{ item }}"
     state: present
   with_items:
     - "centos-release-gluster{{ glusterfs_default_release }}"
+  when: ansible_distribution == "CentOS"
+
 
 - name: Install Packages
   yum:

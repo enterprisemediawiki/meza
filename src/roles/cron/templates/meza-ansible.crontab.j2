@@ -27,6 +27,7 @@
 #
 # Run a small set of jobs across all wikis periodically
 #
+# run_jobs_freq_maxtime run_jobs_freq_totalmaxtime run_jobs_freq_maxjobs run_jobs_freq_maxload
 {{ run_jobs_freq_crontime }} WIKI={{ list_of_wikis[0] }} php {{ m_deploy }}/runAllJobs.php {{ run_jobs_freq_maxtime }} {{ run_jobs_freq_totalmaxtime }} {{ run_jobs_freq_maxjobs }} {{ run_jobs_freq_maxload }} >> {{ m_logs }}/jobs_`date "+\%Y\%m\%d"`_cron.log 2>&1
 
 #

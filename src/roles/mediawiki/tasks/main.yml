@@ -8,6 +8,44 @@
     name: sync-configs
 
 
+#
+# ENSURE APP SERVERS CAN GIT-CLONE OVER SSH
+#
+- name: Ensure user meza-ansible .ssh dir configured
+  file:
+    path: "{{ m_home }}/meza-ansible/.ssh"
+    owner: meza-ansible
+    group: wheel
+    mode: 0700
+    state: directory
+
+- name: Copy meza-ansible keys to app servers
+  copy:
+    src: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
+    dest: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
+    owner: meza-ansible
+    group: wheel
+    mode: "{{ item.mode }}"
+  with_items:
+  - name: id_rsa
+    mode: "0600"
+  - name: id_rsa.pub
+    mode: "0644"
+
+- name: Copy meza-ansible known_hosts to app-servers
+  copy:
+    src: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
+    dest: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
+    owner: meza-ansible
+    group: wheel
+    mode: "{{ item.mode }}"
+  ignore_errors: True
+  with_items:
+  - name: known_hosts
+    mode: "0600"
+
+
+
 
 
 #
@@ -172,11 +210,17 @@
   file:
     state: directory
     path: "{{ m_cache_directory }}"
-    owner: apache
-    group: apache
-    mode: 0700
+    owner: "{{ m_cache_directory_owner }}"
+    group: "{{ m_cache_directory_group }}"
+    mode: "{{ m_cache_directory_mode }}"
 
-
+- name: "Ensure root uploads dir configured"
+  file:
+    path: "{{ m_uploads_dir }}"
+    state: directory
+    mode: "{{ m_uploads_dir_mode }}"
+    owner: "{{ m_uploads_dir_owner }}"
+    group: "{{ m_uploads_dir_group }}"
 
 
 #
