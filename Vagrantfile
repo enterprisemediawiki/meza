@@ -54,7 +54,7 @@ Vagrant.configure("2") do |config|
       # Setup SSH user and unsafe testing config
       #
       app2.vm.provision "minion-ssh", type: "shell", preserve_order: true, binary: true, inline: <<-SHELL
-        if [ ! -f /opt/conf-meza/public/vars.yml ]; then
+        if [ ! -f /opt/conf-meza/public/public.yml ]; then
 
           bash /tmp/minion.sh
 
@@ -105,7 +105,7 @@ Vagrant.configure("2") do |config|
       # Setup SSH user and unsafe testing config
       #
       db2.vm.provision "minion-ssh", type: "shell", preserve_order: true, binary: true, inline: <<-SHELL
-        if [ ! -f /opt/conf-meza/public/vars.yml ]; then
+        if [ ! -f /opt/conf-meza/public/public.yml ]; then
 
           bash /tmp/minion.sh
 
@@ -207,8 +207,8 @@ Vagrant.configure("2") do |config|
       [ -d /opt/conf-meza/public ] || mkdir /opt/conf-meza/public
 
       # If public config YAML file not present, create with defaults
-      if [ ! -f /opt/conf-meza/public/vars.yml ]; then
-cat >/opt/conf-meza/public/vars.yml <<EOL
+      if [ ! -f /opt/conf-meza/public/public.yml ]; then
+cat >/opt/conf-meza/public/public.yml <<EOL
 ---
 blender_landing_page_title: Meza Wikis
 m_setup_php_profiling: true
@@ -216,7 +216,7 @@ m_force_debug: true
 EOL
       fi
 
-      cat /opt/conf-meza/public/vars.yml
+      cat /opt/conf-meza/public/public.yml
     SHELL
 
     #

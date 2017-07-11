@@ -9,9 +9,9 @@
     m_uploads_dir: "{{ gluster_mount_dir }}"
   when: "'app-servers' in groups and groups['app-servers']|length|int > 1"
 
-- name: Set meza-local variables
+- name: Set meza local public variables
   include_vars:
-    file: "{{ m_local_public }}/vars.yml"
+    file: "{{ m_local_public }}/public.yml"
   # Ingore errors so this file is not required to be included
   ignore_errors: yes
 
@@ -25,3 +25,9 @@
 
 - set_fact:
     list_of_wikis: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+- name: Set meza local secret variables
+  include_vars:
+    file: "{{ m_local_secret }}/{{ env }}/secret.yml"
+  # DO NOT ingore errors generally, except when setting up an env
+  ignore_errors: "{{ allow_missing_secret_config | default(false) }}"

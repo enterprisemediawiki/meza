@@ -15,7 +15,7 @@ fi
 source "/opt/.deploy-meza/config.sh"
 
 # TEMPORARY method of recording slack webhooks. Should be in
-# secret/group_vars/all.yml and then written to a dynamic shell script
+# secret/secret.yml and then written to a dynamic shell script
 # file.
 logging_config="/opt/.deploy-meza/logging.sh"
 if [ -f "$logging_config" ]; then

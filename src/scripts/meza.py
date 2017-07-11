@@ -244,10 +244,10 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	os.remove(extra_vars_file)
 
 	# Now that the env is setup, generate a vault password file and use it to
-	# encrypt all.yml
+	# encrypt secret.yml
 	vault_pass_file = get_vault_pass_file( env )
-	all_yml = "/opt/conf-meza/secret/{}/group_vars/all.yml".format(env)
-	cmd = "ansible-vault encrypt {} --vault-password-file {}".format(all_yml, vault_pass_file)
+	secret_yml = "/opt/conf-meza/secret/{}/secret.yml".format(env)
+	cmd = "ansible-vault encrypt {} --vault-password-file {}".format(secret_yml, vault_pass_file)
 	os.system(cmd)
 
 
@@ -256,7 +256,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	print "Please review your host file. Run command:"
 	print "  sudo vi /opt/conf-meza/secret/{}/hosts".format(env)
 	print "Please review your secret config. It is encrypted, so edit by running:"
-	print "  sudo ansible-vault edit /opt/conf-meza/secret/{}/group_vars/all.yml --vault-password-file /opt/conf-meza/users/meza-ansible/.vault-pass-{}.txt".format(env,env)
+	print "  sudo ansible-vault edit /opt/conf-meza/secret/{}/secret.yml --vault-password-file /opt/conf-meza/users/meza-ansible/.vault-pass-{}.txt".format(env,env)
 	if return_not_exit:
 		return rc
 	else:
@@ -464,7 +464,7 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 
 		# Meza _needs_ to be able to load this file. Be perhaps a little
 		# overzealous and chown/chmod it everytime
-		secret_file = '/opt/conf-meza/secret/{}/group_vars/all.yml'.format(env)
+		secret_file = '/opt/conf-meza/secret/{}/secret.yml'.format(env)
 		meza_chown( secret_file, 'meza-ansible', 'wheel' )
 		os.chmod( secret_file, 0o660 )
 

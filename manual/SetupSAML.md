@@ -3,7 +3,7 @@ Setting up SAML authentication
 
 ## Step 1: Set secret config
 
-Add the following to your secret config. This can be found at `/opt/conf-meza/secret/<env>/group_vars/all.yml` where `<env>` is your environment name (e.g. "monolith" or "production" or whatever you chose). Pick good strong passwords and salt below. See comments.
+Add the following to your secret config. This can be found at `/opt/conf-meza/secret/<env>/secret.yml` where `<env>` is your environment name (e.g. "monolith" or "production" or whatever you chose). Pick good strong passwords and salt below. See comments.
 
 ```yaml
 saml_secret:
@@ -21,7 +21,7 @@ saml_secret:
 
 ## Step 2: Set public config
 
-Add the following to your public config, located at `/opt/conf-meza/public/vars.yml`. Fill in appropriate values for everything. You'll need to confer with your SAML Identity Provider for correct values.
+Add the following to your public config, located at `/opt/conf-meza/public/public.yml`. Fill in appropriate values for everything. You'll need to confer with your SAML Identity Provider for correct values.
 
 ```yaml
 saml_public:

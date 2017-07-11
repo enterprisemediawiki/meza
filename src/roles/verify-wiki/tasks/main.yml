@@ -66,20 +66,22 @@
 
 - name: "{{ wiki_id }} - Set SQL source-from-backup facts IF SOURCING FROM db-src"
   set_fact:
-    sql_backup_server: "{{ groups['db-src'][0] }}"
+    sql_backup_server: "{{ backups_server_db_dump.addr }}"
     do_sql_dump: True
     sql_file_match: "wiki_{{ wiki_id }}.sql"
+    db_backup_server_remote_user: "{{ backups_server_db_dump.remote_user }}"
     sql_backup_server_set: True
-  when: "'db-src' in groups and groups['db-src']|length|int > 0"
+  when: "backups_server_db_dump is defined"
 
 - name: "{{ wiki_id }} - Set SQL source-from-backup facts IF SOURCING FROM backup-src"
   set_fact:
-    sql_backup_server: "{{ groups['backup-src'][0] }}"
+    sql_backup_server: "{{ backups_server_alt_source.addr }}"
     do_sql_dump: False
-    sql_dir_path: "{{ backups_src_sql_path | regex_replace('<id>', wiki_id) }}"
-    sql_file_match: "{{ backups_src_sql_file_match | default('*.sql') | regex_replace('<id>', wiki_id) }}"
+    sql_dir_path: "{{ backups_server_alt_source.sql_dir_path | regex_replace('<id>', wiki_id) }}"
+    sql_file_match: "{{ backups_server_alt_source.sql_file_match | default('*.sql') | regex_replace('<id>', wiki_id) }}"
+    db_backup_server_remote_user: "{{ backups_server_alt_source.remote_user }}"
     sql_backup_server_set: True
-  when: "not sql_backup_server_set and 'backup-src' in groups and groups['backup-src']|length|int > 0"
+  when: "not sql_backup_server_set and backups_server_alt_source is defined"
 
 - name: "{{ wiki_id }} - Set SQL source-from-backup facts IF SOURCING FROM backup-servers"
   set_fact:
@@ -95,21 +97,11 @@
 #
 # Set remote user to access database backup
 #
-- name: "{{ wiki_id }} - Set fact for database backup server remote user IF ALTERNATE SPECIFIED"
-  set_fact:
-    db_backup_server_remote_user: "{{ hostvars[sql_backup_server]['alt_remote_user'] }}"
-  when:
-    sql_backup_server is defined
-    and 'alt_remote_user' in hostvars[sql_backup_server]
-
-# Note: since not rsync-ing from one remote to another, can use meza-ansible
-# here instead of alt-meza-ansible
 - name: "{{ wiki_id }} - Set fact for database backup server remote user TO DEFAULT meza-ansible"
   set_fact:
     db_backup_server_remote_user: "meza-ansible"
   when:
-    sql_backup_server is defined
-    and 'alt_remote_user' not in hostvars[sql_backup_server]
+    db_backup_server_remote_user is not defined
 
 
 # WHEN: do_sql_dump is True
@@ -170,8 +162,8 @@
     name: "wiki_{{ wiki_id }}"
     target: "{{ sql_dir_path }}/{{ sql_file_match }}"
     # FIXME: Security issue?
-    login_user: "{{ hostvars[sql_backup_server]['db_src_mysql_user'] }}"
-    login_password: "{{ hostvars[sql_backup_server]['db_src_mysql_pass'] }}"
+    login_user: "{{ backups_server_db_dump.mysql_user }}"
+    login_password: "{{ backups_server_db_dump.mysql_pass }}"
   delegate_to: "{{ sql_backup_server }}"
   remote_user: "{{ db_backup_server_remote_user }}"
   run_once: true
@@ -389,10 +381,11 @@
 
 - name: "{{ wiki_id }} - Set uploads-source-from-backup facts IF SOURCING FROM backup-src"
   set_fact:
-    uploads_backup_server: "{{ groups['backup-src'][0] }}"
-    uploads_backup_dir_path: "{{ hostvars[ groups['backup-src'][0] ]['backups_src_uploads_path'] | regex_replace('<id>', wiki_id) }}"
+    uploads_backup_server: "{{ backups_server_alt_source.addr }}"
+    uploads_backup_dir_path: "{{ backups_server_alt_source.uploads_dir_path | regex_replace('<id>', wiki_id) }}"
+    uploads_backup_server_remote_user: "{{ backups_server_alt_source.remote_user }}"
     uploads_backup_server_set: True
-  when: "'backup-src' in groups and groups['backup-src']|length|int > 0"
+  when: "backups_server_alt_source is defined"
 
 - name: "{{ wiki_id }} - Set uploads-source-from-backup facts IF SOURCING FROM backup-servers"
   set_fact:
@@ -403,21 +396,13 @@
 
 
 #
-# Set remote user to access uploads backup
+# Set remote user to access uploads backup if not set above
 #
-- name: "{{ wiki_id }} - Set fact for uploads backup server remote user IF ALTERNATE SPECIFIED"
-  set_fact:
-    uploads_backup_server_remote_user: "{{ hostvars[uploads_backup_server]['alt_remote_user'] }}"
-  when:
-    uploads_backup_server is defined
-    and 'alt_remote_user' in hostvars[uploads_backup_server]
-
-- name: "{{ wiki_id }} - Set fact for uploads backup server remote user TO DEFAULT alt-meza-ansible"
+- name: "{{ wiki_id }} - Set fact for uploads backup server remote user TO DEFAULT meza-ansible"
   set_fact:
     uploads_backup_server_remote_user: "meza-ansible"
   when:
-    uploads_backup_server is defined
-    and 'alt_remote_user' not in hostvars[uploads_backup_server]
+    uploads_backup_server_remote_user is not defined
 
 
 
