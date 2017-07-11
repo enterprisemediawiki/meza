@@ -26,7 +26,7 @@ for d in $do_wikis; do
 
 	timestamp=$(date +"%F_%T")
 	exception_log="{{ m_logs }}/smw-rebuilddata-exceptions-$wiki_id-$timestamp.log"
-	out_log="{{ m_logs }}/smw-rebuilddata-out.$wiki_id.$timestamp.log"
+	out_log="{{ m_logs }}/smw-rebuilddata/$wiki_id.$timestamp.log"
 
 	echo "Start rebuilding SMW data for \"$wiki_id\" at $timestamp"
 	echo "  Exception log (if req'd):"

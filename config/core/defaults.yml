@@ -120,3 +120,8 @@ m_uploads_dir_group: apache
 m_cache_directory_mode: "0770"
 m_cache_directory_owner: apache
 m_cache_directory_group: apache
+
+
+m_logs_mode: "0755"
+m_logs_owner: meza-ansible
+m_logs_group: wheel
