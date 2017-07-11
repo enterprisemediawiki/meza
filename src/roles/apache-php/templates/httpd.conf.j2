@@ -96,7 +96,7 @@ ServerAdmin you@example.com
 #
 # If your host doesn't have a registered DNS name, enter its IP address here.
 #
-#ServerName www.example.com:80
+ServerName https://{{ wiki_app_fqdn }}
 
 #
 # Deny access to the entirety of your server's filesystem. You must
@@ -411,7 +411,7 @@ Listen 8080
 	</Directory>
 
 	DocumentRoot {{ m_htdocs }}
-	ServerName Meza
+	ServerName https://{{ wiki_app_fqdn }}
 
 	{% if saml_secret is defined -%}
 	# Use SimpleSamlPhp to handle authentication
@@ -441,7 +441,9 @@ Listen 8089
 	</Directory>
 
 	DocumentRoot {{ m_profiling_xhgui_directory }}/webroot
-	ServerName MezaProfiling
+
+	# HAProxy listening on 8088 for this
+	ServerName http://{{ wiki_app_fqdn }}:8088
 
 </VirtualHost>
 {% endif %}
