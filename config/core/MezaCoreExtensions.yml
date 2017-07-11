@@ -51,7 +51,9 @@ list:
     composer: "mediawiki/maps"
     version: "~4.1"
 
-
+  - name: DisplayTitle
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DisplayTitle.git
+    version: tags/1.2
 
 
   #
