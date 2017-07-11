@@ -312,6 +312,17 @@
     - elastic-rebuild-all.sh
     - smw-rebuild-all.sh
 
+- name: Ensure data rebuilding logs directories exist
+  file:
+    path: "{{ m_logs }}/{{ item }}"
+    owner: "{{ m_logs_owner }}"
+    group: "{{ m_logs_group }}"
+    mode: "{{ m_logs_mode }}"
+    state: directory
+  with_items:
+    - smw-rebuilddata
+    - search-index
+
 # Wikis are totally built at this point, but SMW and search need rebuilding
 # FIXME: WILL ONLY WORK WHEN CONTROLLER AND APP-SERVER ARE THE SAME MACHINE
 - name: "(Re-)build search index for: {{ wikis_to_rebuild_data | join(', ') }}"

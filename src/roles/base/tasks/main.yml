@@ -190,9 +190,9 @@
 - name: "Ensure {{ m_logs }} exists"
   file:
     path: "{{ m_logs }}"
-    owner: meza-ansible
-    group: wheel
-    mode: 0755
+    owner: "{{ m_logs_owner }}"
+    group: "{{ m_logs_group }}"
+    mode: "{{ m_logs_mode }}"
     state: directory
 
 # Prevent runJobs and other scripts from running when application may be in

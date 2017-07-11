@@ -24,7 +24,7 @@ for d in $do_wikis; do
 
 	timestamp=$(date +"%F_%T")
 
-	out_log="{{ m_logs }}/search-index.$wiki_id.$timestamp.log"
+	out_log="{{ m_logs }}/search-index/$wiki_id.$timestamp.log"
 
 	echo "Rebuilding index for $wiki_id"
 	echo "  Output log:"
