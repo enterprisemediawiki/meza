@@ -120,6 +120,19 @@ list:
   - name: UniversalLanguageSelector
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UniversalLanguageSelector.git
     version: REL1_27
+    config: |
+      // Disable international phoenetic alphabet selector that breaks searching for
+      // English users. From docs:
+      //
+      // $wgULSIMEEnabled - Disable the input methods feature for all users by
+      // default. Can still be enabled manually by the user.
+      //
+      // Refs:
+      //
+      // https://www.mediawiki.org/wiki/Help:Extension:UniversalLanguageSelector/Input_methods
+      // https://www.mediawiki.org/wiki/Extension:UniversalLanguageSelector
+      $wgULSIMEEnabled = false;
+
   - name: VisualEditor
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git
     version: REL1_27
