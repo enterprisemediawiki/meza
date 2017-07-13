@@ -462,123 +462,20 @@
 #
 # Do the rsync transfer of files
 #
-- name: "{{ wiki_id }} - If no uploads dir, but backup dir exists, give backups.0 the keys"
+- name: "{{ wiki_id }} - Rsync uploads directory"
   include_role:
-    name: grant-keys
+    name: rsync
   vars:
-    grant_keys_to_server: "{{ inventory_hostname }}"
-    alt_remote_user: "{{ uploads_backup_server_remote_user }}"
-    alt_remote_user_home: "{{ uploads_remote_user_home_dir }}"
+    pulling_to_server:   "{{ inventory_hostname }}"
+    pulling_to_path:     "{{ m_uploads_dir }}/{{ wiki_id }}"
+    pulling_from_server: "{{ uploads_backup_server }}"
+    pulling_from_path:   "{{ uploads_backup_dir_path }}/"
+    pulling_from_user:   "{{ uploads_backup_server_remote_user }}"
   run_once: true
   when:
     images_backup_dir.stat.exists
     and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
-    and uploads_backup_server != inventory_hostname
-    # don't grant keys if the backup server is the current server
 
-# copy from server A (backups.0) to server B (the app server in context)
-#- name: "{{ wiki_id }} - If no uploads dir, but backup dir exists, copy from there"
-#  synchronize:
-#    # copy from server A
-#    src: "{{ uploads_backup_dir_path }}/"
-#    # copy to server B
-#    dest: "{{ m_uploads_dir }}/{{ wiki_id }}"
-#    recursive: yes
-#
-#    # If the source server has an /uploads directory with symlinks, follow
-#    # the symlinks and re-assemble them on the destination server not as
-#    # symlinks. This allows an old server that is running out of space to
-#    # spread its data onto other partitions using symlinks, but a new server
-#    # with more space to put everything back where it belongs.
-#    copy_links: yes
-#
-#    # Perhaps required due to not being able to properly specify an Ansible
-#    # user in synchronize
-#    # ref: https://github.com/ansible/ansible/issues/16215
-#    #
-#    # Potentially should use ssh_extra_args or ssh_common_args
-#    # Ref: https://github.com/ansible/ansible/pull/15306
-#    ssh_args: "-l meza-ansible"
-#    # ssh_args: "-l {{ uploads_backup_server_remote_user }}"
-#  # server A
-#  delegate_to: "{{ uploads_backup_server }}"
-#  remote_user: "{{ uploads_backup_server_remote_user }}"
-#  run_once: true
-#  when:
-#    images_backup_dir.stat.exists
-#    and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
-
-
-- debug:
-    msg: >
-      rsync
-      --delay-updates
-      -F
-      --compress
-      --copy-links
-      --archive
-      --rsh="/usr/bin/ssh -S none -o StrictHostKeyChecking=no
-      -l {{ uploads_backup_server_remote_user }} -i /root/meza-ansible-id_rsa
-      -o UserKnownHostsFile=/root/meza-ansible-known_hosts"
-      "{{ uploads_backup_server }}:{{ uploads_backup_dir_path }}/"
-      "{{ m_uploads_dir }}/{{ wiki_id }}"
-  when:
-    images_backup_dir.stat.exists
-    and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
-    and uploads_backup_server != inventory_hostname
-
-# rsync from outside inventory_hostname
-- name: "{{ wiki_id }} - If no uploads dir, but backup dir exists, copy from there"
-  shell: >
-      rsync
-      --delay-updates
-      -F
-      --compress
-      --copy-links
-      --archive
-      --rsh="/usr/bin/ssh -S none -o StrictHostKeyChecking=no
-      -l {{ uploads_backup_server_remote_user }} -i /root/meza-ansible-id_rsa
-      -o UserKnownHostsFile=/root/meza-ansible-known_hosts"
-      "{{ uploads_backup_server }}:{{ uploads_backup_dir_path }}/"
-      "{{ m_uploads_dir }}/{{ wiki_id }}"
-  run_once: true
-  when:
-    images_backup_dir.stat.exists
-    and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
-    and uploads_backup_server != inventory_hostname
-
-
-# rsync within inventory_hostname
-- name: "{{ wiki_id }} - If no uploads dir, but backup dir exists, copy from there"
-  shell: >
-      rsync
-      --delay-updates
-      -F
-      --compress
-      --copy-links
-      --archive
-      "{{ uploads_backup_dir_path }}/"
-      "{{ m_uploads_dir }}/{{ wiki_id }}"
-  run_once: true
-  when:
-    images_backup_dir.stat.exists
-    and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
-    and uploads_backup_server == inventory_hostname
-
-
-- name: "{{ wiki_id }} - If no uploads dir, but backup dir exists, revoke keys"
-  include_role:
-    name: revoke-keys
-  vars:
-    revoke_keys_from_server: "{{ inventory_hostname }}"
-    alt_remote_user: "{{ uploads_backup_server_remote_user }}"
-    alt_remote_user_home: "{{ uploads_remote_user_home_dir }}"
-  run_once: true
-  when:
-    images_backup_dir.stat.exists
-    and (not uploads_dir.stat.exists or do_overwrite_uploads_from_backup)
-    and uploads_backup_server != inventory_hostname
-    # don't revoke keys if the backup server is the current server
 
 # Either way (existing backup or no) make sure uploads dir is configured
 - name: "{{ wiki_id }} - Ensure wiki's uploads dir is still configured properly"
