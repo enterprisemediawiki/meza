@@ -1,17 +1,15 @@
 ---
+# This file handles most things needing to be done on a per-wiki basis. Two
+# major per-wiki things omitted from this file include: SMW data (re)build and
+# search-index (re)build. These are omitted because they take a long time, and
+# it is preferable to do all other per-wiki actions first, then do those after.
 #
-# Things that need to be done just once:
-#   1. Create database if not exists
-#      - If present, do nothing
-#      - If possible, use SQL files from controller: backups/WIKI-ID
-#      - else: just use MediaWiki tables.sql
+# Things that are handled in this file, in order:
 #
-# Things that need to be done on all app servers:
-#   2. Make sure htdocs/wikis/WIKI-ID/config symlinks to local/wikis/WIKI-ID
-#   3. Make sure htdocs/wikis/WIKI-ID/images exists
-#      - if possible: get from controller: backups/WIKI-ID/images
-#      - else: just create dir
-#      - eventually need method to force-rsync from backup
+#   1. Ensure localization cache configured
+#   2. TBD
+#   3. TBD
+#
 
 
 - name: Ensure localization cache directory exists for this wiki
@@ -104,111 +102,6 @@
     db_backup_server_remote_user is not defined
 
 
-# WHEN: do_sql_dump is True
-# Get home directory for {{db_backup_server_remote_user}}@{{sql_backup_server}}
-- name: "Get {{ db_backup_server_remote_user }} home directory on {{ sql_backup_server }}"
-  shell: "getent passwd '{{ db_backup_server_remote_user }}' | cut -d: -f6"
-  register: remote_user_home_dir
-  delegate_to: "{{ sql_backup_server }}"
-  remote_user: "{{ db_backup_server_remote_user }}"
-  run_once: true
-  when: do_sql_dump
-
-- name: how does fact-setting work when register was run_once
-  debug:
-    var: remote_user_home_dir
-
-- name: "Set remote_user_home_dir fact"
-  set_fact:
-    remote_user_home_dir: "{{ remote_user_home_dir.stdout }}"
-  when: do_sql_dump
-
-- name: "{{ wiki_id }} - If doing a SQL dump, need to set path to SQL file based on remote user"
-  set_fact:
-    sql_dir_path: "{{ remote_user_home_dir }}"
-  when: do_sql_dump
-
-
-
-#
-# Check for backups directory
-#
-- name: "{{ wiki_id }} - Check if backups dir exists"
-  stat:
-    path: "{{ sql_dir_path }}"
-  register: backups_dir_stat
-  delegate_to: "{{ sql_backup_server }}"
-  remote_user: "{{ db_backup_server_remote_user }}"
-  run_once: true
-
-- name: "{{ wiki_id }} - Set fact if backups server DOES have {{ sql_dir_path }}"
-  set_fact:
-    backup_dir_exists: True
-  when: backups_dir_stat.stat.exists == true
-
-- name: "{{ wiki_id }} - Set fact if backups server DOES NOT have {{ sql_dir_path }}"
-  set_fact:
-    backup_dir_exists: False
-  when: backups_dir_stat.stat.exists == false
-
-
-
-#
-# Dump SQL if required
-#
-- name: "{{ wiki_id }} - Dump SQL file from db-src"
-  mysql_db:
-    state: dump
-    name: "wiki_{{ wiki_id }}"
-    target: "{{ sql_dir_path }}/{{ sql_file_match }}"
-    # FIXME: Security issue?
-    login_user: "{{ backups_server_db_dump.mysql_user }}"
-    login_password: "{{ backups_server_db_dump.mysql_pass }}"
-  delegate_to: "{{ sql_backup_server }}"
-  remote_user: "{{ db_backup_server_remote_user }}"
-  run_once: true
-  when: do_sql_dump and (not wiki_exists or intend_overwrite_from_backup)
-
-
-
-# This will find the latest sql file by name, or wiki.sql over any timestamped one
-# assuming timestamp-named files like 20170220000002_wiki.sql
-- name: "{{ wiki_id }} - Find SQL file if it exists"
-  shell: 'find {{ sql_dir_path }} -maxdepth 1 -type f -iname "{{ sql_file_match }}" | sort -r | head -n +1'
-  register: wiki_sql_file
-  delegate_to: "{{ sql_backup_server }}"
-  run_once: true
-  remote_user: "{{ db_backup_server_remote_user }}"
-  ignore_errors: yes
-  when: backup_dir_exists and (not wiki_exists or intend_overwrite_from_backup)
-
-- name: "{{ wiki_id }} - Set fact if SQL file DOES exist"
-  set_fact:
-    sql_file_exists: True
-  when: wiki_sql_file is defined and wiki_sql_file.rc is defined and wiki_sql_file.rc == 0
-
-- name: "{{ wiki_id }} - Set fact if SQL file DOES NOT exist"
-  set_fact:
-    sql_file_exists: False
-  when: wiki_sql_file is not defined or wiki_sql_file.rc is not defined or wiki_sql_file.rc != 0
-
-
-
-#
-# Set facts to clarify if overwriting data should actually occur
-#
-- name: "{{ wiki_id }} - Set fact if SHOULD overwrite data (only possible if backup exists)"
-  set_fact:
-    do_overwrite_db_from_backup: True
-  when: intend_overwrite_from_backup and sql_file_exists
-
-- name: "{{ wiki_id }} - Set fact if SHOULD NOT overwrite data"
-  set_fact:
-    do_overwrite_db_from_backup: False
-  when: not intend_overwrite_from_backup or not sql_file_exists
-
-
-
 - name: "{{ wiki_id }} - Ensure no wiki.sql on DB master"
   file:
     path: "{{ m_tmp }}/wiki.sql"
@@ -218,80 +111,50 @@
 
 
 #
-# Do the rsync transfer of SQL file from backup server to DB master
+# DUMP SQL to DB master
 #
-- name: "{{ wiki_id }} - Rsync SQL file from backup to DB master"
+- name: "{{ wiki_id }} - mysqldump onto DB master"
   include_role:
-    name: rsync
+    name: remote-mysqldump
   vars:
-    pulling_to_server:   "{{ groups['db-master'][0] }}"
-    pulling_to_path:     "{{ m_tmp }}/wiki.sql"
-    pulling_from_server: "{{ sql_backup_server }}"
-    pulling_from_path:   "{{ wiki_sql_file.stdout }}"
-    pulling_from_user:   "{{ db_backup_server_remote_user }}"
+    remote_server:            "{{ sql_backup_server }}"
+    remote_server_ssh_user:   "{{ db_backup_server_remote_user }}"
+    remote_server_mysql_user: "{{ backups_server_db_dump.mysql_user }}"
+    remote_server_mysql_pass: "{{ backups_server_db_dump.mysql_pass }}"
+    dump_database:            "wiki_{{ wiki_id }}"
+    target_server:            "{{ groups['db-master'][0] }}"
+    target_server_path:       "{{ m_tmp }}/wiki.sql"
   run_once: true
-  when:
-    sql_file_exists
+  when: do_sql_dump and (not wiki_exists or intend_overwrite_from_backup)
 
 
-# FIXME: Remove this when SQL dumped directly to DB master (not onto backup first)
-- name: "{{ wiki_id }} - If SQL was dumped from db-src, remove file now that it's on db-master"
-  file:
-    state: absent
-    path: "{{ wiki_sql_file.stdout }}"
-  delegate_to: "{{ sql_backup_server }}"
-  remote_user: "{{ db_backup_server_remote_user }}"
+#
+# TRANSFER SQL to DB master
+#
+- name: "{{ wiki_id }} - Transfer SQL file from backup server to DB master"
+  include: transfer-backup-to-db-master.yml
   run_once: true
-  when: do_sql_dump and sql_file_exists
+  when: (not do_sql_dump) and (not wiki_exists or intend_overwrite_from_backup)
 
-- name: "{{ wiki_id }} - If wiki_sql_file NOT defined, send generic file to master db"
-  copy:
-    src: templates/mediawiki-tables.sql
-    dest: "{{ m_tmp }}/wiki.sql"
-    force: yes
+
+#
+# IMPORT wiki SQL
+#
+- name: "{{ wiki_id }} - Import wiki.sql"
+  include: import-wiki-sql.yml
   run_once: true
-  delegate_to: "{{ groups['db-master'][0] }}"
-  when: not sql_file_exists
+  when: (not wiki_exists) or intend_overwrite_from_backup
 
-- name: "{{ wiki_id }} - Drop database if --overwrite (or -o) set"
-  mysql_db:
-    name: "wiki_{{ wiki_id }}"
-    state: absent
-  run_once: true
-  delegate_to: "{{ groups['db-master'][0] }}"
-  when: do_overwrite_db_from_backup
 
-- name: "{{ wiki_id }} - Import SQL file"
-  mysql_db:
-    name: "wiki_{{ wiki_id }}"
-    state: import
-    target: "{{ m_tmp }}/wiki.sql"
-  run_once: true
-  register: did_db_import
-  delegate_to: "{{ groups['db-master'][0] }}"
-  when: not wiki_exists or do_overwrite_db_from_backup
-
-- name: Did DB import?
-  debug: { var: did_db_import }
-
-- name: Initiate wikis_to_rebuild_data if not exists
-  set_fact:
-    wikis_to_rebuild_data: []
-  when: wikis_to_rebuild_data is not defined
-
-- name: Add wiki to list of DB-imported wikis if required
-  set_fact:
-    wikis_to_rebuild_data: "{{ wikis_to_rebuild_data + [ wiki_id ] }}"
-  when: did_db_import is defined and did_db_import.changed is defined and did_db_import.changed
-
+#
+# REMOVE SQL file from DB master
+#
 - name: "{{ wiki_id }} - Remove SQL file from master DB"
   file:
     path: "{{ m_tmp }}/wiki.sql"
     state: absent
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
-  when: not wiki_exists or do_overwrite_db_from_backup
-
 
 
 #
@@ -494,7 +357,7 @@
 
 - name: "{{ wiki_id }} - Include init-wiki.yml only when a new wiki created (but not imported)"
   include: init-wiki.yml
-  when: not wiki_exists and not sql_file_exists
+  when: created_new_wiki
 
 - name: "{{ wiki_id }} - Create list of new wikis if not exist"
   set_fact:

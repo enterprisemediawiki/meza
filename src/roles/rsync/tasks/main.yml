@@ -11,37 +11,19 @@
 
 
 #
-# Put meza-ansible's private key on server within /root
+# Put meza-ansible's private key and known_hosts on server within /root
 #
-- name: "Grant keys to rsync pulling-to server {{ pulling_to_server }}"
-  copy:
-    src: "{{ m_home }}/meza-ansible/.ssh/id_rsa"
-    dest: /root/meza-ansible-id_rsa
-    owner: root
-    group: root
-    mode: "0600"
-  delegate_to: "{{ pulling_to_server }}"
+- name: "Grant keys to {{ pulling_to_server }}"
+  include_role:
+    name: key-transfer
+    tasks_from: grant-keys
+  vars:
+    granted_server: "{{ pulling_to_server }}"
   when:
-    pulling_from_server != inventory_hostname
-    # don't revoke keys if the backup server is the current server
+    pulling_to_server != pulling_from_server
 
-# When the delegated server uses rsync to another server, allow it the same
-# list of known hosts as the controller. In some cases this file may not exist,
-# so ignore_errors.
-# FIXME: Use this?
-- name: "Copy known_hosts to delegated server {{ pulling_to_server }}"
-  copy:
-    src: "{{ m_home }}/meza-ansible/.ssh/known_hosts"
-    dest: /root/meza-ansible-known_hosts
-    owner: root
-    group: root
-    mode: "0644"
-  delegate_to: "{{ pulling_to_server }}"
-  ignore_errors: True
-  when:
-    pulling_from_server != inventory_hostname
-    # don't revoke keys if the backup server is the current server
 
+# FIXME: Remove StrictHostKeyChecking=no when tests properly add host keys (users should do so, too, of course)
 - name: Set rsync command fact for pulling-from server {{ pulling_from_server }} NOT pulling-to server
   set_fact:
     rsync_command: >
@@ -78,11 +60,10 @@
   delegate_to: "{{ pulling_to_server }}"
   run_once: true
 
-- name: "Revoke keys from pulling-to server {{ pulling_to_server }}"
-  file:
-    path: "/root/meza-ansible-id_rsa"
-    state: absent
-  delegate_to: "{{ pulling_to_server }}"
-  when:
-    pulling_from_server != inventory_hostname
-    # don't revoke keys if the backup server is the current server
+
+- name: "Revoke keys from {{ pulling_to_server }}"
+  include_role:
+    name: key-transfer
+    tasks_from: revoke-keys
+  vars:
+    granted_server: "{{ pulling_to_server }}"
