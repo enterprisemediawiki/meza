@@ -94,3 +94,39 @@
   set_fact:
     wikis_to_rebuild_data: "{{ wikis_to_rebuild_data + [ wiki_id ] }}"
   when: did_db_import is defined and did_db_import.changed is defined and did_db_import.changed
+
+
+#
+# SECTION: update.php
+#
+- name: "{{ wiki_id }} - Update database"
+  include_role:
+    name: update.php
+  when: not wiki_exists or do_overwrite_db_from_backup
+
+
+#
+# SECTION: init new wiki
+#
+- name: "{{ wiki_id }} - Include init-wiki.yml only when a new wiki created (but not imported)"
+  include: init-wiki.yml
+  when: created_new_wiki
+
+
+#
+# SECTION: Create list_of_new_wikis
+#
+- name: "{{ wiki_id }} - Create list of new wikis if not exist"
+  set_fact:
+    list_of_new_wikis: []
+  when: list_of_new_wikis is not defined
+
+# Create a list of wikis that are "new" (either actually new, or that the
+# database has been rebuilt)
+# FIXME: Get terminology straight. This one implies a "new wiki" is a totally
+#        new or an overwrite. Above "new" means not-an-import, just a clean-
+#        slate wiki.
+- name: "{{ wiki_id }} - Update list of new wikis"
+  set_fact:
+    list_of_new_wikis: "{{ list_of_new_wikis }} + [ '{{ wiki_id }}' ]"
+  when: not wiki_exists or do_overwrite_db_from_backup
