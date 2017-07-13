@@ -209,43 +209,32 @@
 
 
 
-  #
-  # Since backup-servers[0], master-db[0] and controller (localhost) are three
-  # different servers, and the current Ansible play is being run against app-
-  # servers, there's no way to send from backup-servers[0] to master-db[0]
-  # directly. Instead, pass to controller, then form controller to master-db
-  #
-- name: "{{ wiki_id }} - if wiki_sql_file exists, FIRST remove preexisting SQL file from controller"
+- name: "{{ wiki_id }} - Ensure no wiki.sql on DB master"
   file:
-    path: "{{ m_tmp }}/controller-wiki.sql"
+    path: "{{ m_tmp }}/wiki.sql"
     state: absent
   run_once: true
-  delegate_to: localhost
-  when: sql_file_exists
-
-- name: "{{ wiki_id }} - if wiki_sql_file exists, NEXT send SQL file to controller"
-  fetch:
-    src: "{{ wiki_sql_file.stdout }}"
-    dest: "{{ m_tmp }}/controller-wiki.sql"
-    fail_on_missing: yes
-    flat: yes
-  # note: don't run fetch with become on large files. ref bottom of this page:
-  # http://docs.ansible.com/ansible/fetch_module.html
-  become: no
-  run_once: true
-  delegate_to: "{{ sql_backup_server }}"
-  remote_user: "{{ db_backup_server_remote_user }}"
-  when: sql_file_exists
-
-- name: "{{ wiki_id }} - if wiki_sql_file exists, NEXT send file from controller to master-db"
-  copy:
-    src: "{{ m_tmp }}/controller-wiki.sql"
-    dest: "{{ m_tmp }}/wiki.sql"
-    force: yes
-  run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
-  when: sql_file_exists
 
+
+#
+# Do the rsync transfer of SQL file from backup server to DB master
+#
+- name: "{{ wiki_id }} - Rsync SQL file from backup to DB master"
+  include_role:
+    name: rsync
+  vars:
+    pulling_to_server:   "{{ groups['db-master'][0] }}"
+    pulling_to_path:     "{{ m_tmp }}/wiki.sql"
+    pulling_from_server: "{{ sql_backup_server }}"
+    pulling_from_path:   "{{ wiki_sql_file.stdout }}"
+    pulling_from_user:   "{{ db_backup_server_remote_user }}"
+  run_once: true
+  when:
+    sql_file_exists
+
+
+# FIXME: Remove this when SQL dumped directly to DB master (not onto backup first)
 - name: "{{ wiki_id }} - If SQL was dumped from db-src, remove file now that it's on db-master"
   file:
     state: absent
@@ -460,7 +449,7 @@
 
 
 #
-# Do the rsync transfer of files
+# Do the rsync transfer of user-uploaded files
 #
 - name: "{{ wiki_id }} - Rsync uploads directory"
   include_role:
