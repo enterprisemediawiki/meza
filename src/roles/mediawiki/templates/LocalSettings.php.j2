@@ -41,12 +41,7 @@ require_once "{{ m_deploy }}/samlLocalSettings.php";
  *  from the WIKI environment variable (for command line scripts)
  **/
 
-// same value as bash variable in config.sh
-$m_meza = '{{ m_meza }}';
-$m_config_core = '{{ m_config_core }}';
-$m_htdocs = '{{ m_htdocs }}';
-$m_deploy = '{{ m_deploy }}';
-$m_meza_data = '{{ m_meza_data }}';
+require_once '/opt/.deploy-meza/config.php';
 
 if( $wgCommandLineMode ) {
 
