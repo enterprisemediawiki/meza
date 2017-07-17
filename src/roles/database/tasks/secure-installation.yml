@@ -57,18 +57,23 @@
 - name: Copy .my.cnf file with root password credentials
   template:
     src: "root-my.cnf.j2"
-    dest: "{{ item.home }}/.my.cnf"
-    owner: "{{ item.owner }}"
-    group: "{{ item.group }}"
-    mode: 0600
-  when: mysql_install_packages | bool or mysql_root_password_update
-  with_items:
-  - home: "{{ mysql_root_home }}"
+    dest: "{{ mysql_root_home }}/.my.cnf"
     owner: root
     group: root
-  - home: "{{ m_home }}/meza-ansible"
+    mode: 0600
+  when: mysql_install_packages | bool or mysql_root_password_update
+
+# Also make sure meza-ansible has mysql root's .my.cnf. This allows `mysql` and
+# `mysqldump` to be called using Ansible's `shell` command rather than the
+# Ansible mysql commands. Doing `shell: mysqldump my_db > /some/path/.sql` as
+# user meza-ansible needs a .my.cnf in place
+- name: Copy .my.cnf file with root password credentials
+  template:
+    src: "root-my.cnf.j2"
+    dest: "{{ m_home }}/meza-ansible/.my.cnf"
     owner: meza-ansible
     group: wheel
+    mode: 0600
 
 - name: Get list of hosts for the anonymous user.
   command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
