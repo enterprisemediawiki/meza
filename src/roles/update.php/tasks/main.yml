@@ -6,6 +6,13 @@
   set_fact:
     backup_timestamp: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
 
+- name: Ensure backups directory exists for each wiki
+  file:
+    path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}"
+    state: directory
+    mode: "{{ m_backups_mode }}"
+    owner: "{{ m_backups_owner }}"
+    group: "{{ m_backups_group }}"
 
 #
 # DUMP SQL from DB Master to backup-servers[0]
@@ -25,7 +32,7 @@
 
     # FIXME: this string below is copied from role:backup-db-wikis. It should
     #        be standardized somehow to avoid mistakes.
-    target_server_path:       "{{ m_backups }}/{{ env }}/{{ item }}/{{ backup_timestamp }}_wiki.sql"
+    target_server_path:       "{{ m_backups }}/{{ env }}/{{ wiki_id }}/{{ backup_timestamp }}_wiki.sql"
   run_once: true
   tags:
     - update.php

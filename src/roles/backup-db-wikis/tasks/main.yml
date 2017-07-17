@@ -12,17 +12,17 @@
   file:
     path: "{{ m_backups }}/{{ env }}"
     state: directory
-    mode: 0755
-    owner: root
-    group: root
+    mode: "{{ m_backups_mode }}"
+    owner: "{{ m_backups_owner }}"
+    group: "{{ m_backups_group }}"
 
 - name: Ensure backups directory exists for each wiki
   file:
     path: "{{ m_backups }}/{{ env }}/{{ item }}"
     state: directory
-    mode: 0755
-    owner: root
-    group: root
+    mode: "{{ m_backups_mode }}"
+    owner: "{{ m_backups_owner }}"
+    group: "{{ m_backups_group }}"
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
 
 # copy from server A (db-master) to server B (backups)

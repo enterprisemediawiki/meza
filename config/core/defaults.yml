@@ -125,3 +125,8 @@ m_cache_directory_group: apache
 m_logs_mode: "0755"
 m_logs_owner: meza-ansible
 m_logs_group: wheel
+
+
+m_backups_mode: "0755"
+m_backups_owner: root
+m_backups_group: root
