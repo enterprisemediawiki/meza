@@ -33,7 +33,7 @@ docker_exec_2=( "${docker_exec[@]}" )
 
 # Create a new environment called "travis" with everything on CONTAINER 1, but
 # backups on CONTAINER 2
-${docker_exec_1[@]} default_servers="localhost" backup_servers="$docker_ip_2" \
+${docker_exec_1[@]} default_servers="$docker_ip_1" backup_servers="$docker_ip_2" \
 	meza setup env "$env_name" \
 	--fqdn="$docker_ip_1" --db_pass=1234 --private_net_zone=public
 
