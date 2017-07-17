@@ -1,11 +1,4 @@
 ---
-- name: Ensure config vars for logging in place
-  template:
-    src: logging.sh.j2
-    dest: "{{ m_deploy }}/logging.sh"
-    owner: meza-ansible
-    group: wheel
-    mode: 0750
 
 - name: "Check if server log database exists"
   shell: 'mysqlshow "{{ meza_server_log_db }}" | grep -v Wildcard | grep -o {{ meza_server_log_db }}'

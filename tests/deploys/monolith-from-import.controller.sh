@@ -18,7 +18,7 @@ git clone https://github.com/enterprisemediawiki/meza-test-config-secret.git "/o
 
 # Write the docker containers IP as the FQDN for the test config (the only
 # config setting we can't know ahead of time)
-sed -r -i "s/INSERT_FQDN/$fqdn/g;" "/opt/conf-meza/secret/$env_name/group_vars/all.yml"
+sed -r -i "s/INSERT_FQDN/$fqdn/g;" "/opt/conf-meza/secret/$env_name/secret.yml"
 
 # get backup files
 git clone https://github.com/jamesmontalvo3/meza-test-backups.git "/opt/data-meza/backups/$env_name"

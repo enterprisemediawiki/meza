@@ -4,7 +4,7 @@
 # file uploads for a wiki, which could be split over the db-src or the
 # backups-src server(s), but in the hosts declaration below it only specifies
 # backups-src. For the test case these servers will be the same.
-- hosts: backup-src
+- hosts: "{{ alt_source_ip_addr }}"
   become: yes
   vars:
     alt_source_backups_dir: /opt/alt/backups

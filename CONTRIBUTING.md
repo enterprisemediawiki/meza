@@ -25,7 +25,7 @@ Meza pulls together many complex systems. Testing is a big job. We always need h
 
 These tests should be performed on all changes
 
-* Set `m_force_debug: true` in `/opt/conf-meza/public/vars.yml`
+* Set `m_force_debug: true` in `/opt/conf-meza/public/public.yml`
 * Create page with wikitext editor
 * Create page with VisualEditor
 * Verify adding images to pages with VisualEditor

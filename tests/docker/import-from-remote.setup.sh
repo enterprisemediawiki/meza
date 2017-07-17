@@ -37,7 +37,7 @@ docker_exec_2=( "${docker_exec[@]}" )
 # (1) Get local secret config from repo
 # (2) Change backup server IP address to docker#2 in hosts file
 # (3) Change all other servers to docker#1 IP address in hosts file
-# (4) Change FQDN to docker#1 IP address in group_vars/all.yml
+# (4) Change FQDN to docker#1 IP address in secret.yml
 ${docker_exec_1[@]} git clone \
 	https://github.com/enterprisemediawiki/meza-test-config-secret.git \
 	"/opt/conf-meza/secret/$env_name"
@@ -46,11 +46,11 @@ ${docker_exec_1[@]} sed -r -i "s/localhost #backup/$docker_ip_2/g;" \
 ${docker_exec_1[@]} sed -r -i "s/localhost/$docker_ip_1/g;" \
 	"/opt/conf-meza/secret/$env_name/hosts"
 ${docker_exec_1[@]} sed -r -i "s/INSERT_FQDN/$docker_ip_1/g;" \
-	"/opt/conf-meza/secret/$env_name/group_vars/all.yml"
+	"/opt/conf-meza/secret/$env_name/secret.yml"
 
 # Test allow_image_tags (which requires patching Parsoid, plus an item in
 # LocalSettings.php)
-${docker_exec_1[@]} bash -c "echo -e 'allow_image_tags: True\n' >> '/opt/conf-meza/secret/$env_name/group_vars/all.yml'"
+${docker_exec_1[@]} bash -c "echo -e 'allow_image_tags: True\n' >> '/opt/conf-meza/secret/$env_name/secret.yml'"
 
 
 

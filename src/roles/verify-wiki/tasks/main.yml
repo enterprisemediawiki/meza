@@ -1,19 +1,44 @@
 ---
+# This file handles most things needing to be done on a per-wiki basis. Two
+# major per-wiki things omitted from this file include: SMW data (re)build and
+# search-index (re)build. These are omitted because they take a long time, and
+# it is preferable to do all other per-wiki actions first, then do those after.
 #
-# Things that need to be done just once:
-#   1. Create database if not exists
-#      - If present, do nothing
-#      - If possible, use SQL files from controller: backups/WIKI-ID
-#      - else: just use MediaWiki tables.sql
+# Things that are handled in this file, in order:
 #
-# Things that need to be done on all app servers:
-#   2. Make sure htdocs/wikis/WIKI-ID/config symlinks to local/wikis/WIKI-ID
-#   3. Make sure htdocs/wikis/WIKI-ID/images exists
-#      - if possible: get from controller: backups/WIKI-ID/images
-#      - else: just create dir
-#      - eventually need method to force-rsync from backup
+#   Files and directories
+#   - Localization cache
+#   - Ensure access to logo and favicon
+#
+#   Database
+#   - Wiki database exists?
+#   - Intend to overwrite data?
+#   - Set vars for database backup source
+#   - Clear wiki.sql from DB master
+#   - DUMP SQL to DB master
+#   - TRANSFER SQL to DB master
+#   - IMPORT wiki SQL
+#   - REMOVE SQL file from DB master
+#
+#   Uploads
+#   - Uploads directory exists?
+#   - Ensure uploads directory exists
+#   - Set vars for uploads backup source
+#   - Does backup server have uploads?
+#   - Should overwriting occur?
+#   - Rsync upload-backups into place
+#   - Ensure backups still in good config
+#
 
+###############################################################################
+#                                                                             #
+# Files and directories                                                       #
+#                                                                             #
+###############################################################################
 
+#
+# SECTION: Localization cache
+#
 - name: Ensure localization cache directory exists for this wiki
   file:
     state: directory
@@ -22,8 +47,45 @@
     group: "{{ m_cache_directory_group }}"
     mode: "{{ m_cache_directory_mode }}"
 
+#
+# SECTION: Ensure access to logo and favicon
+#
+#
+# Make sure wiki's htdocs directory in place, and symlink to config. Symlink
+# required so logo and favicon accessible via HTTP.
+# FIXME: Come up with other method to allow HTTP access to these files (HAProxy
+#        rule? httpd rule? PHP?); current method is vague, and allows access to
+#        other things.
+- name: "{{ wiki_id }} - Ensure wiki htdocs directory in place"
+  file:
+    path: "{{ m_htdocs }}/wikis/{{ wiki_id }}"
+    state: directory
+    owner: apache
+    group: apache
+    mode: 0755
+- name: "{{ wiki_id }} - Ensure wiki config symlink in place"
+  file:
+    # dest = symlink, src = dir linked to
+    src: "{{ m_deploy }}/public/wikis/{{ wiki_id }}"
+    dest: "{{ m_htdocs }}/wikis/{{ wiki_id }}/config"
+    state: link
+    owner: apache
+    group: apache
+    mode: 0755
 
 
+
+
+###############################################################################
+#                                                                             #
+# Database                                                                    #
+#                                                                             #
+###############################################################################
+
+
+#
+# SECTION: Wiki database exists?
+#
 # Check if databases starting with "wiki_" exist
 #   if database exists: wiki_database.rc == 0
 #   if no database:  wiki_database.rc == 1
@@ -45,10 +107,12 @@
   when: wiki_exists_check is defined and wiki_exists_check.rc != 0
 
 
-
+#
+# SECTION: Intend to overwrite data?
+#
 #
 # Set facts to clarify if overwriting data is INITIALLY INTENDED (regardless of
-#  whether later checks make it possible)
+# whether later checks make it possible)
 #
 - name: "{{ wiki_id }} - Set fact if INTEND overwrite data"
   set_fact:
@@ -60,26 +124,32 @@
     intend_overwrite_from_backup: False
   when: force_overwrite_from_backup is not defined or force_overwrite_from_backup == false
 
+
+#
+# SECTION: Set vars for database backup source
+#
 - name: "{{ wiki_id }} - Mark sql_backup_server_set as NOT SET yet"
   set_fact:
     sql_backup_server_set: False
 
 - name: "{{ wiki_id }} - Set SQL source-from-backup facts IF SOURCING FROM db-src"
   set_fact:
-    sql_backup_server: "{{ groups['db-src'][0] }}"
+    sql_backup_server: "{{ backups_server_db_dump.addr }}"
     do_sql_dump: True
     sql_file_match: "wiki_{{ wiki_id }}.sql"
+    db_backup_server_remote_user: "{{ backups_server_db_dump.remote_user }}"
     sql_backup_server_set: True
-  when: "'db-src' in groups and groups['db-src']|length|int > 0"
+  when: "backups_server_db_dump is defined"
 
 - name: "{{ wiki_id }} - Set SQL source-from-backup facts IF SOURCING FROM backup-src"
   set_fact:
-    sql_backup_server: "{{ groups['backup-src'][0] }}"
+    sql_backup_server: "{{ backups_server_alt_source.addr }}"
     do_sql_dump: False
-    sql_dir_path: "{{ backups_src_sql_path | regex_replace('<id>', wiki_id) }}"
-    sql_file_match: "{{ backups_src_sql_file_match | default('*.sql') | regex_replace('<id>', wiki_id) }}"
+    sql_dir_path: "{{ backups_server_alt_source.sql_dir_path | regex_replace('<id>', wiki_id) }}"
+    sql_file_match: "{{ backups_server_alt_source.sql_file_match | default('*.sql') | regex_replace('<id>', wiki_id) }}"
+    db_backup_server_remote_user: "{{ backups_server_alt_source.remote_user }}"
     sql_backup_server_set: True
-  when: "not sql_backup_server_set and 'backup-src' in groups and groups['backup-src']|length|int > 0"
+  when: "not sql_backup_server_set and backups_server_alt_source is defined"
 
 - name: "{{ wiki_id }} - Set SQL source-from-backup facts IF SOURCING FROM backup-servers"
   set_fact:
@@ -90,283 +160,88 @@
     sql_backup_server_set: True
   when: "not sql_backup_server_set and 'backup-servers' in groups and groups['backup-servers']|length|int > 0"
 
-
-
-#
 # Set remote user to access database backup
-#
-- name: "{{ wiki_id }} - Set fact for database backup server remote user IF ALTERNATE SPECIFIED"
-  set_fact:
-    db_backup_server_remote_user: "{{ hostvars[sql_backup_server]['alt_remote_user'] }}"
-  when:
-    sql_backup_server is defined
-    and 'alt_remote_user' in hostvars[sql_backup_server]
-
-# Note: since not rsync-ing from one remote to another, can use meza-ansible
-# here instead of alt-meza-ansible
 - name: "{{ wiki_id }} - Set fact for database backup server remote user TO DEFAULT meza-ansible"
   set_fact:
     db_backup_server_remote_user: "meza-ansible"
   when:
-    sql_backup_server is defined
-    and 'alt_remote_user' not in hostvars[sql_backup_server]
+    db_backup_server_remote_user is not defined
 
 
-# WHEN: do_sql_dump is True
-# Get home directory for {{db_backup_server_remote_user}}@{{sql_backup_server}}
-- name: "Get {{ db_backup_server_remote_user }} home directory on {{ sql_backup_server }}"
-  shell: "getent passwd '{{ db_backup_server_remote_user }}' | cut -d: -f6"
-  register: remote_user_home_dir
-  delegate_to: "{{ sql_backup_server }}"
-  remote_user: "{{ db_backup_server_remote_user }}"
+#
+# SECTION: Clear wiki.sql from DB master
+#
+- name: "{{ wiki_id }} - Ensure no wiki.sql on DB master"
+  file:
+    path: "{{ m_tmp }}/wiki.sql"
+    state: absent
   run_once: true
-  when: do_sql_dump
-
-- name: how does fact-setting work when register was run_once
-  debug:
-    var: remote_user_home_dir
-
-- name: "Set remote_user_home_dir fact"
-  set_fact:
-    remote_user_home_dir: "{{ remote_user_home_dir.stdout }}"
-  when: do_sql_dump
-
-- name: "{{ wiki_id }} - If doing a SQL dump, need to set path to SQL file based on remote user"
-  set_fact:
-    sql_dir_path: "{{ remote_user_home_dir }}"
-  when: do_sql_dump
-
+  delegate_to: "{{ groups['db-master'][0] }}"
 
 
 #
-# Check for backups directory
+# SECTION: DUMP SQL to DB master
 #
-- name: "{{ wiki_id }} - Check if backups dir exists"
-  stat:
-    path: "{{ sql_dir_path }}"
-  register: backups_dir_stat
-  delegate_to: "{{ sql_backup_server }}"
-  remote_user: "{{ db_backup_server_remote_user }}"
-  run_once: true
-
-- name: "{{ wiki_id }} - Set fact if backups server DOES have {{ sql_dir_path }}"
-  set_fact:
-    backup_dir_exists: True
-  when: backups_dir_stat.stat.exists == true
-
-- name: "{{ wiki_id }} - Set fact if backups server DOES NOT have {{ sql_dir_path }}"
-  set_fact:
-    backup_dir_exists: False
-  when: backups_dir_stat.stat.exists == false
-
-
-
-#
-# Dump SQL if required
-#
-- name: "{{ wiki_id }} - Dump SQL file from db-src"
-  mysql_db:
-    state: dump
-    name: "wiki_{{ wiki_id }}"
-    target: "{{ sql_dir_path }}/{{ sql_file_match }}"
-    # FIXME: Security issue?
-    login_user: "{{ hostvars[sql_backup_server]['db_src_mysql_user'] }}"
-    login_password: "{{ hostvars[sql_backup_server]['db_src_mysql_pass'] }}"
-  delegate_to: "{{ sql_backup_server }}"
-  remote_user: "{{ db_backup_server_remote_user }}"
+- name: "{{ wiki_id }} - mysqldump onto DB master"
+  include_role:
+    name: remote-mysqldump
+  vars:
+    remote_server:            "{{ sql_backup_server }}"
+    remote_server_ssh_user:   "{{ db_backup_server_remote_user }}"
+    remote_server_mysql_user: "{{ backups_server_db_dump.mysql_user }}"
+    remote_server_mysql_pass: "{{ backups_server_db_dump.mysql_pass }}"
+    dump_database:            "wiki_{{ wiki_id }}"
+    target_server:            "{{ groups['db-master'][0] }}"
+    target_server_path:       "{{ m_tmp }}/wiki.sql"
   run_once: true
   when: do_sql_dump and (not wiki_exists or intend_overwrite_from_backup)
 
 
-
-# This will find the latest sql file by name, or wiki.sql over any timestamped one
-# assuming timestamp-named files like 20170220000002_wiki.sql
-- name: "{{ wiki_id }} - Find SQL file if it exists"
-  shell: 'find {{ sql_dir_path }} -maxdepth 1 -type f -iname "{{ sql_file_match }}" | sort -r | head -n +1'
-  register: wiki_sql_file
-  delegate_to: "{{ sql_backup_server }}"
+#
+# SECTION: TRANSFER SQL to DB master
+#
+- name: "{{ wiki_id }} - Transfer SQL file from backup server to DB master"
+  include: transfer-backup-to-db-master.yml
   run_once: true
-  remote_user: "{{ db_backup_server_remote_user }}"
-  ignore_errors: yes
-  when: backup_dir_exists and (not wiki_exists or intend_overwrite_from_backup)
-
-- name: "{{ wiki_id }} - Set fact if SQL file DOES exist"
-  set_fact:
-    sql_file_exists: True
-  when: wiki_sql_file is defined and wiki_sql_file.rc is defined and wiki_sql_file.rc == 0
-
-- name: "{{ wiki_id }} - Set fact if SQL file DOES NOT exist"
-  set_fact:
-    sql_file_exists: False
-  when: wiki_sql_file is not defined or wiki_sql_file.rc is not defined or wiki_sql_file.rc != 0
-
+  when: (not do_sql_dump) and (not wiki_exists or intend_overwrite_from_backup)
 
 
 #
-# Set facts to clarify if overwriting data should actually occur
+# SECTION: IMPORT wiki SQL
 #
-- name: "{{ wiki_id }} - Set fact if SHOULD overwrite data (only possible if backup exists)"
-  set_fact:
-    do_overwrite_db_from_backup: True
-  when: intend_overwrite_from_backup and sql_file_exists
-
-- name: "{{ wiki_id }} - Set fact if SHOULD NOT overwrite data"
-  set_fact:
-    do_overwrite_db_from_backup: False
-  when: not intend_overwrite_from_backup or not sql_file_exists
-
-
-
-  #
-  # Since backup-servers[0], master-db[0] and controller (localhost) are three
-  # different servers, and the current Ansible play is being run against app-
-  # servers, there's no way to send from backup-servers[0] to master-db[0]
-  # directly. Instead, pass to controller, then form controller to master-db
-  #
-- name: "{{ wiki_id }} - if wiki_sql_file exists, FIRST remove preexisting SQL file from controller"
-  file:
-    path: "{{ m_tmp }}/controller-wiki.sql"
-    state: absent
+- name: "{{ wiki_id }} - Import wiki.sql"
+  include: import-wiki-sql.yml
   run_once: true
-  delegate_to: localhost
-  when: sql_file_exists
+  when: (not wiki_exists) or intend_overwrite_from_backup
 
-- name: "{{ wiki_id }} - if wiki_sql_file exists, NEXT send SQL file to controller"
-  fetch:
-    src: "{{ wiki_sql_file.stdout }}"
-    dest: "{{ m_tmp }}/controller-wiki.sql"
-    fail_on_missing: yes
-    flat: yes
-  # note: don't run fetch with become on large files. ref bottom of this page:
-  # http://docs.ansible.com/ansible/fetch_module.html
-  become: no
-  run_once: true
-  delegate_to: "{{ sql_backup_server }}"
-  remote_user: "{{ db_backup_server_remote_user }}"
-  when: sql_file_exists
 
-- name: "{{ wiki_id }} - if wiki_sql_file exists, NEXT send file from controller to master-db"
-  copy:
-    src: "{{ m_tmp }}/controller-wiki.sql"
-    dest: "{{ m_tmp }}/wiki.sql"
-    force: yes
-  run_once: true
-  delegate_to: "{{ groups['db-master'][0] }}"
-  when: sql_file_exists
-
-- name: "{{ wiki_id }} - If SQL was dumped from db-src, remove file now that it's on db-master"
-  file:
-    state: absent
-    path: "{{ wiki_sql_file.stdout }}"
-  delegate_to: "{{ sql_backup_server }}"
-  remote_user: "{{ db_backup_server_remote_user }}"
-  run_once: true
-  when: do_sql_dump and sql_file_exists
-
-- name: "{{ wiki_id }} - If wiki_sql_file NOT defined, send generic file to master db"
-  copy:
-    src: templates/mediawiki-tables.sql
-    dest: "{{ m_tmp }}/wiki.sql"
-    force: yes
-  run_once: true
-  delegate_to: "{{ groups['db-master'][0] }}"
-  when: not sql_file_exists
-
-- name: "{{ wiki_id }} - Drop database if --overwrite (or -o) set"
-  mysql_db:
-    name: "wiki_{{ wiki_id }}"
-    state: absent
-  run_once: true
-  delegate_to: "{{ groups['db-master'][0] }}"
-  when: do_overwrite_db_from_backup
-
-- name: "{{ wiki_id }} - Import SQL file"
-  mysql_db:
-    name: "wiki_{{ wiki_id }}"
-    state: import
-    target: "{{ m_tmp }}/wiki.sql"
-  run_once: true
-  register: did_db_import
-  delegate_to: "{{ groups['db-master'][0] }}"
-  when: not wiki_exists or do_overwrite_db_from_backup
-
-- name: Did DB import?
-  debug: { var: did_db_import }
-
-- name: Initiate wikis_to_rebuild_data if not exists
-  set_fact:
-    wikis_to_rebuild_data: []
-  when: wikis_to_rebuild_data is not defined
-
-- name: Add wiki to list of DB-imported wikis if required
-  set_fact:
-    wikis_to_rebuild_data: "{{ wikis_to_rebuild_data + [ wiki_id ] }}"
-  when: did_db_import is defined and did_db_import.changed is defined and did_db_import.changed
-
+#
+# SECTION: REMOVE SQL file from DB master
+#
 - name: "{{ wiki_id }} - Remove SQL file from master DB"
   file:
     path: "{{ m_tmp }}/wiki.sql"
     state: absent
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
-  when: not wiki_exists or do_overwrite_db_from_backup
 
 
 
-#
-#
-# Ensure access to logo and favicon
-#
-#
+
+###############################################################################
+#                                                                             #
+# Uploads                                                                     #
+#                                                                             #
+###############################################################################
 
 
 #
-# Make sure wiki's htdocs directory in place, and symlink to config. Symlink
-# required so logo and favicon accessible via HTTP. Consider creating other
-# method to allow HTTP access to these files (HAProxy rule? httpd rule? PHP?)
+# SECTION: Uploads directory exists?
 #
-- name: "{{ wiki_id }} - Ensure wiki htdocs directory in place"
-  file:
-    path: "{{ m_htdocs }}/wikis/{{ wiki_id }}"
-    state: directory
-    owner: apache
-    group: apache
-    mode: 0755
-- name: "{{ wiki_id }} - Ensure wiki config symlink in place"
-  file:
-    # dest = symlink, src = dir linked to
-    src: "{{ m_deploy }}/public/wikis/{{ wiki_id }}"
-    dest: "{{ m_htdocs }}/wikis/{{ wiki_id }}/config"
-    state: link
-    owner: apache
-    group: apache
-    mode: 0755
-
-
-
-#
-#
-# Handling file uploads
-#
-#
-
-
-# FIXME: This nees to be rectified for multiple app servers vs shared storage
-#        (e.g. on a SAN or other mount) vs GlusterFS.
 - name: "{{ wiki_id }} - Check if wiki's uploads dir exists ON APP SERVER"
   stat:
     path: "{{ m_uploads_dir }}/{{ wiki_id }}"
   register: uploads_dir
-# Either way (existing backup or no, existing uploads or no) make sure uploads
-# dir is configured
-- name: "{{ wiki_id }} - Ensure uploads dir configured"
-  file:
-    path: "{{ m_uploads_dir }}/{{ wiki_id }}"
-    state: directory
-    mode: "{{ m_uploads_dir_mode }}"
-    owner: "{{ m_uploads_dir_owner }}"
-    # owner: "alt-meza-ansible"
-    group: "{{ m_uploads_dir_group }}"
 
 - name: "{{ wiki_id }} - Set fact if wiki {{ wiki_id }} DOES HAVE uploads"
   set_fact:
@@ -379,9 +254,20 @@
   when: not uploads_dir.stat.exists
 
 
+#
+# SECTION: Ensure uploads directory exists
+#
+- name: "{{ wiki_id }} - Ensure uploads dir configured"
+  file:
+    path: "{{ m_uploads_dir }}/{{ wiki_id }}"
+    state: directory
+    mode: "{{ m_uploads_dir_mode }}"
+    owner: "{{ m_uploads_dir_owner }}"
+    group: "{{ m_uploads_dir_group }}"
+
 
 #
-# Determine uploads server and required variables
+# SECTION: Set vars for uploads backup source
 #
 - name: "{{ wiki_id }} - Mark uploads_backup_server_set as NOT SET yet"
   set_fact:
@@ -389,10 +275,11 @@
 
 - name: "{{ wiki_id }} - Set uploads-source-from-backup facts IF SOURCING FROM backup-src"
   set_fact:
-    uploads_backup_server: "{{ groups['backup-src'][0] }}"
-    uploads_backup_dir_path: "{{ hostvars[ groups['backup-src'][0] ]['backups_src_uploads_path'] | regex_replace('<id>', wiki_id) }}"
+    uploads_backup_server: "{{ backups_server_alt_source.addr }}"
+    uploads_backup_dir_path: "{{ backups_server_alt_source.uploads_dir_path | regex_replace('<id>', wiki_id) }}"
+    uploads_backup_server_remote_user: "{{ backups_server_alt_source.remote_user }}"
     uploads_backup_server_set: True
-  when: "'backup-src' in groups and groups['backup-src']|length|int > 0"
+  when: "backups_server_alt_source is defined"
 
 - name: "{{ wiki_id }} - Set uploads-source-from-backup facts IF SOURCING FROM backup-servers"
   set_fact:
@@ -401,54 +288,16 @@
     uploads_backup_server_set: True
   when: "not uploads_backup_server_set and 'backup-servers' in groups and groups['backup-servers']|length|int > 0"
 
-
-#
-# Set remote user to access uploads backup
-#
-- name: "{{ wiki_id }} - Set fact for uploads backup server remote user IF ALTERNATE SPECIFIED"
-  set_fact:
-    uploads_backup_server_remote_user: "{{ hostvars[uploads_backup_server]['alt_remote_user'] }}"
-  when:
-    uploads_backup_server is defined
-    and 'alt_remote_user' in hostvars[uploads_backup_server]
-
-- name: "{{ wiki_id }} - Set fact for uploads backup server remote user TO DEFAULT alt-meza-ansible"
+# Set remote user to access uploads backup if not set above
+- name: "{{ wiki_id }} - Set fact for uploads backup server remote user TO DEFAULT meza-ansible"
   set_fact:
     uploads_backup_server_remote_user: "meza-ansible"
   when:
-    uploads_backup_server is defined
-    and 'alt_remote_user' not in hostvars[uploads_backup_server]
-
-
-
-# WHEN: do_sql_dump is True
-# Get home directory for {{db_backup_server_remote_user}}@{{sql_backup_server}}
-- name: "Get {{ uploads_backup_server_remote_user }} home directory on {{ uploads_backup_server }}"
-  shell: "getent passwd '{{ uploads_backup_server_remote_user }}' | cut -d: -f6"
-  register: uploads_remote_user_home_dir
-  delegate_to: "{{ uploads_backup_server }}"
-  remote_user: "{{ uploads_backup_server_remote_user }}"
-  run_once: true
-
-- name: TEMPORARY DEBUG uploads_remote_user_home_dir
-  debug: { var: uploads_remote_user_home_dir }
-
-- name: "Set uploads_remote_user_home_dir fact"
-  set_fact:
-    uploads_remote_user_home_dir: "{{ uploads_remote_user_home_dir.stdout }}"
-
-- name: "{{ wiki_id }} - Check if wiki's uploads backup dir exists on backups.0"
-  stat:
-    path: "{{ uploads_backup_dir_path }}"
-  register: images_backup_dir
-  delegate_to: "{{ uploads_backup_server }}"
-  remote_user: "{{ uploads_backup_server_remote_user }}"
-  run_once: true
-
+    uploads_backup_server_remote_user is not defined
 
 
 #
-# Check if uploads backups exist on defined server
+# SECTION: Does backup server have uploads?
 #
 - name: "{{ wiki_id }} - Check if wiki's uploads backup dir exists on backups.0"
   stat:
@@ -459,9 +308,8 @@
   run_once: true
 
 
-
 #
-# Set facts to clarify if overwriting data should actually occur
+# SECTION: Should overwriting occur?
 #
 - name: "{{ wiki_id }} - Set fact if SHOULD overwrite uploads data (only possible if backup exists)"
   set_fact:
@@ -475,127 +323,26 @@
 
 
 #
-# Do the rsync transfer of files
+# SECTION: Rsync upload-backups into place
 #
-- name: "{{ wiki_id }} - If no uploads dir, but backup dir exists, give backups.0 the keys"
+- name: "{{ wiki_id }} - Rsync uploads directory"
   include_role:
-    name: grant-keys
+    name: rsync
   vars:
-    grant_keys_to_server: "{{ inventory_hostname }}"
-    alt_remote_user: "{{ uploads_backup_server_remote_user }}"
-    alt_remote_user_home: "{{ uploads_remote_user_home_dir }}"
+    pulling_to_server:   "{{ inventory_hostname }}"
+    pulling_to_path:     "{{ m_uploads_dir }}/{{ wiki_id }}"
+    pulling_from_server: "{{ uploads_backup_server }}"
+    pulling_from_path:   "{{ uploads_backup_dir_path }}/"
+    pulling_from_user:   "{{ uploads_backup_server_remote_user }}"
   run_once: true
   when:
     images_backup_dir.stat.exists
     and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
-    and uploads_backup_server != inventory_hostname
-    # don't grant keys if the backup server is the current server
 
-# copy from server A (backups.0) to server B (the app server in context)
-#- name: "{{ wiki_id }} - If no uploads dir, but backup dir exists, copy from there"
-#  synchronize:
-#    # copy from server A
-#    src: "{{ uploads_backup_dir_path }}/"
-#    # copy to server B
-#    dest: "{{ m_uploads_dir }}/{{ wiki_id }}"
-#    recursive: yes
+
 #
-#    # If the source server has an /uploads directory with symlinks, follow
-#    # the symlinks and re-assemble them on the destination server not as
-#    # symlinks. This allows an old server that is running out of space to
-#    # spread its data onto other partitions using symlinks, but a new server
-#    # with more space to put everything back where it belongs.
-#    copy_links: yes
+# SECTION: Ensure backups still in good config
 #
-#    # Perhaps required due to not being able to properly specify an Ansible
-#    # user in synchronize
-#    # ref: https://github.com/ansible/ansible/issues/16215
-#    #
-#    # Potentially should use ssh_extra_args or ssh_common_args
-#    # Ref: https://github.com/ansible/ansible/pull/15306
-#    ssh_args: "-l meza-ansible"
-#    # ssh_args: "-l {{ uploads_backup_server_remote_user }}"
-#  # server A
-#  delegate_to: "{{ uploads_backup_server }}"
-#  remote_user: "{{ uploads_backup_server_remote_user }}"
-#  run_once: true
-#  when:
-#    images_backup_dir.stat.exists
-#    and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
-
-
-- debug:
-    msg: >
-      rsync
-      --delay-updates
-      -F
-      --compress
-      --copy-links
-      --archive
-      --rsh="/usr/bin/ssh -S none -o StrictHostKeyChecking=no
-      -l {{ uploads_backup_server_remote_user }} -i /root/meza-ansible-id_rsa
-      -o UserKnownHostsFile=/root/meza-ansible-known_hosts"
-      "{{ uploads_backup_server }}:{{ uploads_backup_dir_path }}/"
-      "{{ m_uploads_dir }}/{{ wiki_id }}"
-  when:
-    images_backup_dir.stat.exists
-    and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
-    and uploads_backup_server != inventory_hostname
-
-# rsync from outside inventory_hostname
-- name: "{{ wiki_id }} - If no uploads dir, but backup dir exists, copy from there"
-  shell: >
-      rsync
-      --delay-updates
-      -F
-      --compress
-      --copy-links
-      --archive
-      --rsh="/usr/bin/ssh -S none -o StrictHostKeyChecking=no
-      -l {{ uploads_backup_server_remote_user }} -i /root/meza-ansible-id_rsa
-      -o UserKnownHostsFile=/root/meza-ansible-known_hosts"
-      "{{ uploads_backup_server }}:{{ uploads_backup_dir_path }}/"
-      "{{ m_uploads_dir }}/{{ wiki_id }}"
-  run_once: true
-  when:
-    images_backup_dir.stat.exists
-    and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
-    and uploads_backup_server != inventory_hostname
-
-
-# rsync within inventory_hostname
-- name: "{{ wiki_id }} - If no uploads dir, but backup dir exists, copy from there"
-  shell: >
-      rsync
-      --delay-updates
-      -F
-      --compress
-      --copy-links
-      --archive
-      "{{ uploads_backup_dir_path }}/"
-      "{{ m_uploads_dir }}/{{ wiki_id }}"
-  run_once: true
-  when:
-    images_backup_dir.stat.exists
-    and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
-    and uploads_backup_server == inventory_hostname
-
-
-- name: "{{ wiki_id }} - If no uploads dir, but backup dir exists, revoke keys"
-  include_role:
-    name: revoke-keys
-  vars:
-    revoke_keys_from_server: "{{ inventory_hostname }}"
-    alt_remote_user: "{{ uploads_backup_server_remote_user }}"
-    alt_remote_user_home: "{{ uploads_remote_user_home_dir }}"
-  run_once: true
-  when:
-    images_backup_dir.stat.exists
-    and (not uploads_dir.stat.exists or do_overwrite_uploads_from_backup)
-    and uploads_backup_server != inventory_hostname
-    # don't revoke keys if the backup server is the current server
-
-# Either way (existing backup or no) make sure uploads dir is configured
 - name: "{{ wiki_id }} - Ensure wiki's uploads dir is still configured properly"
   file:
     path: "{{ m_uploads_dir }}/{{ wiki_id }}"
@@ -604,36 +351,3 @@
     owner: "{{ m_uploads_dir_owner }}"
     group: "{{ m_uploads_dir_group }}"
     # recursive?
-
-
-
-
-#
-#
-# Do database and search index updates as required
-#
-#
-
-# Whether a new wiki was created or something was imported, run db update
-- name: "{{ wiki_id }} - Update database"
-  include_role:
-    name: update.php
-  when: not wiki_exists or do_overwrite_db_from_backup
-
-
-- name: "{{ wiki_id }} - Include init-wiki.yml only when a new wiki created (but not imported)"
-  include: init-wiki.yml
-  when: not wiki_exists and not sql_file_exists
-
-- name: "{{ wiki_id }} - Create list of new wikis if not exist"
-  set_fact:
-    list_of_new_wikis: []
-  when: list_of_new_wikis is not defined
-
-# Create a list of wikis that are "new" (either actually new, or that the
-# database has been rebuilt)
-- name: "{{ wiki_id }} - Update list of new wikis"
-  set_fact:
-    list_of_new_wikis: "{{ list_of_new_wikis }} + [ '{{ wiki_id }}' ]"
-  when: not wiki_exists or do_overwrite_db_from_backup
-

@@ -23,7 +23,7 @@ Meza application directory. This should never change except if you upgrade meza 
 * `config`
   * `core`
     * `ansible.cfg`: Ansible config file. Ref: http://docs.ansible.com/ansible/intro_configuration.html
-    * `defaults.yml`: base config vars, able to be overridden in /opt/conf-meza/public/vars.yml
+    * `defaults.yml`: base config vars, able to be overridden in /opt/conf-meza/public/public.yml
     * `i18n`: mostly unused attempts to internationalize meza
     * `MezaCoreExtensions.yml`: extensions installed on all meza servers
     * `template`
@@ -102,7 +102,7 @@ Additionally, the user `meza-ansible` is used by meza to perform most actions. S
 
 * `public`:
   * `MezaLocalExtensions.yml`: Use to define extra extensions for your meza installation
-  * `vars.yml`: MAIN CONFIGURATION VARIABLES FILE!
+  * `public.yml`: MAIN CONFIGURATION VARIABLES FILE!
   * `postLocalSettings.d/`:
     * (Any .php files here will be loaded at the end of LocalSettings.php)
   * `preLocalSettings.d/`:
@@ -119,10 +119,7 @@ Additionally, the user `meza-ansible` is used by meza to perform most actions. S
     * (more wikis with same format as above)
 * `secret`:
   * `monolith`:
-    * `group_vars`:
-      * `all.yml`: This is the main secret config file. It's location is due to Ansible best-practices of handling config files relative to location of hosts file (see below). Encrypted by vault password.
-        * Ref http://docs.ansible.com/ansible/playbooks_best_practices.html#directory-layout
-        * Ref #624 regarding moving group_vars/all.yml to secret.yml
+    * `secret.yml`: This is the main secret config file. Encrypted by vault password.
     * `hosts`: AKA "Inventory file", listing server roles. See [Glossary](Glossary.md) for more info
     * `ssl`:
       * `meza.crt`: SSL certificate for this environment. Encrypted by vault password
@@ -180,7 +177,7 @@ This directory is a hidden directory (e.g. starts with a period) because it real
   * `MezaLocalExtensions.yml`: present but not used within .deploy-meza (controller only)
   * `postLocalSettings.d`: gives app servers access to these files
   * `preLocalSettings.d`: gives app servers acces to these files
-  * `vars.yml`: present but not used within .deploy-meza (controller only)
+  * `public.yml`: present but not used within .deploy-meza (controller only)
   * `wikis`:
     * `demo`: gives app servers access to these logos and wiki specific PHP
 * `runAllJobs.php`: Used in cron jobs to run jobs

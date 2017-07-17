@@ -1,0 +1,132 @@
+---
+# Write DB
+
+
+#
+# Determine if a backup wiki.sql file has been written to DB master
+#
+- name: From either dump or transfer, does wiki.sql exist on DB master?
+  stat:
+    path: "{{ m_tmp }}/wiki.sql"
+  register: imported_wiki_sql_on_db_master
+  delegate_to: "{{ groups['db-master'][0] }}"
+  run_once: true
+
+
+#
+# Set facts to clarify if overwriting data should actually occur
+#
+- name: "{{ wiki_id }} - Set fact if SHOULD overwrite data (only possible if backup exists)"
+  set_fact:
+    do_overwrite_db_from_backup: True
+  when: intend_overwrite_from_backup and imported_wiki_sql_on_db_master.stat.exists
+
+- name: "{{ wiki_id }} - Set fact if SHOULD NOT overwrite data"
+  set_fact:
+    do_overwrite_db_from_backup: False
+  when: not intend_overwrite_from_backup or not imported_wiki_sql_on_db_master.stat.exists
+
+
+#
+# New wiki & no backup SQL? Use generic SQL
+#
+- name: "{{ wiki_id }} - If wiki_sql_file NOT defined, send generic file to master db"
+  copy:
+    src: templates/mediawiki-tables.sql
+    dest: "{{ m_tmp }}/wiki.sql"
+    force: yes
+  run_once: true
+  delegate_to: "{{ groups['db-master'][0] }}"
+  when: not wiki_exists and not imported_wiki_sql_on_db_master.stat.exists
+
+
+#
+# DROP database
+#
+- name: "{{ wiki_id }} - Drop database if --overwrite (or -o) set"
+  mysql_db:
+    name: "wiki_{{ wiki_id }}"
+    state: absent
+  run_once: true
+  delegate_to: "{{ groups['db-master'][0] }}"
+  when: do_overwrite_db_from_backup
+
+
+#
+# IMPORT SQL
+#
+- name: "{{ wiki_id }} - Import SQL file"
+  mysql_db:
+    name: "wiki_{{ wiki_id }}"
+    state: import
+    target: "{{ m_tmp }}/wiki.sql"
+  run_once: true
+  register: did_db_import
+  delegate_to: "{{ groups['db-master'][0] }}"
+  when: not wiki_exists or do_overwrite_db_from_backup
+
+- name: Did DB import?
+  debug: { var: did_db_import }
+
+
+#
+# Set fact if new wiki was created
+#
+- name: SET FACT - New wiki was created
+  set_fact:
+    created_new_wiki: True
+  when: (not wiki_exists) and (not imported_wiki_sql_on_db_master.stat.exists)
+- name: SET FACT - New wiki NOT created
+  set_fact:
+    created_new_wiki: False
+  # not a "new" wiki if one already existed _or_ an imported SQL file was used
+  when: (wiki_exists) or (imported_wiki_sql_on_db_master.stat.exists)
+
+#
+# Do rebuild scripts (SMW and search index) need to run?
+#
+- name: Initiate wikis_to_rebuild_data if not exists
+  set_fact:
+    wikis_to_rebuild_data: []
+  when: wikis_to_rebuild_data is not defined
+
+- name: Add wiki to list of DB-imported wikis if required
+  set_fact:
+    wikis_to_rebuild_data: "{{ wikis_to_rebuild_data + [ wiki_id ] }}"
+  when: did_db_import is defined and did_db_import.changed is defined and did_db_import.changed
+
+
+#
+# SECTION: update.php
+#
+- name: "{{ wiki_id }} - Update database"
+  include_role:
+    name: update.php
+  when: not wiki_exists or do_overwrite_db_from_backup
+
+
+#
+# SECTION: init new wiki
+#
+- name: "{{ wiki_id }} - Include init-wiki.yml only when a new wiki created (but not imported)"
+  include: init-wiki.yml
+  when: created_new_wiki
+
+
+#
+# SECTION: Create list_of_new_wikis
+#
+- name: "{{ wiki_id }} - Create list of new wikis if not exist"
+  set_fact:
+    list_of_new_wikis: []
+  when: list_of_new_wikis is not defined
+
+# Create a list of wikis that are "new" (either actually new, or that the
+# database has been rebuilt)
+# FIXME: Get terminology straight. This one implies a "new wiki" is a totally
+#        new or an overwrite. Above "new" means not-an-import, just a clean-
+#        slate wiki.
+- name: "{{ wiki_id }} - Update list of new wikis"
+  set_fact:
+    list_of_new_wikis: "{{ list_of_new_wikis }} + [ '{{ wiki_id }}' ]"
+  when: not wiki_exists or do_overwrite_db_from_backup

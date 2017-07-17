@@ -1,0 +1,7 @@
+---
+
+- name: "Revoke keys from {{ granted_server }}"
+  file:
+    path: "/root/meza-ansible-id_rsa"
+    state: absent
+  delegate_to: "{{ granted_server }}"

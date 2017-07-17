@@ -1,0 +1,64 @@
+---
+# Transfer SQL to DB master
+
+
+#
+# Check for backups directory
+#
+- name: "{{ wiki_id }} - Check if backups dir exists"
+  stat:
+    path: "{{ sql_dir_path }}"
+  register: backups_dir_stat
+  delegate_to: "{{ sql_backup_server }}"
+  remote_user: "{{ db_backup_server_remote_user }}"
+  run_once: true
+
+- name: "{{ wiki_id }} - Set fact if backups server DOES have {{ sql_dir_path }}"
+  set_fact:
+    backup_dir_exists: True
+  when: backups_dir_stat.stat.exists == true
+
+- name: "{{ wiki_id }} - Set fact if backups server DOES NOT have {{ sql_dir_path }}"
+  set_fact:
+    backup_dir_exists: False
+  when: backups_dir_stat.stat.exists == false
+
+
+
+# This will find the latest sql file by name, or wiki.sql over any timestamped one
+# assuming timestamp-named files like 20170220000002_wiki.sql
+- name: "{{ wiki_id }} - Find SQL file if it exists"
+  shell: 'find {{ sql_dir_path }} -maxdepth 1 -type f -iname "{{ sql_file_match }}" | sort -r | head -n +1'
+  register: wiki_sql_file
+  delegate_to: "{{ sql_backup_server }}"
+  run_once: true
+  remote_user: "{{ db_backup_server_remote_user }}"
+  ignore_errors: yes
+  when: backup_dir_exists and (not wiki_exists or intend_overwrite_from_backup)
+
+- name: "{{ wiki_id }} - Set fact if SQL file DOES exist"
+  set_fact:
+    sql_file_exists: True
+  when: wiki_sql_file is defined and wiki_sql_file.rc is defined and wiki_sql_file.rc == 0
+
+- name: "{{ wiki_id }} - Set fact if SQL file DOES NOT exist"
+  set_fact:
+    sql_file_exists: False
+  when: wiki_sql_file is not defined or wiki_sql_file.rc is not defined or wiki_sql_file.rc != 0
+
+
+#
+# Do the rsync transfer of SQL file from backup server to DB master
+#
+- name: "{{ wiki_id }} - Rsync SQL file from backup to DB master"
+  include_role:
+    name: rsync
+  vars:
+    pulling_to_server:   "{{ groups['db-master'][0] }}"
+    pulling_to_path:     "{{ m_tmp }}/wiki.sql"
+    pulling_from_server: "{{ sql_backup_server }}"
+    pulling_from_path:   "{{ wiki_sql_file.stdout }}"
+    pulling_from_user:   "{{ db_backup_server_remote_user }}"
+  run_once: true
+  when:
+    sql_file_exists

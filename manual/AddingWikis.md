@@ -54,7 +54,7 @@ A wiki can be setup as the "primary" wiki. This means that all other wikis will 
 primary_wiki_id: big
 ```
 
-In this example the wiki with ID "big", and thus database name "wiki_big", is being defined as the primary wiki. This statement can be added to any configuration YAML file, but the recommended is `/opt/conf-meza/public/vars.yml`.
+In this example the wiki with ID "big", and thus database name "wiki_big", is being defined as the primary wiki. This statement can be added to any configuration YAML file, but the recommended is `/opt/conf-meza/public/public.yml`.
 
 ## Unify user tables
 

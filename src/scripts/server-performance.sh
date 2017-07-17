@@ -14,14 +14,6 @@ fi
 
 source "/opt/.deploy-meza/config.sh"
 
-# TEMPORARY method of recording slack webhooks. Should be in
-# secret/group_vars/all.yml and then written to a dynamic shell script
-# file.
-logging_config="/opt/.deploy-meza/logging.sh"
-if [ -f "$logging_config" ]; then
-	source "$logging_config"
-fi
-
 if [ -z "$slack_webhook_token_server_performance" ]; then
 	slack_token=""
 else
