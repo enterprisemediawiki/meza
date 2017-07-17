@@ -2,21 +2,40 @@
 
 - debug: { msg: "Running role:update.php for {{ wiki_id }}" }
 
-# FIXME: This shouldn't go to {{ m_tmp }}. Also it should be pushed to a backup server
-#        and maybe we should use incremental backups (patches) to limit size.
-- name: Backup wiki database prior to running update.php
-  mysql_db:
-    state: dump
-    name: "wiki_{{ wiki_id }}"
-    target: "{{ m_tmp }}/backup_{{ wiki_id }}_{{ ansible_date_time.iso8601 }}.sql"
-  delegate_to: "{{ groups['db-master'][0] }}"
+- name: Set backup timestamp fact
+  set_fact:
+    backup_timestamp: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
 
-  # [1] This role should be included in such a way that it is run just once,
-  #     but just in case we'll add it here, too. Apply to all tasks
+
+#
+# DUMP SQL from DB Master to backup-servers[0]
+#
+- name: "Backup wiki database prior to running update.php"
+  include_role:
+    name: remote-mysqldump
+  vars:
+    remote_server:            "{{ groups['db-master'][0] }}"
+
+    # FIXME: these shouldn't be required
+    # remote_server_ssh_user:   "{{ db_backup_server_remote_user }}"
+    # remote_server_mysql_user: "{{  }}"
+    # remote_server_mysql_pass: "{{  }}"
+    dump_database:            "wiki_{{ wiki_id }}"
+    target_server:            "{{ groups['backup-servers'][0] }}"
+
+    # FIXME: this string below is copied from role:backup-db-wikis. It should
+    #        be standardized somehow to avoid mistakes.
+    target_server_path:       "{{ m_backups }}/{{ env }}/{{ item }}/{{ backup_timestamp }}_wiki.sql"
   run_once: true
+  tags:
+    - update.php
+    - update.php-backup
+
 
 - name: Run update.php on this wiki
   shell: >
     WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/update.php" --quick
   # run_once see [1]
   run_once: true
+  tags:
+    - update.php
