@@ -254,14 +254,14 @@ EOL
         # ssh 192.168.56.57 "sudo sed -r -i 's/UsePAM yes/UsePAM no/g;' /etc/ssh/sshd_config && sudo systemctl restart sshd"
       SHELL
 
-    else
+      # else
 
       #
       # Finally: Deploy if not multi-server
       #
-      app1.vm.provision "deploy", type: "shell", preserve_order: true, inline: <<-SHELL
-        meza deploy vagrant
-      SHELL
+      # app1.vm.provision "deploy", type: "shell", preserve_order: true, inline: <<-SHELL
+      #   meza deploy vagrant
+      # SHELL
     end
 
   end
