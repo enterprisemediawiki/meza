@@ -204,3 +204,28 @@
   # Ignore errors due issue #699: If a crontab doesn't exist yet this command
   # will fail
   ignore_errors: yes
+
+# Ref: http://docs.ansible.com/ansible/playbooks_loops.html#id4
+- name: Copy any custom PEM-format CA certs into place
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/pki/ca-trust/source/anchors/"
+    owner: root
+    mode: "0755"
+  with_fileglob:
+    - "{{ m_local_public }}/custom-pem-ca-trust/*"
+  register: new_custom_pem_ca_certs
+
+- name: Copy any custom OpenSSL extended-format CA certs into place
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/pki/ca-trust/source/"
+    owner: root
+    mode: "0755"
+  with_fileglob:
+    - "{{ m_local_public }}/custom-extended-ca-trust/*"
+  register: new_custom_extended_ca_certs
+
+- name: Update CA trust if certs changed
+  shell: update-ca-trust
+  when: new_custom_pem_ca_certs.changed or new_custom_extended_ca_certs.changed
