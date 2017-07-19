@@ -411,7 +411,9 @@ Listen 8080
 	</Directory>
 
 	DocumentRoot {{ m_htdocs }}
-	ServerName https://{{ wiki_app_fqdn }}
+	# WAS: ServerName https://{{ wiki_app_fqdn }}
+	#      This server name causes issues with SAML setups, ref #794
+	ServerName MezaMainEntrypoint
 
 	{% if saml_secret is defined -%}
 	# Use SimpleSamlPhp to handle authentication
