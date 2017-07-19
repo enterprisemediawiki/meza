@@ -48,22 +48,51 @@
   when: remote_server_mysql_pass is not defined
 
 #
-# DO mysqldump
+# SET remote_server_ssh_user to 'meza-ansible' if not defined
+#
+- name: Set remote_server_ssh_user to 'meza-ansible' if not defined
+  set_fact:
+    remote_server_ssh_user: "meza-ansible"
+  when: remote_server_ssh_user is not defined
+
+
+#
+# If remote_server != target_server, use SSH to run mysqldump. Else, doit locally
 #
 # FIXME: Remove StrictHostKeyChecking=no when tests properly add host keys (users should do so, too, of course)
+- name: remote_server ({{ remote_server }}) != target_server ({{ target_server }}); run mysqldump over SSH
+  set_fact:
+    mysqldump_command: >
+      ssh
+      -o StrictHostKeyChecking=no
+      -i /root/meza-ansible-id_rsa
+      -o UserKnownHostsFile=/root/meza-ansible-known_hosts
+      {{ remote_server_ssh_user }}@{{ remote_server }}
+      "mysqldump
+      {{ user_option }}
+      {{ password_option }}
+      {{ dump_database }}
+      | gzip -c"
+      | gunzip > {{ target_server_path }}
+  when: remote_server != target_server
+- name: remote_server == target_server ({{ target_server }}); run mysqldump locally
+  set_fact:
+    mysqldump_command: >
+      mysqldump
+      {{ user_option }}
+      {{ password_option }}
+      {{ dump_database }}
+      > {{ target_server_path }}
+  when: remote_server == target_server
+
+- debug: { msg: "{{ mysqldump_command }}" }
+
+#
+# DO mysqldump
+#
 - name: "Perform MySQL dump from {{ remote_server }} to {{ target_server }}"
-  shell: >
-    ssh
-    -o StrictHostKeyChecking=no
-    -i /root/meza-ansible-id_rsa
-    -o UserKnownHostsFile=/root/meza-ansible-known_hosts
-    {{ remote_server_ssh_user }}@{{ remote_server }}
-    "mysqldump
-    {{ user_option }}
-    {{ password_option }}
-    {{ dump_database }}
-    | gzip -c"
-    | gunzip > {{ target_server_path }}
+  shell: "{{ mysqldump_command }}"
+  delegate_to: "{{ target_server }}"
 
 - name: "Revoke keys from {{ target_server }}"
   include_role:

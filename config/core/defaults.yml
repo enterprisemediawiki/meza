@@ -100,6 +100,8 @@ mysql_slow_query_log_file: /var/log/mariadb/slow-queries.log
 load_balancer_unmanaged_parsoid_port: 8000
 load_balancer_unmanaged_mediawiki_port: 8080
 
+# If false, keep all SQL files on backup servers. If true, only keep the latest
+do_cleanup_sql_backup: False
 
 #
 # FILE MODES, OWNERS, GROUPS
@@ -125,3 +127,8 @@ m_cache_directory_group: apache
 m_logs_mode: "0755"
 m_logs_owner: meza-ansible
 m_logs_group: wheel
+
+
+m_backups_mode: "0755"
+m_backups_owner: root
+m_backups_group: root
