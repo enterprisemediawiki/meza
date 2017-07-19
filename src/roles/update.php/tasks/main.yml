@@ -6,13 +6,14 @@
   set_fact:
     backup_timestamp: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
 
-- name: Ensure backups directory exists for each wiki
+- name: Ensure backups directory exists for wiki
   file:
     path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}"
     state: directory
     mode: "{{ m_backups_mode }}"
     owner: "{{ m_backups_owner }}"
     group: "{{ m_backups_group }}"
+  delegate_to: "{{ groups['backup-servers'][0] }}"
 
 #
 # DUMP SQL from DB Master to backup-servers[0]
