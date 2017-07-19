@@ -39,6 +39,16 @@
     - update.php
     - update.php-backup
 
+- name: "Clean out all but the latest SQL backup file for {{ wiki_id }} IF DESIRED"
+  include_role:
+    name: sql-backup-cleanup
+  vars:
+    cleanup_wiki: "{{ wiki_id }}"
+  run_once: true
+  tags:
+    - update.php
+    - sql-backup-cleanup
+  when: do_cleanup_sql_backup
 
 - name: Run update.php on this wiki
   shell: >
