@@ -70,6 +70,12 @@
       group: wheel
       mode: "0600"
 
+# FIXME: why is controller init on all app servers?
+- hosts: app-servers
+  become: yes
+  roles:
+    - set-vars
+    - init-controller-config
 
 # Ensure proper base setup on all servers in inventory, with the exception of
 # servers in "exclude-all" group. At present, the intent of this group is to
@@ -82,13 +88,6 @@
     - base
     # FIXME: add "security" module here
   tags: base
-
-# FIXME: why is controller init on all app servers?
-- hosts: app-servers
-  become: yes
-  roles:
-    - set-vars
-    - init-controller-config
 
 - hosts: load-balancers
   become: yes

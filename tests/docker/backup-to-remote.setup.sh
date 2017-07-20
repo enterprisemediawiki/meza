@@ -38,6 +38,13 @@ ${docker_exec_1[@]} default_servers="$docker_ip_1" backup_servers="$docker_ip_2"
 	--fqdn="$docker_ip_1" --db_pass=1234 --private_net_zone=public
 
 
+public_yml="/opt/conf-meza/public/public.yml"
+${docker_exec_1[@]} bash -c "mkdir -p /opt/conf-meza/public"
+${docker_exec_1[@]} bash -c "echo -e '---\n' > $public_yml"
+${docker_exec_1[@]} bash -c "echo -e 'sshd_config_UsePAM: \"no\"\n' >> $public_yml"
+${docker_exec_1[@]} bash -c "echo -e 'sshd_config_PasswordAuthentication: \"yes\"\n' >> $public_yml"
+
+
 # secret.yml is encrypted. decrypt first, make edits, re-encrypt.
 # secret_yml="/opt/conf-meza/secret/$env_name/secret.yml"
 # vault_pass="/opt/conf-meza/users/meza-ansible/.vault-pass-$env_name.txt"

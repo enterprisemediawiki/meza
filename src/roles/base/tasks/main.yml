@@ -131,6 +131,36 @@
 #   with_dict: "{{firewalld_zone_interface|default({})}}"
 #   notify: restart firewalld
 
+
+#
+# SSH config
+#
+- name: Ensure sshd is running and enabled
+  service:
+    name: sshd
+    state: started
+    enabled: yes
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- name: Ensure SSH client and SSH Daemon configs in place
+  template:
+    src: "ssh_config.j2"
+    dest: "/etc/ssh/ssh_config"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure SSH client and SSH Daemon configs in place
+  template:
+    src: "sshd_config.j2"
+    dest: "/etc/ssh/sshd_config"
+    owner: root
+    group: root
+    mode: "0600"
+  notify:
+    - restart sshd
+
+
 # Replace the following shell commands:
 # chkconfig ntpd on # Activate service
 # ntpdate pool.ntp.org # Synchronize the system clock with 0.pool.ntp.org server
