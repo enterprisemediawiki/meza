@@ -105,7 +105,7 @@ do_cleanup_sql_backup: False
 
 # sshd_config defaults
 sshd_config_UsePAM: "yes"
-sshd_config_PasswordAuthentication: "no"
+sshd_config_PasswordAuthentication: "yes"
 
 #
 # FILE MODES, OWNERS, GROUPS
