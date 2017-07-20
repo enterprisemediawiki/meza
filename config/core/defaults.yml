@@ -103,6 +103,10 @@ load_balancer_unmanaged_mediawiki_port: 8080
 # If false, keep all SQL files on backup servers. If true, only keep the latest
 do_cleanup_sql_backup: False
 
+# sshd_config defaults
+sshd_config_UsePAM: "yes"
+sshd_config_PasswordAuthentication: "no"
+
 #
 # FILE MODES, OWNERS, GROUPS
 #

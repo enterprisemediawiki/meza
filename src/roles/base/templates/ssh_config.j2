@@ -1,0 +1,18 @@
+# From default CentOS 7 ssh(d)_config
+Host *
+        GSSAPIAuthentication yes
+# If this option is set to yes then remote X11 clients will have full access
+# to the original X11 display. As virtually no X11 client supports the untrusted
+# mode correctly we set this to yes.
+        ForwardX11Trusted yes
+# Send locale-related environment variables
+        SendEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
+        SendEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
+        SendEnv LC_IDENTIFICATION LC_ALL LANGUAGE
+        SendEnv XMODIFIERS
+
+# Ciphers allowed in order of preference
+Ciphers aes256-ctr,aes192-ctr,aes128-ctr,aes256-cbc,aes192-cbc,aes128-cbc
+
+# MAC algorithms in order of preference
+MACs hmac-sha2-256,hmac-sha2-512,hmac-sha1
