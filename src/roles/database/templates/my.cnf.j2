@@ -68,6 +68,8 @@ symbolic-links = 0
 user = mysql
 
 # http://dev.mysql.com/doc/refman/5.5/en/performance-schema.html
+# Turn off the performance schema on low mem (1GB) VPS in monolith env. so mem available for parsoid
+# performance_schema = off
 ;performance_schema
 
 # Memory settings.
