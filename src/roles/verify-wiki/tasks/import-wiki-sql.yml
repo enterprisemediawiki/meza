@@ -40,6 +40,18 @@
   when: not wiki_exists and not imported_wiki_sql_on_db_master.stat.exists
 
 
+- name: "Do backup of {{ wiki_id }}"
+  include_role:
+    name: backup-db-wikis
+    tasks_from: do-wiki-backup
+  vars:
+    wiki_id: "{{ wiki_id }}"
+  run_once: true
+  tags:
+    - sql-backup
+  when: do_overwrite_db_from_backup
+
+
 #
 # DROP database
 #

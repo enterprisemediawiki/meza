@@ -2,42 +2,15 @@
 
 - debug: { msg: "Running role:update.php for {{ wiki_id }}" }
 
-- name: Set backup timestamp fact
-  set_fact:
-    backup_timestamp: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
-
-- name: Ensure backups directory exists for wiki
-  file:
-    path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}"
-    state: directory
-    mode: "{{ m_backups_mode }}"
-    owner: "{{ m_backups_owner }}"
-    group: "{{ m_backups_group }}"
-  delegate_to: "{{ groups['backup-servers'][0] }}"
-
-#
-# DUMP SQL from DB Master to backup-servers[0]
-#
-- name: "Backup wiki database prior to running update.php"
+- name: "Do backup of {{ wiki_id }}"
   include_role:
-    name: remote-mysqldump
+    name: backup-db-wikis
+    tasks_from: do-wiki-backup
   vars:
-    remote_server:            "{{ groups['db-master'][0] }}"
-
-    # FIXME: these shouldn't be required
-    # remote_server_ssh_user:   "{{ db_backup_server_remote_user }}"
-    # remote_server_mysql_user: "{{  }}"
-    # remote_server_mysql_pass: "{{  }}"
-    dump_database:            "wiki_{{ wiki_id }}"
-    target_server:            "{{ groups['backup-servers'][0] }}"
-
-    # FIXME: this string below is copied from role:backup-db-wikis. It should
-    #        be standardized somehow to avoid mistakes.
-    target_server_path:       "{{ m_backups }}/{{ env }}/{{ wiki_id }}/{{ backup_timestamp }}_wiki.sql"
+    wiki_id: "{{ wiki_id }}"
   run_once: true
   tags:
-    - update.php
-    - update.php-backup
+    - sql-backup
 
 - name: "Clean out all but the latest SQL backup file for {{ wiki_id }} IF DESIRED"
   include_role:
