@@ -39,6 +39,7 @@ ${docker_exec_1[@]} default_servers="$docker_ip_1" backup_servers="$docker_ip_2"
 
 
 public_yml="/opt/conf-meza/public/public.yml"
+${docker_exec_1[@]} bash -c "mkdir -p /opt/conf-meza/public"
 ${docker_exec_1[@]} bash -c "echo -e '---\n' > $public_yml"
 ${docker_exec_1[@]} bash -c "echo -e 'sshd_config_UsePAM: \"no\"\n' >> $public_yml"
 ${docker_exec_1[@]} bash -c "echo -e 'sshd_config_PasswordAuthentication: \"yes\"\n' >> $public_yml"
