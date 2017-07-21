@@ -60,7 +60,7 @@ In this example the wiki with ID "big", and thus database name "wiki_big", is be
 
 *WARNING: Test user-unification extensively before performing in production"
 
-If you run `unifyUserTables.php` on a set of wikis that do not share user and interwiki tables, the script will automatically setup the `primewiki` file for you (FIXME: this probably is not true anymore). To run `unifyUserTables.php` perform the following:
+If you run `unifyUserTables.php` on a set of wikis that do not share user and interwiki tables, the script will automatically setup the `primewiki` file for you (FIXME #763: this probably is not true anymore). To run `unifyUserTables.php` perform the following:
 
 ```bash
 WIKI=anywiki php /opt/meza/src/scripts/unifyUserTables.php --prime-wiki=anotherwiki

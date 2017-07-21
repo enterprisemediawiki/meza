@@ -59,7 +59,7 @@
   tags:
   - latest
 
-# FIXME: for RedHat may need to enable "Optional RPMs"
+# FIXME #807: for RedHat may need to enable "Optional RPMs"
 - name: ensure EPEL installed
   yum:
     name: epel-release
@@ -120,16 +120,6 @@
 - name: ensure firewalld is running (and enable it at boot)
   service: name=firewalld state=started enabled=yes
   when: docker_skip_tasks is not defined or not docker_skip_tasks
-# FIXME: These were not in non-ansible meza, but was present in the firewalld
-#        role I co-opted.
-# - name: set firewalld default zone
-#   command: /bin/firewall-cmd --set-default-zone={{default_zone|default('public')}}
-#   register: result
-#   changed_when: result.stdout == "success"
-# - name: set firewalld zone interface
-#   command: /bin/firewall-cmd --zone={{item.key}} --change-interface={{item.value}} --permanent
-#   with_dict: "{{firewalld_zone_interface|default({})}}"
-#   notify: restart firewalld
 
 
 #
@@ -179,13 +169,9 @@
   notify:
     - restart ntpd
 
+# FIXME #809: PIP required first; has dependencies; needed on all hosts?
 # Speed up encrypt/decrypt operations
 # ref: http://docs.ansible.com/ansible/playbooks_vault.html#speeding-up-vault-operations
-#
-# FIXME: NEED TO INSTALL PIP FIRST, WHICH HAS DEPENDENCIES. BEFORE DOING THIS
-# FIGURE OUT IF THIS PACKAGE IS NEEDED ON ALL HOSTS, OR JUST ON CONTROLLER, TO
-# GET CRYPTO-SPEED-INCREASES
-#
 # - name: Ensure PIP cryptography package installed
 #   pip:
 #     name: cryptography

@@ -56,7 +56,8 @@ elif [ "$test_type" == "monolith-from-import" ]; then
 	# Working directory in Travis is the GitHub repo, which is meza. Mount it.
 	source "$m_meza_host/tests/docker/init-container.sh" "${m_meza_host}" "mount"
 
-	# TEST ANSIBLE SYNTAX. FIXME: syntax check all playbooks
+	# Test Ansible syntax
+	# FIXME #829: syntax check all playbooks
 	${docker_exec[@]} ANSIBLE_CONFIG=/opt/meza/config/core/ansible.cfg ansible-playbook /opt/meza/src/playbooks/site.yml --syntax-check
 
 	${docker_exec[@]} bash /opt/meza/tests/deploys/monolith-from-import.controller.sh "$docker_ip"

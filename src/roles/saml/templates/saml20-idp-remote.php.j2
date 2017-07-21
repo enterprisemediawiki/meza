@@ -15,8 +15,8 @@ $metadata['{{ saml_public.idp_entity_id }}'] = array(
 // neither {{ saml_secret.idp_entity_id }} nor {{ saml_public.idp_entity_id }} is defined
 {% endif %}
 
-	// FIXME: This jinja template is really hard to follow. Perhaps either stop
-	// offering saml_public for some of these, even though they aren't
+	// FIXME #822: This jinja template is really hard to follow. Perhaps either
+	// stop offering saml_public for some of these, even though they aren't
 	// sensitive, or make it so the saml_secret and saml_public variables are
 	// merged automatically rather than on a case-by-case basis like this.
 

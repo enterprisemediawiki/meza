@@ -29,13 +29,6 @@
   notify:
   - restart apache
 
-# FIXME: required?
-# create logrotate file
-# ln -s " $m_config_core/logrotated_httpd" /etc/logrotate.d/httpd
-
-
-# FIXME: apache.sh had commented-out SELinux commands for services
-
 - name: Install PHP
   include: php.yml
   # http://docs.ansible.com/ansible/playbooks_roles.html#dynamic-versus-static-includes

@@ -6,7 +6,7 @@
   register: wiki_dirs
   delegate_to: localhost
 
-# FIXME: should maybe lock DB first
+# FIXME #813: should maybe lock DB first
 # - name: Set wiki read-only
 # - name: Lock DB
 

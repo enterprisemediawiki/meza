@@ -53,9 +53,9 @@
 #
 # Make sure wiki's htdocs directory in place, and symlink to config. Symlink
 # required so logo and favicon accessible via HTTP.
-# FIXME: Come up with other method to allow HTTP access to these files (HAProxy
-#        rule? httpd rule? PHP?); current method is vague, and allows access to
-#        other things.
+# FIXME #709: Come up with other method to allow HTTP access to these files
+#             (HAProxy rule? httpd rule? PHP?); current method is vague, and
+#             allows access to other things.
 - name: "{{ wiki_id }} - Ensure wiki htdocs directory in place"
   file:
     path: "{{ m_htdocs }}/wikis/{{ wiki_id }}"

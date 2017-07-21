@@ -3,7 +3,6 @@ echo "******* Generating elasticsearch index *******"
 disable_search_file="{{ m_deploy }}/public/wikis/$wiki_id/postLocalSettings.d/disable-search-update.php"
 
 # disable search update in wiki-specific settings
-# FIXME: May only work in monolithic case
 echo -e "<?php\n\$wgDisableSearchUpdate = true;\n" > "$disable_search_file"
 
 # Run script to generate elasticsearch index

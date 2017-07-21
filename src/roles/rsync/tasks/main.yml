@@ -2,8 +2,7 @@
 # Rsync pull role
 #
 # Inputs:
-#   FIXME: Clean up docs below (remove WAS, add descriptions)
-#   pulling_to_server:   server performing the rsync pull
+#   pulling_to_server:
 #   pulling_to_path:
 #   pulling_from_server:
 #   pulling_from_path:
@@ -23,7 +22,7 @@
     pulling_to_server != pulling_from_server
 
 
-# FIXME: Remove StrictHostKeyChecking=no when tests properly add host keys (users should do so, too, of course)
+# FIXME #818: Remove StrictHostKeyChecking=no when tests properly add host keys (users should do so, too, of course)
 - name: Set rsync command fact for pulling-from server {{ pulling_from_server }} NOT pulling-to server
   set_fact:
     rsync_command: >

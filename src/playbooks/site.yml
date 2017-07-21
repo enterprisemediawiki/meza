@@ -70,7 +70,7 @@
       group: wheel
       mode: "0600"
 
-# FIXME: why is controller init on all app servers?
+# FIXME 800: Run against localhost
 - hosts: app-servers
   become: yes
   roles:
@@ -86,7 +86,6 @@
   roles:
     - set-vars
     - base
-    # FIXME: add "security" module here
   tags: base
 
 - hosts: load-balancers
@@ -192,7 +191,6 @@
 
     # One port required for each brick (in meza, this equals each server (one
     # brick per server))
-    # FIXME: currently hard-coded four ports open allowing four app-servers
     - role: firewalld
       firewalld_port: 49152
       firewalld_protocol: tcp
@@ -218,7 +216,7 @@
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
 
-    # Needed?: Gluster inline NFS server: 38465, 38466, 38467
+    # FIXME #801: Some docs said ports 38465, 38466, 38467 needed for Gluster
 
     - role: gluster
       when: "groups['app-servers']|length|int > 1"
@@ -253,7 +251,7 @@
       # Get the one and only server that should be in the db-master group and set
       # it's IP address as replication master IP. Note that this can be left blank
       # or not included at all if no replication should be performed.
-      # FIXME: add condition for "if slaves.length > 0, set replication master, else leave blank"?
+      # FIXME #802: Should replication master be set only if slaves exist?
       mysql_replication_master: "{{ groups['db-master'][0] }}"
       mysql_replication_role: master
 
@@ -337,15 +335,7 @@
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
       when: "'load-balancers-unmanaged' in groups"
     - nodejs
-    - role: parsoid
-      nodejs_install_npm_user: "nodejs"
-      nodejs_version: "0.12" #FIXME: pretty sure this does nothing now
-      nodejs_npm_global_packages: []
-        # - name: example-global-package
-        # - name: jslint
-        #   version: 0.9.3
-        # # latest version
-        # - name: node-sass
+    - parsoid
     - parsoid-settings
 
 - hosts: logging-servers

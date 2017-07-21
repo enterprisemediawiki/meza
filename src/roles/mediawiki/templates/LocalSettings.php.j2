@@ -328,7 +328,7 @@ $wgDBname = isset( $mezaCustomDBname ) ? $mezaCustomDBname : "wiki_$wikiId";
 // get very little of the load, but in the case that all the slaves fail master
 // still is configured to pick up the entirety of the read-load.
 //
-// FIXME: Make load configurable.
+// FIXME #821: Make load configurable.
 $databaseReadLoadRatio = 1;
 
 $wgDBservers = array();

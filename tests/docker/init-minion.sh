@@ -3,8 +3,7 @@
 # Get a container ready to be a minion
 
 # Initiate container
-# FIXME: pre-yum has more than we need. Go lighter. Needs to be a little more
-#        than meza-docker-base, though.
+# FIXME #828: pre-yum has more than we need. Go lighter.
 docker_repo="jamesmontalvo3/meza-docker-pre-yum:latest"
 is_minion=yes
 source "$m_meza_host/tests/docker/init-container.sh" "none"

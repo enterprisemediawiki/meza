@@ -2,7 +2,6 @@
 #
 # meza command
 #
-# FIXME: get commented out notes from meza.sh and make sure documented
 
 import sys, getopt, os
 
@@ -131,7 +130,7 @@ def meza_command_setup (argv):
 		print sub_command + " is not a valid sub-command for setup"
 		sys.exit(1)
 
-# FIXME: This function is big.
+# FIXME #824: This function is big.
 def meza_command_setup_env (argv, return_not_exit=False):
 
 	import json, string
@@ -349,13 +348,14 @@ def meza_command_destroy (argv):
 def meza_command_update (argv):
 	print "command not yet built"
 
-# FIXME: It would be great to have this function automatically map all scripts
-# in MediaWiki's maintenance directory to all wikis. Then you could do:
+# FIXME #825: It would be great to have this function automatically map all
+#             scripts in MediaWiki's maintenance directory to all wikis. Then
+#             you could do:
 #   $ meza maint runJobs + argv            --> run jobs on all wikis
 #   $ meza maint createAndPromote + argv   --> create a user on all wikis
 def meza_command_maint (argv):
 
-	# FIXME: This has no notion of environments
+	# FIXME #711: This has no notion of environments and won't work in polylith
 
 	sub_command = argv[0]
 	command_fn = "meza_command_maint_" + sub_command
@@ -373,9 +373,9 @@ def meza_command_maint (argv):
 def meza_command_maint_runJobs (argv):
 
 	#
-	# WARNING: THIS FUNCTION SHOULD STILL WORK ON MONOLITHS, BUT HAS NOT BE
-	#          RE-TESTED SINCE MOVING TO ANSIBLE. FOR NON-MONOLITHS IT WILL
-	#          NOT WORK AND NEEDS TO BE ANSIBLE-IZED. FIXME.
+	# FIXME #711: THIS FUNCTION SHOULD STILL WORK ON MONOLITHS, BUT HAS NOT BE
+	#             RE-TESTED SINCE MOVING TO ANSIBLE. FOR NON-MONOLITHS IT WILL
+	#             NOT WORK AND NEEDS TO BE ANSIBLE-IZED.
 	#
 
 	wikis_dir = "/opt/htdocs/wikis"
@@ -491,9 +491,9 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 
 def meza_shell_exec ( shell_cmd ):
 
-	# FIXME
 	# Get errors with user meza-ansible trying to write to the calling-user's
-	# home directory if don't cd to a neutral location. FIXME.
+	# home directory if don't cd to a neutral location. By cd'ing to this
+	# location you can pick up ansible.cfg and use vars there.
 	starting_wd = os.getcwd()
 	os.chdir( "/opt/meza/config/core" )
 
@@ -510,7 +510,7 @@ def meza_shell_exec ( shell_cmd ):
 	print cmd
 	rc = os.system(cmd)
 
-	# FIXME: See above
+	# Move back to original working directory
 	os.chdir( starting_wd )
 
 	return rc

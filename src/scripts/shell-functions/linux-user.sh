@@ -47,8 +47,6 @@ mf_add_public_user_with_public_key () {
 		exit 1;
 	fi
 
-	# FIXME: there are methods to gaurantee removal of this file even if script
-	#        aborts. Implement.
 	tmpfile=$(mktemp /tmp/pub.XXXXXX)
 	echo "$2" >> "$tmpfile"
 	importkey_check=`ssh-keygen -l -f "$tmpfile"`

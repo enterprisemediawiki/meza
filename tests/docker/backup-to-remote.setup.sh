@@ -65,8 +65,7 @@ ${docker_exec_1[@]} bash /opt/meza/tests/deploys/backup-to-remote.controller.sh 
 # The following are two checks against CONTAINER 2 to verify backup was
 # performed correctly.
 #
-# (1) Verify backups directory exists (FIXME: would be better to ensure a
-#     specific file is present)
+# (1) Verify backups directory exists
 # (2) Verify any files matching *_wiki.sql in demo backups. egrep command will
 #     exit-0 if something found, exit-1 (fail) if nothing found.
 ${docker_exec_2[@]} ls "/opt/data-meza/backups/$env_name/demo"
