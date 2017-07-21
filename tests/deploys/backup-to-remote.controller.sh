@@ -9,9 +9,6 @@ set -eux
 
 echo "RUNNING TEST"
 
-
-# FIXME: Need to git-fetch and git-checkout the appropriate commit
-
 # Now that environment is setup, deploy/install it
 meza deploy "$1"
 
