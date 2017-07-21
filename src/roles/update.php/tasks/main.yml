@@ -22,18 +22,10 @@
   include_role:
     name: remote-mysqldump
   vars:
-    remote_server:            "{{ groups['db-master'][0] }}"
-
-    # FIXME: these shouldn't be required
-    # remote_server_ssh_user:   "{{ db_backup_server_remote_user }}"
-    # remote_server_mysql_user: "{{  }}"
-    # remote_server_mysql_pass: "{{  }}"
-    dump_database:            "wiki_{{ wiki_id }}"
-    target_server:            "{{ groups['backup-servers'][0] }}"
-
-    # FIXME: this string below is copied from role:backup-db-wikis. It should
-    #        be standardized somehow to avoid mistakes.
-    target_server_path:       "{{ m_backups }}/{{ env }}/{{ wiki_id }}/{{ backup_timestamp }}_wiki.sql"
+    remote_server:      "{{ groups['db-master'][0] }}"
+    dump_database:      "wiki_{{ wiki_id }}"
+    target_server:      "{{ groups['backup-servers'][0] }}"
+    target_server_path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}/{{ backup_timestamp }}_wiki.sql"
   run_once: true
   tags:
     - update.php

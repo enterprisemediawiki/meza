@@ -60,7 +60,7 @@ else {
     // if there are multiple environments backed up to this server, and
     // $backups_environment isn't specified for which environment to disply in
     // backupListing.php, then just guess the first one.
-    // FIXME: This probably is all totally broken in a polylithic setup.
+    // FIXME #816: This probably is all totally broken in a polylithic setup.
     $env = array_pop( $envs );
 }
 
@@ -94,7 +94,7 @@ $userID = $attributes[ $saml_idp_username_attr ][0];
 
 
 // wiki_backup_downloaders and all_backup_downloaders from config.php if set
-// FIXME: this is a lot of duplication with backupListing.php
+// FIXME #817: this is a lot of duplication with backupListing.php
 if ( ! isset( $wiki_backup_downloaders ) || ! is_array( $wiki_backup_downloaders ) ) {
     $wiki_backup_downloaders = array();
 }

@@ -1,7 +1,8 @@
 ---
 
 # Perform checks on user input
-# FIXME: Checks for wiki_name? Any others for wiki_id? Length requirements?
+# FIXME #179: This isn't working: spaces and dashes getting through
+# FIXME #298: Dashes break MariaDB. Figure out how to allow them.
 - assert:
     that: 'wiki_id is search("[a-zA-Z0-9_]")'
     msg: "Your wiki ID may only include letters, numbers and underscores"
@@ -23,8 +24,9 @@
     name: verify-wiki
 
 # Wikis are totally built at this point, but SMW and search need rebuilding
-# FIXME: WILL ONLY WORK WHEN CONTROLLER AND APP-SERVER ARE THE SAME MACHINE
 # Not totally sure SMW-rebuild is necessary, but maybe for imported pages?
+# FIXME #811: Ensure no issues with this on multi-server environments and when
+#             controller is NOT an app server
 - name: (Re-)build search index for each wiki
   shell: "bash {{ m_deploy }}/elastic-rebuild-all.sh {{ wiki_id }}"
   run_once: true

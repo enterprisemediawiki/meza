@@ -17,7 +17,6 @@
 # When the delegated server uses rsync to another server, allow it the same
 # list of known hosts as the controller. In some cases this file may not exist,
 # so ignore_errors.
-# FIXME: Use this?
 - name: "Copy known_hosts to {{ granted_server }}"
   copy:
     src: "{{ m_home }}/meza-ansible/.ssh/known_hosts"

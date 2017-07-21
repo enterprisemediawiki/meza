@@ -2,9 +2,7 @@
 #
 # The following conditionals are reused many times in the tasks in this file.
 # As such, they've been encapsulated in these tasks and registered to vars.
-# FIXME: The logic to uses these, "not role_is_valid_slave|skipped" is very
-# awkward. Try to find a better way to do this.
-#
+# FIXME #812: The logic "not role_is_valid_slave|skipped" is awkward
 - name: Check if valid slave
   command: /bin/true
   register: role_is_valid_slave
@@ -101,7 +99,8 @@
 # Copying SQL files from one server to another *appears* to be somewhat
 # complicated by the fact that the control server could *be* either the master
 # or slave server. To get around this, copy all files into /tmp directories
-# with different names. FIXME: clean up files when done with them.
+# with different names.
+# FIXME #788: Use role remote-mysqldump to send direct; don't create tmp files
 #
 - name: fetch dump file
   fetch:
@@ -119,7 +118,6 @@
   when: >
     not slave_needs_configuration|skipped
     and not role_is_valid_slave|skipped
-# FIXME: cleanup SQL files after import?
 
 #
 # Import SQL file from above
