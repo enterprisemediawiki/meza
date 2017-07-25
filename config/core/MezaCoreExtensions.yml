@@ -186,10 +186,15 @@ list:
   - name: WhoIsWatching
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/WhoIsWatching.git
     version: "{{ mediawiki_default_branch }}"
+    legacy_load: true
     config: |
       $wgPageShowWatchingUsers = true;
   - name: SemanticInternalObjects
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticInternalObjects.git
+    version: "{{ mediawiki_default_branch }}"
+    legacy_load: true
+  - name: SemanticCompoundQueries
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticCompoundQueries.git
     version: "{{ mediawiki_default_branch }}"
     legacy_load: true
   - name: SemanticDrilldown

@@ -77,7 +77,12 @@ Some extensions, perhaps only [Visual Editor](https://www.mediawiki.org/wiki/Ext
     version: "{{ mediawiki_default_branch }}"
     git_submodules: True
 ```
-
+```yaml
+- name: VisualEditor
+  repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git
+  version: "{{ mediawiki_default_branch }}"
+  git_submodules: True
+```
 Note: Meza installs Visual Editor for you by default.
 
 ## Example MezaLocalConfig.yml

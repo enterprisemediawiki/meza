@@ -129,7 +129,6 @@ m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
 elasticsearch_major_version: "1.6"
 
 
-
 #
 # NOTIFICATIONS
 #
@@ -157,7 +156,6 @@ disk_space_usage_notification_icon: https://github.com/enterprisemediawiki/meza/
 
 # Cleanup upload stash (temporary files) daily at 6pm
 clean_upload_stash_crontime: "0 18 * * *"
-
 
 #
 # FILE MODES, OWNERS, GROUPS
