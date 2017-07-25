@@ -197,7 +197,7 @@ class MezaUnifyUserTables extends Maintenance {
 
 		global $m_htdocs, $m_deploy, $m_meza;
 
-		// FIXME:
+		// FIXME #826: unifyUserTables.php is currently non-functional
 		die( "user unify needs to be rethought for new meza" );
 		if ( is_file( "$m_deploy/public/primewiki" ) ) {
 			die( "A prime wiki is already set in $m_deploy/public/primewiki. You cannot run this script." );
@@ -318,9 +318,10 @@ class MezaUnifyUserTables extends Maintenance {
 
 			}
 
-			// FIXME: This doesn't run a test against the ipblock table because it's a unique case
-			// and it was difficult to implement and not relevant to the developer who had
-			// no rows in his ipblocks table
+			// FIXME #826: unifyUserTables.php is currently non-functional
+			//             This doesn't run a test against the ipblock table because it's a unique case
+			//             and it was difficult to implement and not relevant to the developer who had
+			//             no rows in his ipblocks table
 
 		}
 	}

@@ -63,7 +63,7 @@
 #
 # SKINS
 #
-# FIXME: Add skins in Meza(Core|Local)Extensions.yml
+# FIXME #819: Add skins in Meza(Core|Local)Extensions.yml
 - name: Ensure Vector skin installed
   git:
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git
@@ -126,7 +126,7 @@
   composer:
     command: install
     working_dir: "{{ m_mediawiki }}"
-  # FIXME: need ignore_errors because composer throws an error when running as root.
+  # FIXME #317: need ignore_errors because composer throws an error when running as root.
   ignore_errors: yes
   tags:
     - composer-extensions
@@ -137,7 +137,7 @@
   composer:
     command: update
     working_dir: "{{ m_mediawiki }}"
-  # FIXME: need ignore_errors because composer throws an error when running as root.
+  # FIXME #317: need ignore_errors because composer throws an error when running as root.
   ignore_errors: yes
   tags:
     - composer-extensions
@@ -228,7 +228,7 @@
 #
 # 1. Check if wikis exist
 # 2. Create Demo Wiki if they don't
-# 3. FIXME: Will create-wiki re-sync configs? If so, explicit re-sync not required.
+# 3. FIXME #820: create-wiki re-sync configs? Explicit re-sync not req'd?
 #
 - name: Check if any wikis exist
   find:
@@ -324,7 +324,7 @@
     - search-index
 
 # Wikis are totally built at this point, but SMW and search need rebuilding
-# FIXME: WILL ONLY WORK WHEN CONTROLLER AND APP-SERVER ARE THE SAME MACHINE
+# FIXME #811: Will this work when controller is not an app server?
 - name: "(Re-)build search index for: {{ wikis_to_rebuild_data | join(', ') }}"
   shell: "bash {{ m_deploy }}/elastic-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
   when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0)

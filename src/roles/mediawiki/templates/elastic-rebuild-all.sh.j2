@@ -38,7 +38,7 @@ for d in $do_wikis; do
 	# If the above command had a failing exit code
 	if [[ $? -ne 0 ]]; then
 
-		# FIXME: add notification/warning system here
+		# FIXME #577 #681: add notification/warning system here
 		echo "elastic-build-index FAILED for \"$wiki_id\" at $endtimestamp"
 
 	#if the above command had a passing exit code (e.g. zero)

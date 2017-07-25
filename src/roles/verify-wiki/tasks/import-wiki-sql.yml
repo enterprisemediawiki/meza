@@ -123,9 +123,9 @@
 
 # Create a list of wikis that are "new" (either actually new, or that the
 # database has been rebuilt)
-# FIXME: Get terminology straight. This one implies a "new wiki" is a totally
-#        new or an overwrite. Above "new" means not-an-import, just a clean-
-#        slate wiki.
+# FIXME #823: Get terminology straight. This one implies a "new wiki" is a
+#             totally new or an overwrite. Above "new" means not-an-import,
+#             just a clean-slate wiki.
 - name: "{{ wiki_id }} - Update list of new wikis"
   set_fact:
     list_of_new_wikis: "{{ list_of_new_wikis }} + [ '{{ wiki_id }}' ]"

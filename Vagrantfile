@@ -74,7 +74,7 @@ Vagrant.configure("2") do |config|
 
   end
 
-  # Gross...copy-paste of above. FIXME.
+  # FIXME #830: Gross...copy-paste of above
   if configuration.key?("db2")
 
     config.vm.define "db2" do |db2|
@@ -191,8 +191,7 @@ Vagrant.configure("2") do |config|
       envvars[:db_slaves] = "192.168.56.58"
     end
 
-
-    # FIXME: should have a less fragile method to check if env exists
+    # Create vagrant environment if it doesn't exist
     app1.vm.provision "setupenv", type: "shell", preserve_order: true, env: envvars, inline: <<-SHELL
       if [ ! -d /opt/conf-meza/secret/vagrant ]; then
         meza setup env vagrant --fqdn=192.168.56.56 --db_pass=1234 --private_net_zone=public
@@ -213,6 +212,9 @@ cat >/opt/conf-meza/public/public.yml <<EOL
 blender_landing_page_title: Meza Wikis
 m_setup_php_profiling: true
 m_force_debug: true
+
+sshd_config_UsePAM: "no"
+sshd_config_PasswordAuthentication: "yes"
 EOL
       fi
 
@@ -236,7 +238,7 @@ EOL
         sed -r -i 's/UsePAM yes/UsePAM no/g;' /etc/ssh/sshd_config
         systemctl restart sshd
 
-        # Stuff below would be more secure if it worked...FIXME.
+        # FIXME $818: Stuff below would be more secure if it worked
 
         # echo "switch user"
         # sudo su meza-ansible

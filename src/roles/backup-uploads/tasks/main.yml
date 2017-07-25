@@ -8,7 +8,7 @@
   register: wiki_dirs
   delegate_to: localhost
 
-# FIXME: option to wipe files clean before sync? If so, do it before pulling SQL file
+# FIXME #805: option to delete existing uploads backups initially (clean slate)
 
 - name: Ensure backups directory exists for environment
   file:

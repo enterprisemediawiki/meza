@@ -16,7 +16,6 @@
 
 - name: Define nodejs_install_npm_user
   set_fact:
-    # not working: "{{ ansible_user }}"
     nodejs_install_npm_user: nodeuser
   when: nodejs_install_npm_user is not defined
 

@@ -475,8 +475,8 @@ Listen 8090
 </IfModule>
 
 # Don't allow access to images directories. Will allow access via img_auth.php
-# FIXME: No images are here anymore anyway. We actually have no method of NOT
-#        using img_auth.php now.
+# FIXME #805: No images are here anymore anyway. We actually have no method of NOT
+#             using img_auth.php now. Remove me.
 <DirectoryMatch "^{{ m_htdocs }}/wikis/(.+)/images">
 	Order Allow,Deny
 	Deny From All

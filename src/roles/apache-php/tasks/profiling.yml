@@ -70,7 +70,7 @@
     # owner: who?
     # group: who?
 
-    # FIXME: suggested per docs, but c'mon
+    # FIXME #804: suggested per docs, but c'mon
     mode: 0777
     recurse: yes
     state: directory

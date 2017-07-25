@@ -59,7 +59,7 @@
 #
 # If remote_server != target_server, use SSH to run mysqldump. Else, doit locally
 #
-# FIXME: Remove StrictHostKeyChecking=no when tests properly add host keys (users should do so, too, of course)
+# FIXME #818: Remove StrictHostKeyChecking=no when tests properly add host keys (users should do so, too, of course)
 - name: remote_server ({{ remote_server }}) != target_server ({{ target_server }}); run mysqldump over SSH
   set_fact:
     mysqldump_command: >
