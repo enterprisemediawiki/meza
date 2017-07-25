@@ -72,8 +72,13 @@ Note: Elastica is installed on Meza by default, so this is for example only.
 Some extensions, perhaps only [Visual Editor](https://www.mediawiki.org/wiki/Extension:VisualEditor) and [Widgets](https://www.mediawiki.org/wiki/Extension:Widgets), say that in addition to downloading the code you must also `cd` into the extension directory then run `git submodule update --init`. To make Meza handle this for you, add `git_submodules: True` to the extension's configuration:
 
 ```yaml
+<<<<<<< 2577c67f960f3c9630db7cdc34b22f97ddd76940
   - name: Widgets
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Widgets.git
+=======
+  - name: VisualEditor
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git
+>>>>>>> Move all instances of REL1_27 into an easily updateable variable
     version: "{{ mediawiki_default_branch }}"
     git_submodules: True
 ```
