@@ -61,7 +61,7 @@ Some extensions, like [Elastica](https://www.mediawiki.org/wiki/Extension:Elasti
 ```yaml
   - name: Elastica
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Elastica.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     composer_merge: True
 ```
 
@@ -74,7 +74,7 @@ Some extensions, perhaps currently only [Visual Editor](https://www.mediawiki.or
 ```yaml
   - name: VisualEditor
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     git_submodules: True
 ```
 

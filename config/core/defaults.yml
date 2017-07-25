@@ -112,6 +112,8 @@ do_cleanup_sql_backup: False
 sshd_config_UsePAM: "yes"
 sshd_config_PasswordAuthentication: "yes"
 
+mediawiki_default_branch: "REL1_27"
+
 #
 # FILE MODES, OWNERS, GROUPS
 #
