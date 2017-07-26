@@ -109,8 +109,6 @@ do_cleanup_sql_backup: False
 sshd_config_UsePAM: "yes"
 sshd_config_PasswordAuthentication: "yes"
 
-<<<<<<< 2577c67f960f3c9630db7cdc34b22f97ddd76940
-
 #
 # Software versions
 #
@@ -130,10 +128,13 @@ m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
 elasticsearch_major_version: "1.6"
 
 
-=======
+# The branch of MediaWiki to use, as well as the branch to use on many
+# extensions.
 mediawiki_default_branch: "REL1_27"
 
->>>>>>> Move all instances of REL1_27 into an easily updateable variable
+# This commit is closest to MW 1.27 release date of 28 June 2016
+m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
+
 #
 # FILE MODES, OWNERS, GROUPS
 #
