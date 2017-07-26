@@ -65,9 +65,6 @@ m_db_replication_log_file: /opt/data-meza/db_master_log_file
 m_db_replication_log_pos: /opt/data-meza/db_master_log_pos
 
 
-# Set Parsoid version.
-# This commit is closest to MW 1.27 release date of 28 June 2016
-m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
 
 meza_server_log_db: meza_server_log
 
@@ -112,7 +109,18 @@ do_cleanup_sql_backup: False
 sshd_config_UsePAM: "yes"
 sshd_config_PasswordAuthentication: "yes"
 
+
+#
+# Software versions
+#
+
+# The branch of MediaWiki to use, as well as the branch to use on many
+# extensions.
 mediawiki_default_branch: "REL1_27"
+
+# This commit is closest to MW 1.27 release date of 28 June 2016
+m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
+
 
 #
 # FILE MODES, OWNERS, GROUPS
