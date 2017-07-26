@@ -118,29 +118,28 @@ sshd_config_PasswordAuthentication: "yes"
 mediawiki_version: "1.27.2"
 
 # Branch to use on many extensions extensions and skins
-mediawiki_default_branch: "REL1_27"
+mediawiki_default_branch: "REL1_28"
 
-# This commit is closest to MW 1.27 release date of 28 June 2016
-m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
+# MediaWiki REL1_28 branch point on 2016-10-25
+# Parsoid v0.6.0 on Nov 7, 2016
+# Parsoid v0.5.3 on Oct 31, 2016
+# Parsoid v0.5.2 on May 2, 2016
+m_parsoid_version: "tags/v0.5.3"
 
 # MediaWiki 1.27 and earlier require ElasticSearch 1.6
 # MediaWiki 1.28 and higher require ElasticSearch 2.x
 # MediaWiki 1.29 and higher require ElasticSearch 5.x
-elasticsearch_major_version: "1.6"
+elasticsearch_major_version: "2.x"
 
 
 #
 # NOTIFICATIONS
 #
-server_performance_crontime: "*/10 * * * *"
-
 # at what level do we display amber colored notification
 server_performance_memory_usage_warning: "50"
 
 # same as ^ but red danger message
 server_performance_memory_usage_danger: "75"
-
-disk_space_usage_crontime: "0 1 * * *"
 
 # Icons display in Slack
 server_performance_notification_icon: https://github.com/enterprisemediawiki/meza/raw/master/src/roles/configure-wiki/files/logo.png
@@ -153,6 +152,8 @@ disk_space_usage_notification_icon: https://github.com/enterprisemediawiki/meza/
 #
 # Misc cron times
 #
+disk_space_usage_crontime: "0 1 * * *"
+server_performance_crontime: "*/10 * * * *"
 
 # Cleanup upload stash (temporary files) daily at 6pm
 clean_upload_stash_crontime: "0 18 * * *"
