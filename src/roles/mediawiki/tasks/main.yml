@@ -69,7 +69,22 @@
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git
     dest: "{{ m_mediawiki }}/skins/Vector"
     version: "{{ mediawiki_default_branch }}"
-
+# More default skins
+- name: Ensure Modern skin installed
+  git:
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Modern.git
+    dest: "{{ m_mediawiki }}/skins/Modern"
+    version: "{{ mediawiki_default_branch }}"
+- name: Ensure ColognBlue skin installed
+  git:
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git
+    dest: "{{ m_mediawiki }}/skins/CologneBlue"
+    version: "{{ mediawiki_default_branch }}"
+- name: Ensure MonoBook skin installed
+  git:
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/MonoBook.git
+    dest: "{{ m_mediawiki }}/skins/MonoBook"
+    version: "{{ mediawiki_default_branch }}"
 
 
 #

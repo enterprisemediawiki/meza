@@ -46,7 +46,7 @@ list:
 
   - name: SemanticCompoundQueries
     composer: "mediawiki/semantic-compound-queries"
-    version: "1.1.0"
+    version: "~1.1"
   - name: SubPageList
     composer: "mediawiki/sub-page-list"
     version: "~1.1"
@@ -186,7 +186,10 @@ list:
   - name: WhoIsWatching
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/WhoIsWatching.git
     version: "{{ mediawiki_default_branch }}"
+<<<<<<< 86842f9a7796ec4170a824b07373aebe945ceff5
     legacy_load: true
+=======
+>>>>>>> Add 'versions' section to defaults.yml
     config: |
       $wgPageShowWatchingUsers = true;
   - name: SemanticInternalObjects
