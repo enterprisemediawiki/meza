@@ -93,6 +93,13 @@ mysql_slow_query_log_enabled: yes
 mysql_slow_query_time: "5"
 mysql_slow_query_log_file: /var/log/mariadb/slow-queries.log
 
+# Default to using the performance schema
+# But allow it to be turned OFF easily in low mem environments
+# or for high performance environments like prod
+# http://dev.mysql.com/doc/refman/5.5/en/performance-schema.html
+# https://mariadb.com/kb/en/mariadb/performance-schema-overview/
+mysql_performance_schema: "on"
+
 # If using a load balancer not managed by meza, on what port should you
 # access Parsoid and MediaWiki internal services?
 load_balancer_unmanaged_parsoid_port: 8000
