@@ -69,14 +69,14 @@ $variables = array("1-min Load Avg"=>"loadavg1",
     "Jobs"=>"jobs");
 
 // Get max value of jobs, to be used for normalization
+// for small number of jobs, normalize to 100
+$jobsTemp = [ 100 ];
 while( $row = mysqli_fetch_assoc($res) ){
 
     $jobsTemp[] = floatval($row['jobs']);
 
 }
 $maxJobsValue = max($jobsTemp);
-// for small number of jobs, normalize to 100
-if( $maxJobsValue < 100 ){ $maxJobsValue = 100; }
 
 mysqli_data_seek($res, 0);
 
@@ -117,13 +117,13 @@ while( $row = mysqli_fetch_assoc($res) ){
 
 mysqli_close($mysqli);
 
-
-foreach( $variables as $varname => $varvalue ){
-
-    $data[] = array(
-        'key'       => $varname,                // e.g. loadavg1
-        'values'    => $tempdata[$varvalue],    // e.g. {"x":1384236000000,"y":0.1},{"x":1384256000000,"y":0.2},etc
-    );
+if ( isset( $tempdata ) ) {
+	foreach( $variables as $varname => $varvalue ){
+		$data[] = array(
+			'key'       => $varname,                // e.g. loadavg1
+			'values'    => $tempdata[$varvalue],    // e.g. {"x":1384236000000,"y":0.1},{"x":1384256000000,"y":0.2},etc
+		);
+	}
 }
 
 
@@ -214,11 +214,13 @@ while( $row = mysqli_fetch_assoc($res) ){
 
 mysqli_close($mysqli);
 
-foreach( $variables as $varname => $varvalue ){
-    $data[] = array(
-        'key'       => $varname,                // e.g. loadavg1
-        'values'    => $tempdata[$varvalue],    // e.g. {"x":1384236000000,"y":0.1},{"x":1384256000000,"y":0.2},etc
-    );
+if ( isset( $tempdata ) ) {
+    foreach( $variables as $varname => $varvalue ){
+        $data[] = array(
+            'key'       => $varname,                // e.g. loadavg1
+            'values'    => $tempdata[$varvalue],    // e.g. {"x":1384236000000,"y":0.1},{"x":1384256000000,"y":0.2},etc
+        );
+    }
 }
 
 /*
