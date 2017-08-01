@@ -1,0 +1,34 @@
+---
+# Time to run server-performance.sh script
+server_performance_crontime: "*/10 * * * *"
+
+# When to run disk-space-usage script
+disk_space_usage_crontime: "0 1 * * *"
+
+# Run all jobs on all wikis at 22:00 each night
+run_all_jobs_crontime: "0 22 * * *"
+
+# Restart Parsoid periodically on parsoid-servers
+parsoid_restart_crontime: "0 2 * * *"
+
+
+#
+# Frequent job running
+#
+
+# How often to run small frequent job runs
+run_jobs_freq_crontime: "*/3 * * * *"
+
+# Max CPU and IO load, above which the script won't run; default 50%
+run_jobs_freq_maxload: "100"
+
+# Max number of jobs to run PER WIKI; default ~ infinity
+run_jobs_freq_maxjobs: "200000"
+
+# Max execution time for the script; allow script to run full 3 minutes
+run_jobs_freq_totalmaxtime: "180"
+
+# Max execution time PER WIKI; allow a wiki to run the full 3 minutes
+run_jobs_freq_maxtime: "180"
+
+

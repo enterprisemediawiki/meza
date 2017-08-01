@@ -1,0 +1,25 @@
+---
+- name: Get individual wikis from controller config
+  find:
+    paths: "{{ m_local_public }}/wikis/"
+    file_type: directory
+  register: wiki_dirs
+  delegate_to: localhost
+
+# FIXME #813: should maybe lock DB first
+# - name: Set wiki read-only
+# - name: Lock DB
+
+- name: Remove any existing database dumps
+  file:
+    path: "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
+    state: absent
+  # see role "mediawiki" for explanation of filters below
+  with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+- name: Dump wiki databases
+  mysql_db:
+    state: dump
+    name: "wiki_{{ item }}"
+    target: "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
+  with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"

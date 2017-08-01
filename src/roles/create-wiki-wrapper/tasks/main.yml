@@ -1,0 +1,40 @@
+---
+
+# Perform checks on user input
+# FIXME #179: This isn't working: spaces and dashes getting through
+# FIXME #298: Dashes break MariaDB. Figure out how to allow them.
+- assert:
+    that: 'wiki_id is search("[a-zA-Z0-9_]")'
+    msg: "Your wiki ID may only include letters, numbers and underscores"
+
+- name: Sync configurations (FIXME do we need this)
+  include_role:
+    name: sync-configs
+
+- name: Add wiki to configuration
+  include_role:
+    name: configure-wiki
+
+- name: Re-sync config to app servers
+  include_role:
+    name: sync-configs
+
+- name: Use verify-wiki to make sure new wiki is setup
+  include_role:
+    name: verify-wiki
+
+# Wikis are totally built at this point, but SMW and search need rebuilding
+# Not totally sure SMW-rebuild is necessary, but maybe for imported pages?
+# FIXME #811: Ensure no issues with this on multi-server environments and when
+#             controller is NOT an app server
+- name: (Re-)build search index for each wiki
+  shell: "bash {{ m_deploy }}/elastic-rebuild-all.sh {{ wiki_id }}"
+  run_once: true
+  tags:
+  - search-index
+
+- name: Rebuild SemanticMediaWiki data for each wiki
+  shell: "bash {{ m_deploy }}/smw-rebuild-all.sh {{ wiki_id }}"
+  run_once: true
+  tags:
+  - smw-data

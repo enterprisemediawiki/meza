@@ -1,0 +1,363 @@
+---
+list:
+
+  - name: Semantic MediaWiki
+    composer: "mediawiki/semantic-media-wiki"
+    version: "2.5.3"
+    config: |
+      // Enable Semantic MediaWiki semantics
+      enableSemantics( $wikiId );
+
+      // Semantic MediaWiki Settings
+      $smwgQMaxSize = 5000;
+
+      // allows adding semantic properties to Templates themselves
+      // (not just on pages via templates).
+      $smwgNamespacesWithSemanticLinks[NS_TALK] = true;
+      $smwgNamespacesWithSemanticLinks[NS_TEMPLATE] = true;
+
+      // Always use DB_SLAVE for temporary table actions. Need to pick either
+      // DB_SLAVE or DB_MASTER for this, since temporary tables will either not
+      // replicate at all or won't replicate fast enough (or, even if they do
+      // technically replicate, they are only available to the session that
+      // created them, and thus they effectively don't replicate). Picking
+      // DB_SLAVE since temporary tables are effectively a read-action since
+      // they are used only for making more efficient queries.
+      $smwgLocalConnectionConf['mw.db.queryengine'] = [ 'read' => DB_SLAVE, 'write' => DB_SLAVE ];
+
+  - name: Semantic Result Formats
+    composer: "mediawiki/semantic-result-formats"
+    version: "2.4.x"
+    config: |
+      // SemanticResultFormats formats enabled (beyond defaults)
+      // These are disabled by default because they send data to external
+      // web services for rendering, which may be considered a data leak
+      // $srfgFormats[] = 'googlebar';
+      // $srfgFormats[] = 'googlepie';
+
+      // Disabled until the proper dependencies are added (PHPExcel I think)
+      // $srfgFormats[] = 'excel';
+
+      // Enables the "filtered" format. Where do we use this?
+      $srfgFormats[] = 'filtered';
+
+      // Disabled due to some issue on FOD wikis. Confirm, reenable if possible
+      // $srfgFormats[] = 'exhibit';
+
+  - name: SubPageList
+    composer: "mediawiki/sub-page-list"
+    version: "~1.1"
+  - name: Maps
+    composer: "mediawiki/maps"
+    version: "~4.1"
+
+  - name: DisplayTitle
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DisplayTitle.git
+    version: tags/1.2
+
+
+  #
+  # Extensions loaded with wfLoadExtension
+  #
+  - name: ParserFunctions
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ParserFunctions.git
+    version: REL1_27
+    config: |
+      // Also enable StringFunctions, like len, pos, sub, replace, explode
+      // https://www.mediawiki.org/wiki/Extension:StringFunctions
+      $wgPFEnableStringFunctions = true;
+  - name: ExternalData
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ExternalData.git
+    version: REL1_27
+  - name: LabeledSectionTransclusion
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/LabeledSectionTransclusion.git
+    version: REL1_27
+  - name: Cite
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Cite.git
+    version: REL1_27
+    config: |
+      $wgCiteEnablePopups = true;
+  - name: ParserFunctionHelper
+    repo: https://github.com/enterprisemediawiki/ParserFunctionHelper.git
+    version: master
+  - name: CharInsert
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CharInsert.git
+    version: REL1_27
+  - name: PageForms
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PageForms.git
+    version: tags/4.1.1
+  - name: DismissableSiteNotice
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DismissableSiteNotice.git
+    version: REL1_27
+  - name: WikiEditor
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/WikiEditor.git
+    version: REL1_27
+    config: |
+      $wgDefaultUserOptions['usebetatoolbar'] = 1;
+      $wgDefaultUserOptions['usebetatoolbar-cgd'] = 1;
+      $wgDefaultUserOptions['wikieditor-publish'] = 1; # displays publish button
+      $wgDefaultUserOptions['wikieditor-preview'] = 1; # Displays the Preview and Changes tabs
+
+  # consider replacing with https://gerrit.wikimedia.org/r/mediawiki/extensions/SyntaxHighlight_Pygments.git
+  - name: SyntaxHighlight_GeSHi
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SyntaxHighlight_GeSHi.git
+    version: REL1_27
+    composer_merge: True
+  - name: InputBox
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/InputBox.git
+    version: REL1_27
+  - name: ReplaceText
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ReplaceText.git
+    version: REL1_27
+  - name: Interwiki
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Interwiki.git
+    version: REL1_27
+    config: |
+      $wgGroupPermissions['sysop']['interwiki'] = true;
+  - name: YouTube
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/YouTube.git
+    version: REL1_27
+  - name: UniversalLanguageSelector
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UniversalLanguageSelector.git
+    version: REL1_27
+    config: |
+      // Disable international phoenetic alphabet selector that breaks searching for
+      // English users. From docs:
+      //
+      // $wgULSIMEEnabled - Disable the input methods feature for all users by
+      // default. Can still be enabled manually by the user.
+      //
+      // Refs:
+      //
+      // https://www.mediawiki.org/wiki/Help:Extension:UniversalLanguageSelector/Input_methods
+      // https://www.mediawiki.org/wiki/Extension:UniversalLanguageSelector
+      $wgULSIMEEnabled = false;
+
+  - name: VisualEditor
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git
+    version: REL1_27
+    git_submodules: True
+    config: |
+      // Parsoid servers are defined based upon Ansible hosts file and thus
+      // cannot be easily added to base-extensions.yml. As such, VisualEditor config
+      // is included directly in LocalSettings.php.j2
+  - name: Elastica
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Elastica.git
+    version: REL1_27
+    composer_merge: True
+  - name: Thanks
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Thanks.git
+    version: REL1_27
+    config: |
+      $wgThanksConfirmationRequired = false;
+  - name: CollapsibleVector
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CollapsibleVector
+    version: REL1_27
+  - name: SimpleMathJax
+    repo: https://github.com/jamesmontalvo3/SimpleMathJax.git
+    version: e94afaffcdde8d926b166fdd166162f9519beaa1
+    legacy_load: True
+  - name: ImageMap
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ImageMap
+    version: REL1_27
+  # Extension:PdfHandler (breaks on very large PDFs)
+  # https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler
+  # // Location of PdfHandler dependencies
+  # // $wgPdfProcessor = '/usr/bin/gs'; // installed via yum
+  # // $wgPdfPostProcessor = '/usr/local/bin/convert'; // built from source
+  # // $wgPdfInfo = '/usr/local/bin/pdfinfo'; // pre-built binaries installed
+
+
+
+
+  #
+  # Extensions loaded with legacy require_once method
+  #
+  - name: StringFunctionsEscaped
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/StringFunctionsEscaped.git
+    version: REL1_27
+    legacy_load: true
+  - name: WhoIsWatching
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/WhoIsWatching.git
+    version: REL1_27
+    legacy_load: true
+    config: |
+      $wgPageShowWatchingUsers = true;
+  - name: SemanticInternalObjects
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticInternalObjects.git
+    version: REL1_27
+    legacy_load: true
+  - name: SemanticCompoundQueries
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticCompoundQueries.git
+    version: REL1_27
+    legacy_load: true
+  - name: SemanticDrilldown
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticDrilldown.git
+    version: REL1_27
+    legacy_load: true
+  - name: Arrays
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Arrays.git
+    version: REL1_27
+    legacy_load: true
+  - name: TalkRight
+    repo: https://github.com/enterprisemediawiki/TalkRight.git
+    version: extreg
+    legacy_load: true
+  - name: AdminLinks
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/AdminLinks.git
+    version: REL1_27
+    legacy_load: true
+    config: |
+      $wgGroupPermissions['sysop']['adminlinks'] = true;
+  - name: BatchUserRights
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/BatchUserRights.git
+    version: REL1_27
+    legacy_load: true
+  - name: HeaderTabs
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/HeaderTabs.git
+    version: tags/1.1
+    legacy_load: true
+    config: |
+      $wgHeaderTabsEditTabLink = false;
+      $wgHeaderTabsRenderSingleTab = true;
+  - name: CopyWatchers
+    repo: https://github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git
+    version: master
+  - name: Wiretap
+    repo: https://github.com/enterprisemediawiki/Wiretap.git
+    version: master
+  - name: ApprovedRevs
+    repo: https://github.com/jamesmontalvo3/MediaWiki-ApprovedRevs.git
+    version: master
+    legacy_load: true
+    config: |
+      $egApprovedRevsAutomaticApprovals = false;
+  - name: ImagesLoaded
+    repo: https://github.com/enterprisemediawiki/ImagesLoaded.git
+    version: master
+  - name: MasonryMainPage
+    repo: https://github.com/enterprisemediawiki/MasonryMainPage.git
+    version: master
+  - name: WatchAnalytics
+    repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
+    version: master
+    legacy_load: true
+    config: |
+      $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
+  - name: Variables
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Variables.git
+    version: REL1_27
+    legacy_load: true
+  - name: ContributionScores
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ContributionScores.git
+    version: REL1_27
+    legacy_load: true
+    config: |
+      // Exclude Bots from the reporting - Can be omitted.
+      $wgContribScoreIgnoreBots = true;
+
+      // Exclude Blocked Users from the reporting - Can be omitted.
+      $wgContribScoreIgnoreBlockedUsers = true;
+
+      // Use real user names when available - Can be omitted. Only for MediaWiki 1.19 and later.c
+      $wgContribScoresUseRealName = true;
+
+      // Set to true to disable cache for parser function and inclusion of table.
+      $wgContribScoreDisableCache = false;
+
+      // Each array defines a report - 7,50 is "past 7 days" and "LIMIT 50" - Can be omitted.
+      $wgContribScoreReports = array(
+        array(7,50),
+        array(30,50),
+        array(0,50)
+      );
+
+
+  - name: PipeEscape
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PipeEscape.git
+    version: REL1_27
+    legacy_load: true
+  - name: CirrusSearch
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CirrusSearch.git
+    version: REL1_27
+    legacy_load: true
+    config: |
+      // CirrusSearch cluster(s) are defined based upon Ansible hosts file and thus
+      // cannot be easily added to base-extensions.yml. As such, CirrusSearch config
+      // is included directly in LocalSettings.php.j2
+  - name: Echo
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Echo.git
+    version: REL1_27
+    legacy_load: true
+    config: |
+      $wgEchoEmailFooterAddress = $wgPasswordSender;
+  - name: UploadWizard
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/UploadWizard
+    version: REL1_27
+    legacy_load: true
+    config: |
+      // Needed to make UploadWizard work in IE, see bug 39877
+      // See also: https://www.mediawiki.org/wiki/Manual:$wgApiFrameOptions
+      $wgApiFrameOptions = 'SAMEORIGIN';
+
+      // Use UploadWizard by default in navigation bar
+      $wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard";
+      $wgUploadWizardConfig = array(
+        'debug' => false,
+        'autoCategory' => 'Uploaded with UploadWizard',
+        'feedbackPage' => 'Project:UploadWizard/Feedback',
+        'altUploadForm' => 'Special:Upload',
+        'fallbackToAltUploadForm' => false,
+        'enableFormData' => true,  # Should FileAPI uploads be used on supported browsers?
+        'enableMultipleFiles' => true,
+        'enableMultiFileSelect' => true,
+        'tutorial' => array('skip' => true),
+        'fileExtensions' => $wgFileExtensions, //omitting this can cause errors
+        'licensing' => array(
+          // alternatively, use "thirdparty". Set in postLocalSettings.php like:
+          // $wgUploadWizardConfig['licensing']['defaultType'] = 'thirdparty';
+          'defaultType' => 'ownwork',
+
+          'ownWork' => array(
+            'type' => 'or',
+            // Use [[Project:General disclaimer]] instead of default [[Template:Generic]]
+            'template' => 'Project:General disclaimer',
+            'defaults' => array( 'generic' ),
+            'licenses' => array( 'generic' )
+          ),
+
+          'thirdParty' => array(
+            'type' => 'or',
+            'defaults' => array( 'generic' ),
+            'licenseGroups' => array(
+              array(
+                'head' => 'mwe-upwiz-license-generic-head',
+                'template' => 'Project:General disclaimer', // again, use General disclaimer
+                'licenses' => array( 'generic' ),
+              ),
+            )
+          ),
+        ),
+      );
+
+  - name: DataTransfer
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DataTransfer.git
+    version: tags/0.6.2
+    legacy_load: true
+
+  - name: PageImporter
+    repo: https://github.com/enterprisemediawiki/PageImporter.git
+    version: master
+    legacy_load: True
+  - name: SemanticMeetingMinutes
+    repo: https://github.com/enterprisemediawiki/SemanticMeetingMinutes.git
+    version: master
+    legacy_load: True
+  - name: HeaderFooter
+    repo: https://github.com/enterprisemediawiki/HeaderFooter.git
+    version: master
+    legacy_load: True
+  - name: NumerAlpha
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/NumerAlpha.git
+    version: master
+    legacy_load: True

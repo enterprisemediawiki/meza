@@ -1,0 +1,75 @@
+---
+
+# inputs:
+#   wiki_id
+#   wiki_name
+#
+# all this role needs to do is put a directory named whatever wiki_id is at
+# /opt/conf-meza/public/wikis/<wiki_id>
+#
+# This role DOES NOT actually deploy the wiki to app servers or database
+# servers. It simply puts it into configuration. Subsequently it can be
+# deployed.
+#
+# This directory needs to have some minimum requirements:
+#   logo.png (is .jpg also allowed?)
+#   original.png (is .jpg also allowed? Is this really required?)
+#   favicon.ico
+#   preLocalSettings.php
+#   postLocalSettings.php
+
+- name: Ensure wiki directory exists in config
+  file:
+    path: "/opt/conf-meza/public/wikis/{{ wiki_id }}"
+    state: directory
+    owner: apache
+    group: apache
+    mode: 0755
+  delegate_to: localhost
+  run_once: true
+
+# This will make sure the wiki has some required files, but if they exist
+# already it will not overwrite them.
+- name: Ensure base files are in place (but do not overwrite)
+  copy:
+    src: "files/{{ item }}"
+    dest: "/opt/conf-meza/public/wikis/{{ wiki_id }}/{{ item }}"
+    # force=no: this will not overwrite
+    force: no
+    owner: apache
+    group: apache
+    mode: 0755
+  with_items:
+    - favicon.ico
+    - logo.png
+  delegate_to: localhost
+  run_once: true
+
+- name: Ensure wiki pre/post settings directories exists in config
+  file:
+    path: "/opt/conf-meza/public/wikis/{{ wiki_id }}/{{ item }}"
+    state: directory
+    owner: apache
+    group: apache
+    mode: 0755
+  delegate_to: localhost
+  run_once: true
+  with_items:
+    - preLocalSettings.d
+    - postLocalSettings.d
+
+- name: Ensure base templates are present (but do not overwrite)
+  template:
+    src: "templates/{{ item }}.j2"
+    dest: "/opt/conf-meza/public/wikis/{{ wiki_id }}/{{ item }}"
+    # force=no: Non-default for templates. Destination files will not be overwritten
+    force: no
+    owner: apache
+    group: apache
+    mode: 0755
+  with_items:
+    - preLocalSettings.d/base.php
+    - preLocalSettings.d/README.md
+    - postLocalSettings.d/README.md
+  delegate_to: localhost
+  run_once: true

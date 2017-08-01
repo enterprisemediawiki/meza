@@ -1,0 +1,120 @@
+global
+	log 127.0.0.1 local2
+	# need logging for letsencrypt if setup ???
+	chroot /var/lib/haproxy
+	stats socket /run/haproxy-admin.sock mode 660 level admin
+	stats timeout 30s
+	user haproxy
+	group haproxy
+	daemon
+	maxconn 2048
+	tune.ssl.default-dh-param 2048
+
+	# Default SSL material locations
+	ca-base /etc/ssl/certs
+	crt-base /etc/ssl/private
+
+	# Default ciphers to use on SSL-enabled listening sockets.
+	# For more information, see ciphers(1SSL). This list is from:
+	#  https://hynek.me/articles/hardening-your-web-servers-ssl-ciphers/
+	ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS
+	ssl-default-bind-options no-sslv3
+
+
+	# Apache httpd.conf settings regarding SSL which we should verify if they
+	# need to be included somehow here.
+	#
+	# SSLProtocol             all -SSLv3 -TLSv1
+	# SSLCipherSuite          ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256
+	# SSLHonorCipherOrder     on
+	# SSLCompression          off
+	# #SSLSessionTickets       off # not available until httpd 2.4.11
+
+	# # OCSP Stapling
+	# SSLUseStapling          on
+	# SSLStaplingResponderTimeout 5
+	# SSLStaplingReturnResponderErrors off
+	# SSLStaplingCache        shmcb:/var/run/ocsp(128000)
+
+
+defaults
+	log	global
+	mode	http
+	option	httplog
+	option	dontlognull
+	timeout connect 5000
+	timeout client  50000
+	timeout server  50000
+	# errorfile 400 /etc/haproxy/errors/400.http
+	# errorfile 403 /etc/haproxy/errors/403.http
+	# errorfile 408 /etc/haproxy/errors/408.http
+	errorfile 500 /etc/haproxy/errors/500.http
+	# errorfile 502 /etc/haproxy/errors/502.http
+	# errorfile 503 /etc/haproxy/errors/503.http
+	# errorfile 504 /etc/haproxy/errors/504.http
+	option forwardfor
+	option http-server-close
+
+frontend www-http
+	bind *:80
+	reqadd X-Forwarded-Proto:\ http
+	default_backend www-backend
+
+frontend www-https
+	bind *:443 ssl crt /etc/haproxy/certs/meza.pem
+	reqadd X-Forwarded-Proto:\ https
+	# Keep letsencrypt stuff here for now. Probably add it back later.
+	# acl letsencrypt-acl path_beg /.well-known/acme-challenge/
+	# use_backend letsencrypt-backend if letsencrypt-acl
+	default_backend www-backend
+
+backend www-backend
+	redirect scheme https if !{ ssl_fc }
+	{% for host in groups['app-servers'] -%}
+		{%- if host == inventory_hostname -%}
+			server apache{{ loop.index }} 127.0.0.1:8080 check
+		{%- else -%}
+			server apache{{ loop.index }} {{ host }}:8080 check
+		{%- endif %}
+
+	{% endfor %}
+
+{% if m_setup_php_profiling %}
+listen php-profiling
+	bind *:8088
+	{% for host in groups['app-servers'] -%}
+		server profiling{{ loop.index }} {{ host }}:8089 check
+	{% endfor %}
+{% endif %}
+
+listen parsoid-internal
+	bind *:8001
+	{% for host in groups['parsoid-servers'] -%}
+		server parsoid{{ loop.index }} {{ host }}:8000 check
+	{% endfor %}
+
+
+listen mediawiki-internal
+	bind *:8081
+	{% for host in groups['app-servers'] -%}
+		{%- if host == inventory_hostname -%}
+			server mediawiki{{ loop.index }} 127.0.0.1:8080 check
+		{%- else -%}
+			server mediawiki{{ loop.index }} {{ host }}:8080 check
+		{%- endif %}
+
+	{% endfor %}
+
+{% if enable_haproxy_stats %}
+listen stats
+	bind *:1936 ssl crt /etc/haproxy/certs/meza.pem
+	stats enable
+	stats hide-version
+	stats realm Haproxy\ Statistics
+	stats uri /haproxy
+	stats auth {{ haproxy_stats_user }}:{{ haproxy_stats_password }}
+	stats refresh 30s
+{% endif %}
+
+# backend letsencrypt-backend
+# 	server letsencrypt 127.0.0.1:54321

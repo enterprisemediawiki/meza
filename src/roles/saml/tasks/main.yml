@@ -1,0 +1,57 @@
+---
+
+- name: Ensure SimpleSamlPhp (PHP SAML library) installed
+  git:
+    repo: https://github.com/simplesamlphp/simplesamlphp.git
+    dest: "{{ m_simplesamlphp_path }}"
+    version: "master"
+  tags:
+    - latest
+
+- name: Ensure SimpleSamlAuth (MediaWiki extension) installed
+  git:
+    repo: https://github.com/jornane/mwSimpleSamlAuth.git
+    dest: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
+    
+    # Use hash for now, until version greater than v0.7 is released that fixes
+    # issues with MW 1.27 user creation.
+    # Ref: https://github.com/jornane/mwSimpleSamlAuth/issues/31#issuecomment-302759940
+    version: "2e0e7b7b6d08de2d97741a0561ea4a6b3c58d4f9"
+  tags:
+    - latest
+
+- name: Ensure simplesamlphp dependencies in place
+  composer:
+    command: install
+    working_dir: "{{ m_simplesamlphp_path }}"
+
+- name: Ensure config files in place
+  template:
+    src: "{{ item.filename }}.j2"
+    dest: "{{ item.dest_path }}/{{ item.filename }}"
+  with_items:
+
+    # Config files for SimpleSamlPhp (PHP SAML library)
+    - filename: "config.php"
+      dest_path: "{{ m_simplesamlphp_path }}/config"
+    - filename: "saml20-idp-remote.php"
+      dest_path: "{{ m_simplesamlphp_path }}/metadata"
+    - filename: "authsources.php"
+      dest_path: "{{ m_simplesamlphp_path }}/config"
+
+    # Config files for SimpleSamlAuth (MediaWiki extension)
+    - filename: "samlLocalSettings.php"
+      dest_path: "{{ m_deploy }}"
+
+    # Config file used by MW extension + any other PHP app needing auth
+    # (landing page, admin functions, etc)
+    - filename: "SAMLConfig.php"
+      dest_path: "{{ m_deploy }}"
+
+- name: Ensure NonMediaWikiSimpleSamlAuth.php in place
+  copy:
+    src: files/NonMediaWikiSimpleSamlAuth.php
+    dest: "{{ m_htdocs }}/NonMediaWikiSimpleSamlAuth.php"
+    owner: root
+    group: root
+    mode: 0755

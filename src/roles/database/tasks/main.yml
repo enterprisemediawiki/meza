@@ -1,0 +1,30 @@
+---
+# Variable configuration.
+- include: variables.yml
+
+# Setup/install tasks.
+- include: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+  static: no
+
+- include: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+  static: no
+
+- name: Check if MySQL packages were installed.
+  set_fact:
+    mysql_install_packages: "{{ (rh_mysql_install_packages is defined and rh_mysql_install_packages.changed) or (deb_mysql_install_packages is defined and deb_mysql_install_packages.changed) }}"
+
+# Configure MySQL.
+- include: configure.yml
+- include: secure-installation.yml
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- include: databases.yml
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- include: users.yml
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- include: replication.yml
+  when: docker_skip_tasks is not defined or not docker_skip_tasks

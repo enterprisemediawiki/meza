@@ -1,0 +1,25 @@
+---
+# vars:
+#   cleanup_wiki: "<some wiki id>"
+
+- name: "SQL backup files for {{ cleanup_wiki }} _PRIOR TO_ cleanup"
+  shell: "ls {{ m_backups }}/{{ env }}/{{ cleanup_wiki }} -al"
+  register: ls_sql_backup
+  delegate_to: "{{ groups['backup-servers'][0] }}"
+
+- debug: { var: ls_sql_backup }
+
+- name: "Clean out all but the latest SQL backup file for {{ cleanup_wiki }} IF DESIRED"
+  shell: |
+    path_to_files="{{ m_backups }}/{{ env }}/{{ cleanup_wiki }}"
+    latest_file_path=$(find $path_to_files -maxdepth 1 -type f -iname "*.sql" | sort -r | head -n +1)
+    latest_file=$(basename $latest_file_path)
+    find $path_to_files -type f ! -name "$latest_file" -delete
+  delegate_to: "{{ groups['backup-servers'][0] }}"
+
+- name: "SQL backup files for {{ cleanup_wiki }} _AFTER_ cleanup"
+  shell: "ls {{ m_backups }}/{{ env }}/{{ cleanup_wiki }} -al"
+  register: ls_sql_backup
+  delegate_to: "{{ groups['backup-servers'][0] }}"
+
+- debug: { var: ls_sql_backup }

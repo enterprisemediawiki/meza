@@ -1,0 +1,14 @@
+---
+
+- hosts: app-servers
+  become: yes
+  roles:
+    - set-vars
+    - create-wiki-wrapper
+
+
+- hosts: parsoid-servers
+  become: yes
+  roles:
+    - set-vars
+    - parsoid-settings

@@ -1,0 +1,9 @@
+[elasticsearch-{{ elasticsearch_major_version }}]
+name=Elasticsearch repository for {{ elasticsearch_major_version }} packages
+baseurl=http://packages.elastic.co/elasticsearch/{{ elasticsearch_major_version }}/centos
+gpgcheck=1
+gpgkey=http://packages.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+{% if elasticsearch_proxy_host is defined and elasticsearch_proxy_port is defined %}
+proxy=http://{{ elasticsearch_proxy_host }}:{{elasticsearch_proxy_port}}
+{% endif %}

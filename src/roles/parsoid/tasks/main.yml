@@ -1,0 +1,56 @@
+---
+# Setup paroid user
+
+# Get Parsoid
+#
+# Due to #149 (VE doesn't allow image tags) we set force:yes so this repo's
+# working directory is wiped out on each run. Then We can immediately patch
+# the repo in the following step (optionally, if we want <img> tags)
+- name: Get Parsoid repository
+  git:
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/services/parsoid
+    dest: "{{ m_parsoid_path }}"
+    version: "{{ m_parsoid_version }}"
+    force: yes
+
+# FIXME #149: Get MW-core and Parsoid patched so this isn't required anymore
+- name: Patch Parsoid so it allows image tags
+  shell: "sed -i -e 's/JSUtils.deepFreeze(WikitextConstants);/WikitextConstants.Sanitizer.TagWhiteList.add( \"IMG\" );\\nJSUtils.deepFreeze(WikitextConstants);/' /etc/parsoid/lib/config/WikitextConstants.js"
+  when: allow_image_tags is defined and allow_image_tags
+
+- name: Ensure parsoid group exists
+  group:
+    name: parsoid
+    state: present
+
+- name: Ensure parsoid user exists
+  user:
+    name: parsoid
+    group: parsoid
+    createhome: no
+    append: yes
+
+- name: Ensure parsoid directory permissions
+  file:
+    path: "{{ m_parsoid_path }}"
+    state: directory
+    mode: 0755
+    owner: parsoid
+    group: parsoid
+    recurse: no
+
+# I think I read somewhere that there was a bug in Ansible that made it so you
+# had to separate "present" and "latest" states...couldn't just put "latest",
+# but running both takes a lot of time.
+# - name: Ensure Parsoid dependencies installed
+#   npm:
+#     path: "{{ m_parsoid_path }}"
+#     state: present
+
+- name: Ensure Parsoid dependencies are latest
+  npm:
+    path: "{{ m_parsoid_path }}"
+    state: latest
+  tags:
+    - latest
+    - parsoid-deps

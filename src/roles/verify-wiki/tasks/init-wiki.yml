@@ -1,0 +1,25 @@
+---
+
+
+# Import pages required for SemanticMeetingMinutes and rebuild recent changes
+# - name: import pages for SemanticMeetingMinutes
+#   shell: >
+#     WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/importDump.php" --report --debug < {{ m_mediawiki }}/extensions/SemanticMeetingMinutes/ImportFiles/import.xml
+#   run_once: true
+- name: Import all pages registered with PageImporter (e.g. SemanticMeetingMinutes)
+  shell: >
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/extensions/PageImporter/importPages.php"
+  run_once: True
+
+- name: rebuildrecentchanges.php
+  shell: >
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/rebuildrecentchanges.php"
+  run_once: true
+
+# Create an admin user for Demo Wiki only if the wiki was just created
+- name: Create "Admin" user on Demo Wiki
+  shell: >
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/createAndPromote.php" --force --sysop --bureaucrat Admin adminpass
+  run_once: true
+  when: wiki_id == "demo"
+

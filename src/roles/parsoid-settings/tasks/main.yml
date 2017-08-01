@@ -1,0 +1,24 @@
+---
+
+- name: Ensure localsettings.js present and up-to-date
+  template:
+    src: localsettings.js.j2
+    dest: "{{ m_parsoid_path }}/localsettings.js"
+  notify:
+    - restart parsoid
+
+- name: Ensure /etc/init.d/parsoid configured
+  template:
+    src: parsoid.initd.sh.j2
+    dest: /etc/init.d/parsoid
+    mode: 0755
+  notify:
+    - reload systemd
+    - restart parsoid
+
+- name: Enable parsoid service
+  service:
+    name: parsoid
+    state: started
+    enabled: yes
+  when: docker_skip_tasks is not defined or not docker_skip_tasks

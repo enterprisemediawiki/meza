@@ -1,0 +1,14 @@
+---
+
+- name: restart haproxy
+  service:
+    name: haproxy
+    state: restarted
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- name: restart rsyslog
+  service:
+    name: rsyslog
+    state: restarted
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+

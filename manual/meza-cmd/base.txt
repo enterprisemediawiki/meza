@@ -1,0 +1,29 @@
+Mediawiki EZ Admin
+
+Usage: meza COMMAND [directives]
+
+To setup a multi-server environment, do:
+
+$ meza setup env # Setup the environment, following prompts
+# Edit config as required:
+$ sudo vi /opt/conf-meza/secret/<env-name>/hosts
+$ sudo vi /opt/conf-meza/secret/<env-name>/secret.yml
+$ sudo meza deploy <env-name>
+
+Commands    Directives           Description
+---------------------------------------------------------------
+install     dev-networking       Setup networking on VM
+            monolith             Install server on this machine
+            docker               Install Docker (CentOS only)
+deploy      <environment name>   Deploy your server
+setup       env                  Setup an environment
+            dev                  Setup dev features (Git, FTP)
+create      wiki                 Create a wiki
+            wiki-promptless      Create a wiki without prompts
+backup      <environment name>   Create a backup of an env
+docker      run                  (experimental) Start container
+            exec                 Execute command on container
+
+Every command has directives. If you run any command without
+directives it will provide help for that command.
+

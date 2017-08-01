@@ -1,0 +1,72 @@
+<?php
+
+// Server path
+$blenderServer = "https://{{ wiki_app_fqdn }}/";
+
+// Script path
+$blenderScriptPath = '/WikiBlender';
+
+{% if primary_wiki_id is defined %}
+// If there is a prime wiki, use its favicon as the landing page favicon
+$primeWiki = '{{ primary_wiki_id }}';
+$blenderFavicon = "/wikis/{{ primary_wiki_id }}/config/favicon.ico";
+{% endif %}
+
+// Location of wikis directory
+$blenderWikisDir = '{{ m_htdocs }}/wikis';
+
+//
+// Everything above is standard for all meza. This file has server-specific settings.
+//
+
+// Title for the top of the landing page
+$blenderTitle = "{{ blender_landing_page_title }}";
+
+// Title for top-row wikis
+{% if not blender_header_wiki_title %}
+$blenderHeaderWikiTitle = false;
+{% else %}
+$blenderHeaderWikiTitle = "{{ blender_header_wiki_title }}";
+{% endif %}
+
+// Wiki IDs to put in the top row
+$blenderHeaderWikis = array();
+{% for wiki in blender_header_wikis %}
+$blenderHeaderWikis[] = "{{ wiki }}";
+{% endfor %}
+
+// Title for middle-row wikis. All wiki IDs not in top- or bottom-row
+// automatically go in middle row.
+{% if not blender_middle_wiki_title %}
+	$blenderMiddleWikiTitle = false;
+{% else %}
+	$blenderMiddleWikiTitle = "{{ blender_middle_wiki_title }}";
+{% endif %}
+
+
+// Title for bottom-row wikis
+{% if not blender_footer_wiki_title %}
+	$blenderFooterWikiTitle = false;
+{% else %}
+	$blenderFooterWikiTitle = "{{ blender_footer_wiki_title }}";
+{% endif %}
+
+
+// Wiki IDs to put in the bottom row
+$blenderFooterWikis = array();
+{% for wiki in blender_footer_wikis %}
+  $blenderFooterWikis[] = "{{ wiki }}";
+{% endfor %}
+
+// Links for the bottom of the page
+$blenderFooterLinks = array();
+{% for link in blender_footer_links %}
+  $blenderFooterLinks[] = "{{ link }}";
+{% endfor %}
+
+
+// Array of admin email addresses to display in the footer
+$blenderAdmins = array();
+{% for admin in blender_admins %}
+  $blenderAdmins['{{ admin.email }}'] = "{{ admin.name }}";
+{% endfor %}

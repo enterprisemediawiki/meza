@@ -1,0 +1,39 @@
+# mod_rewrite
+<IfModule mod_rewrite.c>
+
+    # Enable mod_rewrite engine
+    RewriteEngine on
+
+    RewriteBase /
+
+    # This is needed for Links inside MS Office documents to resolve properly
+    # when using single sign on.
+    # Ref: https://groups.google.com/forum/#!topic/simplesamlphp/LcykPSQj_IQ
+    RewriteCond %{HTTP_USER_AGENT} ms-office [NC]
+    RewriteRule ^ - [L,R=200]
+
+    # Allow access to root index.php
+    RewriteRule ^index.php(.*) - [L]
+
+    # Allow access to /wikis directory (where all wiki content and
+    # and settings are located)
+    RewriteRule ^wikis(?:/|$)(.*)$ - [L]
+
+    # Allow access to WikiBlender landing page and support files
+    RewriteRule ^WikiBlender(?:/|$)(.*)$ - [L]
+
+    # Allow access to ServerPerformance plot page and support files
+    RewriteRule ^ServerPerformance(?:/|$)(.*)$ - [L]
+
+    {% if allow_backup_downloads %}
+    # Allow access to BackupDownload function
+    RewriteRule ^BackupDownload(?:/|$)(.*)$ - [L]
+    {% endif %}
+
+    # Taken from MediaWiki.org [[Extension:Simple Farm]]
+    #
+    # Redirect virtual wiki path to physical wiki path. There
+    # can be no wiki accessible using this path.
+    RewriteRule ^(?!mediawiki(?:/|$))[^/]+(?:/(.*))?$ mediawiki/$1
+
+</IfModule>

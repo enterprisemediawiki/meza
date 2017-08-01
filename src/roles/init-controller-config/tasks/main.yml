@@ -1,0 +1,104 @@
+---
+
+# function syncConfigs () {
+
+#   if controller.local_config:
+#     cp controller.local_config app.each.local_config
+#   elif app[1].local_config:
+#     # NOTE: if a .git repo, get it so controller has repo
+#     cp app[1].local_config controller.local_config
+#     cp app[1].local_config app.each.local_config
+#   elif local_config.repo:
+#     clone repo > controller.local_config
+#     clone repo > app.each.local_config
+#   else:
+#     cp baseline controller
+#     cp baseline app.each
+
+# }
+
+# [1] This should only be run the first time (on the first app server) since on
+# subsequent passes the controller is gauranteed to have a local config.
+- name: Does controller have local config
+  stat:
+    path: "{{ m_local_public }}"
+  register: controller_local_config
+  delegate_to: localhost
+  run_once: true
+
+# If a git repo is defined use that for config
+- name: Get local config repo if set
+  git:
+    repo: "{{ local_config_repo.repo }}"
+    dest: "{{ m_local_public }}"
+    version: "{{ local_config_repo.version | default('master') }}"
+    force: "{{ local_config_repo.force | default(false) | bool }}"
+  delegate_to: localhost
+  run_once: true
+  when:
+    not controller_local_config.stat.exists
+    and local_config_repo.repo is defined
+
+# After all that, now check if controller has a local config
+# (not sure if I should reuse controller_local_config here)
+- name: Does controller have local config
+  stat:
+    path: "{{ m_local_public }}"
+  register: recheck_controller
+  delegate_to: localhost
+  run_once: true
+
+# At this point, whether a m_local directory exists on the controller or not,
+# ensure the directory exists and is configured properly
+- name: Ensure m_local_public configured on controller
+  file:
+    path: "{{ m_local_public }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+    recurse: true
+  delegate_to: localhost
+  run_once: true
+
+
+# Still no config for controller? This must be a new installation. Copy from
+# the baseline.
+- name: "Ensure m_local_public/wikis exists"
+  file:
+    path: "{{ m_local_public }}/wikis"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  delegate_to: localhost
+  run_once: true
+
+
+- name: Ensure pre/post settings directories exists in config
+  file:
+    path: "/opt/conf-meza/public/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  delegate_to: localhost
+  run_once: true
+  with_items:
+    - preLocalSettings.d
+    - postLocalSettings.d
+
+
+- name: "Ensure base files present, do NOT overwrite"
+  template:
+    src: "templates/{{ item }}.j2"
+    dest: "{{ m_local_public }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+    force: no
+  delegate_to: localhost
+  run_once: true
+  with_items:
+    - MezaLocalExtensions.yml
+    - public.yml

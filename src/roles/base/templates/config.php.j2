@@ -1,0 +1,152 @@
+<?php
+// {{ ansible_managed }}
+
+$wiki_app_fqdn = '{{ wiki_app_fqdn }}';
+
+### DIRECTORY STRUCTURE ###
+
+# meza install location
+$m_install = "{{ m_install }}";
+$m_meza = "{{ m_meza }}";
+
+# config dir
+$m_config_core = "{{ m_config_core }}";
+
+# scripts dir
+$m_scripts = "{{ m_scripts }}";
+
+# test dir
+$m_test = "{{ m_test }}";
+
+# data dir
+$m_meza_data = "{{ m_meza_data }}";
+$m_backups="{{ m_backups }}";
+$allow_backup_downloads = '{{ allow_backup_downloads }}';
+
+# Things deployed by ansible
+$m_deploy = '{{ m_deploy }}';
+
+# webserver variables
+$m_htdocs = "{{ m_htdocs }}";
+$m_mediawiki = "{{ m_mediawiki }}";
+
+# Installation configuration
+$db_master = "{{ groups['db-master'][0] }}";
+$wiki_app_db_user_name = '{{ wiki_app_db_user.name }}';
+$wiki_app_db_user_pass = '{{ wiki_app_db_user.password }}';
+
+
+$m_language = "{{ m_language }}";
+
+#
+# Logging
+#
+$m_logging_db_name = 'meza_server_log';
+$m_logging_db_host = 'localhost';
+
+
+{% if server_admins is defined %}
+#
+# Server admins only
+#
+$server_admins = array();
+{% for sadmin in server_admins %}
+$server_admins[] = '{{ sadmin }}';
+{% endfor %}
+{% endif %}
+
+{% if saml_public is defined %}
+#
+# SAML
+#
+$saml_idp_username_attr = '{{ saml_public.idp_username_attr }}';
+
+{% endif %}
+
+#
+# Downloading backups
+#
+{% if backups_environment is defined %}
+# Allow downloading backups from this environment
+$backups_environment = '{{ backups_environment }}';
+{% endif %}
+
+{% if wiki_backup_downloaders is defined %}
+# Users allowed to download specific wikis
+$wiki_backup_downloaders = array();
+{% for wiki, users in wiki_backup_downloaders.iteritems() %}
+$wiki_backup_downloaders['{{ wiki }}'] = array(
+	{% for user in users %}
+	'{{ user }}',
+	{% endfor %}
+);
+{% endfor %}
+{% endif %}
+
+{% if all_backup_downloaders is defined %}
+// users allowed ot download from all wikis
+$all_backup_downloaders = array(
+	{% for user in all_backup_downloaders %}
+	'{{ user }}',
+	{% endfor %}
+);
+{% endif %}
+
+
+#
+# CUSTOM DEPLOY VARIABLES: from secret.yml
+#
+{% if deploy_vars is defined and deploy_vars is iterable %}
+{% for key, value in deploy_vars.iteritems() %}
+{% if value is number %}
+${{ key }} = {{ value }};
+{% else %}
+${{ key }} = '{{ value }}';
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
+#
+# SERVER PERFORMANCE
+#
+{% if slack_channel_server_performance is defined %}
+# Slack channel to send server performance info. If undefined, will use webhook default
+$slack_channel_server_performance="{{ slack_channel_server_performance }}";
+{% endif %}
+
+{% if slack_webhook_token_server_performance is defined %}
+# Slack incoming webhook token for sending server performance info
+$slack_webhook_token_server_performance="{{ slack_webhook_token_server_performance }}";
+{% endif %}
+
+{% if slack_username_server_performance is defined %}
+# Slack username to display for webhook
+$slack_username_server_performance="{{ slack_username_server_performance }}";
+{% endif %}
+
+
+#
+# DISK USAGE
+#
+{% if disk_space_usage_mount_name is defined %}
+$disk_space_usage_mount_name="{{ disk_space_usage_mount_name }}";
+{% endif %}
+
+# A short name used in description when sending Slack message
+$disk_space_usage_mount_short_name="{{ disk_space_usage_mount_short_name | default('Disk') }}";
+
+{% if slack_channel_disk_usage is defined %}
+# Slack channel to send disk usage info. If undefined, will use webhook default
+$slack_channel_disk_usage="{{ slack_channel_disk_usage }}";
+{% endif %}
+
+{% if slack_webhook_token_disk_usage is defined %}
+# Slack incoming webhook token for sending disk usage info
+$slack_webhook_token_disk_usage="{{ slack_webhook_token_disk_usage }}";
+{% endif %}
+
+{% if slack_username_disk_usage is defined %}
+# Slack username to display for webhook
+$slack_username_disk_usage="{{ slack_username_disk_usage }}";
+{% endif %}

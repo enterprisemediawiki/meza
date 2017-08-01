@@ -1,0 +1,40 @@
+---
+
+# PROMPTS: setup environment
+MSG_prompt_pretext_fqdn: "Type the domain or IP address you'll use to get to your wiki and press [enter]"
+MSG_prompt_input_fqdn: "Domain or IP address: "
+
+MSG_prompt_pretext_db_pass: "Type a database password and press [enter] or leave blank to auto-generate"
+MSG_prompt_input_db_pass: "Database password: "
+
+MSG_prompt_pretext_enable_email: "Type 'true' or 'false' for whether you want your wiki to send emails"
+MSG_prompt_input_enable_email: "Send emails? true or false: "
+
+MSG_prompt_pretext_private_net_zone: "Type the private networking zone for your server and press [enter]"
+MSG_prompt_input_private_net_zone: "Private networking zone: "
+
+
+# PROMPTS: setup dev
+MSG_prompt_pretext_dev_users: "Type users who use Git separated by spaces, e.g. 'root james', and press [enter]"
+MSG_prompt_input_dev_users: "System users using Git: "
+
+MSG_prompt_pretext_dev_git_user: "Type full name of git user and press [enter]"
+MSG_prompt_input_dev_git_user: "Full name: "
+
+MSG_prompt_pretext_dev_git_user_email: "Type e-mail address of git user and press [enter]"
+MSG_prompt_input_dev_git_user_email: "E-mail: "
+
+
+# Maybe not used prompts
+MSG_prompt_mysql_root_pass: "Type your desired MySQL root password"
+MSG_prompt_db_password: "Type password for database"
+MSG_prompt_enable_email: "Type 'true' to enable email notifications, 'false' to disable"
+MSG_prompt_mw_api_domain: "Type domain or IP address of your wiki"
+MSG_prompt_server_ip_address: "Type IP address of this server"
+MSG_prompt_app_server_ips: "Type space-separated list of app-server IP addresses (or just 'localhost' if installing on one server)"
+MSG_prompt_db_server_ips: "Type space-separated list of database-server IP addresses (or just 'localhost' if DB is on app server)"
+MSG_prompt_db_slave_password: "Type the password used by replication (slave) servers"
+MSG_prompt_db_slave_id: "Each replication (slave) server needs a unique ID greater than 1. Pick a number"
+
+
+

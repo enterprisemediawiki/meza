@@ -1,0 +1,8 @@
+---
+- name: restart ntpd
+  service: name=ntpd state=restarted
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- name: restart sshd
+  service: name=sshd state=restarted
+  when: docker_skip_tasks is not defined or not docker_skip_tasks

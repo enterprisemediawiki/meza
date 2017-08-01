@@ -1,0 +1,11 @@
+---
+# handlers file for parsoid
+- name: reload systemd
+  command: systemctl daemon-reload
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- name: restart parsoid
+  service:
+    name: parsoid
+    state: restarted
+  when: docker_skip_tasks is not defined or not docker_skip_tasks

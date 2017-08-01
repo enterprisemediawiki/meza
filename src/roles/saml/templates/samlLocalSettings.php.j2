@@ -1,0 +1,152 @@
+<?php
+
+#
+# If X-SKIP-SAML header is present, disallow anonymous viewing and editing and
+# skip SAML login. Allow standard MediaWiki login.
+#
+if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
+
+	# Disable reading, editing and account creation by anonymous users
+	$wgGroupPermissions['*']['read'] = false;
+	$wgGroupPermissions['*']['edit'] = false;
+	$wgGroupPermissions['*']['createaccount'] = false;
+	# Note: account creation disabled for everyone at bottom of this file
+
+	# Disable API modules that could allow someone to circumvent SAML auth
+	# ref: https://www.mediawiki.org/wiki/API:Restricting_API_usage
+	# ref: https://www.mediawiki.org/wiki/API:Changing_wiki_content
+	$wgAPIModules['createaccount'] = 'ApiDisabled';
+	$wgAPIModules['options'] = 'ApiDisabled';
+	$wgAPIModules['resetpassword'] = 'ApiDisabled';
+
+	// A bit heavy-handed:
+	// $wgEnableWriteAPI = false;
+
+	// Add to config like:
+	//
+	// allow_skip_saml_users:
+	//   - __allusers: ["*"]
+	//   - James: ["192.168.56.62","23.243.32.123"]
+	//   - Daren: ["*"]
+	//   - Lauren:
+	//     - "192.54.43.13"
+	//     - "3.3.2.1"
+	//   - Willa:
+	//     - "192.169.34.23"
+	//
+	// FIXME #822: The indenting below will be heinous when Ansible does its templating
+	{% if allow_skip_saml_users is defined -%}
+		$wgMezaAllowSkipSamlUsers = array();
+		{% for user, ipaddrs in allow_skip_saml_users.iteritems() -%}
+		$wgMezaAllowSkipSamlUsers['{{ user }}'] = array(
+			{%- for ipaddr in ipaddrs -%}'{{ ipaddr }}',{%- endfor -%}
+		);
+		{%- endfor %}
+	{% else -%}
+		$wgMezaAllowSkipSamlUsers = false;
+	{%- endif %}
+
+
+	// Upon login if user is allowed to skip SAML (and therefore use the API
+	// externally)
+	$wgHooks['UserLoggedIn'][] = function ( $user ) {
+		global $wgMezaAllowSkipSamlUsers;
+
+		$username = $user->getName();
+		$ipaddr = $_SERVER['HTTP_X_FORWARDED_FOR'];
+
+		$forbidden = function ($msg='') {
+			// lightly copied from MediaWiki's img_auth.php
+			HttpStatus::header( 403 );
+			header( 'Cache-Control: no-cache' );
+			header( 'Content-Type: text/html; charset=utf-8' );
+			echo "You do not have rights to access this wiki in this way.";
+			die($msg);
+		};
+
+		if ( ! is_array( $wgMezaAllowSkipSamlUsers ) ) {
+			$forbidden();
+			return false; // pointless due to die() in forbidden
+		}
+
+		// allow option to greenlight all users
+		if ( isset( $wgMezaAllowSkipSamlUsers['__allusers'] ) ) {
+
+			// if * users can access via * ip addresses
+			if ( $wgMezaAllowSkipSamlUsers['__allusers'][0] === '*' ) {
+				return true;
+			}
+
+			// if * users can access via the current IP address
+			elseif ( in_array( $ipaddr, $wgMezaAllowSkipSamlUsers['__allusers'] ) ) {
+				return true;
+			}
+		}
+
+		if ( isset( $wgMezaAllowSkipSamlUsers[$username] ) ) {
+
+			// user allowed from all IP addresses
+			if ( $wgMezaAllowSkipSamlUsers[$username][0] === '*' ) {
+				return true;
+			}
+
+			// user allowed from this IP address only -OR- this IP address is one of many allowed
+			elseif ( in_array( $ipaddr, $wgMezaAllowSkipSamlUsers[$username] ) ) {
+				return true;
+			}
+		}
+
+		$forbidden();
+		return false; // pointless due to die() in forbidden
+	};
+}
+
+#
+# Extension:SimpleSamlAuth
+#
+# Only do auth on requests from outside the server. Requests from inside are a
+# service...probably Parsoid. Requests from outside will come from HAProxy and
+# therefore will have an HTTP_X_FORWARDED_FOR variable
+#
+# Ref: https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
+# Ref: https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
+elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+
+	// wfLoadExtension( 'SimpleSamlAuth' );
+	require_once "$IP/extensions/SimpleSamlAuth/SimpleSamlAuth.php";
+
+	// the base SAML config variables exist in this file, such that it's
+	// easy for the landing page to use them, too.
+	require_once "{{ m_deploy }}/SAMLConfig.php";
+
+	// Array: [MediaWiki group][SAML attribute name][SAML expected value]
+	// If the SAML assertion matches, the user is added to the MediaWiki group
+	$wgSamlGroupMap = array(
+		//'sysop' => array(
+		//	'groups' => array('admin'),
+		//),
+	);
+
+	$GLOBALS['wgHooks']['SpecialPage_initList'][] = function (&$list) {
+		unset( $list['Userlogout'] );
+		unset( $list['Userlogin'] );
+		return true;
+	};
+
+	$GLOBALS['wgHooks']['PersonalUrls'][] = function (&$personal_urls, &$wgTitle) {
+		unset( $personal_urls["login"] );
+		unset( $personal_urls["logout"] );
+		unset( $personal_urls['anonlogin'] );
+		return true;
+	};
+
+}
+
+// don't let nobody do no account creatin'
+// $wgGroupPermissions['*']['createaccount'] = false;
+// $wgGroupPermissions['user']['createaccount'] = false;
+// $wgGroupPermissions['sysop']['createaccount'] = false;
+// $wgGroupPermissions['bureaucrat']['createaccount'] = false;
+foreach( $wgGroupPermissions as $groupName => $perms ) {
+	$wgGroupPermissions[ $groupName ]['createaccount'] = false;
+}

@@ -1,0 +1,353 @@
+---
+# This file handles most things needing to be done on a per-wiki basis. Two
+# major per-wiki things omitted from this file include: SMW data (re)build and
+# search-index (re)build. These are omitted because they take a long time, and
+# it is preferable to do all other per-wiki actions first, then do those after.
+#
+# Things that are handled in this file, in order:
+#
+#   Files and directories
+#   - Localization cache
+#   - Ensure access to logo and favicon
+#
+#   Database
+#   - Wiki database exists?
+#   - Intend to overwrite data?
+#   - Set vars for database backup source
+#   - Clear wiki.sql from DB master
+#   - DUMP SQL to DB master
+#   - TRANSFER SQL to DB master
+#   - IMPORT wiki SQL
+#   - REMOVE SQL file from DB master
+#
+#   Uploads
+#   - Uploads directory exists?
+#   - Ensure uploads directory exists
+#   - Set vars for uploads backup source
+#   - Does backup server have uploads?
+#   - Should overwriting occur?
+#   - Rsync upload-backups into place
+#   - Ensure backups still in good config
+#
+
+###############################################################################
+#                                                                             #
+# Files and directories                                                       #
+#                                                                             #
+###############################################################################
+
+#
+# SECTION: Localization cache
+#
+- name: Ensure localization cache directory exists for this wiki
+  file:
+    state: directory
+    path: "{{ m_cache_directory }}/{{ wiki_id }}"
+    owner: "{{ m_cache_directory_owner }}"
+    group: "{{ m_cache_directory_group }}"
+    mode: "{{ m_cache_directory_mode }}"
+
+#
+# SECTION: Ensure access to logo and favicon
+#
+#
+# Make sure wiki's htdocs directory in place, and symlink to config. Symlink
+# required so logo and favicon accessible via HTTP.
+# FIXME #709: Come up with other method to allow HTTP access to these files
+#             (HAProxy rule? httpd rule? PHP?); current method is vague, and
+#             allows access to other things.
+- name: "{{ wiki_id }} - Ensure wiki htdocs directory in place"
+  file:
+    path: "{{ m_htdocs }}/wikis/{{ wiki_id }}"
+    state: directory
+    owner: apache
+    group: apache
+    mode: 0755
+- name: "{{ wiki_id }} - Ensure wiki config symlink in place"
+  file:
+    # dest = symlink, src = dir linked to
+    src: "{{ m_deploy }}/public/wikis/{{ wiki_id }}"
+    dest: "{{ m_htdocs }}/wikis/{{ wiki_id }}/config"
+    state: link
+    owner: apache
+    group: apache
+    mode: 0755
+
+
+
+
+###############################################################################
+#                                                                             #
+# Database                                                                    #
+#                                                                             #
+###############################################################################
+
+
+#
+# SECTION: Wiki database exists?
+#
+# Check if databases starting with "wiki_" exist
+#   if database exists: wiki_database.rc == 0
+#   if no database:  wiki_database.rc == 1
+- name: "{{ wiki_id }} - check if wiki database exists"
+  shell: 'mysqlshow "wiki_{{ wiki_id }}" | grep -v Wildcard | grep -o wiki_{{ wiki_id }}'
+  register: wiki_exists_check
+  delegate_to: "{{ groups['db-master'][0] }}"
+  ignore_errors: yes
+  run_once: true
+
+- name: "{{ wiki_id }} - Set fact if database wiki_{{ wiki_id }} DOES exist"
+  set_fact:
+    wiki_exists: True
+  when: wiki_exists_check is defined and wiki_exists_check.rc == 0
+
+- name: "{{ wiki_id }} - Set fact if database wiki_{{ wiki_id }} DOES NOT exist"
+  set_fact:
+    wiki_exists: False
+  when: wiki_exists_check is defined and wiki_exists_check.rc != 0
+
+
+#
+# SECTION: Intend to overwrite data?
+#
+#
+# Set facts to clarify if overwriting data is INITIALLY INTENDED (regardless of
+# whether later checks make it possible)
+#
+- name: "{{ wiki_id }} - Set fact if INTEND overwrite data"
+  set_fact:
+    intend_overwrite_from_backup: True
+  when: force_overwrite_from_backup is defined and force_overwrite_from_backup == true
+
+- name: "{{ wiki_id }} - Set fact if NOT INTEND overwrite data"
+  set_fact:
+    intend_overwrite_from_backup: False
+  when: force_overwrite_from_backup is not defined or force_overwrite_from_backup == false
+
+
+#
+# SECTION: Set vars for database backup source
+#
+- name: "{{ wiki_id }} - Mark sql_backup_server_set as NOT SET yet"
+  set_fact:
+    sql_backup_server_set: False
+
+- name: "{{ wiki_id }} - Set SQL source-from-backup facts IF SOURCING FROM db-src"
+  set_fact:
+    sql_backup_server: "{{ backups_server_db_dump.addr }}"
+    do_sql_dump: True
+    sql_file_match: "wiki_{{ wiki_id }}.sql"
+    db_backup_server_remote_user: "{{ backups_server_db_dump.remote_user }}"
+    sql_backup_server_set: True
+  when: "backups_server_db_dump is defined"
+
+- name: "{{ wiki_id }} - Set SQL source-from-backup facts IF SOURCING FROM backup-src"
+  set_fact:
+    sql_backup_server: "{{ backups_server_alt_source.addr }}"
+    do_sql_dump: False
+    sql_dir_path: "{{ backups_server_alt_source.sql_dir_path | regex_replace('<id>', wiki_id) }}"
+    sql_file_match: "{{ backups_server_alt_source.sql_file_match | default('*.sql') | regex_replace('<id>', wiki_id) }}"
+    db_backup_server_remote_user: "{{ backups_server_alt_source.remote_user }}"
+    sql_backup_server_set: True
+  when: "not sql_backup_server_set and backups_server_alt_source is defined"
+
+- name: "{{ wiki_id }} - Set SQL source-from-backup facts IF SOURCING FROM backup-servers"
+  set_fact:
+    sql_backup_server: "{{ groups['backup-servers'][0] }}"
+    do_sql_dump: False
+    sql_dir_path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}"
+    sql_file_match: "*.sql"
+    sql_backup_server_set: True
+  when: "not sql_backup_server_set and 'backup-servers' in groups and groups['backup-servers']|length|int > 0"
+
+# Set remote user to access database backup
+- name: "{{ wiki_id }} - Set fact for database backup server remote user TO DEFAULT meza-ansible"
+  set_fact:
+    db_backup_server_remote_user: "meza-ansible"
+  when:
+    db_backup_server_remote_user is not defined
+
+
+#
+# SECTION: Clear wiki.sql from DB master
+#
+- name: "{{ wiki_id }} - Ensure no wiki.sql on DB master"
+  file:
+    path: "{{ m_tmp }}/wiki.sql"
+    state: absent
+  run_once: true
+  delegate_to: "{{ groups['db-master'][0] }}"
+
+
+#
+# SECTION: DUMP SQL to DB master
+#
+- name: "{{ wiki_id }} - mysqldump onto DB master"
+  include_role:
+    name: remote-mysqldump
+  vars:
+    remote_server:            "{{ sql_backup_server }}"
+    remote_server_ssh_user:   "{{ db_backup_server_remote_user }}"
+    remote_server_mysql_user: "{{ backups_server_db_dump.mysql_user }}"
+    remote_server_mysql_pass: "{{ backups_server_db_dump.mysql_pass }}"
+    dump_database:            "wiki_{{ wiki_id }}"
+    target_server:            "{{ groups['db-master'][0] }}"
+    target_server_path:       "{{ m_tmp }}/wiki.sql"
+  run_once: true
+  when: do_sql_dump and (not wiki_exists or intend_overwrite_from_backup)
+
+
+#
+# SECTION: TRANSFER SQL to DB master
+#
+- name: "{{ wiki_id }} - Transfer SQL file from backup server to DB master"
+  include: transfer-backup-to-db-master.yml
+  run_once: true
+  when: (not do_sql_dump) and (not wiki_exists or intend_overwrite_from_backup)
+
+
+#
+# SECTION: IMPORT wiki SQL
+#
+- name: "{{ wiki_id }} - Import wiki.sql"
+  include: import-wiki-sql.yml
+  run_once: true
+  when: (not wiki_exists) or intend_overwrite_from_backup
+
+
+#
+# SECTION: REMOVE SQL file from DB master
+#
+- name: "{{ wiki_id }} - Remove SQL file from master DB"
+  file:
+    path: "{{ m_tmp }}/wiki.sql"
+    state: absent
+  run_once: true
+  delegate_to: "{{ groups['db-master'][0] }}"
+
+
+
+
+###############################################################################
+#                                                                             #
+# Uploads                                                                     #
+#                                                                             #
+###############################################################################
+
+
+#
+# SECTION: Uploads directory exists?
+#
+- name: "{{ wiki_id }} - Check if wiki's uploads dir exists ON APP SERVER"
+  stat:
+    path: "{{ m_uploads_dir }}/{{ wiki_id }}"
+  register: uploads_dir
+
+- name: "{{ wiki_id }} - Set fact if wiki {{ wiki_id }} DOES HAVE uploads"
+  set_fact:
+    wiki_has_uploads: True
+  when: uploads_dir.stat.exists
+
+- name: "{{ wiki_id }} - Set fact if wiki {{ wiki_id }} DOES NOT HAVE uploads"
+  set_fact:
+    wiki_has_uploads: False
+  when: not uploads_dir.stat.exists
+
+
+#
+# SECTION: Ensure uploads directory exists
+#
+- name: "{{ wiki_id }} - Ensure uploads dir configured"
+  file:
+    path: "{{ m_uploads_dir }}/{{ wiki_id }}"
+    state: directory
+    mode: "{{ m_uploads_dir_mode }}"
+    owner: "{{ m_uploads_dir_owner }}"
+    group: "{{ m_uploads_dir_group }}"
+
+
+#
+# SECTION: Set vars for uploads backup source
+#
+- name: "{{ wiki_id }} - Mark uploads_backup_server_set as NOT SET yet"
+  set_fact:
+    uploads_backup_server_set: False
+
+- name: "{{ wiki_id }} - Set uploads-source-from-backup facts IF SOURCING FROM backup-src"
+  set_fact:
+    uploads_backup_server: "{{ backups_server_alt_source.addr }}"
+    uploads_backup_dir_path: "{{ backups_server_alt_source.uploads_dir_path | regex_replace('<id>', wiki_id) }}"
+    uploads_backup_server_remote_user: "{{ backups_server_alt_source.remote_user }}"
+    uploads_backup_server_set: True
+  when: "backups_server_alt_source is defined"
+
+- name: "{{ wiki_id }} - Set uploads-source-from-backup facts IF SOURCING FROM backup-servers"
+  set_fact:
+    uploads_backup_server: "{{ groups['backup-servers'][0] }}"
+    uploads_backup_dir_path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}/uploads"
+    uploads_backup_server_set: True
+  when: "not uploads_backup_server_set and 'backup-servers' in groups and groups['backup-servers']|length|int > 0"
+
+# Set remote user to access uploads backup if not set above
+- name: "{{ wiki_id }} - Set fact for uploads backup server remote user TO DEFAULT meza-ansible"
+  set_fact:
+    uploads_backup_server_remote_user: "meza-ansible"
+  when:
+    uploads_backup_server_remote_user is not defined
+
+
+#
+# SECTION: Does backup server have uploads?
+#
+- name: "{{ wiki_id }} - Check if wiki's uploads backup dir exists on backups.0"
+  stat:
+    path: "{{ uploads_backup_dir_path }}"
+  register: images_backup_dir
+  delegate_to: "{{ uploads_backup_server }}"
+  remote_user: "{{ uploads_backup_server_remote_user }}"
+  run_once: true
+
+
+#
+# SECTION: Should overwriting occur?
+#
+- name: "{{ wiki_id }} - Set fact if SHOULD overwrite uploads data (only possible if backup exists)"
+  set_fact:
+    do_overwrite_uploads_from_backup: True
+  when: intend_overwrite_from_backup and images_backup_dir.stat.exists
+
+- name: "{{ wiki_id }} - Set fact if SHOULD NOT overwrite uploads data"
+  set_fact:
+    do_overwrite_uploads_from_backup: False
+  when: not intend_overwrite_from_backup or not images_backup_dir.stat.exists
+
+
+#
+# SECTION: Rsync upload-backups into place
+#
+- name: "{{ wiki_id }} - Rsync uploads directory"
+  include_role:
+    name: rsync
+  vars:
+    pulling_to_server:   "{{ inventory_hostname }}"
+    pulling_to_path:     "{{ m_uploads_dir }}/{{ wiki_id }}"
+    pulling_from_server: "{{ uploads_backup_server }}"
+    pulling_from_path:   "{{ uploads_backup_dir_path }}/"
+    pulling_from_user:   "{{ uploads_backup_server_remote_user }}"
+  run_once: true
+  when:
+    images_backup_dir.stat.exists
+    and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
+
+
+#
+# SECTION: Ensure backups still in good config
+#
+- name: "{{ wiki_id }} - Ensure wiki's uploads dir is still configured properly"
+  file:
+    path: "{{ m_uploads_dir }}/{{ wiki_id }}"
+    state: directory
+    mode: "{{ m_uploads_dir_mode }}"
+    owner: "{{ m_uploads_dir_owner }}"
+    group: "{{ m_uploads_dir_group }}"
+    # recursive?

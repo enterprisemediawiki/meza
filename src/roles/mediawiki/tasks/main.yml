@@ -1,0 +1,355 @@
+---
+
+#
+# SYNC CONFIGS
+#
+- name: Sync configuration between controller and app servers
+  include_role:
+    name: sync-configs
+
+
+#
+# ENSURE APP SERVERS CAN GIT-CLONE OVER SSH
+#
+- name: Ensure user meza-ansible .ssh dir configured
+  file:
+    path: "{{ m_home }}/meza-ansible/.ssh"
+    owner: meza-ansible
+    group: wheel
+    mode: 0700
+    state: directory
+
+- name: Copy meza-ansible keys to app servers
+  copy:
+    src: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
+    dest: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
+    owner: meza-ansible
+    group: wheel
+    mode: "{{ item.mode }}"
+  with_items:
+  - name: id_rsa
+    mode: "0600"
+  - name: id_rsa.pub
+    mode: "0644"
+
+- name: Copy meza-ansible known_hosts to app-servers
+  copy:
+    src: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
+    dest: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
+    owner: meza-ansible
+    group: wheel
+    mode: "{{ item.mode }}"
+  ignore_errors: True
+  with_items:
+  - name: known_hosts
+    mode: "0600"
+
+
+
+
+
+#
+# MEDIAWIKI CORE
+#
+- name: Ensure proper MediaWiki git version installed
+  git:
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/core.git
+    dest: "{{ m_mediawiki }}"
+    version: "1.27.2"
+  tags:
+    - latest
+
+
+#
+# SKINS
+#
+# FIXME #819: Add skins in Meza(Core|Local)Extensions.yml
+- name: Ensure Vector skin installed
+  git:
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git
+    dest: "{{ m_mediawiki }}/skins/Vector"
+    version: "REL1_27"
+
+
+
+#
+# EXTENSIONS
+#
+- name: Set variable holding list of core extensions
+  include_vars:
+    file: "{{ m_config_core }}/MezaCoreExtensions.yml"
+    name: meza_core_extensions
+
+- name: Set variable holding list of local extensions
+  include_vars:
+    file: "{{ m_local_public }}/MezaLocalExtensions.yml"
+    name: meza_local_extensions
+
+- name: Ensure core meza extensions installed (non-Composer)
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
+    version: "{{ item.version }}"
+  with_items: "{{ meza_core_extensions.list }}"
+  when: meza_core_extensions.list[0] is defined and item.repo is defined
+  tags:
+    - git-extensions
+    - git-core-extensions
+    - latest
+
+- name: Ensure local meza extensions installed (non-Composer)
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
+    version: "{{ item.version }}"
+  with_items: "{{ meza_local_extensions.list }}"
+  when: meza_local_extensions.list[0] is defined and item.repo is defined
+  tags:
+    - git-extensions
+    - git-local-extensions
+    - latest
+
+# File holding extension loading and config for core and local extensions
+- name: Ensure Extensions.php in place
+  template:
+    src: Extensions.php.j2
+    dest: "{{ m_deploy }}/Extensions.php"
+
+# Adds extensions with composer param from MezaCoreExtensions.yml and
+# MezaLocalExtensions.yml
+- name: Ensure composer.local.json in place to load composer-based extensions
+  template:
+    src: composer.local.json.j2
+    dest: "{{ m_mediawiki }}/composer.local.json"
+
+- name: Run composer install on MediaWiki for dependencies
+  composer:
+    command: install
+    working_dir: "{{ m_mediawiki }}"
+  # FIXME #317: need ignore_errors because composer throws an error when running as root.
+  ignore_errors: yes
+  tags:
+    - composer-extensions
+    - latest
+
+# install doesn't appear to do extensions
+- name: Run composer update on MediaWiki for extensions
+  composer:
+    command: update
+    working_dir: "{{ m_mediawiki }}"
+  # FIXME #317: need ignore_errors because composer throws an error when running as root.
+  ignore_errors: yes
+  tags:
+    - composer-extensions
+    - latest
+
+- name: Ensure Git submodule requirements met for core meza extensions
+  shell: |
+    cd "{{ m_mediawiki }}/extensions/{{ item.name }}"
+    git submodule update --init
+  with_items: "{{ meza_core_extensions.list }}"
+  when: meza_core_extensions.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
+  tags:
+    - git-submodules
+    - latest
+
+- name: Ensure Git submodule requirements met for local meza extensions
+  shell: |
+    cd "{{ m_mediawiki }}/extensions/{{ item.name }}"
+    git submodule update --init
+  with_items: "{{ meza_local_extensions.list }}"
+  when: meza_local_extensions.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
+  tags:
+    - git-submodules
+    - latest
+
+
+
+#
+# LocalSettings.php
+#
+- name: Ensure LocalSettings.php in place
+  template:
+    src: LocalSettings.php.j2
+    dest: "{{ m_mediawiki }}/LocalSettings.php"
+    backup: yes
+
+
+
+#
+# LANDING PAGE
+#
+- name: Ensure WikiBlender installed
+  git:
+    repo: https://github.com/jamesmontalvo3/WikiBlender.git
+    dest: "{{ m_htdocs }}/WikiBlender"
+    version: "master"
+
+- name: Ensure BlenderSettings.php in place
+  template:
+    src: BlenderSettings.php.j2
+    dest: "{{ m_htdocs }}/WikiBlender/BlenderSettings.php"
+
+
+
+#
+# Authentication roles
+#
+- name: Include SAML role if SAML configured
+  include_role:
+    name: saml
+  when: saml_public is defined
+
+
+#
+# Cache (at this time) for localization caching. Also can be used for caching
+# page contents, but this isn't as necessary for enterprise cases where
+# generally users are always logged in.
+#
+- name: Ensure localization cache root directory exists (each wiki with sub-directory)
+  file:
+    state: directory
+    path: "{{ m_cache_directory }}"
+    owner: "{{ m_cache_directory_owner }}"
+    group: "{{ m_cache_directory_group }}"
+    mode: "{{ m_cache_directory_mode }}"
+
+- name: "Ensure root uploads dir configured"
+  file:
+    path: "{{ m_uploads_dir }}"
+    state: directory
+    mode: "{{ m_uploads_dir_mode }}"
+    owner: "{{ m_uploads_dir_owner }}"
+    group: "{{ m_uploads_dir_group }}"
+
+
+#
+# DEMO WIKI (if needed)
+#
+# 1. Check if wikis exist
+# 2. Create Demo Wiki if they don't
+# 3. FIXME #820: create-wiki re-sync configs? Explicit re-sync not req'd?
+#
+- name: Check if any wikis exist
+  find:
+    paths: "{{ m_local_public }}/wikis"
+    file_type: directory
+  delegate_to: localhost
+  register: initial_wikis_dirs_check
+  run_once: true
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- name: Add Demo Wiki to config if no wikis exist
+  include_role:
+    name: configure-wiki
+  vars:
+    wiki_id: demo
+    wiki_name: Demo Wiki
+  when: "initial_wikis_dirs_check.files|length == 0 and (docker_skip_tasks is not defined or not docker_skip_tasks)"
+
+- name: Re-sync configuration between controller and app servers if Demo just configured
+  include_role:
+    name: sync-configs
+  when: "initial_wikis_dirs_check.files|length == 0 and (docker_skip_tasks is not defined or not docker_skip_tasks)"
+
+
+
+#
+# VERIFY WIKIS
+#
+- name: Get individual wikis dirs from localhost
+  find:
+    paths: "{{ m_local_public }}/wikis/"
+    file_type: directory
+  register: wikis_dirs
+  delegate_to: localhost
+  run_once: yes
+
+- name: Set fact - list of wikis
+  set_fact:
+    list_of_wikis: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+# Sort list of wikis so primary wiki is first. Need to have primary wiki's
+# `user` table in place before other wikis are imported, otherwise will get
+# errors when running update.php and such
+- name: Set fact - list of wikis ordered with primary wiki first (if primary_wiki_id set)
+  set_fact:
+    list_of_wikis: "['{{ primary_wiki_id }}'] + {{ list_of_wikis | difference([primary_wiki_id]) }}"
+  when: primary_wiki_id is defined
+
+- debug: { var: list_of_wikis }
+
+- name: Set fact - initiate empty list of wikis to rebuild smw and search data
+  set_fact:
+    wikis_to_rebuild_data: []
+
+# Check that all wikis in config are present on app and DB servers
+- name: Ensure defined wikis exist
+  include_role:
+    name: verify-wiki
+  vars:
+    wiki_id: "{{ item }}"
+  # with initial wikis list of file info objects:
+  #   filter 1: reduce list items to just the path
+  #   filter 2: then reduce to just the last part of the path
+  #   filter 3: convert map object back to an Ansible-friendly list
+  with_items: "{{ list_of_wikis }}"
+  tags:
+  - verify-wiki
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- debug: { var: wikis_to_rebuild_data }
+
+- name: Ensure data rebuilding scripts in place on app servers
+  template:
+    src: "{{ item }}.j2"
+    dest: "/opt/.deploy-meza/{{ item }}"
+    owner: meza-ansible
+    group: wheel
+    mode: 0755
+  with_items:
+    - elastic-build-index.sh
+    - elastic-rebuild-all.sh
+    - smw-rebuild-all.sh
+
+- name: Ensure data rebuilding logs directories exist
+  file:
+    path: "{{ m_logs }}/{{ item }}"
+    owner: "{{ m_logs_owner }}"
+    group: "{{ m_logs_group }}"
+    mode: "{{ m_logs_mode }}"
+    state: directory
+  with_items:
+    - smw-rebuilddata
+    - search-index
+
+# Wikis are totally built at this point, but SMW and search need rebuilding
+# FIXME #811: Will this work when controller is not an app server?
+- name: "(Re-)build search index for: {{ wikis_to_rebuild_data | join(', ') }}"
+  shell: "bash {{ m_deploy }}/elastic-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
+  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0)
+  run_once: true
+  tags:
+  - search-index
+
+- name: "(Re-)build SemanticMediaWiki data for: {{ wikis_to_rebuild_data | join(', ') }}"
+  shell: "bash {{ m_deploy }}/smw-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
+  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0)
+  run_once: true
+  tags:
+  - smw-data
+
+
+
+# Run update.php (MediaWiki's database update script) against all wikis. This
+# only needs to be done once, since the first app server that runs it will
+# update the master database.
+- include_role:
+    name: update.php
+  vars:
+    wiki_id: "{{ item }}"
+  with_items: "{{ list_of_wikis }}"
+  run_once: true
+  tags:
+  - update.php
+  when: docker_skip_tasks is not defined or not docker_skip_tasks

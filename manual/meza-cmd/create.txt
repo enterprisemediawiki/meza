@@ -1,0 +1,11 @@
+Mediawiki EZ Admin
+
+Usage: meza create [directives]
+
+List of directives:
+
+Directive          Description
+---------------------------------------------------------------
+wiki               Create a wiki
+wiki-promptless    Create a wiki without prompts. This is not
+                   intended to be called by users.

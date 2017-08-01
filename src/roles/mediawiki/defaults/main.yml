@@ -1,0 +1,35 @@
+---
+# Big title for the landing page
+blender_landing_page_title: "Meza Wikis"
+
+# Optional top row of wikis with or without a title
+blender_header_wiki_title: false
+blender_header_wikis: []
+
+# All wikis that aren't specified in header or footer row will be placed in
+# middle row. Specify a title as desired.
+blender_middle_wiki_title: false
+
+# Optional bottom row of wikis with or without a title
+blender_footer_wiki_title: false
+blender_footer_wikis: []
+
+# Below all the wikis, links to stuff
+blender_footer_links:
+  - "<a href='https://github.com/enterprisemediawiki/meza'>meza on github</a>"
+  - "<a href='https://enterprisemediawiki.org'>enterprisemediawiki.org</a>"
+
+blender_admins: []
+# - { email: jamesmontalvo3@gmail.com, name: "James Montalvo" }
+# - email: sally@example.com
+#   name: Sally Example
+
+local_config_repo: {}
+
+# Whether to enable debug at all times
+m_force_debug: false
+
+# Whether to enable debug when using the command line
+m_command_line_debug: true
+
+wgPasswordSender: admin@example.com

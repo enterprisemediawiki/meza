@@ -1,0 +1,7 @@
+Mediawiki EZ Admin
+
+Usage: meza prompt_default_on_blank [directives]
+
+List of directives:
+
+TBD

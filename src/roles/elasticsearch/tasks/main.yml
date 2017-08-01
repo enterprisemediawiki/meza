@@ -1,0 +1,104 @@
+---
+
+# INSTALL JAVA
+#
+# FIXME #814: should this increase to java-1.8.0-openjdk.x86_64 ??
+- name: Ensure Java is installed.
+  yum:
+    name: java-1.7.0-openjdk
+    state: installed
+# Environment setup.
+- name: Set JAVA_HOME if configured.
+  template:
+    src: java_home.sh.j2
+    dest: /etc/profile.d/java_home.sh
+    mode: 0644
+
+# INSTALL ELASTICSEARCH
+- name: Add Elasticsearch GPG key.
+  rpm_key:
+    key: https://packages.elastic.co/GPG-KEY-elasticsearch
+    state: present
+- name: Add Elasticsearch repository.
+  template:
+    src: elasticsearch.repo.j2
+    dest: /etc/yum.repos.d/elasticsearch.repo
+    mode: 0644
+- name: Install Elasticsearch.
+  yum:
+    name: elasticsearch
+    state: installed
+
+# Need to perform this check so `lineinfile` doesn't run in Docker. /etc/hosts
+# is special in Docker.
+# ref: https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/#updating-the-etchosts-file
+# ref: http://stackoverflow.com/questions/28327458/how-to-add-my-containers-hostname-to-etc-hosts
+- name: Check whether /etc/hosts contains "127.0.0.1"
+  command: awk /127.0.0.1/ /etc/hosts
+  register: checkhostsfile
+  changed_when: False
+
+# Add host name per https://github.com/elastic/elasticsearch/issues/6611
+- name: Add localhost to /etc/hosts if needed
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '^127\.0\.0\.1'
+    line: '127.0.0.1 localhost meza'
+    owner: root
+    group: root
+    mode: 0644
+  when: '"127.0.0.1" not in checkhostsfile.stdout'
+
+# ref: http://elasticsearch-users.115913.n3.nabble.com/Elasticsearch-Not-Working-td4059398.html
+- name: Ensure dirs from elasticsearch.yml exist and set ownership
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: elasticsearch
+    recurse: yes
+  with_items:
+    - "{{ m_meza_data }}/elasticsearch/data"
+    - "{{ m_meza_data }}/elasticsearch/work"
+    - "{{ m_meza_data }}/elasticsearch/plugins"
+
+
+# CONFIGURE AND START ELASTICSEARCH
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html
+- name: Configure Elasticsearch.
+  template:
+    src: elasticsearch.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+    owner: root
+    group: elasticsearch
+    mode: 0750
+  notify: restart elasticsearch
+- name: Start Elasticsearch.
+  service: name=elasticsearch state=started enabled=yes
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+- name: Make sure Elasticsearch is running before proceeding.
+  wait_for: host={{ elasticsearch_network_host }} port={{ elasticsearch_http_port }} delay=3 timeout=300
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+
+# INSTALL PLUGINS: kopf, head, bigdesk
+# FIXME #815: Check for plugins first to avoid using ignore_errors
+- name: Install elasticsearch plugin Kopf
+  elasticsearch_plugin:
+    state: present
+    name: lmenezes/elasticsearch-kopf
+    version: '1.0'
+  ignore_errors: yes
+- name: Install elasticsearch plugin Head
+  elasticsearch_plugin:
+    state: present
+    name: mobz/elasticsearch-head
+  ignore_errors: yes
+- name: Install elasticsearch plugin Bigdesk
+  elasticsearch_plugin:
+    state: present
+    name: lukas-vlcek/bigdesk
+  ignore_errors: yes
+# removed "polyfractal/elasticsearch-inquisitor" because it was failing and
+# we need to downselect anyway
+

@@ -1,0 +1,14 @@
+Mediawiki EZ Admin
+
+Usage: meza docker [directives]
+
+List of directives:
+
+Directive     Description
+---------------------------------------------------------------
+COMMANDS BELOW ARE EXPERIMENTAL ONLY
+run           Start a Docker container. Optionally specify a
+              Docker image to use.
+exec          Execute a command on your container. Required to
+              specify container ID. Usage:
+              $ meza docker exec <id> some command and args

@@ -1,0 +1,53 @@
+# {{ ansible_managed }}
+#
+# crontab for meza
+
+{% if 'logging-servers' in groups and inventory_hostname in groups['logging-servers'] and server_performance_crontime %}
+#
+# Cron job for logging server performance info
+#
+{{ server_performance_crontime }} {{ m_scripts }}/server-performance.sh
+{% endif %}
+
+{% if disk_space_usage_mount_name is defined and 'logging-servers' in groups and inventory_hostname in groups['logging-servers'] %}
+#
+# Check disk space usage
+#
+{{ disk_space_usage_crontime }} {{ m_scripts }}/disk-space-usage.sh
+{% endif %}
+
+{% if parsoid_restart_crontime and inventory_hostname in groups['parsoid-servers'] %}
+#
+# Restart Parsoid periodically on parsoid-servers
+#
+{{ parsoid_restart_crontime }} systemctl restart parsoid > /opt/data-meza/logs/parsoid-restart.log 2>&1
+{% endif %}
+
+{% if inventory_hostname in groups['app-servers'] %}
+#
+# Run a small set of jobs across all wikis periodically
+#
+# run_jobs_freq_maxtime run_jobs_freq_totalmaxtime run_jobs_freq_maxjobs run_jobs_freq_maxload
+{{ run_jobs_freq_crontime }} WIKI={{ list_of_wikis[0] }} php {{ m_deploy }}/runAllJobs.php {{ run_jobs_freq_maxtime }} {{ run_jobs_freq_totalmaxtime }} {{ run_jobs_freq_maxjobs }} {{ run_jobs_freq_maxload }} >> {{ m_logs }}/jobs_`date "+\%Y\%m\%d"`_cron.log 2>&1
+
+#
+# Run all jobs on all wikis
+# Note: WIKI=<wiki_id> does not matter which wiki. Just needs one to load
+# settings.
+#
+{{ run_all_jobs_crontime }} WIKI={{ list_of_wikis[0] }} php {{ m_deploy }}/runAllJobs.php >> {{ m_logs }}/jobs_`date "+\%Y\%m\%d"`_cron.log 2>&1
+
+{% endif %}
+
+
+{% if custom_crons is defined  %}
+#
+# The following jobs are custom definitions from this meza-instance's config
+#
+{% for cron in custom_crons %}{% if inventory_hostname in groups[cron.server_type] %}
+{{ cron.time }} {{ cron.job }}
+
+{% endif %}{% endfor %}
+
+# END custom crons
+{% endif %}

@@ -1,0 +1,4 @@
+---
+- name: restart mysql
+  service: "name={{ mysql_daemon }} state=restarted sleep=5"
+  when: docker_skip_tasks is not defined or not docker_skip_tasks

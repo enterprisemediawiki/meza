@@ -1,0 +1,291 @@
+---
+# FIXME #748: Eventually add the ability to get SSL cert from letsencrypt
+#     ref: https://www.digitalocean.com/community/tutorials/how-to-secure-haproxy-with-let-s-encrypt-on-centos-7
+# Other refs:
+#     https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Load_Balancer_Administration/install_haproxy_example1.html
+#     https://gist.github.com/thisismitch/7c91e9b2b63f837a0c4b
+#     https://www.unixmen.com/configure-high-available-load-balancer-haproxy-keepalived/
+
+- name: Install haproxy packages
+  yum: name={{item}} state=installed
+  with_items:
+    - haproxy
+    - openssl
+    # - keepalived ?
+
+- name: Ensure haproxy certs directory exists
+  file:
+    path: /etc/haproxy/certs
+    state: directory
+    # owner/group/mode?
+
+#
+# 1. If cert/key don't exist ON CONTROLLER, generate self-signed ON CONTROLLER
+# 2. Ensure cert and key in /etc/haproxy/certs
+# 3. Ensure cert and key assembled into pem file at /etc/haproxy/certs/meza.pem
+#
+- name: Check if secret config on CONTROLLER has SSL keys
+  stat:
+    path: "{{ m_local_secret }}/{{ env }}/ssl/meza.key"
+  register: ssl_cert_stat_result
+  delegate_to: localhost
+  run_once: True
+
+- name: Ensure config SSL directory exists
+  file:
+    path: "{{ m_local_secret }}/{{ env }}/ssl"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  delegate_to: localhost
+  run_once: True
+
+- name: If not exists, create self-signed SSL cert on CONTROLLER
+  command: |
+    openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
+      -subj "/C=US/ST=TX/L=Houston/O=EnterpriseMediaWiki/CN={{ wiki_app_fqdn}}" \
+      -keyout {{ m_local_secret }}/{{ env }}/ssl/meza.key \
+      -out {{ m_local_secret }}/{{ env }}/ssl/meza.crt
+  when: ssl_cert_stat_result.stat.exists == False
+  delegate_to: localhost
+  run_once: True
+
+- name: Ensure SSL cert and key are encrypted
+  shell: >
+    ansible-vault encrypt
+    {{ item }}
+    --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
+  ignore_errors: True
+  delegate_to: localhost
+  run_once: True
+  with_items:
+    - "{{ m_local_secret }}/{{ env }}/ssl/meza.key"
+    - "{{ m_local_secret }}/{{ env }}/ssl/meza.crt"
+
+- name: Read SSL key into variable
+  shell: >
+    ansible-vault view
+    /opt/conf-meza/secret/{{ env }}/ssl/meza.key
+    --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
+  register: decrypted_key
+  delegate_to: localhost
+  run_once: True
+
+- name: Read SSL cert into variable
+  shell: >
+    ansible-vault view
+    /opt/conf-meza/secret/{{ env }}/ssl/meza.crt
+    --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
+  register: decrypted_cert
+  delegate_to: localhost
+  run_once: True
+
+# - name: Ensure cert and key on load balancers
+#   copy:
+#     src: "{{ m_local_secret }}/{{ env }}/ssl/{{ item }}"
+#     dest: "/etc/haproxy/certs/{{ item }}"
+#   with_items:
+#     - meza.key
+#     - meza.crt
+#   notify:
+#     - restart haproxy
+
+- name: Ensure SSL cert on load balancers
+  copy:
+    content: "{{ decrypted_cert.stdout }}"
+    dest: "/etc/haproxy/certs/meza.crt"
+  notify:
+    - restart haproxy
+
+- name: Ensure SSL key on load balancers
+  copy:
+    content: "{{ decrypted_key.stdout }}"
+    dest: "/etc/haproxy/certs/meza.key"
+  notify:
+    - restart haproxy
+
+- name: Ensure cert and key assembled into into pem file
+  copy:
+    content: |
+      {{ decrypted_cert.stdout }}
+      {{ decrypted_key.stdout }}
+    dest: /etc/haproxy/certs/meza.pem
+  notify:
+    - restart haproxy
+
+# - name: Ensure cert and key assembled into into pem file
+#   assemble:
+#     src: "/opt/conf-meza/secret/{{ env }}/ssl"
+#     dest: /etc/haproxy/certs/meza.pem
+#   notify:
+#     - restart haproxy
+
+- name: Ensure haproxy certs have secure permissions
+  file:
+    path: /etc/haproxy/certs
+    state: directory
+    recurse: yes
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - restart haproxy
+
+- name: write the haproxy config file
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+  notify:
+    - restart haproxy
+
+# - name: Ensure haproxy socket directory exists
+#   file:
+#     path: /run/haproxy
+#     state: directory
+#     owner: root
+#     group: root
+#     mode: 0660
+
+
+- name: Ensure error files directory in place
+  file:
+    path: /etc/haproxy/errors
+    state: directory
+    # FIXME #530: permissions?
+
+
+- name: Ensure error pages in place
+  template:
+    src: "errors/{{ item }}.http.j2"
+    dest: "/etc/haproxy/errors/{{ item }}.http"
+  with_items:
+    # FIXME #663: add the others, make the 500 error one good
+    # - 400
+    # - 403
+    # - 408
+    - 500
+    # - 502
+    # - 503
+    # - 504
+
+# FIXME #746: Why does HAProxy specify this different method for firewall? Is
+# it an SELinux thing (which at present we don't have in enforcing)?
+- name: Ensure firewalld haproxy service files in place
+  template:
+    src: "haproxy-{{ item }}.firewalld.xml.j2"
+    dest: "/etc/firewalld/services/haproxy-{{ item }}.xml"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - http
+    - https
+
+- name: Ensure SELinux context for firewalld haproxy service files
+  shell: restorecon /etc/firewalld/services/haproxy-{{ item }}.xml
+  with_items:
+    - http
+    - https
+
+# Allow http and https through firewall
+#- name: Configure firewalld for haproxy via {{ item }}
+#  firewalld:
+#    service: "haproxy-{{ item }}"
+#    permanent: true
+#    immediate: true
+#    state: enabled
+#    zone: public
+#  with_items:
+#    - http
+#    - https
+
+- name: Configure firewalld for haproxy via port 80 and 443
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  with_items:
+    - 80
+    - 443
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- name: Ensure firewalld port 1936 OPEN when haproxy stats ENABLED
+  firewalld:
+    port: "1936/tcp"
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  when: enable_haproxy_stats and (docker_skip_tasks is not defined or not docker_skip_tasks)
+
+- name: Ensure firewalld port 1936 CLOSED when haproxy stats DISABLED
+  firewalld:
+    port: "1936/tcp"
+    permanent: true
+    immediate: true
+    state: disabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  when: not enable_haproxy_stats and (docker_skip_tasks is not defined or not docker_skip_tasks)
+
+- name: Ensure firewalld port 8088 OPEN when PHP profiling ENABLED
+  firewalld:
+    port: "8088/tcp"
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  when: m_setup_php_profiling and (docker_skip_tasks is not defined or not docker_skip_tasks)
+
+- name: Ensure firewalld port 8088 CLOSED when PHP profiling DISABLED
+  firewalld:
+    port: "8088/tcp"
+    permanent: true
+    immediate: true
+    state: disabled
+    zone: "{{m_public_networking_zone|default('public')}}"
+  when: not m_setup_php_profiling and (docker_skip_tasks is not defined or not docker_skip_tasks)
+
+
+# FIXME #747: haproxy will need to handle reverse proxy for Elasticsearch plugins
+# - name: Configure firewalld for Elasticsearch reverse proxy
+#   firewalld:
+#     port: 8008/tcp
+#     permanent: true
+#     immediate: true
+#     state: enabled
+#     zone: public
+
+
+- name: Uncomment '$ModLoad imudp' in /etc/rsyslog.conf
+  replace:
+    dest: /etc/rsyslog.conf
+    regexp: '^#\$ModLoad imudp'
+    replace: '$ModLoad imudp'
+  notify:
+    - restart rsyslog
+
+- name: Uncomment '$UDPServerRun 514' in /etc/rsyslog.conf
+  replace:
+    dest: /etc/rsyslog.conf
+    regexp: '^#\$UDPServerRun 514'
+    replace: '$UDPServerRun 514'
+  notify:
+    - restart rsyslog
+
+- name: Ensure /etc/rsyslog.d/haproxy.conf configured
+  template:
+    src: haproxy.rsyslog.conf.j2
+    dest: /etc/rsyslog.d/haproxy.conf
+  notify:
+    - restart rsyslog
+
+
+- name: ensure haproxy is running (and enable it at boot)
+  service:
+    name: haproxy
+    state: started
+    enabled: yes
+  when: docker_skip_tasks is not defined or not docker_skip_tasks

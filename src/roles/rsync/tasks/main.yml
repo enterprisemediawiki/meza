@@ -1,0 +1,68 @@
+---
+# Rsync pull role
+#
+# Inputs:
+#   pulling_to_server:
+#   pulling_to_path:
+#   pulling_from_server:
+#   pulling_from_path:
+#   pulling_from_user:
+
+
+#
+# Put meza-ansible's private key and known_hosts on server within /root
+#
+- name: "Grant keys to {{ pulling_to_server }}"
+  include_role:
+    name: key-transfer
+    tasks_from: grant-keys
+  vars:
+    granted_server: "{{ pulling_to_server }}"
+  when:
+    pulling_to_server != pulling_from_server
+
+
+# FIXME #818: Remove StrictHostKeyChecking=no when tests properly add host keys (users should do so, too, of course)
+- name: Set rsync command fact for pulling-from server {{ pulling_from_server }} NOT pulling-to server
+  set_fact:
+    rsync_command: >
+      rsync
+      --delay-updates
+      -F
+      --compress
+      --copy-links
+      --archive
+      --rsh="/usr/bin/ssh -S none -o StrictHostKeyChecking=no
+      -l {{ pulling_from_user }} -i /root/meza-ansible-id_rsa
+      -o UserKnownHostsFile=/root/meza-ansible-known_hosts"
+      "{{ pulling_from_server }}:{{ pulling_from_path }}"
+      "{{ pulling_to_path }}"
+  when:
+    pulling_to_server != pulling_from_server
+
+- name: Set rsync command fact for pulling-from server IS {{ pulling_to_server }}
+  set_fact:
+    rsync_command: >
+      rsync
+      --delay-updates
+      -F
+      --compress
+      --copy-links
+      --archive
+      "{{ pulling_from_path }}"
+      "{{ pulling_to_path }}"
+  when:
+    pulling_to_server == pulling_from_server
+
+- name: Run rsync
+  shell: "{{ rsync_command }}"
+  delegate_to: "{{ pulling_to_server }}"
+  run_once: true
+
+
+- name: "Revoke keys from {{ pulling_to_server }}"
+  include_role:
+    name: key-transfer
+    tasks_from: revoke-keys
+  vars:
+    granted_server: "{{ pulling_to_server }}"

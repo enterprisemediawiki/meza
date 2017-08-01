@@ -1,0 +1,484 @@
+#
+# This is the main Apache HTTP server configuration file.  It contains the
+# configuration directives that give the server its instructions.
+# See <URL:http://httpd.apache.org/docs/2.4/> for detailed information.
+# In particular, see
+# <URL:http://httpd.apache.org/docs/2.4/mod/directives.html>
+# for a discussion of each configuration directive.
+#
+# Do NOT simply read the instructions in here without understanding
+# what they do.  They're here only as hints or reminders.  If you are unsure
+# consult the online docs. You have been warned.
+#
+# Configuration and logfile names: If the filenames you specify for many
+# of the server's control files begin with "/" (or "drive:/" for Win32), the
+# server will use that explicit path.  If the filenames do *not* begin
+# with "/", the value of ServerRoot is prepended -- so "logs/access_log"
+# with ServerRoot set to "/usr/local/apache2" will be interpreted by the
+# server as "/usr/local/apache2/logs/access_log", whereas "/logs/access_log"
+# will be interpreted as '/logs/access_log'.
+
+#
+# ServerRoot: The top of the directory tree under which the server's
+# configuration, error, and log files are kept.
+#
+# Do not add a slash at the end of the directory path.  If you point
+# ServerRoot at a non-local disk, be sure to specify a local disk on the
+# Mutex directive, if file-based mutexes are used.  If you wish to share the
+# same ServerRoot for multiple httpd daemons, you will need to change at
+# least PidFile.
+#
+ServerRoot "/etc/httpd"
+
+#
+# Mutex: Allows you to set the mutex mechanism and mutex file directory
+# for individual mutexes, or change the global defaults
+#
+# Uncomment and change the directory if mutexes are file-based and the default
+# mutex file directory is not on a local disk or is not appropriate for some
+# other reason.
+#
+# Mutex default:logs
+
+
+#
+# Dynamic Shared Object (DSO) Support
+#
+# To be able to use the functionality of a module which was built as a DSO you
+# have to place corresponding `LoadModule' lines at this location so the
+# directives contained in it are actually available _before_ they are used.
+# Statically compiled modules (those listed by `httpd -l') do not need
+# to be loaded here.
+#
+# Example:
+# LoadModule foo_module modules/mod_foo.so
+#
+Include conf.modules.d/*.conf
+LoadModule php5_module		modules/libphp5.so
+
+<IfModule unixd_module>
+#
+# If you wish httpd to run as a different user or group, you must run
+# httpd as root initially and it will switch.
+#
+# User/Group: The name (or #number) of the user/group to run httpd as.
+# It is usually good practice to create a dedicated user and group for
+# running httpd, as with most system services.
+#
+User apache
+Group apache
+
+</IfModule>
+
+# 'Main' server configuration
+#
+# The directives in this section set up the values used by the 'main'
+# server, which responds to any requests that aren't handled by a
+# <VirtualHost> definition.  These values also provide defaults for
+# any <VirtualHost> containers you may define later in the file.
+#
+# All of these directives may appear inside <VirtualHost> containers,
+# in which case these default settings will be overridden for the
+# virtual host being defined.
+#
+
+#
+# ServerAdmin: Your address, where problems with the server should be
+# e-mailed.  This address appears on some server-generated pages, such
+# as error documents.  e.g. admin@your-domain.com
+#
+ServerAdmin you@example.com
+
+#
+# ServerName gives the name and port that the server uses to identify itself.
+# This can often be determined automatically, but we recommend you specify
+# it explicitly to prevent problems during startup.
+#
+# If your host doesn't have a registered DNS name, enter its IP address here.
+#
+ServerName https://{{ wiki_app_fqdn }}
+
+#
+# Deny access to the entirety of your server's filesystem. You must
+# explicitly permit access to web content directories in other
+# <Directory> blocks below.
+#
+<Directory />
+	AllowOverride none
+	Require all denied
+</Directory>
+
+#
+# Note that from this point forward you must specifically allow
+# particular features to be enabled - so if something's not working as
+# you might expect, make sure that you have specifically enabled it
+# below.
+#
+
+#
+# DocumentRoot: The directory out of which you will serve your
+# documents. By default, all requests are taken from this directory, but
+# symbolic links and aliases may be used to point to other locations.
+#
+# DocumentRoot "{{ m_htdocs }}"
+# <Directory "{{ m_htdocs }}">
+#	 #
+#	 # Possible values for the Options directive are "None", "All",
+#	 # or any combination of:
+#	 #   Indexes Includes FollowSymLinks SymLinksifOwnerMatch ExecCGI MultiViews
+#	 #
+#	 # Note that "MultiViews" must be named *explicitly* --- "Options All"
+#	 # doesn't give it to you.
+#	 #
+#	 # The Options directive is both complicated and important.  Please see
+#	 # http://httpd.apache.org/docs/2.4/mod/core.html#options
+#	 # for more information.
+#	 #
+#	 Options Indexes FollowSymLinks
+
+#	 #
+#	 # AllowOverride controls what directives may be placed in .htaccess files.
+#	 # It can be "All", "None", or any combination of the keywords:
+#	 #   AllowOverride FileInfo AuthConfig Limit
+#	 #
+#	 AllowOverride all
+
+#	 #
+#	 # Controls who can get stuff from this server.
+#	 #
+#	 Require all granted
+
+#	 #
+#	 # Disable directory browsing
+#	 #
+#	 Options All -Indexes
+
+# </Directory>
+
+#
+# DirectoryIndex: sets the file that Apache will serve if a directory
+# is requested.
+#
+<IfModule dir_module>
+	DirectoryIndex index.php index.html
+</IfModule>
+
+#
+# The following lines prevent .htaccess and .htpasswd files from being
+# viewed by Web clients.
+#
+<Files ".ht*">
+	Require all denied
+</Files>
+
+#
+# ErrorLog: The location of the error log file.
+# If you do not specify an ErrorLog directive within a <VirtualHost>
+# container, error messages relating to that virtual host will be
+# logged here.  If you *do* define an error logfile for a <VirtualHost>
+# container, that host's errors will be logged there and not here.
+#
+ErrorLog "logs/error_log"
+
+#
+# LogLevel: Control the number of messages logged to the error_log.
+# Possible values include: debug, info, notice, warn, error, crit,
+# alert, emerg.
+#
+LogLevel warn
+
+<IfModule log_config_module>
+
+	# Logging format:
+	#   ref: http://httpd.apache.org/docs/current/mod/mod_log_config.html
+	#
+	#   %h -  IP address of requester. For normal requests this will be the IP
+	#         address of the HAProxy load balancer, which is mostly useless.
+	#   %{X-Forwarded-For}i - IP address of client as seen by HAProxy. This is
+	#         forwarded on by HAProxy.
+	#   %l -  Remote logname (from identd, if supplied). This will return a
+	#         dash unless mod_ident is present and IdentityCheck is set On.
+	#   %u -  Remote user if the request was authenticated. May be bogus if
+	#         return status (%s) is 401 (unauthorized).
+	#   %t -  Time the request was received
+	#   %D -  The time taken to serve the request, in microseconds.
+	#   %r -  First line of request.
+	#   %>s - The final status. Just %s would be the initial status
+	#   %{Referer}i - Referer
+	#   %{User-Agent}i - User agent (browser) of client
+	#   %I -  Bytes received, including request and headers, cannot be zero.
+	#   %O -  Bytes sent, including headers, cannot be zero.
+
+	# Logging for normal requests from clients
+	LogFormat "%{X-Forwarded-For}i %h %l %u %t %D \"%r\" %>s \"%{Referer}i\" \"%{User-Agent}i\" %I %O" proxy
+
+	# This is for non-proxied requests, meaning requests made from within the
+	# server itself or by other non-HAProxy nodes (if that's possible)
+	LogFormat             "noproxy %h %l %u %t %D \"%r\" %>s \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combined
+
+	SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded
+	CustomLog "logs/access_log" combined env=!forwarded
+	CustomLog "logs/access_log" proxy env=forwarded
+
+</IfModule>
+
+<IfModule alias_module>
+	#
+	# Redirect: Allows you to tell clients about documents that used to
+	# exist in your server's namespace, but do not anymore. The client
+	# will make a new request for the document at its new location.
+	# Example:
+	# Redirect permanent /foo http://www.example.com/bar
+
+	#
+	# Alias: Maps web paths into filesystem paths and is used to
+	# access content that does not live under the DocumentRoot.
+	# Example:
+	# Alias /webpath /full/filesystem/path
+	#
+	# If you include a trailing / on /webpath then the server will
+	# require it to be present in the URL.  You will also likely
+	# need to provide a <Directory> section to allow access to
+	# the filesystem path.
+
+	#
+	# ScriptAlias: This controls which directories contain server scripts.
+	# ScriptAliases are essentially the same as Aliases, except that
+	# documents in the target directory are treated as applications and
+	# run by the server when requested rather than as documents sent to the
+	# client.  The same rules about trailing "/" apply to ScriptAlias
+	# directives as to Alias.
+	#
+	# ScriptAlias /cgi-bin/ "/usr/local/apache2/cgi-bin/"
+
+</IfModule>
+
+<IfModule cgid_module>
+	#
+	# ScriptSock: On threaded servers, designate the path to the UNIX
+	# socket used to communicate with the CGI daemon of mod_cgid.
+	#
+	#Scriptsock cgisock
+</IfModule>
+
+#
+# "/usr/local/apache2/cgi-bin" should be changed to whatever your ScriptAliased
+# CGI directory exists, if you have that configured.
+#
+# <Directory "/usr/local/apache2/cgi-bin">
+#	 AllowOverride None
+#	 Options None
+#	 Require all granted
+# </Directory>
+
+<IfModule mime_module>
+	#
+	# TypesConfig points to the file containing the list of mappings from
+	# filename extension to MIME-type.
+	#
+	TypesConfig /etc/mime.types
+
+	#
+	# AddType allows you to add to or override the MIME configuration
+	# file specified in TypesConfig for specific file types.
+	#
+	#AddType application/x-gzip .tgz
+	#
+	# AddEncoding allows you to have certain browsers uncompress
+	# information on the fly. Note: Not all browsers support this.
+	#
+	#AddEncoding x-compress .Z
+	#AddEncoding x-gzip .gz .tgz
+	#
+	# If the AddEncoding directives above are commented-out, then you
+	# probably should define those extensions to indicate media types:
+	#
+	AddType application/x-compress .Z
+	AddType application/x-gzip .gz .tgz
+
+	#
+	# AddHandler allows you to map certain file extensions to "handlers":
+	# actions unrelated to filetype. These can be either built into the server
+	# or added with the Action directive (see below)
+	#
+	# To use CGI scripts outside of ScriptAliased directories:
+	# (You will also need to add "ExecCGI" to the "Options" directive.)
+	#
+	#AddHandler cgi-script .cgi
+
+	# For type maps (negotiated resources):
+	#AddHandler type-map var
+
+	#
+	# Filters allow you to process content before it is sent to the client.
+	#
+	# To parse .shtml files for server-side includes (SSI):
+	# (You will also need to add "Includes" to the "Options" directive.)
+	#
+	#AddType text/html .shtml
+	#AddOutputFilter INCLUDES .shtml
+</IfModule>
+
+#
+# Specify a default charset for all content served; this enables
+# interpretation of all content as UTF-8 by default.  To use the
+# default browser choice (ISO-8859-1), or to allow the META tags
+# in HTML content to override this choice, comment out this
+# directive:
+#
+AddDefaultCharset UTF-8
+
+<IfModule mime_magic_module>
+	#
+	# The mod_mime_magic module allows the server to use various hints from the
+	# contents of the file itself to determine its type.  The MIMEMagicFile
+	# directive tells the module where the hint definitions are located.
+	#
+	MIMEMagicFile conf/magic
+</IfModule>
+
+#
+# Customizable error responses come in three flavors:
+# 1) plain text 2) local redirects 3) external redirects
+#
+# Some examples:
+#ErrorDocument 500 "The server made a boo boo."
+#ErrorDocument 404 /missing.html
+#ErrorDocument 404 "/cgi-bin/missing_handler.pl"
+#ErrorDocument 402 http://www.example.com/subscription_info.html
+#
+
+#
+# MaxRanges: Maximum number of Ranges in a request before
+# returning the entire resource, or one of the special
+# values 'default', 'none' or 'unlimited'.
+# Default setting is to accept 200 Ranges.
+#MaxRanges unlimited
+
+#
+# EnableMMAP and EnableSendfile: On systems that support it,
+# memory-mapping or the sendfile syscall may be used to deliver
+# files.  This usually improves server performance, but must
+# be turned off when serving from networked-mounted
+# filesystems or if support for these functions is otherwise
+# broken on your system.
+# Defaults: EnableMMAP On, EnableSendfile Off
+#
+#EnableMMAP off
+#EnableSendfile on
+
+# Secure (SSL/TLS) connections
+#Include conf/extra/httpd-ssl.conf
+#
+# Note: The following must must be present to support
+#	   starting without SSL on platforms with no /dev/random equivalent
+#	   but a statically compiled-in mod_ssl.
+#
+<IfModule ssl_module>
+SSLRandomSeed startup builtin
+SSLRandomSeed connect builtin
+</IfModule>
+#
+# uncomment out the below to deal with user agents that deliberately
+# violate open standards by misusing DNT (DNT *must* be a specific
+# end-user choice)
+#
+#<IfModule setenvif_module>
+#BrowserMatch "MSIE 10.0;" bad_DNT
+#</IfModule>
+#<IfModule headers_module>
+#RequestHeader unset DNT env=bad_DNT
+#</IfModule>
+
+
+# main handling via http
+Listen 8080
+<VirtualHost *:8080>
+
+	<Directory {{ m_htdocs }}>
+
+		#
+		AllowOverride All
+
+		#
+		Options Indexes FollowSymLinks
+
+		# Controls who can get stuff from this server.
+		Require all granted
+
+		# Disable directory browsing
+		Options All -Indexes
+	</Directory>
+
+	DocumentRoot {{ m_htdocs }}
+	# WAS: ServerName https://{{ wiki_app_fqdn }}
+	#      This server name causes issues with SAML setups, ref #794
+	ServerName MezaMainEntrypoint
+
+	{% if saml_secret is defined -%}
+	# Use SimpleSamlPhp to handle authentication
+	Alias /simplesaml {{ m_simplesamlphp_path }}/www
+	<Directory {{ m_simplesamlphp_path }}/www>
+		Require all granted
+		Options All -Indexes
+	</Directory>
+	{%- endif %}
+
+	{% if m_setup_php_profiling -%}
+	# Prepends file all files to initiate profiling
+	php_admin_value auto_prepend_file "{{ m_profiling_xhgui_directory }}/external/header.php"
+	{% endif %}
+
+</VirtualHost>
+
+{% if m_setup_php_profiling -%}
+# Enable profiling for PHP
+Listen 8089
+<VirtualHost *:8089>
+
+	<Directory {{ m_profiling_xhgui_directory }}/webroot>
+		Options Indexes MultiViews FollowSymLinks
+		AllowOverride All
+		Require all granted
+	</Directory>
+
+	DocumentRoot {{ m_profiling_xhgui_directory }}/webroot
+
+	# HAProxy listening on 8088 for this
+	ServerName http://{{ wiki_app_fqdn }}:8088
+
+</VirtualHost>
+{% endif %}
+
+# Use port 8090 to access mod_status. Not accessible outside firewall.
+ExtendedStatus on
+Listen 8090
+<VirtualHost *:8090>
+        <Location /server-status>
+                SetHandler server-status
+                Require all granted
+        </Location>
+</VirtualHost>
+
+
+#
+# Handle files ending in .php, .php5, .php6, etc with PHP
+#
+<FilesMatch "\.ph(p[2-6]?|tml)$">
+	SetHandler application/x-httpd-php
+</FilesMatch>
+<IfModule !php5_module>
+	<FilesMatch "\.ph(p[2-6]?|tml)$">
+		Order allow,deny
+		Deny from all
+	</FilesMatch>
+</IfModule>
+
+# Don't allow access to images directories. Will allow access via img_auth.php
+# FIXME #805: No images are here anymore anyway. We actually have no method of NOT
+#             using img_auth.php now. Remove me.
+<DirectoryMatch "^{{ m_htdocs }}/wikis/(.+)/images">
+	Order Allow,Deny
+	Deny From All
+</DirectoryMatch>
+

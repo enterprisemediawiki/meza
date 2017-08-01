@@ -1,0 +1,14 @@
+---
+app1:
+  memory: 2048
+  cpus: 1
+
+# To add a second app server, uncomment the lines below
+# app2:
+#   memory: 512
+#   cpus: 1
+
+# To add a second database server, uncomment the lines below
+# db2:
+#   memory: 512
+#   cpus: 1

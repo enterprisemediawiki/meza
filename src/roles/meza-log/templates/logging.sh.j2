@@ -1,0 +1,49 @@
+#!/bin/sh
+#
+# {{ ansible_managed }}
+#
+# Config for logging functions
+
+#
+# SERVER PERFORMANCE
+#
+{% if slack_channel_server_performance is defined %}
+# Slack channel to send server performance info. If undefined, will use webhook default
+slack_channel_server_performance="{{ slack_channel_server_performance }}"
+{% endif %}
+
+{% if slack_webhook_token_server_performance is defined %}
+# Slack incoming webhook token for sending server performance info
+slack_webhook_token_server_performance="{{ slack_webhook_token_server_performance }}"
+{% endif %}
+
+{% if slack_username_server_performance is defined %}
+# Slack username to display for webhook
+slack_username_server_performance="{{ slack_username_server_performance }}"
+{% endif %}
+
+
+#
+# DISK USAGE
+#
+{% if disk_space_usage_mount_name is defined %}
+disk_space_usage_mount_name="{{ disk_space_usage_mount_name }}"
+{% endif %}
+
+# A short name used in description when sending Slack message
+disk_space_usage_mount_short_name="{{ disk_space_usage_mount_short_name | default('Disk') }}"
+
+{% if slack_channel_disk_usage is defined %}
+# Slack channel to send disk usage info. If undefined, will use webhook default
+slack_channel_disk_usage="{{ slack_channel_disk_usage }}"
+{% endif %}
+
+{% if slack_webhook_token_disk_usage is defined %}
+# Slack incoming webhook token for sending disk usage info
+slack_webhook_token_disk_usage="{{ slack_webhook_token_disk_usage }}"
+{% endif %}
+
+{% if slack_username_disk_usage is defined %}
+# Slack username to display for webhook
+slack_username_disk_usage="{{ slack_username_disk_usage }}"
+{% endif %}

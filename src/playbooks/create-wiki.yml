@@ -1,0 +1,37 @@
+---
+
+- hosts: app-servers
+  become: yes
+
+  # prompt for wiki_id and wiki_name
+  vars_prompt:
+    - name: "wiki_id"
+      prompt: |
+        Enter the desired wiki identifier. This should be a short
+        alphanumeric string (no spaces) which will be part of the
+        URL for your wiki. For example, in the following URL the
+        "mywiki" part is your wiki ID: https://example.com/mywiki
+
+        Type the desired wiki ID and press [ENTER]:
+      private: no
+
+    - name: "wiki_name"
+      prompt: |
+        The wiki name should name should be short, but not as short
+        as the wiki ID. It can be a little more descriptive, and
+        should also use capitalization where appropriate.
+        Example: Engineering Wiki
+
+        Type the desired wiki name and press [ENTER]:
+      private: no
+
+  roles:
+    - set-vars
+    - create-wiki-wrapper
+
+
+- hosts: parsoid-servers
+  become: yes
+  roles:
+    - set-vars
+    - parsoid-settings

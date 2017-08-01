@@ -1,0 +1,11 @@
+Mediawiki EZ Admin
+
+Usage: meza install [directives]
+
+List of directives:
+
+Directive          Description
+---------------------------------------------------------------
+dev-networking     Setup a VirtualBox VM networking
+monolith           Install meza on a single machine
+docker             Install Docker (CentOS only)

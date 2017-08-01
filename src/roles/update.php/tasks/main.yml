@@ -1,0 +1,51 @@
+---
+
+- debug: { msg: "Running role:update.php for {{ wiki_id }}" }
+
+- name: Set backup timestamp fact
+  set_fact:
+    backup_timestamp: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+
+- name: Ensure backups directory exists for wiki
+  file:
+    path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}"
+    state: directory
+    mode: "{{ m_backups_mode }}"
+    owner: "{{ m_backups_owner }}"
+    group: "{{ m_backups_group }}"
+  delegate_to: "{{ groups['backup-servers'][0] }}"
+
+#
+# DUMP SQL from DB Master to backup-servers[0]
+#
+- name: "Backup wiki database prior to running update.php"
+  include_role:
+    name: remote-mysqldump
+  vars:
+    remote_server:      "{{ groups['db-master'][0] }}"
+    dump_database:      "wiki_{{ wiki_id }}"
+    target_server:      "{{ groups['backup-servers'][0] }}"
+    target_server_path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}/{{ backup_timestamp }}_wiki.sql"
+  run_once: true
+  tags:
+    - update.php
+    - update.php-backup
+
+- name: "Clean out all but the latest SQL backup file for {{ wiki_id }} IF DESIRED"
+  include_role:
+    name: sql-backup-cleanup
+  vars:
+    cleanup_wiki: "{{ wiki_id }}"
+  run_once: true
+  tags:
+    - update.php
+    - sql-backup-cleanup
+  when: do_cleanup_sql_backup
+
+- name: Run update.php on this wiki
+  shell: >
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/update.php" --quick
+  # run_once see [1]
+  run_once: true
+  tags:
+    - update.php

@@ -1,0 +1,247 @@
+---
+- name: Ensure user's meza-ansible and alt-meza-ansible in group "wheel"
+  user:
+    name: "{{ item }}"
+    # primary group
+    group: wheel
+    move_home: yes
+    home: "{{ m_home }}/{{ item }}"
+  with_items:
+  - meza-ansible
+  - alt-meza-ansible
+
+- name: Ensure user alt-meza-ansible .ssh dir configured
+  file:
+    path: "{{ m_home }}/alt-meza-ansible/.ssh"
+    owner: alt-meza-ansible
+    group: wheel
+    mode: 0700
+    state: directory
+
+- name: Copy meza-ansible authorized_keys to alt-meza-ansible
+  shell: cp {{ m_home }}/meza-ansible/.ssh/authorized_keys {{ m_home }}/alt-meza-ansible/.ssh/authorized_keys
+
+- name: Ensure user meza-ansible and alt-meza-ansible authorized_keys configured
+  file:
+    path: "{{ m_home }}/{{ item }}/.ssh/authorized_keys"
+    owner: "{{ item }}"
+    group: wheel
+    mode: 0644
+  with_items:
+  - meza-ansible
+  - alt-meza-ansible
+
+- name: Set authorized key for alt-meza-ansible
+  authorized_key:
+    user: alt-meza-ansible
+    state: present
+    key: "{{ lookup('file', '{{ m_home }}/meza-ansible/.ssh/id_rsa.pub') }}"
+
+- name: Ensure no password on alt-meza-ansible user
+  shell: passwd --delete alt-meza-ansible
+  ignore_errors: yes
+
+# Add line to visudo file if it does not exist
+- name: Ensure alt-meza-ansible is passwordless sudoer
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    line: 'alt-meza-ansible ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: ensure deltarpm is installed and latest
+  yum: name=deltarpm state=latest
+  tags:
+  - latest
+
+- name: upgrade all packages
+  yum: name=* state=latest
+  tags:
+  - latest
+
+# FIXME #807: for RedHat may need to enable "Optional RPMs"
+- name: ensure EPEL installed
+  yum:
+    name: epel-release
+    state: installed
+  when: ansible_distribution == "CentOS"
+
+- name: Check if EPEL repo is already configured.
+  stat:
+    path: "/etc/yum.repos.d/epel.repo"
+  register: epel_repofile_result
+
+- name: Install EPEL repo.
+  yum:
+    name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+    state: present
+  register: result
+  until: '"failed" not in result'
+  retries: 5
+  delay: 10
+  when: ansible_distribution == "RedHat" and not epel_repofile_result.stat.exists
+
+- name: Import EPEL GPG key.
+  rpm_key:
+    key: "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+    state: present
+  when: ansible_distribution == "RedHat" and not epel_repofile_result.stat.exists
+  ignore_errors: "{{ ansible_check_mode }}"
+
+
+- name: Ensure optional repos enabled
+  shell: subscription-manager repos --enable rhel-7-server-optional-rpms
+  when: ansible_distribution == "RedHat"
+
+
+- name: ensure libselinux-python installed prior to SELinux
+  yum: name=libselinux-python state=installed
+- name: Install base packages
+  yum: name={{item}} state=installed
+  with_items:
+    - ntp
+    - ntpdate
+    - ntp-doc
+    - openssh-server
+    - openssh-clients
+    - vim
+    - git
+    - net-tools
+    - firewalld
+    - selinux-policy
+    - rsyslog
+    - jq
+    - tree
+    - cronie
+- name: put SELinux in permissive mode
+  selinux:
+    policy: targeted
+    state: permissive # log actions that would be blocked if state=enforcing
+- name: ensure firewalld is running (and enable it at boot)
+  service: name=firewalld state=started enabled=yes
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+
+#
+# SSH config
+#
+- name: Ensure sshd is running and enabled
+  service:
+    name: sshd
+    state: started
+    enabled: yes
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- name: Ensure SSH client and SSH Daemon configs in place
+  template:
+    src: "ssh_config.j2"
+    dest: "/etc/ssh/ssh_config"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure SSH client and SSH Daemon configs in place
+  template:
+    src: "sshd_config.j2"
+    dest: "/etc/ssh/sshd_config"
+    owner: root
+    group: root
+    mode: "0600"
+  notify:
+    - restart sshd
+
+
+# Replace the following shell commands:
+# chkconfig ntpd on # Activate service
+# ntpdate pool.ntp.org # Synchronize the system clock with 0.pool.ntp.org server
+# service ntpd start # Start service
+- name: Install NTP
+  yum: name=ntp state=installed
+- name: Ensure NTP is running and enabled as configured.
+  service:
+    name: ntpd
+    state: started
+    enabled: yes
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- name: Copy the ntp.conf template file
+  template: src=ntp.conf.j2 dest=/etc/ntp.conf
+  notify:
+    - restart ntpd
+
+# FIXME #809: PIP required first; has dependencies; needed on all hosts?
+# Speed up encrypt/decrypt operations
+# ref: http://docs.ansible.com/ansible/playbooks_vault.html#speeding-up-vault-operations
+# - name: Ensure PIP cryptography package installed
+#   pip:
+#     name: cryptography
+
+- name: Ensure deploy directory in place
+  file:
+    path: "{{ m_deploy }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Ensure config variables available in PHP and shell files
+  template:
+    src: "config.{{ item }}.j2"
+    dest: "{{ m_deploy }}/config.{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - "php"
+    - "sh"
+
+- name: "Ensure {{ m_tmp }} exists"
+  file:
+    path: "{{ m_tmp }}"
+    owner: meza-ansible
+    group: wheel
+    mode: 0755
+    state: directory
+
+- name: "Ensure {{ m_logs }} exists"
+  file:
+    path: "{{ m_logs }}"
+    owner: "{{ m_logs_owner }}"
+    group: "{{ m_logs_group }}"
+    mode: "{{ m_logs_mode }}"
+    state: directory
+
+# Prevent runJobs and other scripts from running when application may be in
+# indeterminate state
+- name: Ensure crontab empty for meza-ansible when overwriting wikis
+  shell: crontab -u meza-ansible -r
+  when: force_overwrite_from_backup is defined and force_overwrite_from_backup == true
+
+  # Ignore errors due issue #699: If a crontab doesn't exist yet this command
+  # will fail
+  ignore_errors: yes
+
+# Ref: http://docs.ansible.com/ansible/playbooks_loops.html#id4
+- name: Copy any custom PEM-format CA certs into place
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/pki/ca-trust/source/anchors/"
+    owner: root
+    mode: "0755"
+  with_fileglob:
+    - "{{ m_local_public }}/custom-pem-ca-trust/*"
+  register: new_custom_pem_ca_certs
+
+- name: Copy any custom OpenSSL extended-format CA certs into place
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/pki/ca-trust/source/"
+    owner: root
+    mode: "0755"
+  with_fileglob:
+    - "{{ m_local_public }}/custom-extended-ca-trust/*"
+  register: new_custom_extended_ca_certs
+
+- name: Update CA trust if certs changed
+  shell: update-ca-trust
+  when: new_custom_pem_ca_certs.changed or new_custom_extended_ca_certs.changed

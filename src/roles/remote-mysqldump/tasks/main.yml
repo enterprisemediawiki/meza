@@ -1,0 +1,102 @@
+---
+# MySQL dump from one server onto another
+#
+# Inputs:
+#   remote_server:
+#   remote_server_ssh_user:
+#   remote_server_mysql_user:
+#   remote_server_mysql_pass:
+#   dump_database: the database to dump
+#   target_server
+#   target_server_path
+
+
+#
+# Put meza-ansible's private key and known_hosts on server within /root
+#
+- name: "Grant keys to {{ target_server }}"
+  include_role:
+    name: key-transfer
+    tasks_from: grant-keys
+  vars:
+    granted_server: "{{ target_server }}"
+  when:
+    target_server != remote_server
+
+#
+# SET user option like `-u MYUSER` if desired
+#
+- name: Set mysql user option if defined
+  set_fact:
+    user_option: "-u {{ remote_server_mysql_user }}"
+  when: remote_server_mysql_user is defined
+- name: Set mysql user option to empty string if not defined
+  set_fact:
+    user_option: ""
+  when: remote_server_mysql_user is not defined
+
+#
+# SET password option like `-pMYPASSWORD` if desired
+#
+- name: Set mysql password option if defined
+  set_fact:
+    password_option: "-p{{ remote_server_mysql_pass }}"
+  when: remote_server_mysql_pass is defined
+- name: Set mysql password option to empty string if not defined
+  set_fact:
+    password_option: ""
+  when: remote_server_mysql_pass is not defined
+
+#
+# SET remote_server_ssh_user to 'meza-ansible' if not defined
+#
+- name: Set remote_server_ssh_user to 'meza-ansible' if not defined
+  set_fact:
+    remote_server_ssh_user: "meza-ansible"
+  when: remote_server_ssh_user is not defined
+
+
+#
+# If remote_server != target_server, use SSH to run mysqldump. Else, doit locally
+#
+# FIXME #818: Remove StrictHostKeyChecking=no when tests properly add host keys (users should do so, too, of course)
+- name: remote_server ({{ remote_server }}) != target_server ({{ target_server }}); run mysqldump over SSH
+  set_fact:
+    mysqldump_command: >
+      ssh
+      -o StrictHostKeyChecking=no
+      -i /root/meza-ansible-id_rsa
+      -o UserKnownHostsFile=/root/meza-ansible-known_hosts
+      {{ remote_server_ssh_user }}@{{ remote_server }}
+      "mysqldump
+      {{ user_option }}
+      {{ password_option }}
+      {{ dump_database }}
+      | gzip -c"
+      | gunzip > {{ target_server_path }}
+  when: remote_server != target_server
+- name: remote_server == target_server ({{ target_server }}); run mysqldump locally
+  set_fact:
+    mysqldump_command: >
+      mysqldump
+      {{ user_option }}
+      {{ password_option }}
+      {{ dump_database }}
+      > {{ target_server_path }}
+  when: remote_server == target_server
+
+- debug: { msg: "{{ mysqldump_command }}" }
+
+#
+# DO mysqldump
+#
+- name: "Perform MySQL dump from {{ remote_server }} to {{ target_server }}"
+  shell: "{{ mysqldump_command }}"
+  delegate_to: "{{ target_server }}"
+
+- name: "Revoke keys from {{ target_server }}"
+  include_role:
+    name: key-transfer
+    tasks_from: revoke-keys
+  vars:
+    granted_server: "{{ target_server }}"

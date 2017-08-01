@@ -1,0 +1,61 @@
+<?php
+/**
+ * SAML 2.0 remote IdP metadata for SimpleSAMLphp.
+ *
+ * Remember to remove the IdPs you don't use from this file.
+ *
+ * See: https://simplesamlphp.org/docs/stable/simplesamlphp-reference-idp-remote
+ */
+
+{% if saml_secret.idp_entity_id is defined %}
+$metadata['{{ saml_secret.idp_entity_id }}'] = array(
+{% elif saml_public.idp_entity_id is defined %}
+$metadata['{{ saml_public.idp_entity_id }}'] = array(
+{% else %}
+// neither {{ saml_secret.idp_entity_id }} nor {{ saml_public.idp_entity_id }} is defined
+{% endif %}
+
+	// FIXME #822: This jinja template is really hard to follow. Perhaps either
+	// stop offering saml_public for some of these, even though they aren't
+	// sensitive, or make it so the saml_secret and saml_public variables are
+	// merged automatically rather than on a case-by-case basis like this.
+
+	{% if saml_secret.single_sign_on_service is defined %}
+	'SingleSignOnService' => '{{ saml_secret.single_sign_on_service }}',
+	{% elif saml_public.single_sign_on_service is defined %}
+	'SingleSignOnService' => '{{ saml_public.single_sign_on_service }}',
+	{% else %}
+	// neither {{ saml_secret.single_sign_on_service }} nor {{ saml_public.single_sign_on_service }} is defined
+	{% endif %}
+
+
+	{% if saml_secret.single_logout_service is defined %}
+	'SingleLogoutService' => '{{ saml_secret.single_logout_service }}',
+	{% elif saml_public.single_logout_service is defined %}
+	'SingleLogoutService' => '{{ saml_public.single_logout_service }}',
+	{% else %}
+	// neither {{ saml_secret.single_logout_service }} nor {{ saml_public.single_logout_service }} is defined
+	{% endif %}
+
+
+	{% if saml_secret.cert_fingerprint is defined %}
+
+	'certFingerprint' => array(
+		{% for fp in saml_secret.cert_fingerprint -%}
+		'{{ fp }}',
+		{%- endfor %}
+	),
+
+	{% elif saml_public.cert_fingerprint is defined %}
+
+	'certFingerprint' => array(
+		{% for fp in saml_public.cert_fingerprint -%}
+		'{{ fp }}',
+		{%- endfor %}
+	),
+
+	{% else %}
+	// neither {{ saml_secret.cert_fingerprint }} nor {{ saml_public.cert_fingerprint }} is defined
+	{% endif %}
+
+);

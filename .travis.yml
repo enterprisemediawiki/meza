@@ -1,0 +1,28 @@
+---
+# Copied, with great appreciation, from geerlingguy/ansible-role-nodejs
+
+services: docker
+
+env:
+  - test_type: monolith-from-scratch
+  - test_type: monolith-from-import
+  - test_type: import-from-remote
+  - test_type: backup-to-remote
+  - test_type: import-from-alt-remote
+
+# before_install:
+  # To upgrade Docker, uncomment the following lines. Do this only if there are
+  # suspected differences between Travis' version and latest Docker CE version,
+  # since these lines take additional time and occasionally cause build errors.
+  # - sudo apt-get update
+  # - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-engine
+
+script:
+  - 'bash ./tests/docker/run-tests.sh ${test_type} ${PWD}'
+
+notifications:
+  slack:
+    secure: WGio0Sf5R+nm7kNLSxG5DZoFZjh1ifNbuH0TR5XlbtQ6r9hVHYDW8jRT2PoG9mHFNUDzHE4ixJfpbhHKdnqHwjJrtKhUWemBE95dqrDhQI1iWQZm2JHnK0KsjyOtc6DVqa3zA6Mrv1w1UONHwoe3QfSj5cj/qVBQaWBB8EhxNubmcKK2Zz+keMNkMfWDaPmGj+pQG5daGGRlkvoZOm7TkAIk4JXpvOwnAPKZx+MbX3tYNFqPgPJpbxejM8t5EqHAQEPJA8dThgG76kO5jFTMhkQdCWusK+7pl/IN0MlJf9S+rVv0HuacPDQmnaEw23O+otA8T9amNlOvc2bUR8djiStDLfZYlYtTdEpUOfPAR2CxplJM1YV1o982Vt8wOyqO0BWjaID8BEjHE0tn8vKF+qQ1WpNB6nZZNNqLdfUSaMS2y6t15sLV3NZWYe3Bw0ebsR5dsfOHX5U4RwSjbsL99Rm9B4eDL9gAUWn4L4USYjLb5Os6DePXxrCRvPL13OjxJGvWb8NIUJbtQASDc69Qc2M4M9ZB4MkjBDsoEfLYhmB9KeERycRB2pnAGVxUWJn/Cbj4yAvaU60sZPNBLr4Q+HGz1zciZ4yV8tCrLkN99pxxAWxil/PsNVWPtRueznNRPfbPiARbVeLO/r3OcQocfEKpRrNh8sb3kJ8MzHXa9RU=
+  on_success: always
+  on_failure: always
+  on_pull_requests: true

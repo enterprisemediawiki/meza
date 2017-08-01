@@ -1,0 +1,46 @@
+---
+
+# Handled in role:base now
+# - name: Ensure cron installed
+#   yum:
+#     name: cronie
+#     state: installed
+
+- name: Ensure cron is running (and enable it at boot)
+  service:
+    name: crond
+    state: started
+    enabled: yes
+
+- name: Ensure crontab file up-to-date
+  template:
+    src: meza-ansible.crontab.j2
+    dest: "{{ m_home }}/meza-ansible/.ansible-cronfile"
+    owner: meza-ansible
+    group: wheel
+    mode: 0755
+
+- name: Ensure runAllJobs.php in place
+  template:
+    src: runAllJobs.php.j2
+    dest: /opt/.deploy-meza/runAllJobs.php
+    owner: meza-ansible
+    group: wheel
+    mode: 0755
+
+# Make sure sudo can be used in cron jobs
+- lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^Defaults\s+requiretty'
+    line: '#Defaults requiretty'
+    validate: 'visudo -cf %s'
+- lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^Defaults\s+!visiblepw'
+    line: '#Defaults !visiblepw'
+    validate: 'visudo -cf %s'
+
+- name: Ensure crontab up-to-date from file
+  shell: crontab -u meza-ansible {{ m_home }}/meza-ansible/.ansible-cronfile

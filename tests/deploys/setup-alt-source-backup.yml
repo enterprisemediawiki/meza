@@ -1,0 +1,96 @@
+---
+
+# NOTE: this playbook is for test purposes only. It sets up a database and gets
+# file uploads for a wiki, which could be split over the db-src or the
+# backups-src server(s), but in the hosts declaration below it only specifies
+# backups-src. For the test case these servers will be the same.
+- hosts: "{{ alt_source_ip_addr }}"
+  become: yes
+  vars:
+    alt_source_backups_dir: /opt/alt/backups
+    m_home: /opt/conf-meza/users
+
+  tasks:
+    - name: Ensure packages installed
+      yum:
+        name: "{{item}}"
+        state: installed
+      with_items:
+        - mariadb
+        - mariadb-server
+        - mariadb-libs
+        - MySQL-python
+        - perl-DBD-MySQL
+
+    - name: Ensure backups repo in place
+      git:
+        repo: https://github.com/jamesmontalvo3/meza-test-backups.git
+        dest: "{{ alt_source_backups_dir }}"
+        version: master
+
+    - name: Start mariadb
+      service:
+        name: mariadb
+        state: started
+        enabled: yes
+
+    - name: Set MariaDB root password
+      shell: mysqladmin -u root password 1234
+
+
+    # This will find the latest sql file by name, or wiki.sql over any timestamped one
+    # assuming timestamp-named files like 20170220000002_wiki.sql
+    - name: Find SQL file
+      shell: 'find {{ alt_source_backups_dir }}/top -maxdepth 1 -type f -iname "*.sql" | sort -r | head -n +1'
+      register: wiki_sql_file
+
+    - name: Create "top" DB
+      mysql_db:
+        name: wiki_top
+        state: import
+        target: "{{ wiki_sql_file.stdout }}"
+        login_user: root
+        login_password: 1234
+
+    - name: Create alternate SSH user
+      user:
+        name: test-user
+        group: wheel
+
+    # Add line to visudo file if it does not exist
+    # FIXME #827: This is really bad that a backup-retrieval-user needs sudo,
+    #             but unfortunately synchronize doesn't allow one end to be
+    #             sudo and the other to not.
+    - name: Ensure test-user is passwordless sudoer
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        line: 'test-user ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+
+    - name: Ensure test-user .ssh dir configured
+      file:
+        path: "/home/test-user/.ssh"
+        owner: test-user
+        group: wheel
+        mode: 0700
+        state: directory
+
+    - name: Ensure authorized_keys configured
+      file:
+        path: "/home/test-user/.ssh/authorized_keys"
+        owner: test-user
+        group: wheel
+        mode: 0644
+        state: touch
+
+    - name: Set authorized key test-user
+      authorized_key:
+        user: test-user
+        state: present
+        key: "{{ lookup('file', '{{ m_home }}/meza-ansible/.ssh/id_rsa.pub') }}"
+
+    - name: Ensure no password on test-user
+      shell: passwd --delete test-user
+      ignore_errors: yes
+

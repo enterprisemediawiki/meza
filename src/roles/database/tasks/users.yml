@@ -1,0 +1,33 @@
+---
+- name: Ensure meza application MySQL users are present
+  mysql_user:
+    name: "{{ wiki_app_db_user.name }}"
+    host: "{{ item }}"
+    password: "{{ wiki_app_db_user.password }}"
+    priv: "{{ wiki_app_db_user.priv }}"
+    state: present
+    append_privs: no
+  with_items: "{{ groups['app-servers'] }}"
+  no_log: true
+
+- name: If this DB-server is an app server, include localhost as a valid host for application user
+  mysql_user:
+    name: "{{ wiki_app_db_user.name }}"
+    host: localhost
+    password: "{{ wiki_app_db_user.password }}"
+    priv: "{{ wiki_app_db_user.priv }}"
+    state: present
+    append_privs: no
+  no_log: true
+  when: inventory_hostname in groups['app-servers']
+
+- name: Ensure additional MySQL users are present.
+  mysql_user:
+    name: "{{ item.name }}"
+    host: "{{ item.host | default('localhost') }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.priv | default('*.*:USAGE') }}"
+    state: "{{ item.state | default('present') }}"
+    append_privs: "{{ item.append_privs | default('no') }}"
+  with_items: "{{ mysql_users }}"
+  no_log: true

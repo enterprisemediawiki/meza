@@ -1,0 +1,4 @@
+---
+- name: restart firewalld
+  service: name=firewalld state=restarted
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
