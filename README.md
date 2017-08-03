@@ -43,6 +43,8 @@ This will setup a demo wiki with the user `Admin` with password `adminpass`. Upd
 Running VirtualBox and need to get your virtual machine configured? See our
 [setting up VirtualBox](manual/SettingUpVirtualBox.md) guide.
 
+Want to install on multiple servers. See [setting up a multi-server environment](manual/multi-server.md).
+
 ## What is installed?
 
 Everything can be installed on a single server (a monolith, `meza deploy monolith`) or can be configured to install different components on different servers. For example, you may have the following setup:
