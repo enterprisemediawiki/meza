@@ -61,20 +61,20 @@ list:
   #
   - name: ParserFunctions
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ParserFunctions.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     config: |
       // Also enable StringFunctions, like len, pos, sub, replace, explode
       // https://www.mediawiki.org/wiki/Extension:StringFunctions
       $wgPFEnableStringFunctions = true;
   - name: ExternalData
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ExternalData.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
   - name: LabeledSectionTransclusion
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/LabeledSectionTransclusion.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
   - name: Cite
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Cite.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     config: |
       $wgCiteEnablePopups = true;
   - name: ParserFunctionHelper
@@ -82,16 +82,16 @@ list:
     version: master
   - name: CharInsert
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CharInsert.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
   - name: PageForms
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PageForms.git
     version: tags/4.1.1
   - name: DismissableSiteNotice
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DismissableSiteNotice.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
   - name: WikiEditor
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/WikiEditor.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     config: |
       $wgDefaultUserOptions['usebetatoolbar'] = 1;
       $wgDefaultUserOptions['usebetatoolbar-cgd'] = 1;
@@ -101,25 +101,25 @@ list:
   # consider replacing with https://gerrit.wikimedia.org/r/mediawiki/extensions/SyntaxHighlight_Pygments.git
   - name: SyntaxHighlight_GeSHi
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SyntaxHighlight_GeSHi.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     composer_merge: True
   - name: InputBox
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/InputBox.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
   - name: ReplaceText
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ReplaceText.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
   - name: Interwiki
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Interwiki.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     config: |
       $wgGroupPermissions['sysop']['interwiki'] = true;
   - name: YouTube
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/YouTube.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
   - name: UniversalLanguageSelector
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UniversalLanguageSelector.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     config: |
       // Disable international phoenetic alphabet selector that breaks searching for
       // English users. From docs:
@@ -135,7 +135,7 @@ list:
 
   - name: VisualEditor
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     git_submodules: True
     config: |
       // Parsoid servers are defined based upon Ansible hosts file and thus
@@ -143,23 +143,23 @@ list:
       // is included directly in LocalSettings.php.j2
   - name: Elastica
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Elastica.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     composer_merge: True
   - name: Thanks
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Thanks.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     config: |
       $wgThanksConfirmationRequired = false;
   - name: CollapsibleVector
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CollapsibleVector
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
   - name: SimpleMathJax
     repo: https://github.com/jamesmontalvo3/SimpleMathJax.git
     version: e94afaffcdde8d926b166fdd166162f9519beaa1
     legacy_load: True
   - name: ImageMap
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ImageMap
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
   # Extension:PdfHandler (breaks on very large PDFs)
   # https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler
   # // Location of PdfHandler dependencies
@@ -175,29 +175,29 @@ list:
   #
   - name: StringFunctionsEscaped
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/StringFunctionsEscaped.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
   - name: WhoIsWatching
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/WhoIsWatching.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
     config: |
       $wgPageShowWatchingUsers = true;
   - name: SemanticInternalObjects
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticInternalObjects.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
   - name: SemanticCompoundQueries
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticCompoundQueries.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
   - name: SemanticDrilldown
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticDrilldown.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
   - name: Arrays
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Arrays.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
   - name: TalkRight
     repo: https://github.com/enterprisemediawiki/TalkRight.git
@@ -205,13 +205,13 @@ list:
     legacy_load: true
   - name: AdminLinks
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/AdminLinks.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
     config: |
       $wgGroupPermissions['sysop']['adminlinks'] = true;
   - name: BatchUserRights
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/BatchUserRights.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
   - name: HeaderTabs
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/HeaderTabs.git
@@ -246,11 +246,11 @@ list:
       $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
   - name: Variables
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Variables.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
   - name: ContributionScores
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ContributionScores.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
     config: |
       // Exclude Bots from the reporting - Can be omitted.
@@ -275,11 +275,11 @@ list:
 
   - name: PipeEscape
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PipeEscape.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
   - name: CirrusSearch
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CirrusSearch.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
     config: |
       // CirrusSearch cluster(s) are defined based upon Ansible hosts file and thus
@@ -287,13 +287,13 @@ list:
       // is included directly in LocalSettings.php.j2
   - name: Echo
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Echo.git
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
     config: |
       $wgEchoEmailFooterAddress = $wgPasswordSender;
   - name: UploadWizard
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/UploadWizard
-    version: REL1_27
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: true
     config: |
       // Needed to make UploadWizard work in IE, see bug 39877
