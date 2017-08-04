@@ -29,6 +29,8 @@ Standard MediaWiki is easy to install, but increasingly its newer and better fea
 
 ## Install
 
+### Typical install
+
 Login to your server and run the following (should take 15-30 minutes depending on your connection):
 
 ```bash
@@ -44,6 +46,20 @@ Running VirtualBox and need to get your virtual machine configured? See our
 [setting up VirtualBox](manual/SettingUpVirtualBox.md) guide.
 
 Want to install on multiple servers. See [setting up a multi-server environment](manual/multi-server.md).
+
+### Install with vagrant
+
+To get a basic meza setup running on your personal computer, install Git, VirtualBox, and Vagrant, then do:
+
+```
+git clone https://github.com/enterprisemediawiki/meza.git
+cd meza
+vagrant up
+vagrant ssh
+sudo meza deploy vagrant
+```
+
+For a more detailed explanation of the commands above, or to do more complex things, see [the meza Vagrant docs](manual/vagrant.md)
 
 ## What is installed?
 
