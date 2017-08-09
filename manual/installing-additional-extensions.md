@@ -69,16 +69,16 @@ Note: Elastica is installed on Meza by default, so this is for example only.
 
 ### Extensions that require a Git submodule step
 
-Some extensions, perhaps currently only [Visual Editor](https://www.mediawiki.org/wiki/Extension:VisualEditor), say that in addition to downloading the code you must also `cd` into the `VisualEditor` directory then run `git submodule update --init`. To make Meza handle this for you, add `git_submodules: True` to the extension's configuration:
+Some extensions, perhaps only [Visual Editor](https://www.mediawiki.org/wiki/Extension:VisualEditor) and [Widgets](https://www.mediawiki.org/wiki/Extension:Widgets), say that in addition to downloading the code you must also `cd` into the extension directory then run `git submodule update --init`. To make Meza handle this for you, add `git_submodules: True` to the extension's configuration:
 
 ```yaml
-  - name: VisualEditor
-    repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git
+  - name: Widgets
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Widgets.git
     version: REL1_27
     git_submodules: True
 ```
 
-Note: Visual Editor is installed on Meza by default, so this is for example only.
+Note: Meza installs Visual Editor for you by default.
 
 ## Example MezaLocalConfig.yml
 
