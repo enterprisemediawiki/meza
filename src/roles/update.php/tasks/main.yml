@@ -44,7 +44,7 @@
 
 - name: Run update.php on this wiki
   shell: >
-    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/update.php" --quick
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/update.php" --quick --doshared
   # run_once see [1]
   run_once: true
   tags:
