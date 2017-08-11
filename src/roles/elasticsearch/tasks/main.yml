@@ -97,4 +97,3 @@
 # removed "polyfractal/elasticsearch-inquisitor" because it was failing and
 # we need to downselect anyway. Removed lukas-vlcek/bigdesk because it doesn't
 # support Elasticsearch 2.x
-
