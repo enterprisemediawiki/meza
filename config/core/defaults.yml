@@ -114,8 +114,10 @@ sshd_config_PasswordAuthentication: "yes"
 # Software versions
 #
 
-# The branch of MediaWiki to use, as well as the branch to use on many
-# extensions.
+# Version of MediaWiki core
+mediawiki_version: "1.27.2"
+
+# Branch to use on many extensions extensions and skins
 mediawiki_default_branch: "REL1_27"
 
 # This commit is closest to MW 1.27 release date of 28 June 2016

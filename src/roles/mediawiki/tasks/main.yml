@@ -55,7 +55,7 @@
   git:
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/core.git
     dest: "{{ m_mediawiki }}"
-    version: "1.27.2"
+    version: "{{ mediawiki_version }}"
   tags:
     - latest
 
