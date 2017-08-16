@@ -10,7 +10,6 @@ At present there are four Elasticsearch plugins installed:
 
 * [Kopf](https://github.com/lmenezes/elasticsearch-kopf)
 * [Elasticsearch-head](https://mobz.github.io/elasticsearch-head/)
-* [Bigdesk](http://bigdesk.org/)
 * [Inquisitor](https://github.com/polyfractal/elasticsearch-inquisitor)
 
 ## Enabling access
@@ -35,6 +34,5 @@ To access each plugin, navigate to the following URIs:
 
 * Kopf: `http://<your-domain>:8008/_plugin/kopf`
 * Head: `http://<your-domain>:8008/_plugin/elasticsearch-head`
-* Bigdesk: `http://<your-domain>:8008/_plugin/bigdesk`
 * Inquisitor: `http://<your-domain>:8008/_plugin/inquisitor`
 
