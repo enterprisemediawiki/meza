@@ -9,8 +9,7 @@
 # repository, which caused it to be removed from the EPEL repository. When
 # CentOS 7.4 comes out it will have http-parser in its base repo. To maintain
 # functionality for all machines running RHEL/CentOS 7.0-7.3 we need to
-# manually install http-parser. If using 7.4+, make sure this manually-added
-# RPM isn't installed
+# manually install http-parser.
 #
 # Refs:
 #   https://bugs.centos.org/view.php?id=13669&nbn=8
@@ -21,11 +20,6 @@
     name: https://kojipkgs.fedoraproject.org//packages/http-parser/2.7.1/3.el7/x86_64/http-parser-2.7.1-3.el7.x86_64.rpm
     state: present
   when: ansible_distribution_version.split('.')[1] | int <= 3
-- name: Ensure http-parser not installed from RPM for {{ ansible_distribution_version }}
-  yum:
-    name: https://kojipkgs.fedoraproject.org//packages/http-parser/2.7.1/3.el7/x86_64/http-parser-2.7.1-3.el7.x86_64.rpm
-    state: absent
-  when: ansible_distribution_version.split('.')[1] | int > 3
 
 - name: Ensure Node.js and npm are installed.
   yum:
