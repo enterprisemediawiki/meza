@@ -123,6 +123,11 @@ mediawiki_default_branch: "REL1_27"
 # This commit is closest to MW 1.27 release date of 28 June 2016
 m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
 
+# MediaWiki 1.27 and earlier require ElasticSearch 1.6
+# MediaWiki 1.28 and higher require ElasticSearch 2.x
+# MediaWiki 1.29 and higher require ElasticSearch 5.x
+elasticsearch_major_version: "1.6"
+
 
 #
 # FILE MODES, OWNERS, GROUPS
