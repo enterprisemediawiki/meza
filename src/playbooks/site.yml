@@ -355,4 +355,15 @@
     - set-vars
     - role: cron
       when: docker_skip_tasks is not defined or not docker_skip_tasks
- 
+
+    - cron
+
+
+# This is just for Amazon with an unmanaged load balancer
+- hosts: all:!exclude-all:!load-balancers-unmanaged
+  become: true
+  tasks:
+   - name: ensure firewalld is stopped
+     service: name=firewalld enabled=no state=stopped
+     when: "'load-balancers-unmanaged' in groups and groups['load-balancers-unmanaged']|length|int > 1"
+  tags: last, gluster
