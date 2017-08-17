@@ -94,9 +94,64 @@ $all_backup_downloaders = array(
 
 
 #
-# CUSTOM DEPLOY VARIABLES: from secret.yml
+# DEPLOY VARS included in the following order, with each superceding the previous
+#   1. public
+#   2. env-specific
+#   3. secret
+#   4. FIXME: deprecated deploy_vars, use secret_deploy_vars instead
 #
+{% if public_deploy_vars is defined and public_deploy_vars is iterable %}
+#
+# CUSTOM __public__ DEPLOY VARIABLES
+# These should only come from public.yml
+#
+{% for key, value in public_deploy_vars.iteritems() %}
+{% if value is number %}
+${{ key }} = {{ value }};
+{% else %}
+${{ key }} = '{{ value }}';
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
+{% if env_deploy_vars is defined and env_deploy_vars is iterable %}
+#
+# CUSTOM __{{ env }} environment__ DEPLOY VARIABLES
+# These should only come from env/{{ env }}.yml
+#
+{% for key, value in env_deploy_vars.iteritems() %}
+{% if value is number %}
+${{ key }} = {{ value }};
+{% else %}
+${{ key }} = '{{ value }}';
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
+{% if secret_deploy_vars is defined and secret_deploy_vars is iterable %}
+#
+# CUSTOM __secret__ DEPLOY VARIABLES
+# These should only come from secret.yml
+#
+{% for key, value in secret_deploy_vars.iteritems() %}
+{% if value is number %}
+${{ key }} = {{ value }};
+{% else %}
+${{ key }} = '{{ value }}';
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
 {% if deploy_vars is defined and deploy_vars is iterable %}
+#
+# __DEPRECATED__ CUSTOM DEPLOY VARIABLES
+#
+# FIXME: remove deploy_vars in lieu of secret_deploy_vars when production wikis
+#        are updated.
+#
 {% for key, value in deploy_vars.iteritems() %}
 {% if value is number %}
 ${{ key }} = {{ value }};
