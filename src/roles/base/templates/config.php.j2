@@ -108,6 +108,15 @@ $all_backup_downloaders = array(
 {% for key, value in public_deploy_vars.iteritems() %}
 {% if value is number %}
 ${{ key }} = {{ value }};
+{% elif value is iterable %}
+	${{ key }} = [];
+	{% for subkey, subvalue in value.iteritems() %}
+		{% if value is number %}
+		${{ key }}[{{ subkey }}] = {{ subvalue }};
+		{% else %}
+		${{ key }}[{{ subkey }}] = '{{ subvalue }}';
+		{% endif %}
+	{% endfor %}
 {% else %}
 ${{ key }} = '{{ value }}';
 {% endif %}
@@ -123,6 +132,15 @@ ${{ key }} = '{{ value }}';
 {% for key, value in env_deploy_vars.iteritems() %}
 {% if value is number %}
 ${{ key }} = {{ value }};
+{% elif value is iterable %}
+	${{ key }} = [];
+	{% for subkey, subvalue in value.iteritems() %}
+		{% if value is number %}
+		${{ key }}[{{ subkey }}] = {{ subvalue }};
+		{% else %}
+		${{ key }}[{{ subkey }}] = '{{ subvalue }}';
+		{% endif %}
+	{% endfor %}
 {% else %}
 ${{ key }} = '{{ value }}';
 {% endif %}
@@ -138,6 +156,15 @@ ${{ key }} = '{{ value }}';
 {% for key, value in secret_deploy_vars.iteritems() %}
 {% if value is number %}
 ${{ key }} = {{ value }};
+{% elif value is iterable %}
+	${{ key }} = [];
+	{% for subkey, subvalue in value.iteritems() %}
+		{% if value is number %}
+		${{ key }}[{{ subkey }}] = {{ subvalue }};
+		{% else %}
+		${{ key }}[{{ subkey }}] = '{{ subvalue }}';
+		{% endif %}
+	{% endfor %}
 {% else %}
 ${{ key }} = '{{ value }}';
 {% endif %}
@@ -155,6 +182,15 @@ ${{ key }} = '{{ value }}';
 {% for key, value in deploy_vars.iteritems() %}
 {% if value is number %}
 ${{ key }} = {{ value }};
+{% elif value is iterable %}
+	${{ key }} = [];
+	{% for subkey, subvalue in value.iteritems() %}
+		{% if value is number %}
+		${{ key }}[{{ subkey }}] = {{ subvalue }};
+		{% else %}
+		${{ key }}[{{ subkey }}] = '{{ subvalue }}';
+		{% endif %}
+	{% endfor %}
 {% else %}
 ${{ key }} = '{{ value }}';
 {% endif %}
