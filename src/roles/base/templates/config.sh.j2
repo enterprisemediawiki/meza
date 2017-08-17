@@ -64,7 +64,9 @@ m_i18n="{{ m_i18n }}"
 # These should only come from public.yml
 #
 {% for key, value in public_deploy_vars.iteritems() %}
-{% if value is iterable %}
+{% if value is string %}
+{{ key }}="{{ value }}"
+{% elif value is iterable %}
 # Skipping iterable deploy var {{ key }}. FIXME #856.
 {% else %}
 {{ key }}="{{ value }}"
@@ -79,7 +81,9 @@ m_i18n="{{ m_i18n }}"
 # These should only come from env/{{ env }}.yml
 #
 {% for key, value in env_deploy_vars.iteritems() %}
-{% if value is iterable %}
+{% if value is string %}
+{{ key }}="{{ value }}"
+{% elif value is iterable %}
 # Skipping iterable deploy var {{ key }}. FIXME #856.
 {% else %}
 {{ key }}="{{ value }}"
@@ -94,7 +98,9 @@ m_i18n="{{ m_i18n }}"
 # These should only come from secret.yml
 #
 {% for key, value in secret_deploy_vars.iteritems() %}
-{% if value is iterable %}
+{% if value is string %}
+{{ key }}="{{ value }}"
+{% elif value is iterable %}
 # Skipping iterable deploy var {{ key }}. FIXME #856.
 {% else %}
 {{ key }}="{{ value }}"
@@ -111,7 +117,9 @@ m_i18n="{{ m_i18n }}"
 #        are updated.
 #
 {% for key, value in deploy_vars.iteritems() %}
-{% if value is iterable %}
+{% if value is string %}
+{{ key }}="{{ value }}"
+{% elif value is iterable %}
 # Skipping iterable deploy var {{ key }}. FIXME #856.
 {% else %}
 {{ key }}="{{ value }}"
