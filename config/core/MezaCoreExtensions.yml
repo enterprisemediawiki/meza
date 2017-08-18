@@ -44,6 +44,9 @@ list:
       // Disabled due to some issue on FOD wikis. Confirm, reenable if possible
       // $srfgFormats[] = 'exhibit';
 
+  - name: SemanticCompoundQueries
+    composer: "mediawiki/semantic-compound-queries"
+    version: "1.1.0"
   - name: SubPageList
     composer: "mediawiki/sub-page-list"
     version: "~1.1"
@@ -186,10 +189,6 @@ list:
   - name: SemanticInternalObjects
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticInternalObjects.git
     version: "{{ mediawiki_default_branch }}"
-    legacy_load: true
-  - name: SemanticCompoundQueries
-    repo: https://github.com/SemanticMediaWiki/SemanticCompoundQueries.git
-    version: "tags/1.1.0"
     legacy_load: true
   - name: SemanticDrilldown
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticDrilldown.git
