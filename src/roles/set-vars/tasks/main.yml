@@ -26,6 +26,12 @@
 - set_fact:
     list_of_wikis: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
 
+- name: "Set meza environment-specific public variables for env={{ env }}"
+  include_vars:
+    file: "{{ m_local_public }}/env/{{ env }}.yml"
+  # Ingore errors so this file is not required to be included
+  ignore_errors: yes
+
 - name: Set meza local secret variables
   include_vars:
     file: "{{ m_local_secret }}/{{ env }}/secret.yml"
