@@ -115,10 +115,11 @@ sshd_config_PasswordAuthentication: "yes"
 #
 
 # Version of MediaWiki core
-mediawiki_version: "1.27.2"
+mediawiki_version: "1.28.3"
 
 # Branch to use on many extensions extensions and skins
 mediawiki_default_branch: "REL1_28"
+
 
 # MediaWiki REL1_28 branch point on 2016-10-25
 # Parsoid v0.6.0 on Nov 7, 2016
