@@ -116,6 +116,7 @@ sshd_config_PasswordAuthentication: "yes"
 # Version of MediaWiki core
 mediawiki_version: "1.27.2"
 
+<<<<<<< 7a9a47ada6e69fa40c94ff811e27c3e5b3ecfee2
 # Branch to use on many extensions extensions and skins
 mediawiki_default_branch: "REL1_27"
 
@@ -133,6 +134,11 @@ elasticsearch_major_version: "1.6"
 mediawiki_default_branch: "REL1_28"
 
 # Parsoid v0.5.2 on May 2, 2016
+=======
+# Branch to use on many extensions and skins
+mediawiki_default_branch: "REL1_28"
+
+>>>>>>> similar to pull #851 on origin/master, but configure to use REL1_28 and 1.28.2
 # MediaWiki REL1_28 branch point on 2016-10-25
 # Parsoid v0.5.3 on Oct 31, 2016
 # Parsoid v0.6.0 on Nov 7, 2016
