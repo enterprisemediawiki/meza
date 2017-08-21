@@ -183,7 +183,6 @@ list:
   - name: WhoIsWatching
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/WhoIsWatching.git
     version: "{{ mediawiki_default_branch }}"
-    legacy_load: true
     config: |
       $wgPageShowWatchingUsers = true;
   - name: SemanticInternalObjects
