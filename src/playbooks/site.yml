@@ -363,7 +363,9 @@
 - hosts: all:!exclude-all:!load-balancers-unmanaged
   become: true
   tasks:
-   - name: ensure firewalld is stopped
-     service: name=firewalld enabled=no state=stopped
-     when: "'load-balancers-unmanaged' in groups and groups['load-balancers-unmanaged']|length|int > 1"
+    - name: ensure firewalld is stopped
+      service: name=firewalld enabled=no state=stopped
+      when: 
+        - "'load-balancers-unmanaged' in groups"
+        - groups['load-balancers-unmanaged']|length|int > 0
   tags: last, gluster
