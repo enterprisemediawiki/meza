@@ -46,8 +46,8 @@
              </IfModule>
       </VirtualHost>
     state: present
-    when: "'load-balancers-unmanaged' in groups and {{ m_https_always }} "
-    notify:
+  when: "'load-balancers-unmanaged' in groups and {{ m_https_always }} "
+  notify:
     - restart apache
 
 - name: Install PHP
