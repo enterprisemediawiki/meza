@@ -65,7 +65,7 @@ class UniteTheWikis extends Maintenance {
 	protected $fileMove;
 	protected $pages;
 	protected $db;
-	protected $maintDir = '/opt/meza/htdocs/mediawiki/maintenance/';
+	protected $maintDir;
 	protected $maxSimoImport = 100;
 	protected $importSetSize = 1000;
 	protected $mergeDatabase = "merge_wiki";
@@ -74,8 +74,11 @@ class UniteTheWikis extends Maintenance {
 
 	public function __construct () {
 
+		require_once '/opt/.deploy-meza/config.php';
+
 		parent::__construct();
 		$this->mDescription = "Count the recent hits for each page.";
+		$this->maintDir = "$m_mediawiki/maintenance/";
 
 		$DIR = "/tmp";
 		$this->fileDisambig = "$DIR/disambig.mediawiki";

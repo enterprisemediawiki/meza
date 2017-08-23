@@ -5,7 +5,7 @@
 
 # must be root or sudoer
 if [ "$(whoami)" != "root" ]; then
-	echo "Try running this script with sudo: \"sudo bash import-wiki.sh\""
+	echo "Try running this script with sudo: \"sudo bash unite-the-wikis.sh\""
 	exit 1
 fi
 
@@ -21,7 +21,7 @@ fi
 # For now this script is not called within the same shell as install.sh
 # and thus it needs to know how to get to the config.sh script on it's own
 #
-source "/opt/meza/config/core/config.sh"
+source "/opt/.deploy-meza/config.sh"
 
 
 # prompt for wikis to merge
@@ -39,7 +39,7 @@ read wiki_id
 done
 
 
-if [ -d "$m_htdocs/wikis/$wiki_id" ]; then
+if [ -d "/opt/.deploy-meza/public/wikis/$wiki_id" ]; then
 
 	echo
 	echo
@@ -63,29 +63,21 @@ else
 		read wiki_name
 	done
 
-	# prompt user for MySQL root password
-	while [ -z "$mysql_root_pass" ]
-	do
-		echo -e "\nEnter MySQL root password and press [ENTER]: "
-		read -s mysql_root_pass
-	done
-
-	# Create a wiki to merge into
-	source "$m_meza/scripts/create-wiki.sh"
+	meza create wiki-promptless "$1" "$wiki_id" "$wiki_name"
 
 fi
 
 
 echo -e "\nSetting up merge"
-WIKI="$wiki_id" php "$m_meza/scripts/uniteTheWikis.php" "--mergedwiki=$wiki_id" "--sourcewikis=$wikis"
+WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php" "--mergedwiki=$wiki_id" "--sourcewikis=$wikis"
 
 
 # Each pass of this loop checks to see how many imports are remaining
 # This is broken out this way because PHP CLI has a memory leak (I think), and
-# leting bash control repeated calls to the script gets around this.
-while [[ `WIKI="$wiki_id" php "$m_meza/scripts/uniteTheWikis.php" --imports-remaining` != "0" ]]; do
+# letting bash control repeated calls to the script gets around this.
+while [[ `WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php" --imports-remaining` != "0" ]]; do
 	echo -e "\n\n*********************\nANOTHER ROUND\n******************\n"
-	WIKI="$wiki_id" php "$m_meza/scripts/uniteTheWikis.php"
+	WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php"
 done;
 
 for wiki in $(echo $wikis | sed "s/,/ /g")
@@ -93,7 +85,7 @@ do
 	for dir in 0 1 2 3 4 5 6 7 8 9 a b c d e f
 	do
 		echo "Importing from $wiki directory $dir"
-		WIKI="$wiki_id" php "$m_mediawiki/maintenance/importImages.php" --search-recursively "$m_htdocs/wikis/$wiki/images/$dir"
+		WIKI="$wiki_id" php "$m_mediawiki/maintenance/importImages.php" --search-recursively "$m_uploads_dir/$wiki/images/$dir"
 	done
 done
 
@@ -102,6 +94,6 @@ WIKI="$wiki_id" php "$m_mediawiki/maintenance/rebuildall.php" --cleanup
 # Don't clean up merge table until rebuild all and images are imported. That
 # way if this needs to stop and restart it won't try to reimport.
 echo -e "\nCleaning up..."
-WIKI="$wiki_id" php "$m_meza/scripts/uniteTheWikis.php" --cleanup
+WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php" --cleanup
 
 echo -e "\nCOMPLETE!"
