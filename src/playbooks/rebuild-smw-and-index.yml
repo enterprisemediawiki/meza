@@ -2,10 +2,13 @@
 
 - hosts: app-servers
   become: yes
-  roles:
-    - set-vars
-
   tasks:
+
+  - name: Set vars
+    include_role:
+      name: set-vars
+    tags:
+    - always
 
   - name: (Re-)build search index for each wiki
     shell: "bash {{ m_deploy }}/elastic-rebuild-all.sh"
@@ -18,3 +21,4 @@
     run_once: true
     tags:
     - smw-data
+

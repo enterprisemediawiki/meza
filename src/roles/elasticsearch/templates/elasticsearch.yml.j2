@@ -74,8 +74,7 @@ node.name: "{{ elasticsearch_node_name }}"
 # Use the Cluster Health API [http://localhost:9200/_cluster/health], the
 # Node Info API [http://localhost:9200/_nodes] or GUI tools
 # such as <http://www.elasticsearch.org/overview/marvel/>,
-# <http://github.com/karmi/elasticsearch-paramedic>,
-# <http://github.com/lukas-vlcek/bigdesk> and
+# <http://github.com/karmi/elasticsearch-paramedic>, and
 # <http://mobz.github.com/elasticsearch-head> to inspect the cluster state.
 
 # A node can have generic attributes associated with it, which can later be used
@@ -384,5 +383,18 @@ path.plugins: /opt/data-meza/elasticsearch/plugins
 #
 #http.jsonp.enable: true
 
+
+{% if elasticsearch_major_version == "1.6" %}
+# FIXME #611: Remove this option after upgrading beyond MW 1.27
 # Enable dynamic scripting per https://www.mediawiki.org/wiki/Thread:Extension_talk:CirrusSearch/error_using_ElasticSearch
 script.disable_dynamic: false
+{% else %}
+# Enable dynamic scripting per:
+#   MW docs saying dynamic scripting required
+#   https://www.mediawiki.org/wiki/Thread:Extension_talk:CirrusSearch/error_using_ElasticSearch
+#
+#   Elasticsearch docs for v2.4
+#   https://www.elastic.co/guide/en/elasticsearch/reference/2.4/modules-scripting.html#enable-dynamic-scripting
+script.inline: true
+script.indexed: true
+{% endif %}

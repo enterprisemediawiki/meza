@@ -1,0 +1,118 @@
+---
+# Ansible
+# Rolling Upgrade of Elasticsearch
+# Original author: Jeff Steinmetz, @jeffsteinmetz
+# Original URL: https://github.com/ekhoinc/ansible-examples/blob/master/elasticsearch-rolling-upgrade.yml
+# Adapted for meza by James Montalvo, @jamesmontalvo3
+
+# Per the 2.x docs [1] upgrading from 1.x requires a "full cluster restart"
+# Per the "full cluster restart" docs [2]
+
+# [1] https://www.elastic.co/guide/en/elasticsearch/reference/2.3/setup-upgrade.html
+#
+- name: Elasticsearch rolling upgrade
+  # At Ekho, we use Amazon tags liberally to track production vs development
+  # as well as a tag that lists the Services each server hosts.
+  # Modify hosts to match your inventory group strategy.
+  # such as:
+  # hosts: tag_Services_elasticsearch:&tag_Environment_production
+  hosts: search
+  serial: 1
+  become: yes
+
+  vars:
+    es_disable_allocation:  '{"transient":{"cluster.routing.allocation.enable":"none"}}'
+    es_enable_allocation: '{"transient":{"cluster.routing.allocation.enable": "all"}}'
+    es_http_port: 9200
+    es_transport_port: 9300
+    # desired version to upgrade to:
+    es_version: 1.4.3
+
+  tasks:
+      # this first step is a overkill, but here
+      # in case the upgrade was cancelled by user mid playbook run
+    - name: make sure elasticsearch service is running
+      service: name=elasticsearch enabled=yes state=started
+      register: response
+
+    - name: Wait for elasticsearch node to come back up if it was stopped
+      wait_for: port={{ es_transport_port }} delay=45
+      when: response.changed == true
+
+      # the ansible the uri action needs httplib2
+    - name: ensure python-httplib2 is installed
+      apt: name=python-httplib2 state=present
+
+    - name: check current version
+      uri: url=http://localhost:{{ es_http_port }} method=GET
+      register: version_found
+      retries: 10
+      delay: 10
+
+    - name: Display Current Elasticsearch Version
+      debug: var=version_found.json.version.number
+
+      # this step is key!!!  Don't restart more nodes
+      # until all shards have completed recovery
+    - name: Wait for cluster health to return to green
+      uri: url=http://localhost:{{ es_http_port }}/_cluster/health method=GET
+      register: response
+      until: "response.json.status == 'green'"
+      retries: 50
+      delay: 30
+      when: version_found.json.version.number != '{{ es_version }}'
+
+    - name: Disable shard allocation for the cluster
+      uri: url=http://localhost:{{ es_http_port }}/_cluster/settings method=PUT body='{{ es_disable_allocation }}'
+      when: version_found.json.version.number != '{{ es_version }}'
+
+    - name: Shutdown elasticsearch node
+      uri: url=http://localhost:{{ es_http_port }}/_cluster/nodes/_local/_shutdown method=POST
+      when: version_found.json.version.number != '{{ es_version }}'
+
+    - name: Wait for all shards to be reallocated
+      uri: url=http://localhost:{{ es_http_port }}/_cluster/health method=GET
+      register: response
+      until: "response.json.relocating_shards == 0"
+      retries: 10
+      delay: 30
+      when: version_found.json.version.number != '{{ es_version }}'
+
+      # this is specific to Ubuntu / Debian based distributions
+    - name: Download Elasticsearch version
+      get_url: url=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-{{ es_version }}.deb dest=/tmp/elasticsearch-{{ es_version }}.deb
+      when: version_found.json.version.number != '{{ es_version }}'
+
+    - name: Update elasticsearch
+      apt: deb=/tmp/elasticsearch-{{ es_version }}.deb
+      when: version_found.json.version.number != '{{ es_version }}'
+
+    - name: clean temp file
+      file: path=/tmp/elasticsearch-{{ es_version }}.deb state=absent
+      when: version_found.json.version.number != '{{ es_version }}'
+
+    - name: Start elasticsearch
+      service: name=elasticsearch enabled=yes state=restarted
+      when: version_found.json.version.number != '{{ es_version }}'
+
+    - name: Wait for elasticsearch node to come back up
+      wait_for: port={{ es_transport_port }} delay=35
+      when: version_found.json.version.number != '{{ es_version }}'
+
+    - name: Wait for cluster health to return to yellow or green
+      uri: url=http://localhost:{{ es_http_port }}/_cluster/health method=GET
+      register: response
+      until: "response.json.status == 'yellow' or response.json.status == 'green'"
+      retries: 5
+      delay: 30
+      when: version_found.json.version.number != '{{ es_version }}'
+
+    - name: Enable shard allocation for the cluster
+      uri: url=http://localhost:{{ es_http_port }}/_cluster/settings method=PUT body='{{ es_enable_allocation }}'
+      register: response
+      # next line is boolean not string, so no quotes around true
+      # use python truthiness
+      until: "response.json.acknowledged == true"
+      retries: 5
+      delay: 30
+      when: version_found.json.version.number != '{{ es_version }}'
