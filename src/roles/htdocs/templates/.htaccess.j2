@@ -30,10 +30,7 @@
     RewriteRule ^BackupDownload(?:/|$)(.*)$ - [L]
     {% endif %}
 
-    # Taken from MediaWiki.org [[Extension:Simple Farm]]
-    #
-    # Redirect virtual wiki path to physical wiki path. There
-    # can be no wiki accessible using this path.
-    RewriteRule ^(?!mediawiki(?:/|$))[^/]+(?:/(.*))?$ mediawiki/$1
+    # from https://www.mediawiki.org/wiki/Manual:Short_URL/Apache
+    RewriteRule ^/?wiki(/.*)?$ %{DOCUMENT_ROOT}/w/index.php [L]
 
 </IfModule>
