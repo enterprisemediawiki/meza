@@ -223,6 +223,10 @@ LogLevel warn
 </IfModule>
 
 <IfModule alias_module>
+        # setup the short-url alias to our controller
+        AliasMatch "^/demo$" /opt/htdocs/w
+        AliasMatch "^/demo/(.*)$" /opt/htdocs/w/$1
+
 	#
 	# Redirect: Allows you to tell clients about documents that used to
 	# exist in your server's namespace, but do not anymore. The client
