@@ -82,6 +82,7 @@
   tags:
     - latest
     - mediawiki-core
+
 - name: Ensure MediaWiki core ignores submodules
   blockinfile:
     path: "{{ m_mediawiki }}/.git/config"
@@ -91,6 +92,15 @@
   tags:
     - mediawiki-core
 
+# create symlink to core for short urls
+# tag it latest, so that the symlink gets created whenever core is downloaded
+- name: Create symlink to core, to enable short urls
+  file:
+    src: "{{ m_mediawiki }}"
+    dest: "{{ m_htdocs }}/w "
+    state: link
+  tags:
+    - latest
 #
 # EXTENSIONS AND SKINS
 #
@@ -291,6 +301,10 @@
     repo: https://github.com/jamesmontalvo3/WikiBlender.git
     dest: "{{ m_htdocs }}/WikiBlender"
     version: "master"
+    # don't modify an existing checkout
+    # assume deployer is playing with Blender source
+    force: no
+    ignore_errors: yes
     umask: "0002"
 
 - name: Ensure BlenderSettings.php in place
@@ -538,4 +552,3 @@
     group: root
     mode: 0755
   when: ansible_os_family == 'RedHat'
-
