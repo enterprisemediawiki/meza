@@ -186,10 +186,7 @@ list:
   - name: WhoIsWatching
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/WhoIsWatching.git
     version: "{{ mediawiki_default_branch }}"
-<<<<<<< 86842f9a7796ec4170a824b07373aebe945ceff5
     legacy_load: true
-=======
->>>>>>> Add 'versions' section to defaults.yml
     config: |
       $wgPageShowWatchingUsers = true;
   - name: SemanticInternalObjects
