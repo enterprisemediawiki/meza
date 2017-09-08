@@ -61,7 +61,7 @@ else {
             // get $wikiId from URI
         $uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
         $wikiId = strtolower( $uriParts[1] ); // URI has leading slash, so $uriParts[0] is empty string
-      }  
+      }
 
 }
 
@@ -233,7 +233,10 @@ else {
 // Depending on proxy setup (particularly for Varnish/Squid caching) may need
 // to set $wgInternalServer:
 // ref: https://www.mediawiki.org/wiki/Manual:$wgInternalServer
-$wgServer = "https://" . $_SERVER['HTTP_HOST'] ;
+
+if ( ! $wgCommandLineMode ) {
+		$wgServer = "https://" . $_SERVER['HTTP_HOST'] ;
+}
 
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
 $wgScriptPath = "/w";
