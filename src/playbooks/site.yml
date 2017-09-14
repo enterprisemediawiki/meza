@@ -283,6 +283,12 @@
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+      # for access to es head plugin
+    - role: firewalld
+      firewalld_port: 9201
+      firewalld_protocol: tcp
+      firewalld_servers: "{{ groups['app-servers'] }}"
+      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewalld
       firewalld_port: 9300
       firewalld_protocol: tcp
@@ -359,8 +365,7 @@
   tasks:
     - name: ensure firewalld is stopped
       service: name=firewalld enabled=no state=stopped
-      when: 
+      when:
         - "'load-balancers-unmanaged' in groups"
         - groups['load-balancers-unmanaged']|length|int > 0
   tags: last, gluster
-
