@@ -33,20 +33,8 @@
     # from https://www.mediawiki.org/wiki/Manual:Short_URL/Apache
     RewriteRule ^/?wiki(/.*)?$ %{DOCUMENT_ROOT}/w/index.php [L]
 
-    # cleanup the mess of path-based wikis
-    RewriteRule ^/?lol(/.*)?$ /w$1 [R=permanent,L]
-    RewriteRule ^/?cod(/.*)?$ /w$1 [R=permanent,L]
-    RewriteRule ^/?halo(/.*)?$ /w$1 [R=permanent,L]
-    RewriteRule ^/?smite(/.*)?$ /w$1 [R=permanent,L]
-
-    # naked and www are not wikis - show the splash page
-    RewriteCond %{HTTP_HOST} ^www\.esportspedia\.com$  [OR]
-    RewriteCond %{HTTP_HOST} ^esportspedia\.com$
-    RewriteRule ^$ index.php
-    RewriteCond %{HTTP_HOST} ^www\.esportpedia\.com$  [OR]
-    RewriteCond %{HTTP_HOST} ^esportpedia\.com$
-    RewriteRule ^$ index.php
-
+    # With a wiki farm, all other wiki domains besides the default should
+    # redirect to their respective wikis, not the splash page
     # Primary wiki redirector for any bare sub-domain:  
     RewriteRule ^$ /w/index.php
 
