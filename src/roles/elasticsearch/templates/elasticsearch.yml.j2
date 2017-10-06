@@ -389,11 +389,6 @@ http.cors.allow-origin: /https?:\/\/localhost(:[0-9]+)?/
 http.cors.allow-methods: [ 'OPTIONS', 'HEAD', 'GET', 'POST' ]  # not PUT, DELETE
 
 
-{% if elasticsearch_major_version == "1.6" %}
-# FIXME #611: Remove this option after upgrading beyond MW 1.27
-# Enable dynamic scripting per https://www.mediawiki.org/wiki/Thread:Extension_talk:CirrusSearch/error_using_ElasticSearch
-script.disable_dynamic: false
-{% else %}
 # Enable dynamic scripting per:
 #   MW docs saying dynamic scripting required
 #   https://www.mediawiki.org/wiki/Thread:Extension_talk:CirrusSearch/error_using_ElasticSearch
@@ -402,4 +397,3 @@ script.disable_dynamic: false
 #   https://www.elastic.co/guide/en/elasticsearch/reference/2.4/modules-scripting.html#enable-dynamic-scripting
 script.inline: true
 script.indexed: true
-{% endif %}
