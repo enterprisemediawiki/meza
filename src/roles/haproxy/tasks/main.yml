@@ -81,29 +81,6 @@
   delegate_to: localhost
   run_once: True
 
-# - name: Ensure cert and key on load balancers
-#   copy:
-#     src: "{{ m_local_secret }}/{{ env }}/ssl/{{ item }}"
-#     dest: "/etc/haproxy/certs/{{ item }}"
-#   with_items:
-#     - meza.key
-#     - meza.crt
-#   notify:
-#     - restart haproxy
-
-- name: Ensure SSL cert on load balancers
-  copy:
-    content: "{{ decrypted_cert.stdout }}"
-    dest: "/etc/haproxy/certs/meza.crt"
-  notify:
-    - restart haproxy
-
-- name: Ensure SSL key on load balancers
-  copy:
-    content: "{{ decrypted_key.stdout }}"
-    dest: "/etc/haproxy/certs/meza.key"
-  notify:
-    - restart haproxy
 
 - name: Ensure cert and key assembled into into pem file
   copy:
@@ -113,13 +90,6 @@
     dest: /etc/haproxy/certs/meza.pem
   notify:
     - restart haproxy
-
-# - name: Ensure cert and key assembled into into pem file
-#   assemble:
-#     src: "/opt/conf-meza/secret/{{ env }}/ssl"
-#     dest: /etc/haproxy/certs/meza.pem
-#   notify:
-#     - restart haproxy
 
 - name: Ensure haproxy certs have secure permissions
   file:
