@@ -383,6 +383,11 @@ path.plugins: /opt/data-meza/elasticsearch/plugins
 #
 #http.jsonp.enable: true
 
+# use the http module to allow the es head plugin to work properly
+http.cors.enabled: true
+http.cors.allow-origin: /https?:\/\/localhost(:[0-9]+)?/
+http.cors.allow-methods: [ 'OPTIONS', 'HEAD', 'GET', 'POST' ]  # not PUT, DELETE
+
 
 # Enable dynamic scripting per:
 #   MW docs saying dynamic scripting required
