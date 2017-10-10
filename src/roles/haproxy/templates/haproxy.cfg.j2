@@ -61,7 +61,7 @@ frontend www-http
 	default_backend www-backend
 
 frontend www-https
-	bind *:443 ssl crt /etc/haproxy/certs/
+	bind *:443 ssl crt /etc/haproxy/certs
 	reqadd X-Forwarded-Proto:\ https
 	# Keep letsencrypt stuff here for now. Probably add it back later.
 	# acl letsencrypt-acl path_beg /.well-known/acme-challenge/
