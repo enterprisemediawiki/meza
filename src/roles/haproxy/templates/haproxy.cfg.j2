@@ -136,9 +136,9 @@ backend elastic
 	{% for host in groups['app-servers'] -%}
 		{%- if host == inventory_hostname -%}
 			server es{{ loop.index }} 127.0.0.1:9200 weight 1 check inter 1000 rise 5 fall 1
-		{%- else -%}
+		{% else %}
 			server es{{ loop.index }} {{ host }}:9200 weight 1 check inter 1000 rise 5 fall 1
-		{%- endif %}
+		{% endif %}
 	{% endfor %}
 
 
