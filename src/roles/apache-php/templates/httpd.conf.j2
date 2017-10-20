@@ -462,6 +462,11 @@ Listen 8090
                 SetHandler server-status
                 Require all granted
         </Location>
+        <Location /server-info>
+                SetHandler server-info
+                Require all granted
+        </Location>
+
 </VirtualHost>
 
 
@@ -485,4 +490,3 @@ Listen 8090
 	Order Allow,Deny
 	Deny From All
 </DirectoryMatch>
-
