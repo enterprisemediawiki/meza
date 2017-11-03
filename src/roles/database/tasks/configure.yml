@@ -64,6 +64,29 @@
     mode: 0640
   when: mysql_log == "" and mysql_log_error != ""
 
+- name: Rotate MariaDB log
+  blockinfile:
+    path: /etc/logrotate.d/mariadb
+    create: yes
+    block: |
+/var/log/mariadb/mariadb.log {
+        create 640 mysql mysql
+        notifempty
+       daily
+        rotate 3
+        missingok
+        compress
+    postrotate
+       # just if mysqld is really running
+       if test -x /usr/bin/mysqladmin && \
+          /usr/bin/mysqladmin ping &>/dev/null
+       then
+          /usr/bin/mysqladmin flush-logs
+       fi
+    endscript
+}
+    validate: "logrotate -d %s"
+
 - name: Ensure MySQL is started and enabled on boot.
   service: "name={{ mysql_daemon }} state=started enabled={{ mysql_enabled_on_startup }}"
   register: mysql_service_configuration
