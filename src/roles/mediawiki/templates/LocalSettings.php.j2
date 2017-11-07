@@ -622,8 +622,12 @@ $wgUseRCPatrol = false;
  *
  *
  **/
+# Prevent new user registrations except by sysops
+$wgGroupPermissions['*']['createaccount'] = false;
+
+
 if ( ! isset( $mezaAuthType ) ) {
-	$mezaAuthType = 'anon-edit'; // default: wide open!
+	$mezaAuthType = 'anon-read'; // default: require creation by sysop
 }
 if ( $mezaAuthType === 'anon-edit' ) {
 
