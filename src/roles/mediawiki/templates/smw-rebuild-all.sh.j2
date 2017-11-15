@@ -37,19 +37,24 @@ for d in $do_wikis; do
 	WIKI="$wiki_id" \
 	php "{{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/rebuildData.php" \
 	-d 5 -v --ignore-exceptions \
+	--debug \
+	--report-runtime \
 	--exception-log="$exception_log" \
 	> "$out_log" 2>&1
 
-	endtimestamp=$(date +"%F_%T")
 
 	# If the above command had a failing exit code
 	if [[ $? -ne 0 ]]; then
+
+		endtimestamp=$(date +"%F_%T")
 
 		# FIXME #577 #681: add notification/warning system here
 		echo "rebuildData FAILED for \"$wiki_id\" at $endtimestamp"
 
 	#if the above command had a passing exit code (e.g. zero)
 	else
+		endtimestamp=$(date +"%F_%T")
+
 		echo "rebuildData completed for \"$wiki_id\" at $endtimestamp"
 	fi
 
