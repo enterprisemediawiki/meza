@@ -483,7 +483,7 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 
 	if len(extra_vars) > 0:
 		import json
-		command = command + ["--extra-vars", "'{}'".format(json.dumps(extra_vars))]
+		command = command + ["--extra-vars", "'{}'".format(json.dumps(extra_vars)).replace('"','\\"') ]
 
 	return command
 
