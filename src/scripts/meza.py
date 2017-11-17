@@ -483,7 +483,7 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 
 	if len(extra_vars) > 0:
 		import json
-		command = command + ["--extra-vars", "'{}'".format(json.dumps(extra_vars))]
+		command = command + ["--extra-vars", "'{}'".format(json.dumps(extra_vars)).replace('"','\\"') ]
 
 	return command
 
@@ -506,7 +506,20 @@ def meza_shell_exec ( shell_cmd ):
 	# 	print child.communicate()[0]
 	# rc = child.returncode
 
-	cmd = ' '.join(shell_cmd)
+
+	#
+	# FIXME #874: For some reason `sudo -u meza-ansible ...` started failing in
+	#             fall 2017. Using `su meza-ansible -c "..."` works. It is not
+	#             known why this started happening, but a fix was needed. This,
+	#             despite being somewhat of a hack, seemed like the best way to
+	#             address the issue at the time.
+	#
+	firstargs = ' '.join(shell_cmd[0:3])
+	if firstargs == "sudo -u meza-ansible":
+		cmd = "su meza-ansible -c \"{}\"".format( ' '.join(shell_cmd[3:]) )
+	else:
+		cmd = ' '.join(shell_cmd)
+
 	print cmd
 	rc = os.system(cmd)
 
