@@ -14,7 +14,7 @@ sudo meza setup dev-networking
 ```
 4. Now SSH into your machine and run `sudo meza deploy monolith`.
 
-This will setup a demo wiki with the user `Admin` with password `adminpass`. Update this password or remove this user for production environments. To add wikis see [these docs](manual/AddingWikis.md).
+This will setup a demo wiki with the user `Admin` with password `adminpass`. Update this password or remove this user for production environments. To add wikis see [these docs](AddingWikis.md).
 
 ## Detailed steps
 
@@ -66,7 +66,7 @@ These steps do the following:
 2. SSH into the VM
 3. Run `sudo meza deploy monolith` to install your wiki server.
 
-This will setup a demo wiki with the user `Admin` with password `adminpass`. Update this password or remove this user for production environments. To add wikis see [these docs](manual/AddingWikis.md).
+This will setup a demo wiki with the user `Admin` with password `adminpass`. Update this password or remove this user for production environments. To add wikis see [these docs](AddingWikis.md).
 
 ## Red Hat
 
