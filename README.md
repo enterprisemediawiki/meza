@@ -143,6 +143,7 @@ This is not necessarily an exhaustive list
 * [Accessing Elasticsearch plugins](manual/ElasticsearchPlugins.md)
 * [Installing additional extensions](manual/installing-additional-extensions.md)
 * [Directory structure overview](manual/DirectoryStructure.md)
+* [Performance Monitoring](manual/PerformanceMonitoring.md)
 * [Setup on Digital Ocean](manual/SetupDigitalOcean.md)
 
 ## Contributing
