@@ -37,27 +37,47 @@
   retries: 50
   delay: 30
 
+
+# FIXME: Maybe add step to tell MediaWiki to trying to use Elasticsearch, in
+#        particular if this is a single ES node setup. Either way, having MW
+#        attempt to add to the index may be bad.
+
+
 - name: Disable shard allocation for the cluster
   uri:
     url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/settings"
     method: PUT
     body: "{{ elasticsearch_disable_allocation | string }}"
 
+# Ref: https://www.elastic.co/guide/en/elasticsearch/reference/2.4/restart-upgrade.html#_step_2_perform_a_synced_flush
+# Ref: https://www.elastic.co/guide/en/elasticsearch/reference/2.4/indices-synced-flush.html
+- name: Perform synced flush
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}/_flush/synced"
+    method: POST
+
+# Shutdown all nodes
 - name: Shutdown elasticsearch node
   service:
     name: elasticsearch
     state: stopped
 
-# If the above command shuts down elasticsearch, how is this hitting the
-# Elasticsearch API?
-- name: Wait for all shards to be reallocated
-  uri:
-    url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
-    method: GET
-  register: response
-  until: "response.json.relocating_shards == 0"
-  retries: 10
-  delay: 30
+
+# For a rolling upgrade:
+#        If the above command shuts down elasticsearch, how is this hitting the
+#        Elasticsearch API? It definitely cannot be hitting anything if this ES
+#        node is the only ES node. As such, the "when" clause to skip this when
+#        number of ES servers is 1 has been added. The FIXME is that we need to
+#        actually test this in a multi-node setup.
+# - name: Wait for all shards to be reallocated
+#   uri:
+#     url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
+#     method: GET
+#   register: response
+#   until: "response.json.relocating_shards == 0"
+#   retries: 10
+#   delay: 30
+#   when: "groups['elastic-servers']|length|int > 1"
 
 - name: Ensure Elasticsearch is latest version
   yum:
@@ -116,5 +136,5 @@
 
 
 #
-# FIXME: ALSO UPGRADE PLUGINS AT THIS POINT
+# FIXME: Re-enable MW usage if disabled. See FIXME above.
 #
