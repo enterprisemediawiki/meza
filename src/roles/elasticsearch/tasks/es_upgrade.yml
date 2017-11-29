@@ -1,0 +1,150 @@
+---
+# Ansible
+# Rolling Upgrade of Elasticsearch
+# Original author: Jeff Steinmetz, @jeffsteinmetz
+# Original URL: https://github.com/ekhoinc/ansible-examples/blob/master/elasticsearch-rolling-upgrade.yml
+# Adapted for meza by James Montalvo, @jamesmontalvo3
+
+# Per the 2.x docs [1] upgrading from 1.x requires a "full cluster restart"
+# Per the "full cluster restart" docs [2]
+
+# [1] https://www.elastic.co/guide/en/elasticsearch/reference/2.3/setup-upgrade.html
+
+# These are carried in elasticsearch/tasks/main.yml
+# - name: make sure elasticsearch service is running
+#   service:
+#     name: elasticsearch
+#     enabled: yes
+#     state: started
+#   register: response
+
+# - name: Wait for elasticsearch node to come back up if it was stopped
+#   wait_for:
+#     port: "{{ elasticsearch_transport_port }}"
+#     delay: 45
+#   when: response.changed == true
+
+  # the ansible the uri action needs httplib2
+- name: Ensure python-httplib2 is installed
+  # apt: name=python-httplib2 state=present
+  yum:
+    name: python-httplib2
+    state: present
+
+- name: Check current Elasticsearch version
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}"
+    method: GET
+  register: version_found
+  retries: 10
+  delay: 10
+
+- name: Display current Elasticsearch full version number
+  debug:
+    var: version_found.json.version.number
+
+- name: Set the version numbers
+  set_fact:
+    es_version_found: "{{ version_found.json.version.number | list | first }}"
+    es_version_desired: "{{ elasticsearch_major_version | list | first }}"
+
+- name: Set do_upgrade to TRUE
+  set_fact:
+    do_upgrade: True
+  when: es_version_found|int != es_version_desired|int
+
+- name: Set do_upgrade to FALSE
+  set_fact:
+    do_upgrade: False
+  when: es_version_found|int == es_version_desired|int
+
+- name: Display do_upgrade variable
+  debug:
+    var: do_upgrade
+
+  # this step is key!!!  Don't restart more nodes
+  # until all shards have completed recovery
+- name: Wait for cluster health to return to green
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
+    method: GET
+  register: response
+  until: "response.json.status == 'green'"
+  retries: 50
+  delay: 30
+  when: do_upgrade
+
+- name: Disable shard allocation for the cluster
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/settings"
+    method: PUT
+    body: "{{ elasticsearch_disable_allocation | string }}"
+  when: do_upgrade
+
+# FIXME: Confirm this is how it should be done. Is this old? Is shutdown API
+#        deprecated post 2.x? Should it just be `systemctl stop elasticsearch`?
+- name: Shutdown elasticsearch node
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/nodes/_local/_shutdown"
+    method: POST
+  when: do_upgrade
+
+# If the above command shuts down elasticsearch, how is this hitting the
+# Elasticsearch API?
+- name: Wait for all shards to be reallocated
+  uri:
+    url: http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
+    method: GET
+  register: response
+  until: "response.json.relocating_shards == 0"
+  retries: 10
+  delay: 30
+  when: do_upgrade
+
+- name: Ensure Elasticsearch is latest version
+  yum:
+    name: elasticsearch
+    state: latest
+  when: do_upgrade
+
+- name: Start elasticsearch
+  service:
+    name: elasticsearch
+    enabled: yes
+    state: restarted
+    daemon_reload: yes
+  when: do_upgrade
+
+- name: Wait for elasticsearch node to come back up
+  wait_for:
+    port: "{{ elasticsearch_transport_port }}"
+    delay: 35
+  when: do_upgrade
+
+- name: Wait for cluster health to return to yellow or green
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
+    method: GET
+  register: response
+  until: "response.json.status == 'yellow' or response.json.status == 'green'"
+  retries: 5
+  delay: 30
+  when: do_upgrade
+
+- name: Enable shard allocation for the cluster
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/settings"
+    method: PUT
+    body: "{{ elasticsearch_enable_allocation | string }}"
+  register: response
+  # next line is boolean not string, so no quotes around true
+  # use python truthiness
+  until: "response.json.acknowledged == true"
+  retries: 5
+  delay: 30
+  when: do_upgrade
+
+
+#
+# ALSO UPGRADE PLUGINS AT THIS POINT
+#

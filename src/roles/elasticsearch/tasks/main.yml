@@ -1,12 +1,17 @@
 ---
 
-# INSTALL JAVA
+# INSTALL JAVA 1.8
 #
-# FIXME #814: should this increase to java-1.8.0-openjdk.x86_64 ??
-- name: Ensure Java is installed.
+- name: Ensure Java 1.7.0 OpenJDK is absent
   yum:
     name: java-1.7.0-openjdk
+    state: absent
+- name: Ensure Java 1.8.0 OpenJDK is installed
+  yum:
+    name: java-1.8.0-openjdk
     state: installed
+
+
 # Environment setup.
 - name: Set JAVA_HOME if configured.
   template:
@@ -73,11 +78,21 @@
     group: elasticsearch
     mode: 0750
   notify: restart elasticsearch
+
 - name: Start Elasticsearch.
-  service: name=elasticsearch state=started enabled=yes
+  service:
+    name: elasticsearch
+    state: started
+    enabled: yes
+  register: response
   when: docker_skip_tasks is not defined or not docker_skip_tasks
+
 - name: Make sure Elasticsearch is running before proceeding.
-  wait_for: host={{ elasticsearch_network_host }} port={{ elasticsearch_http_port }} delay=3 timeout=300
+  wait_for:
+    host: "{{ elasticsearch_network_host }}"
+    port: "{{ elasticsearch_http_port }}"
+    delay: 3
+    timeout: 300
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 
@@ -96,5 +111,12 @@
   ignore_errors: yes
 # removed "polyfractal/elasticsearch-inquisitor" because it was failing and
 # we need to downselect anyway. Removed lukas-vlcek/bigdesk because it doesn't
-# support Elasticsearch 2.x
+# support Elasticsearch 2.x. In case of upgrading, ensure bigdesk is removed.
+- name: Ensure elasticsearch plugin Bigdesk is removed
+  shell: /usr/share/elasticsearch/bin/plugin remove bigdesk
+  ignore_errors: True
 
+# FIXME: This should be conditionally included, if current version doesn't
+#        match desired version
+- name: Include upgrade tasks
+  include: es_upgrade.yml
