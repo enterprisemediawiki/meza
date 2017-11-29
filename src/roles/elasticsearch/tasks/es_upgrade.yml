@@ -93,7 +93,7 @@
 # Elasticsearch API?
 - name: Wait for all shards to be reallocated
   uri:
-    url: http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
+    url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
     method: GET
   register: response
   until: "response.json.relocating_shards == 0"
