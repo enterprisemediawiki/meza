@@ -43,12 +43,10 @@
     method: PUT
     body: "{{ elasticsearch_disable_allocation | string }}"
 
-# FIXME: Confirm this is how it should be done. Is this old? Is shutdown API
-#        deprecated post 2.x? Should it just be `systemctl stop elasticsearch`?
 - name: Shutdown elasticsearch node
-  uri:
-    url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/nodes/_local/_shutdown"
-    method: POST
+  service:
+    name: elasticsearch
+    state: stopped
 
 # If the above command shuts down elasticsearch, how is this hitting the
 # Elasticsearch API?
