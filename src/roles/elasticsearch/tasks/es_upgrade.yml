@@ -10,60 +10,9 @@
 
 # [1] https://www.elastic.co/guide/en/elasticsearch/reference/2.3/setup-upgrade.html
 
-# These are carried in elasticsearch/tasks/main.yml
-# - name: make sure elasticsearch service is running
-#   service:
-#     name: elasticsearch
-#     enabled: yes
-#     state: started
-#   register: response
 
-# - name: Wait for elasticsearch node to come back up if it was stopped
-#   wait_for:
-#     port: "{{ elasticsearch_transport_port }}"
-#     delay: 45
-#   when: response.changed == true
-
-  # the ansible the uri action needs httplib2
-- name: Ensure python-httplib2 is installed
-  # apt: name=python-httplib2 state=present
-  yum:
-    name: python-httplib2
-    state: present
-
-- name: Check current Elasticsearch version
-  uri:
-    url: "http://localhost:{{ elasticsearch_http_port }}"
-    method: GET
-  register: version_found
-  retries: 10
-  delay: 10
-
-- name: Display current Elasticsearch full version number
-  debug:
-    var: version_found.json.version.number
-
-- name: Set the version numbers
-  set_fact:
-    es_version_found: "{{ version_found.json.version.number | list | first }}"
-    es_version_desired: "{{ elasticsearch_major_version | list | first }}"
-
-- name: Set do_upgrade to TRUE
-  set_fact:
-    do_upgrade: True
-  when: es_version_found|int != es_version_desired|int
-
-- name: Set do_upgrade to FALSE
-  set_fact:
-    do_upgrade: False
-  when: es_version_found|int == es_version_desired|int
-
-- name: Display do_upgrade variable
-  debug:
-    var: do_upgrade
-
-  # this step is key!!!  Don't restart more nodes
-  # until all shards have completed recovery
+# This step is key!!! Don't restart more nodes until all shards have completed
+# recovery
 - name: Wait for cluster health to return to green
   uri:
     url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
@@ -146,5 +95,22 @@
 
 
 #
-# ALSO UPGRADE PLUGINS AT THIS POINT
+# No re-display Elasticsearch version
+#
+- name: Check current Elasticsearch version
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}"
+    method: GET
+  register: version_found
+  retries: 10
+  delay: 10
+
+- name: Re-display current Elasticsearch full version number after upgrade
+  debug:
+    var: version_found.json.version.number
+
+
+
+#
+# FIXME: ALSO UPGRADE PLUGINS AT THIS POINT
 #
