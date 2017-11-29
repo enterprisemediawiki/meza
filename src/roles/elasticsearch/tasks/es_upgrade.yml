@@ -11,6 +11,21 @@
 # [1] https://www.elastic.co/guide/en/elasticsearch/reference/2.3/setup-upgrade.html
 
 
+# Upgrades will likely require new plugin versions. Remove plugins which were
+# once installed by meza. Any user-installed plugins will need to be manually
+# removed unless we come up with a way to remove all.
+#
+# Removing elasticsearch plugins. They're too much work to keep in sync with
+# Elasticsearch, and anyone who wants (and knows how) to use them can install
+# them manually.
+- name: Ensure elasticsearch plugins removed
+  shell: "/usr/share/elasticsearch/bin/plugin remove {{ item }}"
+  ignore_errors: True
+  with_items:
+    - bigdesk
+    - head
+    - kopf
+
 # This step is key!!! Don't restart more nodes until all shards have completed
 # recovery
 - name: Wait for cluster health to return to green
@@ -21,14 +36,12 @@
   until: "response.json.status == 'green'"
   retries: 50
   delay: 30
-  when: do_upgrade
 
 - name: Disable shard allocation for the cluster
   uri:
     url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/settings"
     method: PUT
     body: "{{ elasticsearch_disable_allocation | string }}"
-  when: do_upgrade
 
 # FIXME: Confirm this is how it should be done. Is this old? Is shutdown API
 #        deprecated post 2.x? Should it just be `systemctl stop elasticsearch`?
@@ -36,7 +49,6 @@
   uri:
     url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/nodes/_local/_shutdown"
     method: POST
-  when: do_upgrade
 
 # If the above command shuts down elasticsearch, how is this hitting the
 # Elasticsearch API?
@@ -48,13 +60,11 @@
   until: "response.json.relocating_shards == 0"
   retries: 10
   delay: 30
-  when: do_upgrade
 
 - name: Ensure Elasticsearch is latest version
   yum:
     name: elasticsearch
     state: latest
-  when: do_upgrade
 
 - name: Start elasticsearch
   service:
@@ -62,13 +72,11 @@
     enabled: yes
     state: restarted
     daemon_reload: yes
-  when: do_upgrade
 
 - name: Wait for elasticsearch node to come back up
   wait_for:
     port: "{{ elasticsearch_transport_port }}"
     delay: 35
-  when: do_upgrade
 
 - name: Wait for cluster health to return to yellow or green
   uri:
@@ -78,7 +86,6 @@
   until: "response.json.status == 'yellow' or response.json.status == 'green'"
   retries: 5
   delay: 30
-  when: do_upgrade
 
 - name: Enable shard allocation for the cluster
   uri:
@@ -91,7 +98,6 @@
   until: "response.json.acknowledged == true"
   retries: 5
   delay: 30
-  when: do_upgrade
 
 
 #

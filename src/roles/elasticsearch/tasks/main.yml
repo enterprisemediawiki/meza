@@ -96,27 +96,8 @@
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 
-# INSTALL PLUGINS: kopf, head
-# FIXME #815: Check for plugins first to avoid using ignore_errors
-- name: Install elasticsearch plugin Kopf
-  elasticsearch_plugin:
-    state: present
-    name: lmenezes/elasticsearch-kopf
-    version: '1.0'
-  ignore_errors: yes
-- name: Install elasticsearch plugin Head
-  elasticsearch_plugin:
-    state: present
-    name: mobz/elasticsearch-head
-  ignore_errors: yes
-# removed "polyfractal/elasticsearch-inquisitor" because it was failing and
-# we need to downselect anyway. Removed lukas-vlcek/bigdesk because it doesn't
-# support Elasticsearch 2.x. In case of upgrading, ensure bigdesk is removed.
-- name: Ensure elasticsearch plugin Bigdesk is removed
-  shell: /usr/share/elasticsearch/bin/plugin remove bigdesk
-  ignore_errors: True
-
-
+# Previously, elasticsearch plugins Head and Kopf (and at one time Bigdesk and
+# Inquisitor) were installed here.
 
 
 #
