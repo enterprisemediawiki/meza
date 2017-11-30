@@ -124,14 +124,16 @@
     es_version_found: "{{ version_found.json.version.number | list | first }}"
     es_version_desired: "{{ elasticsearch_major_version | list | first }}"
 
-- name: Set do_upgrade to TRUE
+# Note: force_do_elasticsearch_upgrade not set anywhere. This can be used with:
+#       `meza deploy ... --extra-vars "force_do_elasticsearch_upgrade=True"`
+- name: Set do_elasticsearch_upgrade to TRUE
   set_fact:
-    do_upgrade: True
-  when: es_version_found|int != es_version_desired|int
+    do_elasticsearch_upgrade: True
+  when: (es_version_found|int != es_version_desired|int) or force_do_elasticsearch_upgrade
 
-- name: Set do_upgrade to FALSE
+- name: Set do_elasticsearch_upgrade to FALSE
   set_fact:
-    do_upgrade: False
+    do_elasticsearch_upgrade: False
   when: es_version_found|int == es_version_desired|int
 
 
@@ -140,5 +142,4 @@
 #
 - name: Include upgrade tasks
   include: es_upgrade.yml
-  when: do_upgrade
-
+  when: do_elasticsearch_upgrade

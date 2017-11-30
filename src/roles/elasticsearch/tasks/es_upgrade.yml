@@ -134,6 +134,10 @@
     var: version_found.json.version.number
 
 
+- name: Put file on localhost to flag app servers later to do search index rebuild
+  shell: "echo 'elasticsearch_do_upgrade' > /tmp/elasticsearch_do_upgrade"
+  delegate_to: localhost
+
 
 #
 # FIXME: Re-enable MW usage if disabled. See FIXME above.
