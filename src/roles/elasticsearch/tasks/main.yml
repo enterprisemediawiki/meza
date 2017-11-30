@@ -129,7 +129,7 @@
 - name: Set do_elasticsearch_upgrade to TRUE
   set_fact:
     do_elasticsearch_upgrade: True
-  when: (es_version_found|int != es_version_desired|int) or force_do_elasticsearch_upgrade
+  when: (es_version_found|int != es_version_desired|int) or (force_do_elasticsearch_upgrade is defined and force_do_elasticsearch_upgrade)
 
 - name: Set do_elasticsearch_upgrade to FALSE
   set_fact:
