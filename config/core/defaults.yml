@@ -115,10 +115,10 @@ sshd_config_PasswordAuthentication: "yes"
 #
 
 # Version of MediaWiki core
-mediawiki_version: "1.29.2"
+mediawiki_version: "1.30.0-rc.0"
 
 # Branch to use on many extensions extensions and skins
-mediawiki_default_branch: "REL1_29"
+mediawiki_default_branch: "REL1_30"
 
 
 # Parsoid v0.5.2 on May 2, 2016
@@ -130,7 +130,7 @@ mediawiki_default_branch: "REL1_29"
 # Parsoid v0.7.1 on Apr 5, 2017
 # MediaWiki REL1_29 branch point ~July 2017
 # Parsoid v0.8.0 on Oct 23, 2017
-m_parsoid_version: "tags/v0.7.1"
+m_parsoid_version: "tags/v0.8.0"
 
 # MediaWiki 1.27 and earlier require ElasticSearch 1.6
 # MediaWiki 1.28 and higher require ElasticSearch 2.x
