@@ -361,6 +361,11 @@
   tags:
   - search-index
 
+# FIXME: Does this need to be run on all wikis or just one.
+- name: Verify metastore index upgraded
+  shell: WIKI={{ list_of_wikis[0] }} php /opt/htdocs/mediawiki/extensions/CirrusSearch/maintenance/metastore.php --upgrade
+  run_once: true
+
 - name: "(Re-)build SemanticMediaWiki data for: {{ wikis_to_rebuild_data | join(', ') }}"
   shell: "bash {{ m_deploy }}/smw-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
   when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0)
