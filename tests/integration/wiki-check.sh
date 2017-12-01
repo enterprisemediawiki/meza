@@ -35,8 +35,8 @@ curl -L "$api_url_ve" | jq ".visualeditor.result == \"success\"" -e \
 	&& (echo 'VisualEditor PASS' && exit 0) || (echo 'VisualEditor FAIL' && exit 1)
 
 # Verify an indices exist for this wiki
-curl "http://127.0.0.1:9200/_stats/index,store"
-curl "http://127.0.0.1:9200/_stats/index,store" | jq ".indices | has(\"wiki_${wiki_id}_content_first\")" -e \
+curl "http://127.0.0.1:9200/_stats/store"
+curl "http://127.0.0.1:9200/_stats/store" | jq ".indices | has(\"wiki_${wiki_id}_content_first\")" -e \
 	&& (echo 'Elasticsearch PASS' && exit 0) || (echo 'Elasticsearch FAIL' && exit 1)
-curl "http://127.0.0.1:9200/_stats/index,store" | jq ".indices | has(\"wiki_${wiki_id}_general_first\")" -e \
+curl "http://127.0.0.1:9200/_stats/store" | jq ".indices | has(\"wiki_${wiki_id}_general_first\")" -e \
 	&& (echo 'Elasticsearch PASS' && exit 0) || (echo 'Elasticsearch FAIL' && exit 1)
