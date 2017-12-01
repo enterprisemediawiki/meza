@@ -274,7 +274,6 @@
 
 
 - hosts: elastic-servers
-  # Elasticsearch restarts need to be done one node at a time
   become: yes
   tags: elasticsearch
   roles:
