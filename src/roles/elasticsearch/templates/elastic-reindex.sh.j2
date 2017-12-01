@@ -4,11 +4,16 @@
 
 # FIXME: Make MediaWiki stop updating search index before doing any of this
 
+echo "####################################################"
+echo "Elasticsearch reindex script"
+
 # Append this to the name of all indices: version of elasticsearch
-version_quoted=$(curl localhost:9200 | jq .version.number)
-version="${version_quoted%\"}"
-version="${version#\"}"
-reindex_suffix="$version"
+version_quoted=$(curl --silent localhost:9200 | jq .version.number)
+es_version="${version_quoted%\"}"
+es_version="${es_version#\"}"
+echo "Elasticsearch version $es_version"
+echo "####################################################"
+echo
 
 # Get a list of all indices. Note, each index name is quoted like:
 #
@@ -17,68 +22,125 @@ reindex_suffix="$version"
 #	"mw_cirrus_versions"
 #	"wiki_demo_content_first"
 #	"wiki_demo_general_first"
-all_indices=$(curl localhost:9200/_stats/store | jq '.indices | keys | .[]')
+all_indices=$(curl --silent localhost:9200/_stats/store | jq '.indices | keys | .[]')
+
+echo "Index info:"
+echo
+curl --silent localhost:9200/_stats/store | jq .
+echo
+
+echo "List of indices:"
+echo "$all_indices"
+echo
 
 # Loop over all the indices
 while read -r index_quoted; do
 
-	# print it quoted
-	echo "... quoted index name = $index_quoted ..."
-
 	# strip quotes from index_quoted and print it unquoted
 	index="${index_quoted%\"}"
 	index="${index#\"}"
-	echo "... stripped quotes = $index ..."
+	# echo "... stripped quotes = $index ..."
+
+	new_index="$index-$es_version"
+
+	echo
+	echo "####"
+	echo "#### Performing next re-indexing"
+	echo "####   Original index name: $index_quoted"
+	echo "####   New index name: \"$new_index\""
+	echo "####"
+	echo
+
 
 	# FIXME: backup index ???
 
+	# Do this before setting original to read-only
+	echo
+	echo "## Create new index settings and mappings copied from original"\
+	echo
+	settings=$(curl "localhost:9200/$index/_settings" | jq ".$index.settings")
+	mappings=$(curl "localhost:9200/$index/_mapping" | jq ".$index.mappings")
+	curl -XPOST "localhost:9200/$new_index" -d "{ \"settings\" : $settings, \"mappings\" : $mappings }" | jq .
+	echo
+
+
 	# The old index will be made read-only during the reindexing process, after
 	# which it will be deleted.
-	curl -XPUT "localhost:9200/$index/_settings" -d '{"index" : {"blocks" : { "read_only": true } } }'
+	echo
+	echo "## Make $index_quoted read-only"
+	echo
+	curl --silent -XPUT "localhost:9200/$index/_settings" -d '{"index" : {"blocks" : { "read_only": true } } }' | jq .
+	echo
 
-	# Indices will be reindexed to a new index called {name}-{reindex_suffix}
-	curl -XPOST 'localhost:9200/_reindex' -d "{
-	  \"source\": {
-		\"index\": \"$index\"
-	  },
-	  \"dest\": {
-		\"index\": \"$index-$reindex_suffix\"
-	  }
-	}"
+	# Indices will be reindexed to a new index called $new_index
+	echo
+	echo "## Copy \"$index\" to new index \"$new_index\""
+	echo
+	curl --silent -XPOST 'localhost:9200/_reindex?wait_for_completion=true' -d "{ \"source\": { \"index\": \"$index\" }, \"dest\": { \"index\": \"$new_index\" } }" | jq .
+	echo
+
+	echo
+	echo "## Re-print list of indices"
+	echo
+	curl --silent localhost:9200/_stats/store | jq .
+	echo
 
 	# Get list of aliases pointing to the original index. Will use after
 	# deleting the original index.
-	all_aliases_quotes=$(curl "localhost:9200/$index/_alias" | jq '.[] | .[] | keys | .[]')
+	echo
+	echo "## Get list of all current aliases for $index_quoted, before deleting $index_quoted"
+	echo
+	curl --silent "localhost:9200/$index/_alias" | jq .
+	all_aliases_quotes=$(curl --silent "localhost:9200/$index/_alias" | jq '.[] | .[] | keys | .[]')
+	echo
+	echo "$all_aliases_quotes"
+	echo
 
 	# Delete the old index (after making it not read-only)
-	curl -XPUT "localhost:9200/$index/_settings" -d '{"index" : {"blocks" : { "read_only": false } } }'
-	curl -XDELETE "http://localhost:9200/$index/"
+	echo
+	echo "## Make $index_quoted no longer read-only so it can be deleted"
+	echo
+	curl --silent -XPUT "localhost:9200/$index/_settings" -d '{"index" : {"blocks" : { "read_only": false } } }' | jq .
+	echo
+	echo "## Delete $index_quoted"
+	echo
+	curl --silent -XDELETE "http://localhost:9200/$index/" | jq .
+	echo
 
 	# The original index name will be added as an alias for the new index
-	curl -XPOST "localhost:9200/_aliases" -d "
-	{
-		\"actions\" : [
-			{ \"add\" : { \"index\" : \"$index-$reindex_suffix\", \"alias\" : \"$index\" } }
-		]
-	}"
+	echo
+	echo "## Make the original index name, $index_quoted, be an alias for \"$new_index\""
+	echo
+	curl --silent -XPOST "localhost:9200/_aliases"  -d "{ \"actions\" : [	{ \"add\" : { \"index\" : \"$new_index\", \"alias\" : \"$index\" } } ] }" | jq .
+	echo
 
 	# Add any aliases that previously pointed to the old index to the new index
+	echo
+	echo "## Loop over all of these aliases, adding them as aliases for the new index"
+	echo
+	echo "$all_aliases_quotes"
+	echo
 	while read -r alias_quoted; do
 
 		an_alias="${alias_quoted%\"}"
 		an_alias="${an_alias#\"}"
 
-		curl -XPOST "localhost:9200/_aliases" -d "
-		{
-			\"actions\" : [
-				{ \"add\" : { \"index\" : \"$index-$reindex_suffix\", \"alias\" : \"$an_alias\" } }
-			]
-		}"
+		echo
+		echo "  # Add \"$an_alias\" as an alias for $new_index"
+		echo
+		curl --silent -XPOST "localhost:9200/_aliases" -d "{ \"actions\" : [ { \"add\" : { \"index\" : \"$new_index\", \"alias\" : \"$an_alias\" } } ] }" | jq .
+		echo
 
 	done <<< "$all_aliases_quotes"
 
+	echo
+	echo "## Complete with $index and $new_index"
+	echo
 
 done <<< "$all_indices"
 
-
 # FIXME: If MediaWiki search-indexing disabled, reenable now
+
+echo "####################################################"
+echo "Re-indexing complete"
+echo "####################################################"
