@@ -1,9 +1,9 @@
 ---
 
-- name: Ensure localsettings.js present and up-to-date
+- name: Ensure Parsoid config.yaml present and up-to-date
   template:
-    src: localsettings.js.j2
-    dest: "{{ m_parsoid_path }}/localsettings.js"
+    src: config.yaml.j2
+    dest: "{{ m_parsoid_path }}/config.yaml"
   notify:
     - restart parsoid
 

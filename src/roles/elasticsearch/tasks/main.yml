@@ -64,8 +64,7 @@
     recurse: yes
   with_items:
     - "{{ m_meza_data }}/elasticsearch/data"
-    - "{{ m_meza_data }}/elasticsearch/work"
-    - "{{ m_meza_data }}/elasticsearch/plugins"
+    - "{{ m_meza_data }}/elasticsearch/scripts"
 
 
 # CONFIGURE AND START ELASTICSEARCH
@@ -124,18 +123,18 @@
     es_version_found: "{{ version_found.json.version.number | list | first }}"
     es_version_desired: "{{ elasticsearch_major_version | list | first }}"
 
+# Do false first. Then force_do_elasticsearch_upgrade can override
+- name: Set do_elasticsearch_upgrade to FALSE
+  set_fact:
+    do_elasticsearch_upgrade: False
+  when: es_version_found|int == es_version_desired|int
+
 # Note: force_do_elasticsearch_upgrade not set anywhere. This can be used with:
 #       `meza deploy ... --extra-vars "force_do_elasticsearch_upgrade=True"`
 - name: Set do_elasticsearch_upgrade to TRUE
   set_fact:
     do_elasticsearch_upgrade: True
   when: (es_version_found|int != es_version_desired|int) or (force_do_elasticsearch_upgrade is defined and force_do_elasticsearch_upgrade)
-
-- name: Set do_elasticsearch_upgrade to FALSE
-  set_fact:
-    do_elasticsearch_upgrade: False
-  when: es_version_found|int == es_version_desired|int
-
 
 #
 # Upgrade Elasticsearch if required

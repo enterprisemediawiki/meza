@@ -155,7 +155,11 @@ path.data: /opt/data-meza/elasticsearch/data
 
 # Path to temporary files:
 #
-path.work: /opt/data-meza/elasticsearch/work
+# Appears to have been removed in Elasticsearch 0.90
+# path.work: /opt/data-meza/elasticsearch/work
+
+# Added 5.x: Required for script.inline and/or script.stored (formerly script.indexed)
+path.scripts: /opt/data-meza/elasticsearch/scripts
 
 # Path to log files:
 #
@@ -163,7 +167,8 @@ path.logs: /var/log/elasticsearch
 
 # Path to where plugins are installed:
 #
-path.plugins: /opt/data-meza/elasticsearch/plugins
+# Removed in Elasticsearch 2.x or 5.x
+# path.plugins: /opt/data-meza/elasticsearch/plugins
 
 
 #################################### Plugin ###################################
@@ -396,5 +401,13 @@ script.disable_dynamic: false
 #   Elasticsearch docs for v2.4
 #   https://www.elastic.co/guide/en/elasticsearch/reference/2.4/modules-scripting.html#enable-dynamic-scripting
 script.inline: true
+
+{% if elasticsearch_major_version == "2.x" %}
 script.indexed: true
+{% else %}
+# script.indexed has renamed to script.stored in 5.x
+# ref: https://www.elastic.co/guide/en/elasticsearch/reference/5.0/breaking_50_settings_changes.html#_script_mode_settings
+script.stored: true
+{% endif %}
+
 {% endif %}

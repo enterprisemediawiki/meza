@@ -28,14 +28,15 @@
 
 # This step is key!!! Don't restart more nodes until all shards have completed
 # recovery
-- name: Wait for cluster health to return to green
-  uri:
-    url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
-    method: GET
-  register: response
-  until: "response.json.status == 'green'"
-  retries: 50
-  delay: 30
+# Perhaps not required if doing a full restart
+# - name: Wait for cluster health to return to green
+#   uri:
+#     url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
+#     method: GET
+#   register: response
+#   until: "response.json.status == 'green'"
+#   retries: 50
+#   delay: 30
 
 
 # FIXME: Maybe add step to tell MediaWiki to trying to use Elasticsearch, in

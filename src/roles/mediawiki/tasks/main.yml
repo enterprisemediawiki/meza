@@ -56,6 +56,8 @@
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/core.git
     dest: "{{ m_mediawiki }}"
     version: "{{ mediawiki_version }}"
+    track_submodules: no
+    recursive: no
   tags:
     - latest
 
