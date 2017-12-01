@@ -148,7 +148,7 @@
   when: do_elasticsearch_upgrade and es_version_found|int == 1
 
 # Uncomment this when doing upgrade to 5.x
-# - name: Include upgrade tasks for ES 2.x --> 5.x
-#   include: es_upgrade.yml
-#   when: do_elasticsearch_upgrade
+- name: Include upgrade tasks for ES 2.x --> 5.x
+  include: es_upgrade.yml
+  when: do_elasticsearch_upgrade
 
