@@ -47,10 +47,16 @@
 #     path: "{{ m_parsoid_path }}"
 #     state: present
 
+
+# Previously the Ansible npm module was used here. It wasn't successfully
+# getting all dependencies. Instead use npm directly.
+#
+# - name: Ensure Parsoid dependencies are latest
+#   npm:
+#     path: "{{ m_parsoid_path }}"
+#     state: latest
 - name: Ensure Parsoid dependencies are latest
-  npm:
-    path: "{{ m_parsoid_path }}"
-    state: latest
+  shell: "cd {{ m_parsoid_path }} && npm install"
   tags:
     - latest
     - parsoid-deps
