@@ -148,6 +148,16 @@
 - name: Run Elasticsearch reindex script
   shell: "bash {{ m_deploy }}/elastic-reindex.sh > {{ m_logs }}/elastic-reindex-{{ version_found.json.version.number }} 2>&1"
 
+# FIXME: Does this need to be run on all wikis or just one.
+# FIXME
+# FIXME
+# FIXME
+# FIXME
+# FIXME: Really, no kidding, fixme on WIKI=demo. Need to dynamically grab any wiki, or loop over all of them (based upon fixme above)
+- name: Upgrade metastore index
+  shell: WIKI=demo php /opt/htdocs/mediawiki/extensions/CirrusSearch/maintenance/metastore.php --upgrade
+  delegate_to: "{{ groups['app-servers'][0] }}"
+
 #
 # FIXME: Re-enable MW usage if disabled. See FIXME above.
 #

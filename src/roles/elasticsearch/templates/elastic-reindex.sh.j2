@@ -43,6 +43,7 @@ while read -r index_quoted; do
 
 	new_index="$index-$es_version"
 
+
 	echo
 	echo "####"
 	echo "#### Performing next re-indexing"
@@ -51,6 +52,10 @@ while read -r index_quoted; do
 	echo "####"
 	echo
 
+	echo
+	echo "This index was created in Elasticsearch version:"
+	curl --silent "localhost:9200/$index/_settings?human" | jq ".\"$index\".settings.index.version.created_string"
+	echo
 
 	# FIXME: backup index ???
 
@@ -58,9 +63,11 @@ while read -r index_quoted; do
 	echo
 	echo "## Create new index settings and mappings copied from original"\
 	echo
-	settings=$(curl "localhost:9200/$index/_settings" | jq ".$index.settings")
-	mappings=$(curl "localhost:9200/$index/_mapping" | jq ".$index.mappings")
-	curl -XPOST "localhost:9200/$new_index" -d "{ \"settings\" : $settings, \"mappings\" : $mappings }" | jq .
+	# Get settings for original index, but strip off creation date, uuid, and version info
+	settings=$(curl --silent "localhost:9200/$index/_settings" | jq ".$index.settings | del(.index.creation_date) | del(.index.uuid) | del(.index.version)")
+	# Get mappings. Change similarity:default to similarity:classic
+	mappings=$(curl --silent "localhost:9200/$index/_mapping" | jq ".$index.mappings" | sed 's/"similarity": "default",/"similarity": "classic",/g')
+	curl --silent -XPOST "localhost:9200/$new_index" -d "{ \"settings\" : $settings, \"mappings\" : $mappings }" | jq .
 	echo
 
 
@@ -132,6 +139,11 @@ while read -r index_quoted; do
 		echo
 
 	done <<< "$all_aliases_quotes"
+
+	echo
+	echo "$new_index complete. Now showing index created in Elasticsearch version:"
+	curl --silent "localhost:9200/$new_index/_settings?human" | jq ".\"$new_index\".settings.index.version.created_string"
+	echo
 
 	echo
 	echo "## Complete with $index and $new_index"
