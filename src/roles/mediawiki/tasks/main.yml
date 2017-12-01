@@ -325,28 +325,28 @@
 
 # FIXME: Should search and SMW building be after update.php?
 
+# FIXME: REMOVE?
+# - name: Check if localhost has /tmp/elasticsearch_do_upgrade file
+#   stat:
+#     path: /tmp/elasticsearch_do_upgrade
+#   register: es_do_upgrade_stat
+#   delegate_to: localhost
 
-- name: Check if localhost has /tmp/elasticsearch_do_upgrade file
-  stat:
-    path: /tmp/elasticsearch_do_upgrade
-  register: es_do_upgrade_stat
-  delegate_to: localhost
+# - name: Remove /tmp/elasticsearch_do_upgrade file from localhost
+#   file:
+#     path: /tmp/elasticsearch_do_upgrade
+#     state: absent
+#   delegate_to: localhost
 
-- name: Remove /tmp/elasticsearch_do_upgrade file from localhost
-  file:
-    path: /tmp/elasticsearch_do_upgrade
-    state: absent
-  delegate_to: localhost
+# - name: Set es_do_upgrade to True if localhost file exists
+#   set_fact:
+#     es_do_upgrade: True
+#   when: es_do_upgrade_stat.stat.exists
 
-- name: Set es_do_upgrade to True if localhost file exists
-  set_fact:
-    es_do_upgrade: True
-  when: es_do_upgrade_stat.stat.exists
-
-- name: Set es_do_upgrade to False if localhost file does not exist
-  set_fact:
-    es_do_upgrade: False
-  when: not es_do_upgrade_stat.stat.exists
+# - name: Set es_do_upgrade to False if localhost file does not exist
+#   set_fact:
+#     es_do_upgrade: False
+#   when: not es_do_upgrade_stat.stat.exists
 
 
 
@@ -355,18 +355,11 @@
 # FIXME #811: Will this work when controller is not an app server?
 - name: "(Re-)build search index for: {{ wikis_to_rebuild_data | join(', ') }}"
   shell: "bash {{ m_deploy }}/elastic-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
-  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0) and (not es_do_upgrade)
+  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0)
+  # FIXME: REMOVE? and (not es_do_upgrade)
   run_once: true
   tags:
   - search-index
-
-- name: (Re-)build search index for each wiki on Elasticsearch upgrades
-  shell: "bash {{ m_deploy }}/elastic-rebuild-all.sh"
-  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (es_do_upgrade)
-  run_once: true
-  tags:
-  - search-index
-
 
 - name: "(Re-)build SemanticMediaWiki data for: {{ wikis_to_rebuild_data | join(', ') }}"
   shell: "bash {{ m_deploy }}/smw-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
