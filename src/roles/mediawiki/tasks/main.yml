@@ -59,7 +59,15 @@
   tags:
     - latest
 
-
+# create symlink to core for short urls
+# tag it latest, so that the symlink gets created whenever core is downloaded
+- name: Create symlink to core, to enable short urls
+  file:
+    src: "{{ m_mediawiki }}"
+    dest: "{{ m_htdocs }}/w"
+    state: link
+  tags:
+    - latest
 #
 # SKINS
 #
@@ -69,7 +77,22 @@
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git
     dest: "{{ m_mediawiki }}/skins/Vector"
     version: "{{ mediawiki_default_branch }}"
-
+# More default skins
+- name: Ensure Modern skin installed
+  git:
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Modern.git
+    dest: "{{ m_mediawiki }}/skins/Modern"
+    version: "{{ mediawiki_default_branch }}"
+- name: Ensure ColognBlue skin installed
+  git:
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git
+    dest: "{{ m_mediawiki }}/skins/CologneBlue"
+    version: "{{ mediawiki_default_branch }}"
+- name: Ensure MonoBook skin installed
+  git:
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/MonoBook.git
+    dest: "{{ m_mediawiki }}/skins/MonoBook"
+    version: "{{ mediawiki_default_branch }}"
 
 
 #
@@ -181,9 +204,14 @@
 #
 - name: Ensure WikiBlender installed
   git:
-    repo: https://github.com/jamesmontalvo3/WikiBlender.git
+    # use the multi-domain capable Blender
+    repo: https://github.com/freephile/WikiBlender.git
     dest: "{{ m_htdocs }}/WikiBlender"
-    version: "master"
+    version: "multi-domain-merge-ready"
+    # don't modify an existing checkout
+    # assume deployer is playing with Blender source
+    force: no
+  ignore_errors: yes
 
 - name: Ensure BlenderSettings.php in place
   template:
