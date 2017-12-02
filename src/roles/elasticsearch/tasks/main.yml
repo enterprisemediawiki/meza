@@ -26,7 +26,7 @@
     state: present
 - name: Add Elasticsearch repository.
   template:
-    src: elasticsearch.repo.j2
+    src: elasticsearch5.repo.j2
     dest: /etc/yum.repos.d/elasticsearch.repo
     mode: 0644
 - name: Install Elasticsearch.
@@ -139,12 +139,26 @@
 #
 # Upgrade Elasticsearch if required
 #
+- name: Temporarily set Elasticsearch yum repo to point to 2.x
+  template:
+    src: elasticsearch2.repo.j2
+    dest: /etc/yum.repos.d/elasticsearch.repo
+    mode: 0644
+  when: do_elasticsearch_upgrade and es_version_found|int == 1
+
 - name: Include upgrade tasks for ES 1.6 --> 2.x
   include: es_upgrade.yml
   when: do_elasticsearch_upgrade and es_version_found|int == 1
 
 - name: Do reindex if switching for ES 1.6 --> 2.x
   include: es_reindex.yml
+  when: do_elasticsearch_upgrade and es_version_found|int == 1
+
+- name: Reset Elasticsearch yum repo to point to 5.x
+  template:
+    src: elasticsearch5.repo.j2
+    dest: /etc/yum.repos.d/elasticsearch.repo
+    mode: 0644
   when: do_elasticsearch_upgrade and es_version_found|int == 1
 
 # Uncomment this when doing upgrade to 5.x
