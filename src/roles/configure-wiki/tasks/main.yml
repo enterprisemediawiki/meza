@@ -74,13 +74,8 @@
   delegate_to: localhost
   run_once: true
 
-- name: Ensure alias exists in Apache
-  blockinfile:
-    path: /etc/httpd/conf/httpd.conf
-    block: |
-      AliasMatch "^/{{ item }}$" /opt/htdocs/w
-      AliasMatch "^/{{ item }}/(.*)$" /opt/htdocs/w/$1
-    insertafter: "<IfModule alias_module>"
-  with_items: 
-    - "{{ list_of_wikis }}"
-  notify: "restart apache"
+- name: Update httpd.conf (and restart httpd) if using subdomains
+  include_role:
+    name: httpd.conf
+    tasks_from: httpd.conf.yml
+  when: "initial_wikis_dirs_check.files|length == 0 and (docker_skip_tasks is not defined or not docker_skip_tasks) and (m_wiki_url_style == 'subdomain')"

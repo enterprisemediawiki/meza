@@ -1,0 +1,29 @@
+---
+# This task file can be included from apache-php/tasks/main.yml, but also can
+# be included from within another role by doing:
+#
+# - name: Include httpd.conf role
+#   include_role:
+#     name: httpd.conf
+#     tasks_from: httpd.conf.yml
+#
+# This allows things that add new wikis (create wiki playbooks, role:mediawiki
+# when Demo Wiki is created) to update httpd.conf using the same code.
+#
+
+- name: Get individual wikis dirs from localhost
+  find:
+    paths: "{{ m_local_public }}/wikis/"
+    file_type: directory
+  register: wikis_dirs
+  delegate_to: localhost
+  run_once: yes
+
+- name: Set fact - list of wikis
+  set_fact:
+    list_of_wikis: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+- name: write the apache config file
+  template: "src=httpd.conf.j2 dest={{ m_apache_conf }}"
+  notify:
+  - restart apache

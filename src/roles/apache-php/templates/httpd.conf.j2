@@ -223,9 +223,29 @@ LogLevel warn
 </IfModule>
 
 <IfModule alias_module>
-        # setup the short-url alias to our controller
-        AliasMatch "^/demo$" /opt/htdocs/w
-        AliasMatch "^/demo/(.*)$" /opt/htdocs/w/$1
+
+	{% if m_wiki_url_style == 'subdomain' %}
+
+	#
+	# setup the short-url alias to our controller
+	#
+	{% if list_of_wikis|length == 0 %}
+
+	# If no wikis exist, then later in the deploy Demo Wiki will be created. Do
+	# this now, since subsequent runs of
+	AliasMatch "^/demo$" /opt/htdocs/w
+	AliasMatch "^/demo/(.*)$" /opt/htdocs/w/$1
+
+	{% endif %}
+
+	{% for item in list_of_wikis -%}
+
+	AliasMatch "^/{{ item }}$" /opt/htdocs/w
+	AliasMatch "^/{{ item }}/(.*)$" /opt/htdocs/w/$1
+
+	{%- endfor %}
+
+	{% endif %}
 
 	#
 	# Redirect: Allows you to tell clients about documents that used to

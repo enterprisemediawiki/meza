@@ -24,10 +24,10 @@
   - meza-ansible
   - alt-meza-ansible
 
-- name: write the apache config file
-  template: "src=httpd.conf.j2 dest={{ m_apache_conf }}"
-  notify:
-  - restart apache
+- name: Ensure Apache httpd.conf is up-to-date
+  include: httpd.conf.yml
+  # http://docs.ansible.com/ansible/playbooks_roles.html#dynamic-versus-static-includes
+  static: yes
 
 - name: Install PHP
   include: php.yml

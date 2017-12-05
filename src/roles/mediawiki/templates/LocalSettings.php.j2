@@ -52,16 +52,27 @@ if( $wgCommandLineMode ) {
 
 }
 else {
-            // get $wikiId from subdomain
-            // FIXME make regex a config variable
-            // FIXME add 'ignore' list like 'www' that should not be a wiki
-      if ( preg_match( '%([a-z]+)\.([a-z]+)\..{2,4}[\d]*$%im', $_SERVER['HTTP_HOST'], $matches ) ) {
-        $wikiId = $matches[1];
-      } else {
-            // get $wikiId from URI
-        $uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
-        $wikiId = strtolower( $uriParts[1] ); // URI has leading slash, so $uriParts[0] is empty string
-      }  
+
+	{% if m_wiki_url_style == 'subdomain' %}
+
+	// get $wikiId from subdomain
+	// FIXME make regex a config variable
+	// FIXME add 'ignore' list like 'www' that should not be a wiki
+	if ( preg_match( '%([a-z]+)\.([a-z]+)\..{2,4}[\d]*$%im', $_SERVER['HTTP_HOST'], $matches ) ) {
+		$wikiId = $matches[1];
+	} else {
+		// get $wikiId from URI
+		$uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
+		$wikiId = strtolower( $uriParts[1] ); // URI has leading slash, so $uriParts[0] is empty string
+	}
+
+	{% else %}
+
+	// get $wikiId from URI
+	$uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
+	$wikiId = strtolower( $uriParts[1] ); // URI has leading slash, so $uriParts[0] is empty string
+
+	{% endif %}
 
 }
 
@@ -235,10 +246,19 @@ else {
 // ref: https://www.mediawiki.org/wiki/Manual:$wgInternalServer
 $wgServer = "https://" . $_SERVER['HTTP_HOST'] ;
 
+{% if m_wiki_url_style == 'subdomain' %}
+
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
 $wgScriptPath = "/w";
 // we're using short URLs
 $wgArticlePath = "/wiki/$1";
+
+{% else %}
+
+// https://www.mediawiki.org/wiki/Manual:$wgScriptPath
+$wgScriptPath = "/$wikiId";
+
+{% endif %}
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath
 $wgUploadPath = "$wgScriptPath/img_auth.php";
@@ -566,7 +586,7 @@ $wgEnableMWSuggest = true;
 $wgDisableCookieCheck = true;
 
 #Set Default Timezone
-$wgLocaltimezone = "America/New_York";
+$wgLocaltimezone = '{{ m_timezone }}';
 $oldtz = getenv("TZ");
 putenv("TZ=$wgLocaltimezone");
 

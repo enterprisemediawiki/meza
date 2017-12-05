@@ -192,10 +192,6 @@
     repo: https://github.com/jamesmontalvo3/WikiBlender.git
     dest: "{{ m_htdocs }}/WikiBlender"
     version: "master"
-    # don't modify an existing checkout
-    # assume deployer is playing with Blender source
-    force: no
-  ignore_errors: yes
 
 - name: Ensure BlenderSettings.php in place
   template:
@@ -263,7 +259,6 @@
   include_role:
     name: sync-configs
   when: "initial_wikis_dirs_check.files|length == 0 and (docker_skip_tasks is not defined or not docker_skip_tasks)"
-
 
 
 #

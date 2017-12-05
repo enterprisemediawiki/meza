@@ -30,7 +30,19 @@
     RewriteRule ^BackupDownload(?:/|$)(.*)$ - [L]
     {% endif %}
 
+    {% if m_wiki_url_style == 'subdomain' %}
+
     # from https://www.mediawiki.org/wiki/Manual:Short_URL/Apache
     RewriteRule ^/?wiki(/.*)?$ %{DOCUMENT_ROOT}/w/index.php [L]
+
+    {% else %}
+
+    # Taken from MediaWiki.org [[Extension:Simple Farm]]
+    #
+    # Redirect virtual wiki path to physical wiki path. There
+    # can be no wiki accessible using this path.
+    RewriteRule ^(?!mediawiki(?:/|$))[^/]+(?:/(.*))?$ mediawiki/$1
+
+    {% endif %}
 
 </IfModule>
