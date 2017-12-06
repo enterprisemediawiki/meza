@@ -106,8 +106,8 @@ def meza_command_deploy (argv):
 
 	return_code = meza_shell_exec( shell_cmd )
 
-	# exit with same return code as ansible command
-	sys.exit(return_code)
+	meza_shell_exec_exit( return_code )
+
 
 
 
@@ -312,7 +312,7 @@ def meza_command_create (argv):
 
 		rc = check_environment(env)
 		if rc > 0:
-			sys.exit(rc)
+			meza_shell_exec_exit(rc)
 
 		playbook = "create-" + sub_command
 
@@ -325,7 +325,8 @@ def meza_command_create (argv):
 			shell_cmd = playbook_cmd( playbook, env )
 
 		rc = meza_shell_exec( shell_cmd )
-		sys.exit(rc)
+		meza_shell_exec_exit(rc)
+
 
 def meza_command_backup (argv):
 
@@ -333,12 +334,12 @@ def meza_command_backup (argv):
 
 	rc = check_environment(env)
 	if rc != 0:
-		sys.exit(rc)
+		meza_shell_exec_exit(rc)
 
 	shell_cmd = playbook_cmd( 'backup', env ) + argv[1:]
 	rc = meza_shell_exec( shell_cmd )
 
-	sys.exit(rc)
+	meza_shell_exec_exit(rc)
 
 
 def meza_command_destroy (argv):
@@ -394,7 +395,7 @@ def meza_command_maint_runJobs (argv):
 		shell_cmd = shell_cmd + ["--wikis="+argv[1]]
 	rc = meza_shell_exec( shell_cmd )
 
-	sys.exit(rc)
+	meza_shell_exec_exit(rc)
 
 def meza_command_maint_rebuild (argv):
 
@@ -404,7 +405,7 @@ def meza_command_maint_rebuild (argv):
 
 	# return code != 0 means failure
 	if rc != 0:
-		sys.exit(rc)
+		meza_shell_exec_exit(rc)
 
 	more_extra_vars = False
 
@@ -415,10 +416,10 @@ def meza_command_maint_rebuild (argv):
 	if len(argv) > 0:
 		shell_cmd = shell_cmd + argv
 
-	return_code = meza_shell_exec( shell_cmd )
+	rc = meza_shell_exec( shell_cmd )
 
 	# exit with same return code as ansible command
-	sys.exit(return_code)
+	meza_shell_exec_exit(rc)
 
 
 def meza_command_docker (argv):
@@ -431,7 +432,7 @@ def meza_command_docker (argv):
 			docker_repo = argv[1]
 
 		rc = meza_shell_exec([ "bash", "/opt/meza/src/scripts/build-docker-container.sh", docker_repo])
-		sys.exit(rc)
+		meza_shell_exec_exit(rc)
 
 
 	elif argv[0] == "exec":
@@ -527,6 +528,17 @@ def meza_shell_exec ( shell_cmd ):
 	os.chdir( starting_wd )
 
 	return rc
+
+# Return codes from function meza_shell_exec may either not be numbers or they
+# may be out of the range accepted by sys.exit(). For example, return codes in
+# the 30000 range were not being interpretted as failures. This function will
+# instead take any non-zero return code and make it return the integer 1.
+def meza_shell_exec_exit( return_code=0 ):
+	if int(return_code) > 0:
+		print "Exiting with return code {}".format(return_code)
+		sys.exit(1)
+	else:
+		sys.exit(0)
 
 def get_vault_pass_file ( env ):
 	import pwd
