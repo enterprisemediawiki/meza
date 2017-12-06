@@ -65,7 +65,6 @@
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 
-
 # Might need these for SELinux to be turned back on
 # - name: Configure SELinux to start mysql on any port
 #   seboolean: name=mysql_connect_any state=true persistent=yes
