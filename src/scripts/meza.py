@@ -107,8 +107,10 @@ def meza_command_deploy (argv):
 	return_code = meza_shell_exec( shell_cmd )
 
 	# exit with same return code as ansible command
-	sys.exit(return_code)
-
+	if int(return_code) > 0:
+		sys.exit(1)
+	else:
+		sys.exit(0)
 
 
 # env
