@@ -239,7 +239,7 @@ else {
 // Depending on proxy setup (particularly for Varnish/Squid caching) may need
 // to set $wgInternalServer:
 // ref: https://www.mediawiki.org/wiki/Manual:$wgInternalServer
-$wgServer = "https://" . $_SERVER['HTTP_HOST'] ;
+$wgServer = 'https://{{ wiki_app_fqdn }}';
 
 {% if m_wiki_url_style == 'subdomain' %}
 
