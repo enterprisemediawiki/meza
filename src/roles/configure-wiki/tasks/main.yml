@@ -76,6 +76,6 @@
 
 - name: Update httpd.conf (and restart httpd) if using subdomains
   include_role:
-    name: httpd.conf
+    name: apache-php
     tasks_from: httpd.conf.yml
   when: "initial_wikis_dirs_check.files|length == 0 and (docker_skip_tasks is not defined or not docker_skip_tasks) and (m_wiki_url_style == 'subdomain')"
