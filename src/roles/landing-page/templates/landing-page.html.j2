@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{ landing_page_title }}</title>
+	{#
+
+
+	Javascript files: #}
+	{% for script in landing_page_scripts %}
+	<script src="/{{ landing_page_libs_dirname }}/{{ script }}" type="text/javascript"></script>
+	{% endfor %}
+	{#
+
+
+	Favicon: #}
+	<link rel="shortcut icon" href="{{ landing_page_favicon_path }}">
+	{#
+
+
+	CSS Files: #}
+	{% for css in landing_page_css %}
+	<link href="/{{ landing_page_libs_dirname }}/{{ css }}" rel="stylesheet" type="text/css" />
+	{% endfor %}
+	<script>
+		$(document).ready(function(){
+			WikiBlender.tooltipAllTitles();
+
+			$(".num-articles").each( WikiBlender.getWikiStats );
+
+			var container = document.querySelector('#masonry-container');
+			var msnry = new Masonry( container, {
+				columnWidth: 250,
+				isFitWidth : true
+			});
+
+			var containerBottom = document.querySelector('#bottom-wikis');
+			var msnryBottom = new Masonry( containerBottom, {
+				columnWidth: 250,
+				isFitWidth : true
+			});
+
+			var containerTop = document.querySelector('#top-wikis');
+			var msnryTop = new Masonry( containerTop, {
+				columnWidth: 250,
+				isFitWidth : true
+			});
+		});
+	</script>
+</head>
+<body>
+	<h1 id="first-heading">{{ landing_page_title }}</h1>
+	<p id="subtitle">Loading data...</p>
+	<div id="container">
+
+		{% if landing_page_header_wikis_title is defined %}
+		<h2 style='clear:both;'>{{ landing_page_header_wikis_title }}</h2>
+		{% endif %}
+
+		<div style="clear:both;" id='top-wikis'>
+			{% for wiki in wikis_metadata|sort %}
+				{% if wiki in landing_page_header_wikis %}
+					{% include 'wiki-block.html.j2' %}
+				{% endif %}
+			{% endfor %}
+		</div>
+
+
+		{% if landing_page_middle_wikis_title is defined %}
+		<h2 style='clear:both;'>{{ landing_page_middle_wikis_title }}</h2>
+		{% endif %}
+
+		<div style="clear:both;" id="masonry-container">
+			{% for wiki in wikis_metadata|sort %}
+				{% if wiki not in landing_page_header_wikis and wiki not in landing_page_footer_wikis %}
+					{% include 'wiki-block.html.j2' %}
+				{% endif %}
+			{% endfor %}
+		</div>
+
+		{% if landing_page_footer_wikis_title is defined %}
+		<h2 style='clear:both;'>{{ landing_page_footer_wikis_title }}</h2>
+		{% endif %}
+
+		<div style="clear:both;" id='bottom-wikis'>
+			{% for wiki in wikis_metadata|sort %}
+				{% if wiki in landing_page_footer_wikis %}
+					{% include 'wiki-block.html.j2' %}
+				{% endif %}
+			{% endfor %}
+		</div>
+
+		<div id='footer'>
+			{% landing_page_footer_links|join(' | ') %}
+			{% if landing_page_admins is defined %}
+				|
+				{% for admin in landing_page_admins %}
+					<a href='mailto:{{ landing_page_admins|map(attribute='email')|join(';')' title='{{ landing_page_admins|map(attribute='name')|join('<br />') }}'>Administrators</a>
+				{% endfor %}
+			{% endif %}
+		</div>
+
+	</div>
+</body>
+</html>

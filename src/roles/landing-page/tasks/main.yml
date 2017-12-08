@@ -1,0 +1,111 @@
+---
+
+#
+# Use getWikisMetadata.php to generate YAML file of wiki IDs, names, paths, ...
+#
+- name: Ensure getWikisMetadata.php in place
+  template:
+    src: getWikisMetadata.php
+    dest: "{{ m_deploy }}/getWikisMetadata.php"
+
+- name: Run getWikisMetadata.php
+  shell: "php {{ m_deploy }}/getWikisMetadata.php"
+
+
+#
+# Pull ^ metadata into this Ansible role
+#
+- name: Include wikis_metadata.yml into the 'wikis_metadata' variable
+  include_vars:
+    file: "{{ m_deploy }}/wikis_metadata.yml"
+    name: wikis_metadata
+
+
+#
+# Favicon
+#
+- name: Set favicon path to primary wiki's favicon (if conditions met)
+  set_vars:
+    landing_page_favicon_path: "/wikis/{{ primary_wiki_id }}/config/favicon.ico"
+  when: primary_wiki_id is defined and landing_page_favicon_path is not defined
+
+- name: Set favicon path to first wiki in wikis_metadata if still not defined
+  set_vars:
+    landing_page_favicon_path: "/wikis/{{ wikis_metadata|first|attr('id') }}/config/favicon.ico"
+  when: landing_page_favicon_path is not defined and wikis_metadata|length > 0
+
+- name: Set favicon path to blank if still not defined
+  set_vars:
+    landing_page_favicon_path: ""
+  when: landing_page_favicon_path is not defined
+
+
+#
+# If SAML: Using ^ metadata, generate a landing page that is wrapped in SAML auth
+#
+- name: Ensure saml landing page wrapper in place
+  template:
+    src: "{{ landing_page_saml_wrapper_src_path }}"
+    dest: "{{ m_htdocs }}/index.php"
+    owner: apache
+    mode: "0755"
+  when: saml_public is defined
+
+- name: Ensure actual landing page in place
+  template:
+    src: "{{ landing_page_src_path }}"
+    dest: "{{ m_htdocs }}/landing.html"
+    owner: apache
+    mode: "0755"
+  when: saml_public is defined
+
+
+#
+# If not SAML: Using ^ metadata, generate just an HTML landing page
+#
+- name: Ensure actual landing page in place
+  template:
+    src: "{{ landing_page_src_path }}"
+    dest: "{{ m_htdocs }}/index.html"
+    owner: apache
+    mode: "0755"
+  when: saml_public is not defined
+
+
+#
+# Ensure required JS and CSS in place
+#
+# Note: directory name long/awkward to avoid collision with any wiki names
+#
+- name: Ensure htdocs/landing directory in place
+  file:
+    state: directory
+    path: "{{ m_htdocs }}/{{ landing_page_libs_dirname }}"
+    owner: apache
+    group: apache
+    mode: 0775
+
+- name: Ensure landing page Javascript in place
+  template:
+    src: "{{ item }}"
+    dest: "{{ m_htdocs }}/{{ landing_page_libs_dirname }}/{{ item | basename }}"
+    owner: apache
+    mode: "0755"
+  with_items: "{{ landing_page_scripts }}"
+
+- name: Ensure landing page CSS in place
+  template:
+    src: "{{ item }}"
+    dest: "{{ m_htdocs }}/{{ landing_page_libs_dirname }}/{{ item | basename }}"
+    owner: apache
+    mode: "0755"
+  with_items: "{{ landing_page_css }}"
+
+
+#
+# REMOVE WikiBlender
+#
+- name: Remove old landing page system, WikiBlender
+  file:
+    path: "{{ m_htdocs }}/WikiBlender"
+    state: absent

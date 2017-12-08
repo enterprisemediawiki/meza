@@ -1,8 +1,8 @@
 <?php
 
 // if there's a SAML config file, we need to authenticate with SAML, like, now.
-if ( is_file( '/opt/.deploy-meza/SAMLConfig.php' ) ) {
+if ( is_file( '{{ m_deploy }}/SAMLConfig.php' ) ) {
 	require_once __DIR__ . '/NonMediaWikiSimpleSamlAuth.php';
 }
 
-require_once "WikiBlender/index.php";
+require_once "landing.html";

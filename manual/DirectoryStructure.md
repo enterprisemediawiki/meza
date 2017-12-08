@@ -204,7 +204,7 @@ This directory is similar to `/opt/.deploy-meza` in that it is a deployed direct
     * `nv.d3.js`:
     * `server-performance.nvd3.js`:
   * `space.php`: disk space usage
-* `WikiBlender`: landing page repo. Perhaps should be rolled into meza
+* `landing`: landing page JS and CSS files.
 * `wikis`:
   * `demo`: directory that symlinks to deployed config, to make logo/favicon web accessible
     * `config`: symlink to `/opt/.deploy-meza/public/wikis/demo` (FIXME #709: Security implications)

@@ -171,3 +171,13 @@ m_logs_group: wheel
 m_backups_mode: "0755"
 m_backups_owner: root
 m_backups_group: root
+
+
+#
+# ROLE:landing-page + ROLE:htdocs
+#
+# Name of http-accessible directory to put all JS and CSS into. It should be a
+# name unlikely to collide with wiki IDs...so awkwardly long. It needs to be
+# available to both the landing page role (for obvious reasons) as well as the
+# htdocs role since an .htaccess rule needs to be setup.
+landing_page_libs_dirname: "landing-page-lib-files"

@@ -190,17 +190,9 @@
 #
 # LANDING PAGE
 #
-- name: Ensure WikiBlender installed
-  git:
-    repo: https://github.com/jamesmontalvo3/WikiBlender.git
-    dest: "{{ m_htdocs }}/WikiBlender"
-    version: "master"
-
-- name: Ensure BlenderSettings.php in place
-  template:
-    src: BlenderSettings.php.j2
-    dest: "{{ m_htdocs }}/WikiBlender/BlenderSettings.php"
-
+- name: Run landing-page role
+  include_role:
+    name: landing-page
 
 
 #

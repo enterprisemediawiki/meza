@@ -19,8 +19,8 @@
     # and settings are located)
     RewriteRule ^wikis(?:/|$)(.*)$ - [L]
 
-    # Allow access to WikiBlender landing page and support files
-    RewriteRule ^WikiBlender(?:/|$)(.*)$ - [L]
+    # Allow access to landing page support files
+    RewriteRule ^{{ landing_page_libs_dirname }}(?:/|$)(.*)$ - [L]
 
     # Allow access to ServerPerformance plot page and support files
     RewriteRule ^ServerPerformance(?:/|$)(.*)$ - [L]
