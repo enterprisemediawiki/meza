@@ -1,5 +1,6 @@
 ---
 
+
 #
 # Use getWikisMetadata.php to generate YAML file of wiki IDs, names, paths, ...
 #
@@ -15,9 +16,9 @@
 #
 # Pull ^ metadata into this Ansible role
 #
-- name: Include wikis_metadata.yml into the 'wikis_metadata' variable
+- name: Include wikis_metadata.json into the 'wikis_metadata' variable
   include_vars:
-    file: "{{ m_deploy }}/wikis_metadata.yml"
+    file: "{{ m_deploy }}/wikis_metadata.json"
     name: wikis_metadata
 
 
@@ -25,17 +26,17 @@
 # Favicon
 #
 - name: Set favicon path to primary wiki's favicon (if conditions met)
-  set_vars:
+  set_fact:
     landing_page_favicon_path: "/wikis/{{ primary_wiki_id }}/config/favicon.ico"
   when: primary_wiki_id is defined and landing_page_favicon_path is not defined
 
 - name: Set favicon path to first wiki in wikis_metadata if still not defined
-  set_vars:
+  set_fact:
     landing_page_favicon_path: "/wikis/{{ wikis_metadata|first|attr('id') }}/config/favicon.ico"
   when: landing_page_favicon_path is not defined and wikis_metadata|length > 0
 
 - name: Set favicon path to blank if still not defined
-  set_vars:
+  set_fact:
     landing_page_favicon_path: ""
   when: landing_page_favicon_path is not defined
 

@@ -26,7 +26,7 @@ foreach ($wikiDirs as $wiki) {
 	}
 	else {
 		$path = "https://$wiki_app_fqdn/$wiki";
-		$api  = "$path/api.php"
+		$api  = "$path/api.php";
 	}
 
 	$wikisData[] = [
@@ -38,9 +38,9 @@ foreach ($wikiDirs as $wiki) {
 	];
 }
 
-// $yaml = yaml_emit( [ 'wikis_metadata' => $wikisData ] );
-$yaml = yaml_emit( $wikisData );
+// $json = json_encode( [ 'wikis_metadata' => $wikisData ] );
+$json = json_encode( $wikisData );
 
-// echo $yaml;
+// echo $json;
 
-file_put_contents( "$m_deploy/wikis_metadata.yml", $yaml );
+file_put_contents( "$m_deploy/wikis_metadata.json", $json );
