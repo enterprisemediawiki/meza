@@ -1,0 +1,73 @@
+---
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                                                                             #
+# The following settings are likely to be customized by any meza admin. Do so #
+# in your /opt/conf-meza/public/public.yml file.                              #
+#                                                                             #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+# Big title at the top of the page
+landing_page_title: "Meza Wikis"
+
+# This can be added to your public config and can point to any path relative to
+# the htdocs root. If it is not added to your config it will be assigned the
+# path of your primary wiki's favicon, or if that doesn't exist then the first
+# wiki's (alphabetically) favicon.
+# landing_page_favicon_path: /wikis/somewiki/config/favicon.ico
+
+# Add a header above any of the three wiki sections
+#
+# landing_page_header_wikis_title: Wikis at the top of the page
+# landing_page_middle_wikis_title: Wikis in the middle of the page
+# landing_page_footer_wikis_title: Bottom wikis
+
+# Specify wiki IDs which will not be in the middle section, and instead will be
+# in the top or bottom.
+#
+# landing_page_header_wikis: ['mywiki', 'yourwiki']
+# landing_page_footer_wikis: ['testwiki', 'sandboxwiki']
+
+landing_page_footer_links:
+  - "<a href='https://github.com/enterprisemediawiki/meza'>meza on github</a>"
+  - "<a href='https://enterprisemediawiki.org'>enterprisemediawiki.org</a>"
+
+# Create a link at the end of landing_page_footer_links that emails admins
+#
+# landing_page_admins:
+#   - name: Your wiki admin
+#     email: admin@example.com
+#   - name: Backup admin
+#     email: admin2@example.com
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                                                                             #
+# All remaining settings are only likely to be customized by meza developers  #
+# or meza administrators attempting to use non-standard landing pages.        #
+#                                                                             #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+# Path to landing page files, either relative to "templates" directory or use
+# an absolute path. This allows you to specify a different HTML template file
+# to customize your landing page.
+#
+# SAML wrapper path only matters if using SAML authentication, and even if you
+# are you probably still want to use the default path.
+landing_page_src_path: "landing-page.html.j2"
+landing_page_saml_wrapper_src_path: "saml-landing-wrapper.php.j2"
+
+# Scripts pulled into the landing page
+landing_page_scripts:
+  - "lib/jquery.min.js"
+  - "lib/jquery-ui.min.js"
+  - "lib/masonry.pkgd.min.js"
+  - "lib/underscore-min.js"
+  - "landing.js"
+
+# CSS pulled into the landing page
+landing_page_css:
+  - "lib/jquery-ui.min.css"
+  - "landing.css"

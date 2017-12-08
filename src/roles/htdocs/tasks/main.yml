@@ -39,6 +39,5 @@
     mode: 0755
   with_items:
   - ".htaccess"
-  - "index.php"
   - "office.html"
   - "robots.txt"

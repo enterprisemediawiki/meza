@@ -1,0 +1,104 @@
+body { font-family: sans-serif; }
+#container { text-align: center; }
+#masonry-container, #bottom-wikis, #top-wikis { text-align: center; margin: 10px auto 30px auto; }
+h1, h2, h3, h4 { text-align:center; }
+h2 { margin: 40px 0 0 0;}
+h3 { margin:0;}
+h4 { margin:0; }
+#first-heading { margin: 20px 0 10px 0; }
+#subtitle { text-align:center; font-style: italic; font-size: 11px; margin-top: 0px; }
+
+a {
+	text-decoration: none;
+}
+a:link, a:visited, a:hover, a:active, .fakelink {color:#0645AD; border:none;}
+img { border:none; }
+a:hover, .fakelink:hover { text-decoration:underline;}
+a.nounderline:hover { text-decoration:none; }
+a table:hover {
+	background-color: #EEE;
+}
+
+p { margin: 0; }
+.wiki-title { text-align:center; }
+.logo-title-group div, .logo-title-group img, .logo-title-group h1 {
+	display: inline-block;
+	vertical-align: middle;
+	margin: 0 10px 0 10px;
+}
+#container h1 {
+}
+#footer {
+	margin-top: 50px;
+	margin-bottom: 50px;
+	font-size:11px;
+	font-weight:normal;
+	clear:left;
+}
+.ui-tooltip {
+	font-size: 12px;
+}
+table {
+	margin:0 auto 0 auto;
+
+}
+table td {
+	padding: 10px;
+	text-align: center;
+}
+.wiki-block {
+	text-align:center;
+	margin:0px;
+	padding-top: 10px;
+	width: 250px;
+	height: 275px;
+	/*display: inline-block;*/
+	float: left;
+	border-collapse:collapse;
+}
+.wiki-block td {
+	margin:0;
+	padding:0;
+	vertical-align:bottom;
+}
+.wiki-block td h3 {
+	margin-top:5px;
+}
+
+.wiki-block:hover {
+	background-color: #ffd;
+}
+
+.num-articles {
+  font-style:italic;
+  font-size:80%;
+  vertical-align: bottom;
+  height:60px;
+}
+
+/*.wiki-block-no-masonry {
+	float: none;
+}*/
+
+/* For Admin page*/
+table#versions {
+	margin:0 auto 0 auto;
+
+}
+table#versions td {
+	padding: 10px;
+	text-align: center;
+}
+
+table#versions {
+	width : 500px;
+	margin : 10px auto;
+}
+table#versions td.hash-color {
+	height : 50px;
+	width : 50px;
+	margin : 5px;
+}
+table#versions td.wiki-info {
+	text-align : left;
+}
