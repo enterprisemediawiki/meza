@@ -64,7 +64,7 @@
 - name: Create symlink to mediawiki core, to enable short urls
   file:
     src: "{{ m_mediawiki }}"
-    dest: "{{ m_htdocs }}/w "
+    dest: "{{ m_htdocs }}/w"
     state: link
   notify:
   - restart apache
