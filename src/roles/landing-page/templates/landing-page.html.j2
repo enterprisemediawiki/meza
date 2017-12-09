@@ -7,7 +7,7 @@
 
 	Javascript files: #}
 	{% for script in landing_page_scripts %}
-	<script src="/{{ landing_page_libs_dirname }}/{{ script }}" type="text/javascript"></script>
+	<script src="/{{ landing_page_libs_dirname }}/{{ script | basename }}" type="text/javascript"></script>
 	{% endfor %}
 	{#
 
@@ -19,7 +19,7 @@
 
 	CSS Files: #}
 	{% for css in landing_page_css %}
-	<link href="/{{ landing_page_libs_dirname }}/{{ css }}" rel="stylesheet" type="text/css" />
+	<link href="/{{ landing_page_libs_dirname }}/{{ css | basename }}" rel="stylesheet" type="text/css" />
 	{% endfor %}
 	<script>
 		$(document).ready(function(){
