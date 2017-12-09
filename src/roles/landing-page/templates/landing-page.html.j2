@@ -57,11 +57,13 @@
 		{% endif %}
 
 		<div style="clear:both;" id='top-wikis'>
-			{% for wiki in wikis_metadata|sort %}
-				{% if wiki in landing_page_header_wikis %}
-					{% include 'wiki-block.html.j2' %}
-				{% endif %}
-			{% endfor %}
+			{% if landing_page_header_wikis is defined %}
+				{% for wiki in wikis_metadata|sort(attribute='id') %}
+					{% if wiki.id in landing_page_header_wikis %}
+						{% include 'wiki-block.html.j2' %}
+					{% endif %}
+				{% endfor %}
+			{% endif %}
 		</div>
 
 
@@ -70,8 +72,8 @@
 		{% endif %}
 
 		<div style="clear:both;" id="masonry-container">
-			{% for wiki in wikis_metadata|sort %}
-				{% if wiki not in landing_page_header_wikis and wiki not in landing_page_footer_wikis %}
+			{% for wiki in wikis_metadata|sort(attribute='id') %}
+				{% if (landing_page_header_wikis is not defined or wiki.id not in landing_page_header_wikis) and (landing_page_footer_wikis is not defined or wiki.id not in landing_page_footer_wikis) %}
 					{% include 'wiki-block.html.j2' %}
 				{% endif %}
 			{% endfor %}
@@ -82,23 +84,25 @@
 		{% endif %}
 
 		<div style="clear:both;" id='bottom-wikis'>
-			{% for wiki in wikis_metadata|sort %}
-				{% if wiki in landing_page_footer_wikis %}
-					{% include 'wiki-block.html.j2' %}
-				{% endif %}
-			{% endfor %}
+			{% if landing_page_footer_wikis is defined %}
+				{% for wiki in wikis_metadata|sort(attribute='id') %}
+					{% if wiki.id in landing_page_footer_wikis %}
+						{% include 'wiki-block.html.j2' %}
+					{% endif %}
+				{% endfor %}
+			{% endif %}
 		</div>
 
 		<div id='footer'>
 			{% if landing_page_footer_links is defined %}
 				{{ landing_page_footer_links|join(' | ') }}
-			[% endif %}
+			{% endif %}
 			{% if landing_page_admins is defined %}
 				{% if landing_page_footer_links is defined and landing_page_footer_links|length > 0 %}
 				|
 				{% endif %}
 				{% for admin in landing_page_admins %}
-					<a href='mailto:{{ landing_page_admins|map(attribute='email')|join(';')' title='{{ landing_page_admins|map(attribute='name')|join('<br />') }}'>Administrators</a>
+					<a href='mailto:{{ landing_page_admins|map(attribute='email')|join(';') }}' title='{{ landing_page_admins|map(attribute='name')|join('<br />') }}'>Administrators</a>
 				{% endfor %}
 			{% endif %}
 		</div>

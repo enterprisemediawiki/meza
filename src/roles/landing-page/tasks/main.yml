@@ -88,7 +88,7 @@
 - name: Ensure landing page Javascript in place
   template:
     src: "{{ item }}"
-    dest: "{{ m_htdocs }}/{{ landing_page_libs_dirname }}/{{ item | basename }}"
+    dest: "{{ m_htdocs }}/{{ landing_page_libs_dirname }}/{{ item.split('/') | last }}"
     owner: apache
     mode: "0755"
   with_items: "{{ landing_page_scripts }}"
@@ -96,7 +96,7 @@
 - name: Ensure landing page CSS in place
   template:
     src: "{{ item }}"
-    dest: "{{ m_htdocs }}/{{ landing_page_libs_dirname }}/{{ item | basename }}"
+    dest: "{{ m_htdocs }}/{{ landing_page_libs_dirname }}/{{ item.split('/') | last }}"
     owner: apache
     mode: "0755"
   with_items: "{{ landing_page_css }}"
