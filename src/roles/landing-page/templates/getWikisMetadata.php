@@ -38,8 +38,8 @@ foreach ($wikiDirs as $wiki) {
 	];
 }
 
-// $json = json_encode( [ 'wikis_metadata' => $wikisData ] );
-$json = json_encode( $wikisData );
+$json = json_encode( [ 'wikis_metadata' => $wikisData ] );
+// $json = json_encode( $wikisData );
 
 // echo $json;
 

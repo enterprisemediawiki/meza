@@ -56,7 +56,7 @@ landing_page_footer_links:
 #
 # SAML wrapper path only matters if using SAML authentication, and even if you
 # are you probably still want to use the default path.
-landing_path_src_path: "landing-page.html.j2"
+landing_page_src_path: "landing-page.html.j2"
 landing_page_saml_wrapper_src_path: "saml-landing-wrapper.php.j2"
 
 # Scripts pulled into the landing page

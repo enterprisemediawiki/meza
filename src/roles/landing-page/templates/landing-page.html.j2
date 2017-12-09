@@ -90,9 +90,13 @@
 		</div>
 
 		<div id='footer'>
-			{% landing_page_footer_links|join(' | ') %}
+			{% if landing_page_footer_links is defined %}
+				{{ landing_page_footer_links|join(' | ') }}
+			[% endif %}
 			{% if landing_page_admins is defined %}
+				{% if landing_page_footer_links is defined and landing_page_footer_links|length > 0 %}
 				|
+				{% endif %}
 				{% for admin in landing_page_admins %}
 					<a href='mailto:{{ landing_page_admins|map(attribute='email')|join(';')' title='{{ landing_page_admins|map(attribute='name')|join('<br />') }}'>Administrators</a>
 				{% endfor %}

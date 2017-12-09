@@ -19,7 +19,6 @@
 - name: Include wikis_metadata.json into the 'wikis_metadata' variable
   include_vars:
     file: "{{ m_deploy }}/wikis_metadata.json"
-    name: wikis_metadata
 
 
 #
@@ -32,7 +31,7 @@
 
 - name: Set favicon path to first wiki in wikis_metadata if still not defined
   set_fact:
-    landing_page_favicon_path: "/wikis/{{ wikis_metadata|first|attr('id') }}/config/favicon.ico"
+    landing_page_favicon_path: "/wikis/{{ wikis_metadata|json_query('[0].id') }}/config/favicon.ico"
   when: landing_page_favicon_path is not defined and wikis_metadata|length > 0
 
 - name: Set favicon path to blank if still not defined
