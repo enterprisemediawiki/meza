@@ -475,6 +475,7 @@ Listen 8089
 {% endif %}
 
 # Use port 8090 to access mod_status. Not accessible outside firewall.
+# Accessible via [[Special:Serverstatus]]
 ExtendedStatus on
 Listen 8090
 <VirtualHost *:8090>
@@ -482,6 +483,11 @@ Listen 8090
                 SetHandler server-status
                 Require all granted
         </Location>
+        <Location /server-info>
+                SetHandler server-info
+                Require all granted
+        </Location>
+
 </VirtualHost>
 
 
@@ -505,4 +511,3 @@ Listen 8090
 	Order Allow,Deny
 	Deny From All
 </DirectoryMatch>
-

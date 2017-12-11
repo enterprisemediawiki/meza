@@ -203,7 +203,6 @@ This directory is similar to `/opt/.deploy-meza` in that it is a deployed direct
     * `jquery-3.1.0.min.js`:
     * `nv.d3.js`:
     * `server-performance.nvd3.js`:
-  * `mod_status.php`: Apache's mod_status page
   * `space.php`: disk space usage
 * `WikiBlender`: landing page repo. Perhaps should be rolled into meza
 * `wikis`:
