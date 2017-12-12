@@ -23,8 +23,3 @@ bash /opt/meza/tests/integration/wiki-check.sh "top" "Top Wiki"
 
 # Test for imported image
 bash /opt/meza/tests/integration/image-check.sh "top" "Test_image.png"
-
-# Delete top wiki
-meza delete wiki-promptless "$1" "top"
-
-# FIXME: Perform checks that "Top Wiki" is gone, but system is still functional
