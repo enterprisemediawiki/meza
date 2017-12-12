@@ -11,9 +11,11 @@
   include_role:
     name: sync-configs
 
-# This is required, but should be satisfied by sync-configs
-# echo "DELETE web directory"
-# sudo rm -rf "/opt/htdocs/wikis/${wiki}"
+# FIXME: Shouldn't this not be required?
+- name: Delete htdocs directory
+  file:
+    path: "{{ m_htdocs }}/wikis/{{ wiki_id }}"
+    state: absent
 
 - name: Delete wiki uploads directory and gluster brick
   file:
