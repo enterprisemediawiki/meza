@@ -55,7 +55,7 @@
  * @author James Montalvo
  * @ingroup Maintenance
  */
-require_once( '/opt/meza/htdocs/mediawiki/maintenance/Maintenance.php' );
+require_once( '/opt/htdocs/mediawiki/maintenance/Maintenance.php' );
 class UniteTheWikis extends Maintenance {
 
 	protected $mergedwiki;
@@ -483,7 +483,7 @@ class UniteTheWikis extends Maintenance {
 			$this->output( "\n\nImport unique page(s)\n" );
 			$this->importUniquePages( $pageTitleText, $wikis[0] );
 		}
-		else if ( $pages->uniques === 1 ) {
+		else if ( intval( $pages->uniques ) === 1 ) {
 			$this->output( "\n\nImport identical pages\n" );
 			$this->importIdenticalPages( $pageTitleText, $wikis );
 		}
