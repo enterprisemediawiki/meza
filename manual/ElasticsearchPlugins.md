@@ -1,38 +1,53 @@
 # Elasticsearch Plugins
 
-## WARNING
+## Installed plugins
 
-The steps below may be out of date. Meza now uses HAProxy to handle incoming traffic, and changes may be required to this documentation to account for that difference.
-
-## Installed plugg
-
-At present there are four Elasticsearch plugins installed:
+At present there are two Elasticsearch plugins installed:
 
 * [Kopf](https://github.com/lmenezes/elasticsearch-kopf)
 * [Elasticsearch-head](https://mobz.github.io/elasticsearch-head/)
-* [Inquisitor](https://github.com/polyfractal/elasticsearch-inquisitor)
+
+**WARNING: all pre-installed plugins may be removed in future versions of meza**
 
 ## Enabling access
 
-By default Elasticsearch is not accessible from outside the server. In order to access it you need to create an authenticated user by performing the following command:
+At present meza does not have a built in method to enable access to Elasticsearch and plugins from a remote web browser. For now, do the following:
+
+**WARNING: This method opens Elasticsearch up completely. Anyone will be able to view and modify your indexes. This should be used in development only!**
+
+Open firewal port 8008:
 
 ```
-sudo htpasswd -c /etc/httpd/.htpasswd <username>
+sudo firewall-cmd --zone=public --add-port=8008/tcp --permanent
+sudo firewall-cmd --reload
 ```
 
-You will then be prompted to enter a password. Make sure this is a strong password. If you want to create additional users perform the same command without the `-c` option:
+Add HAProxy rule for 8008 --> 9200 by editing `/etc/haproxy/haproxy.cfg`, and add the following:
 
 ```
-sudo htpasswd /etc/httpd/.htpasswd <username>
+frontend elastic-front
+	bind *:8008
+	mode http
+	default_backend elastic-back
+
+backend elastic-back
+	mode http
+	option forwardfor
+	balance source
+	option httpclose
+	server es1 127.0.0.1:9200 weight 1 check inter 1000 rise 5 fall 1
 ```
 
-Note that this connection is read-only. You can only perform GET requests to Elasticsearch.
+Restart HAProxy: `sudo systemctl restart haproxy`
+
+Use browser to access: `http://<your domain or IP address>:8008`
+
+**WARNING: This method opens Elasticsearch up completely. Anyone will be able to view and modify your indexes. This should be used in development only!**
 
 ## Accessing each plugin
 
 To access each plugin, navigate to the following URIs:
 
 * Kopf: `http://<your-domain>:8008/_plugin/kopf`
-* Head: `http://<your-domain>:8008/_plugin/elasticsearch-head`
-* Inquisitor: `http://<your-domain>:8008/_plugin/inquisitor`
+* Head: `http://<your-domain>:8008/_plugin/head`
 
