@@ -2,7 +2,7 @@
 
 ## Installed plugins
 
-At present there are four Elasticsearch plugins installed:
+At present there are two Elasticsearch plugins installed:
 
 * [Kopf](https://github.com/lmenezes/elasticsearch-kopf)
 * [Elasticsearch-head](https://mobz.github.io/elasticsearch-head/)
@@ -49,5 +49,5 @@ Use browser to access: `http://<your domain or IP address>:8008`
 To access each plugin, navigate to the following URIs:
 
 * Kopf: `http://<your-domain>:8008/_plugin/kopf`
-* Head: `http://<your-domain>:8008/_plugin/elasticsearch-head`
+* Head: `http://<your-domain>:8008/_plugin/head`
 
