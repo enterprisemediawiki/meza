@@ -129,6 +129,29 @@ m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
 elasticsearch_major_version: "1.6"
 
 
+
+#
+# NOTIFICATIONS
+#
+server_performance_crontime: "*/10 * * * *"
+
+# at what level do we display amber colored notification
+server_performance_memory_usage_warning: "50"
+
+# same as ^ but red danger message
+server_performance_memory_usage_danger: "75"
+
+disk_space_usage_crontime: "0 1 * * *"
+
+# Icons display in Slack
+server_performance_notification_icon: https://github.com/enterprisemediawiki/meza/raw/master/src/roles/configure-wiki/files/logo.png
+disk_space_usage_notification_icon: https://github.com/enterprisemediawiki/meza/raw/master/src/roles/configure-wiki/files/logo.png
+
+# secret.yml has additional configuration options commented out. See that file
+# for more details.
+
+
+
 #
 # FILE MODES, OWNERS, GROUPS
 #
