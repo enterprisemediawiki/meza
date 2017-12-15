@@ -233,7 +233,7 @@ class UniteTheWikis extends Maintenance {
 			$pagelist = $pages;
 		}
 		file_put_contents( $this->fileDumpList, $pagelist );
-		shell_exec( "WIKI=$wiki php {$this->maintDir}dumpBackup.php --full --logs --pagelist={$this->fileDumpList} > {$this->fileXml}" );
+		shell_exec( "WIKI=$wiki php {$this->maintDir}dumpBackup.php --full --logs --uploads --include-files --pagelist={$this->fileDumpList} > {$this->fileXml}" );
 	}
 
 	public function importXML () {
