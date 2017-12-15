@@ -399,11 +399,14 @@ class UniteTheWikis extends Maintenance {
 		$count = 0;
 
 		while( $page = $result->fetchObject() ) {
+
+			// On first page print the ID with a big header
 			if ( $count === 0 ) {
-				$startId = $page->import_id;
-				$this->output( "\nStarting import at ID = $startId\n===============================\n" );
+				$this->output( "\nStarting import at ID = " . $page->import_id . "\n===============================\n" );
 			}
 			$count++;
+
+			// On each page print the ID and other info
 			$percent = round( ($page->import_id / $totalNumRows) * 100, 3 ) . "%";
 			$this->output( "\nRow {$page->import_id} of $totalNumRows ($percent). Wikis=" . $page->wikis
 				. "; NS=" . $page->page_namespace
@@ -415,10 +418,17 @@ class UniteTheWikis extends Maintenance {
 			// of the current loop
 			$importQueueWiki = count($importQueue) > 0 ? $importQueue[0]->wikis : $page->wikis;
 
-			if ( intval($page->num_wikis) ===  1 && $importQueueWiki === $page->wikis && count($importQueue) < $this->maxSimoImport ) {
+
+			// If page is in a single wiki, current queue is set for that wiki,
+			// and queue hasn't reached max length: add page to queue.
+			if ( intval($page->num_wikis) === 1 && $importQueueWiki === $page->wikis && count($importQueue) < $this->maxSimoImport ) {
 				$this->output( "\n  --> Queue" );
 				$importQueue[] = $page;
 			}
+
+			// Else: (1) process queue as required and (2) import the current
+			// page (alternatively could add that page to the queue, to be
+			// processed on the next pass)
 			else {
 				// Import the pages in the queue and clear it
 				if ( count( $importQueue ) > 0 ) {
@@ -444,17 +454,40 @@ class UniteTheWikis extends Maintenance {
 
 	}
 
+	/**
+	 * $pages is either:
+	 *
+	 *	$page object with $page->page_title, $page->wikis, etc ($page being an
+	 *  object representation of a row from $this->mergeTable)
+	 *
+	 *  - OR -
+	 *
+	 *  array( $page1, $page2, $page3, ... )
+	 *
+	 **/
 	public function handleImport ( $pages ) {
 
 		$importIDs = array();
 
 		// Determine if this is multiple pages or just one
 		if ( is_array($pages) && count($pages) > 1 ) {
-			// if multiple pages, they'll all be from the same wiki
+
+			// if multiple pages, they'll all be from the same wiki (so create
+			// an array with just this wiki in it, rather than the exploded
+			// comma-separated-list of wikis below)
 			$wikis = array( $pages[0]->wikis );
+
+			// ??
 			$pageTitleText = array();
+
 			$this->output( "\nImporting multiple pages from " . $pages[0]->wikis . ": ");
+
+
 			foreach( $pages as $page ) {
+
+				// Make a MediaWiki Title object in order to get the full text
+				//of the page, then put that text in an array for later use as
+				// indicating what to import
 				$pageTitleObj = Title::makeTitle( $page->page_namespace, $page->page_title );
 				$text = $pageTitleObj->getFullText();
 				$pageTitleText[] = $text;
@@ -467,9 +500,10 @@ class UniteTheWikis extends Maintenance {
 				$pages = $pages[0];
 			}
 			else if ( is_array($pages) ) {
-				$this->output( "\n\n\n\n  ## Array when object expected. Array length = " . count($pages) );
+				$this->output( "\n\n\n\n  ## ERROR: Array when object expected. Array length = " . count($pages) );
+				$this->output( "\n\n  ## This may mean all pages have been processed. Array print_r output below: " );
 				$this->output( "\n\n" . print_r( $pages, true ) );
-				continue;
+				return;
 			}
 			$wikis = explode( ",", $pages->wikis );
 			$pageTitleObj = Title::makeTitle( $pages->page_namespace, $pages->page_title );
@@ -478,7 +512,7 @@ class UniteTheWikis extends Maintenance {
 			$this->output( "\nImporting page $pageTitleText from " . $pages->wikis );
 		}
 
-
+		// ASDF left off here FIXME
 		if ( count( $wikis ) === 1 ) {
 			$this->output( "\n\nImport unique page(s)\n" );
 			$this->importUniquePages( $pageTitleText, $wikis[0] );

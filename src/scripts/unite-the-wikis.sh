@@ -84,12 +84,12 @@ for wiki in $(echo $wikis | sed "s/,/ /g")
 do
 	for dir in 0 1 2 3 4 5 6 7 8 9 a b c d e f
 	do
-		echo "Importing from $wiki directory $dir"
-		WIKI="$wiki_id" php "$m_mediawiki/maintenance/importImages.php" --search-recursively "$m_uploads_dir/$wiki/images/$dir"
+		echo "Importing from $m_uploads_dir/$wiki/$dir"
+		WIKI="$wiki_id" php "$m_mediawiki/maintenance/importImages.php" --search-recursively "$m_uploads_dir/$wiki/$dir"
 	done
 done
 
-WIKI="$wiki_id" php "$m_mediawiki/maintenance/rebuildall.php" --cleanup
+WIKI="$wiki_id" php "$m_mediawiki/maintenance/rebuildall.php"
 
 # Don't clean up merge table until rebuild all and images are imported. That
 # way if this needs to stop and restart it won't try to reimport.
