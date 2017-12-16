@@ -69,6 +69,10 @@ else
 fi
 
 
+echo -e "\nBefore doing anything, run a cleanup..."
+WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php" --cleanup
+
+
 echo -e "\nSetting up merge"
 WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php" "--mergedwiki=$wiki_id" "--sourcewikis=$wikis"
 
