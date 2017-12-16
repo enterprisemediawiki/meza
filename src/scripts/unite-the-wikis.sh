@@ -41,18 +41,19 @@ done
 
 if [ -d "/opt/.deploy-meza/public/wikis/$wiki_id" ]; then
 
-	echo
-	echo
-	echo -e "Are you sure you want to import into $wiki_id? Type \"y\" and hit [ENTER]: "
-	read confirm_merge
-
-	# Confirm you want to import into this existing wiki
-	if [ "$confirm_merge" != "y" ]; then
+	if [ "$skip_confirm_merge" != "y" ]; then
 		echo
-		echo "User does not want to merge into $wiki_id"
-		exit 1
-	fi
+		echo
+		echo -e "Are you sure you want to import into $wiki_id? Type \"y\" and hit [ENTER]: "
+		read confirm_merge
 
+		# Confirm you want to import into this existing wiki
+		if [ "$confirm_merge" != "y" ]; then
+			echo
+			echo "User does not want to merge into $wiki_id"
+			exit 1
+		fi
+	fi
 
 else
 
