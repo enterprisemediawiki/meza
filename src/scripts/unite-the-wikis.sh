@@ -80,10 +80,10 @@ WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php" "--mergedwiki=$wiki_id" "--so
 # Each pass of this loop checks to see how many imports are remaining
 # This is broken out this way because PHP CLI has a memory leak (I think), and
 # letting bash control repeated calls to the script gets around this.
-# while [[ `WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php" --imports-remaining` != "0" ]]; do
-# 	echo -e "\n\n*********************\nANOTHER ROUND\n******************\n"
-# 	WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php"
-# done;
+while [[ `WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php" --imports-remaining` != "0" ]]; do
+	echo -e "\n\n*********************\nANOTHER ROUND\n******************\n"
+	WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php"
+done;
 
 # for wiki in $(echo $wikis | sed "s/,/ /g")
 # do
