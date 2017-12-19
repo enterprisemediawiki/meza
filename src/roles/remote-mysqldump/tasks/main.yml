@@ -10,6 +10,8 @@
 #   target_server
 #   target_server_path
 
+- debug: { msg: "Running role:remote-mysqldump for {{ wiki_id }}" }
+
 
 #
 # Put meza-ansible's private key and known_hosts on server within /root
