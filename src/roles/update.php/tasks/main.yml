@@ -19,7 +19,7 @@
 # DUMP SQL from DB Master to backup-servers[0]
 #
 - name: "Backup wiki database prior to running update.php"
-  include_role:
+  import_role:
     name: remote-mysqldump
   vars:
     remote_server:      "{{ groups['db-master'][0] }}"
@@ -32,7 +32,7 @@
     - update.php-backup
 
 - name: "Clean out all but the latest SQL backup file for {{ wiki_id }} IF DESIRED"
-  include_role:
+  import_role:
     name: sql-backup-cleanup
   vars:
     cleanup_wiki: "{{ wiki_id }}"
