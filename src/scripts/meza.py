@@ -451,6 +451,31 @@ def meza_command_maint_rebuild (argv):
 	meza_shell_exec_exit(rc)
 
 
+def meza_command_maint_cleanuploadstash (argv):
+
+	env = argv[0]
+
+	rc = check_environment(env)
+
+	# return code != 0 means failure
+	if rc != 0:
+		meza_shell_exec_exit(rc)
+
+	more_extra_vars = False
+
+	# strip environment off of it
+	argv = argv[1:]
+
+	shell_cmd = playbook_cmd( 'cleanup-upload-stash', env, more_extra_vars )
+	if len(argv) > 0:
+		shell_cmd = shell_cmd + argv
+
+	rc = meza_shell_exec( shell_cmd )
+
+	# exit with same return code as ansible command
+	meza_shell_exec_exit(rc)
+
+
 def meza_command_docker (argv):
 
 	if argv[0] == "run":
