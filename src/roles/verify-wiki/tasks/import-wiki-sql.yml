@@ -103,7 +103,7 @@
   include_role:
     name: update.php
   vars:
-    wiki_id: "{{ item }}"
+    wiki_id: "{{ wiki_id }}"
   tags:
   - update.php
   when: not wiki_exists or do_overwrite_db_from_backup
