@@ -151,6 +151,13 @@ disk_space_usage_notification_icon: https://github.com/enterprisemediawiki/meza/
 # for more details.
 
 
+#
+# Misc cron times
+#
+
+# Cleanup upload stash (temporary files) daily at 6pm
+clean_upload_stash_crontime: "0 18 * * *"
+
 
 #
 # FILE MODES, OWNERS, GROUPS
