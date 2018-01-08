@@ -348,7 +348,9 @@
 
 - hosts: all:!exclude-all:!load-balancers-unmanaged
   become: yes
-  tags: cron
+  tags:
+    - cron
+    - always
   roles:
     - set-vars
     - role: cron
