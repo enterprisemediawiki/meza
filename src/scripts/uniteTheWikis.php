@@ -238,7 +238,7 @@ class UniteTheWikis extends Maintenance {
 
 	public function importXML () {
 		$this->output( "\nImport XML" );
-		shell_exec( "WIKI={$this->mergedwiki} php {$this->maintDir}importDump.php --no-updates < {$this->fileXml}" );
+		shell_exec( "WIKI={$this->mergedwiki} php {$this->maintDir}importDump.php --no-updates --uploads --debug --report=100 < {$this->fileXml}" );
 	}
 
 	public function importUniquePages ($pages, $wiki) {
