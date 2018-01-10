@@ -351,4 +351,6 @@
   tags: cron
   roles:
     - set-vars
-    - cron
+    - role: cron
+      when: docker_skip_tasks is not defined or not docker_skip_tasks
+ 
