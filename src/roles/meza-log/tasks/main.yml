@@ -22,7 +22,7 @@
     state: import
     target: "/opt/meza/src/roles/meza-log/files/meza_server_log.sql"
   run_once: true
-  when: not server_log_exists
+  when: not server_log_exists AND (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 
 #
@@ -33,16 +33,17 @@
   register: register_disk_space
   ignore_errors: yes
   run_once: true
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 - name: "Set fact if disk_space table DOES exist"
   set_fact:
     disk_space_exists: True
-  when: register_disk_space.rc == 0
+  when: register_disk_space.rc == 0 AND (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 - name: "Set fact if disk_space table DOES NOT exist"
   set_fact:
     disk_space_exists: False
-  when: register_disk_space.rc != 0
+  when: register_disk_space.rc != 0 AND (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 - name: "Create table disk_space if not exists"
   mysql_db:
@@ -50,7 +51,7 @@
     state: import
     target: "/opt/meza/src/roles/meza-log/files/table_disk_space.sql"
   run_once: true
-  when: not disk_space_exists
+  when: not disk_space_exists AND (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 
 #
