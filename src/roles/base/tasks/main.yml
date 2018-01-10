@@ -65,11 +65,15 @@
     name: epel-release
     state: installed
   when: ansible_distribution == "CentOS"
+  tags:
+  - latest
 
 - name: Check if EPEL repo is already configured.
   stat:
     path: "/etc/yum.repos.d/epel.repo"
   register: epel_repofile_result
+  tags:
+  - latest
 
 - name: Install EPEL repo.
   yum:
@@ -80,6 +84,8 @@
   retries: 5
   delay: 10
   when: ansible_distribution == "RedHat" and not epel_repofile_result.stat.exists
+  tags:
+  - latest
 
 - name: Import EPEL GPG key.
   rpm_key:
@@ -87,15 +93,20 @@
     state: present
   when: ansible_distribution == "RedHat" and not epel_repofile_result.stat.exists
   ignore_errors: "{{ ansible_check_mode }}"
-
+  tags:
+  - latest
 
 - name: Ensure optional repos enabled
   shell: subscription-manager repos --enable rhel-7-server-optional-rpms
   when: ansible_distribution == "RedHat"
-
+  tags:
+  - latest
 
 - name: ensure libselinux-python installed prior to SELinux
   yum: name=libselinux-python state=installed
+  tags:
+  - latest
+
 - name: Install base packages
   yum: name={{item}} state=installed
   with_items:
@@ -113,10 +124,14 @@
     - jq
     - tree
     - cronie
+  tags:
+  - latest
+
 - name: put SELinux in permissive mode
   selinux:
     policy: targeted
     state: permissive # log actions that would be blocked if state=enforcing
+
 - name: ensure firewalld is running (and enable it at boot)
   service: name=firewalld state=started enabled=yes
   when: docker_skip_tasks is not defined or not docker_skip_tasks
@@ -157,6 +172,9 @@
 # service ntpd start # Start service
 - name: Install NTP
   yum: name=ntp state=installed
+  tags:
+  - latest
+
 - name: Ensure NTP is running and enabled as configured.
   service:
     name: ntpd
