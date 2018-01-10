@@ -344,6 +344,7 @@
   roles:
     - set-vars
     - meza-log
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 - hosts: all:!exclude-all:!load-balancers-unmanaged
   become: yes
