@@ -64,7 +64,7 @@ class NonMediaWikiSimpleSamlAuth {
 		// Load the simpleSamlPhp service
 		require_once rtrim( $wgSamlSspRoot, DIRECTORY_SEPARATOR ) .
 			DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . '_autoload.php';
-		self::$as = new SimpleSAML_Auth_Simple( $wgSamlAuthSource );
+		self::$as = new SimpleSAML\Auth\Simple( $wgSamlAuthSource );
 		self::$initialised = is_object( self::$as );
 		return self::$initialised;
 	}

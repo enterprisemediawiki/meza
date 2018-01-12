@@ -327,6 +327,35 @@ def meza_command_create (argv):
 		rc = meza_shell_exec( shell_cmd )
 		meza_shell_exec_exit(rc)
 
+def meza_command_delete (argv):
+
+	sub_command = argv[0]
+
+	if sub_command in ("wiki", "wiki-promptless"):
+
+		if len(argv) < 2:
+			print "You must specify an environment: 'meza delete wiki ENV'"
+			sys.exit(1)
+
+		env = argv[1]
+
+		rc = check_environment(env)
+		if rc > 0:
+			meza_shell_exec_exit(rc)
+
+		playbook = "delete-" + sub_command
+
+		if sub_command == "wiki-promptless":
+			if len(argv) < 3:
+				print "delete wiki-promptless requires wiki_id"
+				sys.exit(1)
+			shell_cmd = playbook_cmd( playbook, env, { 'wiki_id': argv[2] } )
+		else:
+			shell_cmd = playbook_cmd( playbook, env )
+
+		rc = meza_shell_exec( shell_cmd )
+		meza_shell_exec_exit(rc)
+
 
 def meza_command_backup (argv):
 
@@ -413,6 +442,31 @@ def meza_command_maint_rebuild (argv):
 	argv = argv[1:]
 
 	shell_cmd = playbook_cmd( 'rebuild-smw-and-index', env, more_extra_vars )
+	if len(argv) > 0:
+		shell_cmd = shell_cmd + argv
+
+	rc = meza_shell_exec( shell_cmd )
+
+	# exit with same return code as ansible command
+	meza_shell_exec_exit(rc)
+
+
+def meza_command_maint_cleanuploadstash (argv):
+
+	env = argv[0]
+
+	rc = check_environment(env)
+
+	# return code != 0 means failure
+	if rc != 0:
+		meza_shell_exec_exit(rc)
+
+	more_extra_vars = False
+
+	# strip environment off of it
+	argv = argv[1:]
+
+	shell_cmd = playbook_cmd( 'cleanup-upload-stash', env, more_extra_vars )
 	if len(argv) > 0:
 		shell_cmd = shell_cmd + argv
 

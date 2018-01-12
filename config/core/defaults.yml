@@ -139,6 +139,36 @@ m_parsoid_version: "tags/v0.8.0"
 elasticsearch_major_version: "5.x"
 
 
+
+#
+# NOTIFICATIONS
+#
+server_performance_crontime: "*/10 * * * *"
+
+# at what level do we display amber colored notification
+server_performance_memory_usage_warning: "50"
+
+# same as ^ but red danger message
+server_performance_memory_usage_danger: "75"
+
+disk_space_usage_crontime: "0 1 * * *"
+
+# Icons display in Slack
+server_performance_notification_icon: https://github.com/enterprisemediawiki/meza/raw/master/src/roles/configure-wiki/files/logo.png
+disk_space_usage_notification_icon: https://github.com/enterprisemediawiki/meza/raw/master/src/roles/configure-wiki/files/logo.png
+
+# secret.yml has additional configuration options commented out. See that file
+# for more details.
+
+
+#
+# Misc cron times
+#
+
+# Cleanup upload stash (temporary files) daily at 6pm
+clean_upload_stash_crontime: "0 18 * * *"
+
+
 #
 # FILE MODES, OWNERS, GROUPS
 #

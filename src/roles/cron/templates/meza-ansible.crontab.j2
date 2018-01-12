@@ -6,14 +6,14 @@
 #
 # Cron job for logging server performance info
 #
-{{ server_performance_crontime }} {{ m_scripts }}/server-performance.sh
+{{ server_performance_crontime }} {{ m_deploy }}/server-performance.sh
 {% endif %}
 
 {% if disk_space_usage_mount_name is defined and 'logging-servers' in groups and inventory_hostname in groups['logging-servers'] %}
 #
 # Check disk space usage
 #
-{{ disk_space_usage_crontime }} {{ m_scripts }}/disk-space-usage.sh
+{{ disk_space_usage_crontime }} {{ m_deploy }}/disk-space-usage.sh
 {% endif %}
 
 {% if parsoid_restart_crontime and inventory_hostname in groups['parsoid-servers'] %}
@@ -39,6 +39,13 @@
 
 {% endif %}
 
+{% if inventory_hostname in groups['app-servers'] %}
+#
+# Clean out uploads temporary files nightly
+#
+{{ clean_upload_stash_crontime }} sudo meza maint cleanuploadstash {{ env }} >> {{ m_logs }}/cleanuploadstash_`date "+\%Y-\%m"`_cron.log 2>&1
+
+{% endif %}
 
 {% if custom_crons is defined  %}
 #
