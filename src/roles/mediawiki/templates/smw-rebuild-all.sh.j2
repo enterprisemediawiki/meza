@@ -34,24 +34,50 @@ for d in $do_wikis; do
 	echo "  Output log:"
 	echo "    $out_log"
 
-	WIKI="$wiki_id" \
-	php "{{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/rebuildData.php" \
-	-d 5 -v --ignore-exceptions \
-	--exception-log="$exception_log" \
-	> "$out_log" 2>&1
+	start_id_file="/opt/data-meza/logs/custom-rebuild-start-id-file"
 
-	endtimestamp=$(date +"%F_%T")
+	# on the first pass, use -f to fully rebuild the SMW structure
+	dependent_option="-f"
+
+	# Initialize start ID file to ID=0
+	echo "0" > "$start_id_file"
+	start_id=$(cat "$start_id_file")
+
+
+	while [ "$start_id" != "-1" ]; do
+
+		WIKI="$wiki_id" \
+		php "{{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/rebuildData.php" \
+		-d 5 -v $dependent_option --ignore-exceptions \
+		--debug \
+		--report-runtime \
+		--startidfile "$start_id_file" -n 1000 \
+		--exception-log="$exception_log" \
+		>> "$out_log" 2>&1
+
+		# after first run, don't rebuild structure, but do skip rebuilding properties
+		dependent_option="--skip-properties"
+
+		start_id=$(cat "$start_id_file")
+
+		echo "next pass start id = $start_id"
+
+	done
+
 
 	# If the above command had a failing exit code
 	if [[ $? -ne 0 ]]; then
+
+		endtimestamp=$(date +"%F_%T")
 
 		# FIXME #577 #681: add notification/warning system here
 		echo "rebuildData FAILED for \"$wiki_id\" at $endtimestamp"
 
 	#if the above command had a passing exit code (e.g. zero)
 	else
+		endtimestamp=$(date +"%F_%T")
+
 		echo "rebuildData completed for \"$wiki_id\" at $endtimestamp"
 	fi
 
 done
-

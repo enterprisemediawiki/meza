@@ -29,7 +29,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  *  Perform authentication up front.
  *
  **/
-require_once "{{ m_deploy }}/samlLocalSettings.php";
+require "{{ m_deploy }}/samlLocalSettings.php";
 
 
 {% endif %}
@@ -41,7 +41,7 @@ require_once "{{ m_deploy }}/samlLocalSettings.php";
  *  from the WIKI environment variable (for command line scripts)
  **/
 
-require_once '/opt/.deploy-meza/config.php';
+require '/opt/.deploy-meza/config.php';
 
 if( $wgCommandLineMode ) {
 

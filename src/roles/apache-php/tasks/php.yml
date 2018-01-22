@@ -61,11 +61,19 @@
     - php56u-soap
     - php56u-mbstring
     - php56u-mcrypt
+    - php56u-mssql
 
 - name: Write php.ini file
   template:
     src: php.ini.j2
     dest: "{{ m_php_ini }}"
+  notify:
+  - restart apache
+
+- name: Write freetds.conf file
+  template:
+    src: freetds.conf.j2
+    dest: /etc/freetds.conf
   notify:
   - restart apache
 

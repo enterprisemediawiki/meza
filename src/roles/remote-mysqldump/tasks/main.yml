@@ -10,6 +10,8 @@
 #   target_server
 #   target_server_path
 
+- debug: { msg: "Running role:remote-mysqldump for {{ wiki_id }}" }
+
 
 #
 # Put meza-ansible's private key and known_hosts on server within /root
@@ -56,6 +58,29 @@
   when: remote_server_ssh_user is not defined
 
 
+
+#
+# Verify wiki exists on source server before attempting to dump from it
+#
+- name: "{{ wiki_id }} - check if wiki database exists ON SOURCE SERVER"
+  shell: 'mysqlshow "wiki_{{ wiki_id }}" | grep -v Wildcard | grep -o wiki_{{ wiki_id }}'
+  register: source_wiki_exists_check
+  delegate_to: "{{ target_server }}"
+  ignore_errors: yes
+  run_once: true
+
+- name: "{{ wiki_id }} - Set fact if database wiki_{{ wiki_id }} DOES exist ON SOURCE SERVER"
+  set_fact:
+    source_wiki_exists: True
+  when: source_wiki_exists_check is defined and source_wiki_exists_check.rc == 0
+
+- name: "{{ wiki_id }} - Set fact if database wiki_{{ wiki_id }} DOES NOT exist ON SOURCE SERVER"
+  set_fact:
+    source_wiki_exists: False
+  when: source_wiki_exists_check is defined and source_wiki_exists_check.rc != 0
+
+
+
 #
 # If remote_server != target_server, use SSH to run mysqldump. Else, doit locally
 #
@@ -93,7 +118,12 @@
 - name: "Perform MySQL dump from {{ remote_server }} to {{ target_server }}"
   shell: "{{ mysqldump_command }}"
   delegate_to: "{{ target_server }}"
+  when: source_wiki_exists
 
+
+#
+# Revoke keys
+#
 - name: "Revoke keys from {{ target_server }}"
   include_role:
     name: key-transfer

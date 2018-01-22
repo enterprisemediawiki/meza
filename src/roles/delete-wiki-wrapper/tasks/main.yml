@@ -1,0 +1,44 @@
+---
+
+- name: Delete wiki from controller
+  file:
+    path: "{{ m_local_public }}/wikis/{{ wiki_id }}"
+    state: absent
+  delegate_to: localhost
+
+# Ensure app servers have this change
+- name: Sync configurations (FIXME do we need this)
+  include_role:
+    name: sync-configs
+
+# FIXME: Shouldn't this not be required?
+- name: Delete htdocs directory
+  file:
+    path: "{{ m_htdocs }}/wikis/{{ wiki_id }}"
+    state: absent
+
+- name: Delete wiki uploads directory and gluster brick
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ m_uploads_dir }}/{{ wiki_id }}"
+    - "{{ gluster_brick_dir }}/{{ wiki_id }}"
+
+
+# Cleanup elasticsearch
+# FIXME: Does this need to happen on all ES servers, or just one?
+- name: Delete Elasticsearch indices
+  shell: "{{ item }}"
+  delegate_to: "{{ groups['elastic-servers'][0] }}"
+  with_items:
+    - curl -XDELETE "localhost:9200/wiki_{{ wiki_id }}_general_first/"
+    - curl -XDELETE "localhost:9200/wiki_{{ wiki_id }}_content_first/"
+    - curl -XDELETE "localhost:9200/wiki_{{ wiki_id }}_general/"
+
+# Delete database
+- name: Drop database from master DB
+  mysql_db:
+    name: "wiki_{{ wiki_id }}"
+    state: absent
+  delegate_to: "{{ groups['db-master'][0] }}"

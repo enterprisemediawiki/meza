@@ -52,8 +52,6 @@ Meza application directory. This should never change except if you upgrade meza 
   * `scripts`
     * Run on hosts: `create-vm.sh`: Create a Vbox VM; remove when `vagrant up` mature? Or keep for RedHat
     * Setup dev VMs: `dev-networking.sh`: Setup host-only network on Vbox VM; Remove after Vagrant? Keep for RedHat setup?
-    * Move to Ansible role [1]: `disk-space-usage.sh`: (needs to be within role on any server that needs disk space alerts. Currently requires MariaDB and Ansible present on logging servers)
-    * Move to Ansible role [1]: `server-performance.sh`: (needs to be within role on any server that needs performance alerts. Currently requires MariaDB and Ansible present on logging servers)
     * Run on controller: `getmeza.sh`: (Used to install `meza` command)
     * Run on controller: `meza.py`: (Entry point for `meza` command)
     * Consolidate [2]: `shell-functions`:
@@ -169,7 +167,6 @@ This directory is a hidden directory (e.g. starts with a period) because it real
 * `config.php`: PHP config variable file written based off defaults, secret and public config
 * `config.sh`: Bash config variable file written based off defaults, secret and public config
 * `Extensions.php`: Extensions to load, written based off core and local extensions
-* `logging.sh`: Config variables specific to logging. FIXME #715: merge into config.sh
 * `elastic-build-index.sh`: Rebuild Elasticsearch index for a wiki. Deployed by `role:mediawiki`
 * `elastic-rebuild-all.sh`: Wrapper for `elastic-build-index.sh`. Deployed by `role:mediawiki`
 * `smw-rebuild-all.sh`: Rebuild SMW data for all wikis. Deployed by `role:mediawiki`
@@ -203,7 +200,6 @@ This directory is similar to `/opt/.deploy-meza` in that it is a deployed direct
     * `jquery-3.1.0.min.js`:
     * `nv.d3.js`:
     * `server-performance.nvd3.js`:
-  * `mod_status.php`: Apache's mod_status page
   * `space.php`: disk space usage
 * `WikiBlender`: landing page repo. Perhaps should be rolled into meza
 * `wikis`:

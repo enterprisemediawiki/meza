@@ -1,0 +1,24 @@
+---
+
+- hosts: app-servers
+  become: yes
+
+  # prompt for wiki_id and wiki_name
+  vars_prompt:
+    - name: "wiki_id"
+      prompt: |
+        Enter the desired wiki identifier to delete.
+
+        Type the wiki ID and press [ENTER]:
+      private: no
+
+  roles:
+    - set-vars
+    - delete-wiki-wrapper
+
+
+- hosts: parsoid-servers
+  become: yes
+  roles:
+    - set-vars
+    - parsoid-settings
