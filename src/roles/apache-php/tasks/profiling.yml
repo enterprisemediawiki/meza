@@ -41,7 +41,7 @@
   git:
     repo: https://github.com/perftools/xhgui.git
     dest: "{{ m_profiling_xhgui_directory }}"
-    version: master
+    version: "0.8.1"
     force: yes
 
 - name: Ensure XHGui directory owned by Apache
