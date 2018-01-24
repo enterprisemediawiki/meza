@@ -193,10 +193,6 @@ list:
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticInternalObjects.git
     version: "{{ mediawiki_default_branch }}"
     legacy_load: true
-  - name: SemanticCompoundQueries
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticCompoundQueries.git
-    version: "{{ mediawiki_default_branch }}"
-    legacy_load: true
   - name: SemanticDrilldown
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticDrilldown.git
     version: "{{ mediawiki_default_branch }}"
