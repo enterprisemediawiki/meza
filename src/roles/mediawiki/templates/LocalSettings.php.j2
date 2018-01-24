@@ -747,8 +747,6 @@ $wgCirrusSearchClusters['default'][] = 'localhost';
 $wgCirrusSearchClusters['default'][] = '{{ host }}';
 {% endif %}
 {% endfor %}
-// elastic versions before 5.3.x requires the following
-$CirrusSearchElasticQuirks = [ 'query_string_max_determinized_states' => true ];
 
 
 /**
