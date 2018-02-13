@@ -188,3 +188,28 @@ m_logs_group: wheel
 m_backups_mode: "0755"
 m_backups_owner: root
 m_backups_group: root
+
+
+#
+# CONFIG FILES (php, apache, etc)
+#
+
+
+#
+# php.ini
+#
+php_ini_max_input_time: 60
+php_ini_max_execution_time: 30
+php_ini_memory_limit: "128M"
+
+#
+# httpd.conf
+#
+httpd_conf_timeout: 300
+
+#
+# haproxy.cfg
+#
+haproxy_timeout_connect: "5s"
+haproxy_timeout_client: "50s"
+haproxy_timeout_server: "50s"

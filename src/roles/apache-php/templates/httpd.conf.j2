@@ -108,6 +108,8 @@ ServerName https://{{ wiki_app_fqdn }}
 	Require all denied
 </Directory>
 
+TimeOut {{ httpd_conf_timeout }}
+
 #
 # Note that from this point forward you must specifically allow
 # particular features to be enabled - so if something's not working as
