@@ -8,15 +8,15 @@ print "Here are the extensions in core\n$core";
 
 print "\n\n Here are additional extensions from MezaLocalExtensions.yml\n$local";
 
-$core = explode("\n", $core);
-$local = explode("\n", $local);
+$core = explode("\n", trim($core));
+$local = explode("\n", trim($local));
 
 // var_dump($core);
 
 $api = $argv[1];
 
 if ( ($api == null) || ($api == false) || ($api == '') ) {
-  die (' You must supply the domain and path to your wiki api as the first argument. e.g. https://freephile.org/w/api.php' );
+  exit (' Supply the full URL to your wiki API as the first argument. e.g. https://freephile.org/w/api.php to get a list of extensions which still need to be added locally' );
 }
 $endpoint = $api . '?action=query&meta=siteinfo&siprop=extensions&format=json';
 // $extension_json = file_get_contents( 'https://freephile.org/w/api.php?action=query&meta=siteinfo&siprop=extensions&format=json' );
@@ -63,4 +63,3 @@ foreach ( $extension_php as $ext ) {
 // $existing = yaml_parse_file( '/opt/meza/config/core/MezaCoreExtensions.yml' );
 
 // var_dump ($existing);
-
