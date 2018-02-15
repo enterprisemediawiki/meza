@@ -5,10 +5,6 @@
   roles:
     - set-vars
     - create-wiki-wrapper
-  handlers:
-    - name: restart apache
-      service: name=httpd state=restarted
-      when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 - hosts: parsoid-servers
   become: yes
