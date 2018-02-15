@@ -57,7 +57,6 @@ m_mediawiki: /opt/htdocs/mediawiki
 m_cert_private: /etc/pki/tls/private/meza.key
 m_cert_public: /etc/pki/tls/certs/meza.crt
 m_ca_cert: /etc/pki/tls/certs/meza-ca.crt
-m_https_always: True
 
 # app locations
 m_apache: /etc/httpd
@@ -125,22 +124,19 @@ sshd_config_PasswordAuthentication: "yes"
 #
 
 # Version of MediaWiki core
-mediawiki_version: "1.28.3"
+mediawiki_version: "1.27.3"
 
 # Branch to use on many extensions extensions and skins
-mediawiki_default_branch: "REL1_28"
+mediawiki_default_branch: "REL1_27"
 
 
-# MediaWiki REL1_28 branch point on 2016-10-25
-# Parsoid v0.6.0 on Nov 7, 2016
-# Parsoid v0.5.3 on Oct 31, 2016
-# Parsoid v0.5.2 on May 2, 2016
-m_parsoid_version: "tags/v0.5.3"
+# This commit is closest to MW 1.27 release date of 28 June 2016
+m_parsoid_version: dd8e644d320aec076f76da4e2bd70a8527e0dfd8
 
 # MediaWiki 1.27 and earlier require ElasticSearch 1.6
 # MediaWiki 1.28 and higher require ElasticSearch 2.x
 # MediaWiki 1.29 and higher require ElasticSearch 5.x
-elasticsearch_major_version: "2.x"
+elasticsearch_major_version: "1.6"
 
 
 #
