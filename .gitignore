@@ -1,5 +1,3 @@
 .DS_Store
-hosts
-/nbproject/*
 .vagrant/*
 vagrantconf.yml
