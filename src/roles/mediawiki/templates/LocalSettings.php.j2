@@ -235,13 +235,37 @@ else {
 // ref: https://www.mediawiki.org/wiki/Manual:$wgInternalServer
 
 if ( ! $wgCommandLineMode ) {
-		$wgServer = "https://" . $_SERVER['HTTP_HOST'] ;
+	// $wgServer for subdomain mode
+	$wgServer = "https://" . $_SERVER['HTTP_HOST'] ;
 }
+{% if m_extra_pretty is defined and m_extra_pretty == True %}
+// Setup Pretty URLs in a 'REST-like' verb way with 'action' on the end
+// standard example.com/wiki/Main_Page view urls,
+// and rewrites to example.com/wiki/Main_Page/edit
+// Note: you cannot have subpages of main pages named "delete, edit, watch, unwatch" etc from the array when setup like this.
+// https://www.mediawiki.org/wiki/Manual:$wgActionPaths
+$actions = array( 'edit', 'watch', 'unwatch', 'delete','revert', 'rollback',
+  'protect', 'unprotect', 'markpatrolled', 'render', 'submit', 'history', 'purge', 'info' );
 
+foreach ( $actions as $action ) {
+  $wgActionPaths[$action] = "/wiki/$1/$action";
+}
+$wgActionPaths['view'] = "/wiki/$1";
+$wgArticlePath = $wgActionPaths['view'];
+{% if m_pretty is defined and m_pretty == true %}$wgScriptPath = "/w";{% endif %}
+// only pretty
+{% elif m_pretty is defined and m_pretty == true %}
+  {% if m_wiki_url_stlye is defined and m_wiki_url_style == "subdomain" %}
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
 $wgScriptPath = "/w";
 // we're using short URLs
 $wgArticlePath = "/wiki/$1";
+  {% endif %}
+{% else %}
+// $wgServer for path mode
+$wgServer = 'https://{{ wiki_app_fqdn }}';
+$wgScriptPath = "/$wikiId";
+{% endif %}
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath
 $wgUploadPath = "$wgScriptPath/img_auth.php";
@@ -498,12 +522,11 @@ $wgRightsIcon = "";
 $wgDiff3 = "/usr/bin/diff3";
 
 ## Default skin: you can change the default skin. Use the internal symbolic
-## names, ie 'vector', 'monobook':
+## names, ie 'vector', 'monobook': see MezaCoreSkins.yml for choices
 $wgDefaultSkin = "vector";
 
 # Enabled skins.
-# The following skins were automatically enabled:
-wfLoadSkin( 'Vector' );
+# No need to call wfLoadSkin() as this is handled automatically
 
 // allows users to remove the page title.
 // https://www.mediawiki.org/wiki/Manual:$wgRestrictDisplayTitle

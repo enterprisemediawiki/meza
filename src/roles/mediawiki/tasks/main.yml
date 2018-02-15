@@ -69,44 +69,35 @@
   tags:
     - latest
 #
-# SKINS
-#
-# FIXME #819: Add skins in Meza(Core|Local)Extensions.yml
-- name: Ensure Vector skin installed
-  git:
-    repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git
-    dest: "{{ m_mediawiki }}/skins/Vector"
-    version: "{{ mediawiki_default_branch }}"
-# More default skins
-- name: Ensure Modern skin installed
-  git:
-    repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Modern.git
-    dest: "{{ m_mediawiki }}/skins/Modern"
-    version: "{{ mediawiki_default_branch }}"
-- name: Ensure ColognBlue skin installed
-  git:
-    repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git
-    dest: "{{ m_mediawiki }}/skins/CologneBlue"
-    version: "{{ mediawiki_default_branch }}"
-- name: Ensure MonoBook skin installed
-  git:
-    repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/MonoBook.git
-    dest: "{{ m_mediawiki }}/skins/MonoBook"
-    version: "{{ mediawiki_default_branch }}"
-
-
-#
-# EXTENSIONS
+# EXTENSIONS AND SKINS
 #
 - name: Set variable holding list of core extensions
   include_vars:
     file: "{{ m_config_core }}/MezaCoreExtensions.yml"
     name: meza_core_extensions
+  tags:
+    - extensions
+
+- name: Set variable holding list of core skins
+  include_vars:
+    file: "{{ m_config_core }}/MezaCoreSkins.yml"
+    name: meza_core_skins
+  tags:
+    - skins
 
 - name: Set variable holding list of local extensions
   include_vars:
     file: "{{ m_local_public }}/MezaLocalExtensions.yml"
     name: meza_local_extensions
+  tags:
+    - extensions
+
+- name: Set variable holding list of local skins
+  include_vars:
+    file: "{{ m_local_public }}/MezaLocalSkins.yml"
+    name: meza_local_skins
+  tags:
+    - skins
 
 - name: Ensure core meza extensions installed (non-Composer)
   git:
@@ -116,8 +107,20 @@
   with_items: "{{ meza_core_extensions.list }}"
   when: meza_core_extensions.list[0] is defined and item.repo is defined
   tags:
-    - git-extensions
-    - git-core-extensions
+    - extensions
+    - core-extensions
+    - latest
+
+- name: Ensure core meza skins installed (non-Composer)
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ m_mediawiki }}/skins/{{ item.name }}"
+    version: "{{ item.version }}"
+  with_items: "{{ meza_core_skins.list }}"
+  when: meza_core_skins.list[0] is defined and item.repo is defined
+  tags:
+    - skins
+    - core-skins
     - latest
 
 - name: Ensure local meza extensions installed (non-Composer)
@@ -128,22 +131,43 @@
   with_items: "{{ meza_local_extensions.list }}"
   when: meza_local_extensions.list[0] is defined and item.repo is defined
   tags:
-    - git-extensions
-    - git-local-extensions
+    - extensions
+    - local-extensions
     - latest
 
-# File holding extension loading and config for core and local extensions
+- name: Ensure local meza skins installed (non-Composer)
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ m_mediawiki }}/skins/{{ item.name }}"
+    version: "{{ item.version }}"
+  with_items: "{{ meza_local_skins.list }}"
+  when: meza_local_skins.list[0] is defined and item.repo is defined
+  tags:
+    - skins
+    - local-skins
+    - latest
+
+
+# File holding loading and config for extensions plus skins (core and local)
 - name: Ensure Extensions.php in place
   template:
     src: Extensions.php.j2
     dest: "{{ m_deploy }}/Extensions.php"
+  tags:
+    - extensions
+    - skins
 
-# Adds extensions with composer param from MezaCoreExtensions.yml and
-# MezaLocalExtensions.yml
-- name: Ensure composer.local.json in place to load composer-based extensions
+# Adds extensions and skins with composer param
+# from MezaCoreExtensions.yml, MezaLocalExtensions.yml
+# and MezaCoreSkins.yml, MezaLocalSkins.yml
+- name: Ensure composer.local.json in place to load composer-based extensions and skins
   template:
     src: composer.local.json.j2
     dest: "{{ m_mediawiki }}/composer.local.json"
+  tags:
+    - extensions
+    - skins
+
 
 - name: Run composer install on MediaWiki for dependencies
   composer:
@@ -152,18 +176,22 @@
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
   ignore_errors: yes
   tags:
-    - composer-extensions
+    - extensions
+    - skins
+    - composer-mediawiki
     - latest
 
 # install doesn't appear to do extensions
-- name: Run composer update on MediaWiki for extensions
+- name: Run composer update on MediaWiki for extensions and skins
   composer:
     command: update
     working_dir: "{{ m_mediawiki }}"
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
   ignore_errors: yes
   tags:
-    - composer-extensions
+    - extensions
+    - skins
+    - composer-mediawiki
     - latest
 
 - name: Ensure Git submodule requirements met for core meza extensions
@@ -174,6 +202,7 @@
   when: meza_core_extensions.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
   tags:
     - git-submodules
+    - extensions
     - latest
 
 - name: Ensure Git submodule requirements met for local meza extensions
@@ -184,8 +213,33 @@
   when: meza_local_extensions.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
   tags:
     - git-submodules
+    - extensions
+    - local-extensions
     - latest
 
+# Are there skins that have submodules?
+- name: Ensure Git submodule requirements met for core meza skins
+  shell: |
+    cd "{{ m_mediawiki }}/skins/{{ item.name }}"
+    git submodule update --init
+  with_items: "{{ meza_core_skins.list }}"
+  when: meza_core_skins.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
+  tags:
+    - git-submodules
+    - skins
+    - latest
+
+- name: Ensure Git submodule requirements met for local meza skins
+  shell: |
+    cd "{{ m_mediawiki }}/skins/{{ item.name }}"
+    git submodule update --init
+  with_items: "{{ meza_local_skins.list }}"
+  when: meza_local_skins.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
+  tags:
+    - git-submodules
+    - skins
+    - local-skins
+    - latest
 
 
 #
@@ -210,7 +264,7 @@
     version: "multi-domain-merge-ready"
     # don't modify an existing checkout
     # assume deployer is playing with Blender source
-    force: no
+    # force: no
   ignore_errors: yes
 
 - name: Ensure BlenderSettings.php in place

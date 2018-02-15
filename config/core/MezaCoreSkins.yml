@@ -1,0 +1,22 @@
+---
+list:
+
+- name: Ensure Vector skin is installed
+  repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git
+  type: skins
+  version: "{{ mediawiki_default_branch }}"
+
+- name: Ensure Modern skin is installed
+  repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Modern.git
+  type: skins
+  version: "{{ mediawiki_default_branch }}"
+
+- name: Ensure ColognBlue skin is installed
+  repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/CologneBlue.git
+  type: skins
+  version: "{{ mediawiki_default_branch }}"
+
+- name: Ensure MonoBook skin is installed
+  repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/MonoBook.git
+  type: skins
+  version: "{{ mediawiki_default_branch }}"

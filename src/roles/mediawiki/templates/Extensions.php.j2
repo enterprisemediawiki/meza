@@ -18,7 +18,21 @@
 {{ ext.config }}
 
 {% endfor %}
+/**
+ *  SECTION: CORE MEZA COMPOSER SKINS
+ *
+ *  Below is configuration for skins installed by Composer, which are part
+ *  of core meza. Further down the document is a section for Composer-installed
+ *  local skins config.
+ **/
+{% for ext in meza_core_skins['list'] if ext.composer is defined and ext.config is defined %}
 
+#
+# Config for Skin:{{ ext.name }}
+#
+{{ ext.config }}
+
+{% endfor %}
 
 
 /**
@@ -42,6 +56,26 @@
 
 {%- endfor %}
 
+/**
+ *  SECTION: CORE MEZA STANDARD SKINS
+ *
+ *  Skins below are part of core Meza. Further down in this file there may
+ *  be additional skins specified by this particular installation of meza
+ **/
+{% for ext in meza_core_skins['list'] if ext.composer is not defined %}
+
+{% if ext.legacy_load is defined and ext.legacy_load -%}
+	require_once "$IP/skins/{{ ext.name }}/{{ ext.name }}.php";
+{%- else -%}
+	wfLoadSkin( "{{ ext.name }}" );
+{%- endif -%}
+
+{%- if ext.config is defined %}
+
+{{ ext.config }}
+{%- endif -%}
+
+{%- endfor %}
 
 
 
@@ -61,6 +95,21 @@
 
 {% endfor %}
 
+/**
+ *  SECTION: LOCAL MEZA COMPOSER SKINS
+ *
+ *  Below is configuration for skins installed by Composer, which are part
+ *  of this local meza installation. This section may be blank if no Composer
+ *  skins are required for this local installation.
+ **/
+{% for ext in meza_local_skins['list'] if ext.composer is defined and ext.config is defined %}
+
+#
+# Config for Skin:{{ ext.name }}
+#
+{{ ext.config }}
+
+{% endfor %}
 
 
 
@@ -83,6 +132,40 @@
 		require_once "$IP/extensions/{{ ext.name }}/{{ ext.name }}.php";
 	{%- else -%}
 		wfLoadExtension( "{{ ext.name }}" );
+	{%- endif -%}
+
+	{%- if ext.config is defined %}
+
+{{ ext.config }}
+	{%- endif -%}
+
+
+{%- if ext.wikis is defined %}
+}
+{%- endif -%}
+
+{%- endfor %}
+
+
+/**
+ *  SECTION: LOCAL MEZA STANDARD SKINS
+ *
+ *  Skins configured by this installation of Meza, but not included in
+ *  core meza. These skins are defined in MezaLocalSkins.yml in
+ *  /opt/conf-meza/public. This section may be blank if no additional skins
+ *  are required for this local installation.
+ **/
+{% for ext in meza_local_skins['list'] if ext.composer is not defined %}
+
+{% if ext.wikis is defined -%}
+	if ( in_array( $wikiId, array( {% for wiki in ext.wikis -%}'{{ wiki}}', {%- endfor -%} ) ) ) {
+{%- endif -%}
+
+
+	{%- if ext.legacy_load is defined and ext.legacy_load -%}
+		require_once "$IP/skins/{{ ext.name }}/{{ ext.name }}.php";
+	{%- else -%}
+		wfLoadSkin( "{{ ext.name }}" );
 	{%- endif -%}
 
 	{%- if ext.config is defined %}

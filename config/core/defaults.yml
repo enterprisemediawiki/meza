@@ -5,6 +5,16 @@
 m_install: /opt
 m_meza: /opt/meza
 
+# Pretty means we use 'short urls'
+# Replaces wiki/index.php/Main_Page with /wiki/Main_Page
+m_pretty: True
+# Extra pretty means Do you want REST-style action verbs?
+# replaces Main_Page?action=history with Main_Page/history
+m_extra_pretty: True
+# does this wiki use paths or subdomains?
+m_wiki_url_style: subdomain
+
+
 # config dir
 m_config_core: /opt/meza/config/core
 m_local_secret: /opt/conf-meza/secret
