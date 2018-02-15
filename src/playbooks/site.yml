@@ -283,12 +283,6 @@
       firewalld_protocol: tcp
       firewalld_servers: "{{ groups['app-servers'] }}"
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-      # for access to es head plugin
-    - role: firewalld
-      firewalld_port: 9201
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewalld
       firewalld_port: 9300
       firewalld_protocol: tcp
