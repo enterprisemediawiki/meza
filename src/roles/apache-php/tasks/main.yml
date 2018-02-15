@@ -29,27 +29,6 @@
   notify:
   - restart apache
 
-- name: HTTPS Always with unmanaged load balancer
-  blockinfile:
-    path: "{{ m_apache_conf }}"
-    block: |
-      # redirect traffic on port 80 to SSL if local HAproxy is unused
-      Listen 80
-      <VirtualHost *:80>
-             <IfModule mod_rewrite.c>
-                 # Enable mod_rewrite engine
-                 RewriteEngine on
-                 # This is needed if NOT using HAproxy, but offloading to an unmanaged load balancer
-                 # and you still want all traffic to go through HTTPS
-                 RewriteCond %{HTTP:X-Forwarded-Proto} ^http$
-                 RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-             </IfModule>
-      </VirtualHost>
-    state: present
-  when: "'load-balancers-unmanaged' in groups and {{ m_https_always }} "
-  notify:
-    - restart apache
-
 - name: Install PHP
   include: php.yml
   # http://docs.ansible.com/ansible/playbooks_roles.html#dynamic-versus-static-includes
