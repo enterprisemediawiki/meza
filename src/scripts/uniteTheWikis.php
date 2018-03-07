@@ -273,7 +273,7 @@ class UniteTheWikis extends Maintenance {
 		$conflictWikis = implode( ', ', $wikis );
 		$deconflictMsg = "$conflictWikis all with same page. Deconflicting name $pagename.";
 		$disambigMsg = "Generate disambiguation page for conflicting pages on wikis: $conflictWikis";
-		$disambigForTemplate = "{{Disambig|\n";
+		$disambigForTemplate = "{{Disambig}}\n\n";
 
 		foreach( $wikis as $wiki ) {
 			$wikiForTitle = strtoupper( $wiki );
@@ -284,10 +284,10 @@ class UniteTheWikis extends Maintenance {
 			file_put_contents( $fileMove, "$pagename|$pagename ($wikiForTitle)" );
 			shell_exec( "WIKI=$mergedwiki php {$this->maintDir}moveBatch.php --noredirects -r \"$deconflictMsg\" $fileMove" );
 
-			$disambigForTemplate .= "$pagename ($wikiForTitle)\n";
+			$disambigForTemplate .= "* [[$pagename/$wikiForTitle]]\n";
 		}
 
-		$disambigForTemplate .= "}}";
+		// $disambigForTemplate .= "}}";
 		file_put_contents( "$fileDisambig", $disambigForTemplate );
 		shell_exec( "WIKI=$mergedwiki php {$this->maintDir}edit.php -s \"$disambigMsg\" \"$pagename\" < $fileDisambig" );
 
