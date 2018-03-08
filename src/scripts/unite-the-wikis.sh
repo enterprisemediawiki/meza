@@ -94,7 +94,21 @@ done;
 # 	done
 # done
 
-WIKI="$wiki_id" php "$m_mediawiki/maintenance/rebuildall.php"
+# Seemed to be a memory leak in rebuildall.php. Breaking it up into its
+# component scripts to limit impact.
+# WIKI="$wiki_id" php "$m_mediawiki/maintenance/rebuildall.php"
+
+
+# FIXME: Is this even necessary with elasticsearch?
+echo "Beginning rebuildtextindex.php script"
+WIKI="$wiki_id" php "$m_mediawiki/maintenance/rebuildtextindex.php"
+
+echo "Beginning rebuildrecentchanges.php script"
+WIKI="$wiki_id" php "$m_mediawiki/maintenance/rebuildrecentchanges.php"
+
+echo "Beginning refreshLinks.php script"
+WIKI="$wiki_id" php "$m_mediawiki/maintenance/refreshLinks.php"
+
 
 # Don't clean up merge table until rebuild all and images are imported. That
 # way if this needs to stop and restart it won't try to reimport.
