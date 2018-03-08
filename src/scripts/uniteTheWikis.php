@@ -281,7 +281,7 @@ class UniteTheWikis extends Maintenance {
 			$this->importXML();
 
 			unlink( $fileMove );
-			file_put_contents( $fileMove, "$pagename|$pagename ($wikiForTitle)" );
+			file_put_contents( $fileMove, "$pagename|$pagename/$wikiForTitle" );
 			shell_exec( "WIKI=$mergedwiki php {$this->maintDir}moveBatch.php --noredirects -r \"$deconflictMsg\" $fileMove" );
 
 			$disambigForTemplate .= "* [[$pagename/$wikiForTitle]]\n";
