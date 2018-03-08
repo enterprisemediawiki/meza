@@ -273,7 +273,7 @@ class UniteTheWikis extends Maintenance {
 		$conflictWikis = implode( ', ', $wikis );
 		$deconflictMsg = "$conflictWikis all with same page. Deconflicting name $pagename.";
 		$disambigMsg = "Generate disambiguation page for conflicting pages on wikis: $conflictWikis";
-		$disambigForTemplate = "{{Disambig}}\n\n";
+		$disambigForTemplate = "[[Category:Disambiguation generated from scripted merge]]{{Disambig}}\n\n";
 
 		foreach( $wikis as $wiki ) {
 			$wikiForTitle = strtoupper( $wiki );
