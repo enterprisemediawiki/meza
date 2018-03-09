@@ -106,8 +106,24 @@ WIKI="$wiki_id" php "$m_mediawiki/maintenance/rebuildtextindex.php"
 echo "Beginning rebuildrecentchanges.php script"
 WIKI="$wiki_id" php "$m_mediawiki/maintenance/rebuildrecentchanges.php"
 
+num_pages=$(WIKI="$wiki_id" php "$m_mediawiki/maintenance/showSiteStats.php" | grep "Total pages" | sed 's/[^0-9]*//g')
+end_id=0
+delta=2000
+
 echo "Beginning refreshLinks.php script"
-WIKI="$wiki_id" php "$m_mediawiki/maintenance/refreshLinks.php"
+echo "  Total pages = $num_pages"
+echo "  Doing it in $delta-page chunks to avoid memory leak"
+
+while [ "$end_id" -lt "$num_pages" ]; do
+	start_id=$(($end_id + 1))
+	end_id=$(($end_id + $delta))
+	echo "Running refreshLinks.php from $start_id to $end_id"
+	WIKI="$wiki_id" php "$m_mediawiki/maintenance/refreshLinks.php" --e "$end_id" -- "$start_id"
+done
+
+start_id=$(($end_id + 1))
+echo "Running final refreshLinks.php in case there are more pages beyond num_pages, beyond $start_id"
+WIKI="$wiki_id" php "$m_mediawiki/maintenance/refreshLinks.php" "$start_id"
 
 
 # Don't clean up merge table until rebuild all and images are imported. That
