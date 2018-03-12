@@ -106,7 +106,8 @@ WIKI="$wiki_id" php "$m_mediawiki/maintenance/rebuildtextindex.php"
 echo "Beginning rebuildrecentchanges.php script"
 WIKI="$wiki_id" php "$m_mediawiki/maintenance/rebuildrecentchanges.php"
 
-num_pages=$(WIKI="$wiki_id" php "$m_mediawiki/maintenance/showSiteStats.php" | grep "Total pages" | sed 's/[^0-9]*//g')
+# num_pages=$(WIKI="$wiki_id" php "$m_mediawiki/maintenance/showSiteStats.php" | grep "Total pages" | sed 's/[^0-9]*//g')
+num_pages=$(mysql -s -r -e"USE wiki_issmerged; SELECT page_id FROM page ORDER BY page_id DESC LIMIT 1;" | sed -n "1p")
 end_id=0
 delta=2000
 
