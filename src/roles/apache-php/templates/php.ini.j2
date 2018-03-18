@@ -1855,11 +1855,13 @@ opcache.enable_cli=1
 opcache.memory_consumption=256
 
 ; The amount of memory for interned strings in Mbytes
-opcache.interned_strings_buffer=4
+;opcache.interned_strings_buffer=4
+opcache.interned_strings_buffer=16
 
 ; The maximum number of keys (scripts) in the OPcache hash table
 ; Only numbers between 200 and 100000 are allowed
-opcache.max_accelerated_files=20000
+;opcache.max_accelerated_files=20000
+opcache.max_accelerated_files=7963
 
 ; The maximum percentage of "wasted" memory until a restart is scheduled
 ;opcache.max_wasted_percentage=5
@@ -1872,12 +1874,14 @@ opcache.max_accelerated_files=20000
 
 ; When disabled, you must reset the OPcache manually or restart the
 ; webserver for changes to the filesystem to take effect
-opcache.validate_timestamps=1
+;opcache.validate_timestamps=1
+opcache.validate_timestamps=0
 
 ; How often (in seconds) to check file timestamps for changes to the shared
 ; memory storage allocation. ("1" means validate once per second, but only
 ; once per request. "0" means always validate)
-opcache.revalidate_freq=30
+;opcache.revalidate_freq=30
+opcache.revalidate_freq=0
 
 ; Enables or disables file search in include_path optimization
 ;opcache.revalidate_path=0
@@ -1893,6 +1897,7 @@ opcache.revalidate_freq=30
 
 ; If enabled, a fast shutdown sequence is used for the accelerated code
 ;opcache.fast_shutdown=0
+opcache.fast_shutdown=1
 
 ; Allow file existence override (file_exists, etc.) performance feature.
 ;opcache.enable_file_override=0
