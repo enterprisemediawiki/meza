@@ -79,11 +79,19 @@
   include_vars:
     file: "{{ m_config_core }}/MezaCoreExtensions.yml"
     name: meza_core_extensions
+  tags:
+    - git-extensions
+    - git-core-extensions
+    - latest
 
 - name: Set variable holding list of local extensions
   include_vars:
     file: "{{ m_local_public }}/MezaLocalExtensions.yml"
     name: meza_local_extensions
+  tags:
+    - git-extensions
+    - git-core-extensions
+    - latest
 
 - name: Ensure core meza extensions installed (non-Composer)
   git:
