@@ -30,6 +30,8 @@ yum install -y git ansible libselinux-python
 # default, but should we make this configurable?)
 if [ ! -d "/opt/meza" ]; then
 	git clone https://github.com/enterprisemediawiki/meza.git /opt/meza --branch master
+	cd /opt/meza
+	git config --local fetch.prune true
 fi
 
 if [ ! -f "/usr/bin/meza" ]; then
