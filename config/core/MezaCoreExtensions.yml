@@ -111,7 +111,7 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: ReplaceText
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ReplaceText.git
-    version: "{{ mediawiki_default_branch }}"
+    version: tags/1.4
   - name: Interwiki
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Interwiki.git
     version: "{{ mediawiki_default_branch }}"
