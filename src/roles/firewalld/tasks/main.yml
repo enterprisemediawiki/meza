@@ -62,7 +62,7 @@
     zone: "{{firewalld_zone|default('public')}}"
   # strip "localhost" or inventory_hostname from list of servers to configure
   with_items: "{{ firewalld_servers | difference([ 'localhost', inventory_hostname ]) }}"
-  when: firewalld_service is defined and (docker_skip_tasks is not defined or not docker_skip_tasks)
+  when: m_firewall_enabled and firewalld_service is defined and (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 - name: set firewalld allow port {{ firewalld_port }} for list of servers
   firewalld:
@@ -73,4 +73,4 @@
     zone: "{{firewalld_zone|default('public')}}"
   # strip "localhost" or inventory_hostname from list of servers to configure
   with_items: "{{ firewalld_servers | difference([ 'localhost', inventory_hostname ]) }}"
-  when: firewalld_port is defined and firewalld_protocol is defined and (docker_skip_tasks is not defined or not docker_skip_tasks)
+  when: m_firewall_enabled and firewalld_port is defined and firewalld_protocol is defined and (docker_skip_tasks is not defined or not docker_skip_tasks)

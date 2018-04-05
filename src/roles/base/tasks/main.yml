@@ -118,7 +118,6 @@
     - vim
     - git
     - net-tools
-    - firewalld
     - selinux-policy
     - rsyslog
     - jq
@@ -127,6 +126,14 @@
   tags:
   - latest
 
+- name: Install firewall packages
+  yum: name={{item}} state=installed
+  with_items:
+    - firewalld
+  tags:
+  - latest
+  when: m_firewall_enabled
+
 - name: put SELinux in permissive mode
   selinux:
     policy: targeted
@@ -134,7 +141,7 @@
 
 - name: ensure firewalld is running (and enable it at boot)
   service: name=firewalld state=started enabled=yes
-  when: docker_skip_tasks is not defined or not docker_skip_tasks
+  when: m_firewall_enabled and (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 
 #
