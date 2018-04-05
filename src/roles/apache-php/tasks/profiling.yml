@@ -84,6 +84,7 @@
     firewalld_protocol: tcp
     firewalld_servers: "{{ groups['app-servers'] }}"
     firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+  when: m_firewall_enabled
 
 - name: Open port 8089 to load balancer
   include_role:
@@ -94,3 +95,4 @@
     firewalld_protocol: tcp
     firewalld_servers: "{{ groups['load-balancers'] }}"
     firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+  when: m_firewall_enabled

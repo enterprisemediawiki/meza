@@ -78,6 +78,11 @@ m_force_debug: false
 
 enable_wiki_emails: true
 
+# Do NOT turn this off unless you are behind another firewall
+# Or using a local setup like Vagrant
+# Should this instance enable it's own firewall?
+m_firewall_enabled: true
+
 enable_haproxy_stats: false
 haproxy_stats_user: admin
 haproxy_stats_password: password
