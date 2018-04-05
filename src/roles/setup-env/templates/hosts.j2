@@ -10,6 +10,12 @@ localhost ansible_connection=local
 {{ server }}
 {% endfor %}
 
+# optional: load balancers that our firewall should know about; but not manage
+[load-balancers-unmanaged]
+{% for server in load_balancers_unmanaged %}
+{{ server }}
+{% endfor %}
+
 [app-servers]
 {% for server in app_servers %}
 {{ server }}
@@ -47,5 +53,11 @@ localhost ansible_connection=local
 
 [logging-servers]
 {% for server in logging_servers %}
+{{ server }}
+{% endfor %}
+
+# optional: servers you might manage, but never want meza to touch
+[exclude-all]
+{% for server in exclude_all %}
 {{ server }}
 {% endfor %}
