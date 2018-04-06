@@ -77,7 +77,7 @@ class UniteTheWikis extends Maintenance {
 		require_once '/opt/.deploy-meza/config.php';
 
 		parent::__construct();
-		$this->mDescription = "Count the recent hits for each page.";
+		$this->mDescription = "Merge some wikis into one wiki";
 		$this->maintDir = "$m_mediawiki/maintenance/";
 
 		$DIR = "/tmp";
@@ -121,8 +121,12 @@ class UniteTheWikis extends Maintenance {
 			$this->importSet();
 		}
 
-		// if not, go pull all the pages to merge from the source wikis
+		// If not:
+		//   1. First go make sure everyone is pre-watching all the pages so
+		//      any page moves get recorded.
+		//   2. Then go pull all the pages to merge from the source wikis
 		else {
+			$this->mergeWatchlists();
 			$this->getPages();
 		}
 
@@ -577,6 +581,139 @@ class UniteTheWikis extends Maintenance {
 		$this->output( "\nCleaning up database...");
 		$dbw->query( "DROP DATABASE {$this->mergeDatabase}" );
 		$this->output( "\ndone." );
+	}
+
+
+	/**
+	 *
+	 */
+	protected function mergeWatchlists () {
+
+		// Get distinct list of users
+		$usersDBResult = $this->getWatchlistUsers();
+
+		// Loop over users
+		while ( $userRow = $usersDBResult->fetchRow() ) {
+
+			// Merge the watchlists together in an array
+			$userWatches = $this->getUserMergedWatchlist( $userRow[ 'wl_user' ] );
+
+			// insert the array into the target wiki in chunks
+			$this->insertUserWatchlist( $userWatches );
+
+		}
+
+	}
+
+	/**
+	 *
+	 */
+	protected function getWatchlistUsers () {
+		$dbw = wfGetDB( DB_MASTER );
+
+		$unionParts = [];
+
+		// ONE: Select distinct user IDs
+		foreach( $this->sourcewikis as $wiki ) {
+			$unionParts[] = "SELECT DISTINCT wl_user FROM wiki_$wiki.watchlist";
+		}
+		$union = implode( ' UNION ALL ', $unionParts );
+
+		$query = "SELECT DISTINCT wl_user FROM ( $union ) as tmp";
+
+		$result = $dbw->query( $query );
+
+		return $result;
+	}
+
+	/**
+	 *
+	 */
+	protected function getUserMergedWatchlist ( $userID ) {
+
+		$dbw = wfGetDB( DB_MASTER );
+
+		$userWatches = [];
+
+		// Select all watches from each wiki for this user
+		foreach ( $this->sourcewikis as $wiki ) {
+
+			// Select watches from this wiki for this user
+			$this->output( "\nProcessing watchlist for user=$userID on wiki=$wiki" );
+			$userWatchDBResult = $dbw->select(
+				"wiki_$wiki.watchlist",
+				[ 'wl_user', 'wl_namespace', 'wl_title', 'wl_notificationtimestamp' ],
+				[ 'wl_user' => $userID ]
+			);
+
+			// loop over selections, updating list of user watches accordingly
+			while ( $nextUserWatch = $userWatchDBResult->fetchRow() ) {
+
+				// construct a pageKey since per user, these lines are unique on NS + Title
+				$pageKey = $nextUserWatch[ 'wl_namespace' ] . ':' . $nextUserWatch[ 'wl_title' ];
+
+				// first time user being set
+				if ( ! isset( $userWatches[ $pageKey ] ) ) {
+					$userWatches[ $pageKey ] = $nextUserWatch;
+				}
+
+				// not first time, update if notification timestamp is older
+				else {
+					$prevTS = $userWatches[ $pageKey ][ 'wl_notificationtimestamp' ];
+					$newTS = $nextUserWatch[ 'wl_notificationtimestamp' ];
+
+					if ( is_null( $prevTS ) || ( ! is_null( $newTS ) && $newTS < $prevTS ) ) {
+						$userWatches[ $pageKey ][ 'wl_notificationtimestamp' ] = $newTS;
+					}
+				}
+
+			}
+
+		}
+
+		return $userWatches;
+	}
+
+	/**
+	 *
+	 */
+	protected function insertUserWatchlist ( $watchlist ) {
+		$dbw = wfGetDB( DB_MASTER );
+
+		$chunkSize = 1000;
+
+		// Now, using new $userWatches array, insert 1000 rows at a time
+		$inserts = [];
+		foreach ( $watchlist as $pageKey => $uw ) {
+
+			$inserts[] = [
+				'wl_user'                  => $uw[ 'wl_user' ],
+				'wl_namespace'             => $uw[ 'wl_namespace' ],
+				'wl_title'                 => $uw[ 'wl_title' ],
+				'wl_notificationtimestamp' => $uw[ 'wl_notificationtimestamp' ],
+			];
+
+			if ( count( $inserts ) >= $chunkSize ) {
+
+				$this->output( "\nInserting $chunkSize watchlist rows for user " . $inserts[0][ 'wl_user' ] );
+				$dbw->insert(
+					"wiki_{$this->mergedwiki}.watchlist",
+					$inserts
+				);
+
+				$inserts = [];
+			}
+		}
+
+		if ( count( $inserts ) > 0 ) {
+			$remaining = count( $inserts );
+			$this->output( "\nInserting final $remaining watchlist rows for user " . $inserts[0]['wl_user'] );
+			$dbw->insert(
+				"wiki_{$this->mergedwiki}.watchlist",
+				$inserts
+			);
+		}
+
 	}
 
 }
