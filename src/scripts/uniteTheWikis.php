@@ -127,6 +127,7 @@ class UniteTheWikis extends Maintenance {
 		//   2. Then go pull all the pages to merge from the source wikis
 		else {
 			$this->mergeWatchlists();
+			$this->mergeUserGroups();
 			$this->getPages();
 		}
 
@@ -716,6 +717,27 @@ class UniteTheWikis extends Maintenance {
 
 	}
 
+	protected function mergeUserGroups () {
+
+		$dbw = wfGetDB( DB_MASTER );
+
+		$mergedwiki = $this->mergedwiki;
+
+		$this->output( "\nMerging user_groups table from source wikis into merge wiki" );
+		foreach ( $this->sourcewikis as $sourcewiki ) {
+
+			$dbw->query(
+				"
+				INSERT INTO wiki_$mergedwiki.user_groups (ug_user, ug_group)
+				SELECT ug_user, ug_group
+				FROM wiki_$sourcewiki.user_groups
+				ON DUPLICATE KEY UPDATE ug_user=wiki_$sourcewiki.user_groups.ug_user;
+				"
+			);
+
+		}
+
+	}
 }
 
 $maintClass = "UniteTheWikis";
