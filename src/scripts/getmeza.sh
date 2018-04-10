@@ -32,6 +32,13 @@ if [ ! -d "/opt/meza" ]; then
 	git clone https://github.com/enterprisemediawiki/meza.git /opt/meza --branch master
 fi
 
+# Ensure users can read everything
+chmod a+r /opt/meza -R
+
+# Ensure users can also execute directories
+find /opt/meza -type d -exec chmod 755 {} +
+
+
 if [ ! -f "/usr/bin/meza" ]; then
 	ln -s "/opt/meza/src/scripts/meza.py" "/usr/bin/meza"
 fi
