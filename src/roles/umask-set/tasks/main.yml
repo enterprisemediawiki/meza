@@ -2,8 +2,8 @@
 
 - name: Set umask for duration of deploy
   template:
-    src: umask.bashrc.sh.j2
-    dest: /etc/bashrc.d/umask.bashrc.sh
+    src: umask.profile.sh.j2
+    dest: /etc/profile.d/umask.profile.sh
     owner: root
     group: root
     mode: 0755

@@ -2,5 +2,5 @@
 
 - name: Unset umask at end of deploy
   file:
-    path: /etc/bashrc.d/umask.bashrc.sh
+    path: /etc/profile.d/umask.profile.sh
     state: absent
