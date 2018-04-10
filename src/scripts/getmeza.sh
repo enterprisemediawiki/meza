@@ -9,6 +9,11 @@ if [ "$(whoami)" != "root" ]; then
 	exit 1
 fi
 
+# If you don't do this in a restrictive system (umask 077), it becomes
+# difficult to manage all permissions, AND you constantly have to fix all git
+# clones and checkouts.
+umask 002
+
 # Install epel if not installed
 if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 
@@ -31,13 +36,6 @@ yum install -y git ansible libselinux-python
 if [ ! -d "/opt/meza" ]; then
 	git clone https://github.com/enterprisemediawiki/meza.git /opt/meza --branch master
 fi
-
-# Ensure users can read everything
-chmod a+r /opt/meza -R
-
-# Ensure users can also execute directories
-find /opt/meza -type d -exec chmod 755 {} +
-
 
 if [ ! -f "/usr/bin/meza" ]; then
 	ln -s "/opt/meza/src/scripts/meza.py" "/usr/bin/meza"
