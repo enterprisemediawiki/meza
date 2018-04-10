@@ -46,8 +46,9 @@ if [ ! -f /opt/.deploy-meza/config.sh ]; then
 fi
 
 # make sure conf-meza exists and has good permissions
-mkdir -p /opt/conf-meza
+mkdir -p /opt/conf-meza/secret
 chmod 755 /opt/conf-meza
+chmod 755 /opt/conf-meza/secret
 
 # If user meza-ansible already exists, make sure home directory is correct
 # (update from old meza versions)
