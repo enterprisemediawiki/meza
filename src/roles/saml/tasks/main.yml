@@ -5,6 +5,7 @@
     repo: https://github.com/simplesamlphp/simplesamlphp.git
     dest: "{{ m_simplesamlphp_path }}"
     version: "tags/v1.15.0"
+    umask: 002
   tags:
     - latest
 
@@ -16,6 +17,7 @@
     repo: https://github.com/jamesmontalvo3/mwSimpleSamlAuth.git
     dest: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
     version: master
+    umask: 002
   tags:
     - latest
 

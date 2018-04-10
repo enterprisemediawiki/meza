@@ -27,6 +27,7 @@
         repo: https://github.com/jamesmontalvo3/meza-test-backups.git
         dest: "{{ alt_source_backups_dir }}"
         version: master
+        umask: 002
 
     - name: Start mariadb
       service:

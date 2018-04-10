@@ -43,6 +43,7 @@
     dest: "{{ m_profiling_xhgui_directory }}"
     version: "0.8.1"
     force: yes
+    umask: 002
 
 - name: Ensure XHGui directory owned by Apache
   file:
