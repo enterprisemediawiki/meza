@@ -45,6 +45,9 @@ if [ ! -f /opt/.deploy-meza/config.sh ]; then
 	echo "m_scripts='/opt/meza/src/scripts'; ansible_user='meza-ansible';" > /opt/.deploy-meza/config.sh
 fi
 
+# make sure conf-meza exists and has good permissions
+mkdir -p /opt/conf-meza
+chmod 755 /opt/conf-meza
 
 # If user meza-ansible already exists, make sure home directory is correct
 # (update from old meza versions)
