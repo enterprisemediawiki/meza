@@ -18,11 +18,9 @@ mf_user_exists() {
 }
 
 mf_add_ssh_user() {
-	if [ ! -d "$meza_user_dir" ]; then
-		mkdir -p "$meza_user_dir"
-		chown root:root "$meza_user_dir"
-		chmod 755 "$meza_user_dir"
-	fi
+	mkdir -p "$meza_user_dir"
+	chown root:root "$meza_user_dir"
+	chmod 755 "$meza_user_dir"
 
 	if ! mf_user_exists "$1"; then
 		useradd "$1" --home-dir "$meza_user_dir/$1"
