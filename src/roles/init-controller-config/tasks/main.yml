@@ -33,7 +33,7 @@
     dest: "{{ m_local_public }}"
     version: "{{ local_config_repo.version | default('master') }}"
     force: "{{ local_config_repo.force | default(false) | bool }}"
-    umask: 002
+    umask: "0002"
   delegate_to: localhost
   run_once: true
   when:

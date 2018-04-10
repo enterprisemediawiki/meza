@@ -12,7 +12,7 @@
     dest: "{{ m_parsoid_path }}"
     version: "{{ m_parsoid_version }}"
     force: yes
-    umask: 002
+    umask: "0002"
 
 # FIXME #149: Get MW-core and Parsoid patched so this isn't required anymore
 - name: Patch Parsoid so it allows image tags
