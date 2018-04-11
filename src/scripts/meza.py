@@ -237,6 +237,11 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	f.write(json_env_vars)
 	f.close()
 
+	# Make sure temp_vars.json is accessible. On the first run of deploy it is
+	# possible that user meza-ansible will not be able to reach this file,
+	# specifically if the system has a restrictive umask set (e.g 077).
+	os.chmod(extra_vars_file, 0664)
+
 	shell_cmd = playbook_cmd( "setup-env" ) + ["--extra-vars", '@'+extra_vars_file]
 	rc = meza_shell_exec( shell_cmd )
 
