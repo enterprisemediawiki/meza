@@ -1,21 +1,16 @@
-A description of the pull request
-
-### Testing
-
-- [ ] `curl -LO https://raw.githubusercontent.com/enterprisemediawiki/meza/<<INSERT YOUR BRANCH>>/scripts/install.sh`
-- [ ] `sudo bash install.sh`
-- [ ] `<<INSERT YOUR BRANCH>>` branch
-- [ ] Perform standard tests from [CONTRIBUTING.md](https://github.com/enterprisemediawiki/meza/blob/master/CONTRIBUTING.md)
-- [ ] Any additional details for testing your specific changes?
-
-
 ### Changes
 
-* List
-* Of
-* Changes
+* Please provide
+* a list
+* of changes
 
 ### Issues
 
 * Closes #123456789 ???
 * Addresses #987654321 ???
+
+### Post-merge actions
+
+Post-merge, the following actions need to be addressed:
+
+- [ ] Update documentation at https://www.mediawiki.org/wiki/Meza
