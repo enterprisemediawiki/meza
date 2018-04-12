@@ -9,6 +9,11 @@ if [ "$(whoami)" != "root" ]; then
 	exit 1
 fi
 
+# If you don't do this in a restrictive system (umask 077), it becomes
+# difficult to manage all permissions, AND you constantly have to fix all git
+# clones and checkouts.
+umask 002
+
 # Install epel if not installed
 if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 
@@ -32,30 +37,40 @@ if [ ! -d "/opt/meza" ]; then
 	git clone https://github.com/enterprisemediawiki/meza.git /opt/meza --branch master
 fi
 
+# Make sure /opt/meza permissions are good in case git-cloned earlier
+#  - Ensure users can read everything
+#  - Ensure users can also execute directories
+chmod a+r /opt/meza -R
+find /opt/meza -type d -exec chmod 755 {} +
+
 if [ ! -f "/usr/bin/meza" ]; then
 	ln -s "/opt/meza/src/scripts/meza.py" "/usr/bin/meza"
 fi
 
-ret=false
-getent passwd meza-ansible >/dev/null 2>&1 && ret=true
-
 # Create .deploy-meza directory and very basic config.sh if they don't exist
 # This is done to make the user setup script(s) work
-if [ ! -d /opt/.deploy-meza ]; then
-	mkdir /opt/.deploy-meza
-fi
+mkdir -p /opt/.deploy-meza
+chmod 755 /opt/.deploy-meza
+
 if [ ! -f /opt/.deploy-meza/config.sh ]; then
 	echo "m_scripts='/opt/meza/src/scripts'; ansible_user='meza-ansible';" > /opt/.deploy-meza/config.sh
 fi
 
+# make sure conf-meza exists and has good permissions
+mkdir -p /opt/conf-meza/secret
+chmod 755 /opt/conf-meza
+chmod 755 /opt/conf-meza/secret
+
+# If user meza-ansible already exists, make sure home directory is correct
+# (update from old meza versions)
+ret=false
+getent passwd meza-ansible >/dev/null 2>&1 && ret=true
 if $ret; then
 	echo "meza-ansible already exists"
 	homedir=$( getent passwd "meza-ansible" | cut -d: -f6 )
 	if [ "$homedir" == "/home/meza-ansible" ]; then
 		echo "meza-ansible home directory not correct. moving."
-		if [ ! -d "/opt/conf-meza/users" ]; then
-			mkdir -p "/opt/conf-meza/users"
-		fi
+		mkdir -p "/opt/conf-meza/users"
 		usermod -m -d "/opt/conf-meza/users/meza-ansible" "meza-ansible"
 		ls -la /opt/conf-meza/users
 		ls -la /opt/conf-meza/users/meza-ansible
@@ -63,11 +78,13 @@ if $ret; then
 	else
 		echo "meza-ansible home-dir in correct location"
 	fi
-else
-	echo
-	echo "Add ansible master user"
-	source "/opt/meza/src/scripts/ssh-users/setup-master-user.sh"
 fi
+
+
+echo
+echo "Add ansible master user"
+source "/opt/meza/src/scripts/ssh-users/setup-master-user.sh"
+
 
 # Don't require TTY or visible password for sudo. Ref #769
 sed -r -i "s/^Defaults\\s+requiretty/#Defaults requiretty/g;" /etc/sudoers

@@ -124,6 +124,7 @@
     - jq
     - tree
     - cronie
+    - rsync
   tags:
   - latest
 
