@@ -61,13 +61,21 @@
     umask: "0002"
   tags:
     - latest
-
+- name: Ensure MediaWiki core owned by meza-ansible
+  file:
+    path: "{{ m_mediawiki }}"
+    owner: meza-ansible
+    group: wheel
+    state: directory
+    recurse: yes
 
 #
 # SKINS
 #
 # FIXME #819: Add skins in Meza(Core|Local)Extensions.yml
 - name: Ensure Vector skin installed
+  become: yes
+  become_user: "meza-ansible"
   git:
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git
     dest: "{{ m_mediawiki }}/skins/Vector"
@@ -94,6 +102,8 @@
     - always
 
 - name: Ensure core meza extensions installed (non-Composer)
+  become: yes
+  become_user: "meza-ansible"
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
@@ -107,6 +117,8 @@
     - latest
 
 - name: Ensure local meza extensions installed (non-Composer)
+  become: yes
+  become_user: "meza-ansible"
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
@@ -124,6 +136,8 @@
   template:
     src: Extensions.php.j2
     dest: "{{ m_deploy }}/Extensions.php"
+    owner: meza-ansible
+    group: wheel
 
 # Adds extensions with composer param from MezaCoreExtensions.yml and
 # MezaLocalExtensions.yml
@@ -131,29 +145,39 @@
   template:
     src: composer.local.json.j2
     dest: "{{ m_mediawiki }}/composer.local.json"
+    owner: meza-ansible
+    group: wheel
 
 - name: Run composer install on MediaWiki for dependencies
+  become: yes
+  become_user: "meza-ansible"
   composer:
     command: install
     working_dir: "{{ m_mediawiki }}"
+    no_dev: no
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
-  ignore_errors: yes
+  # ignore_errors: yes
   tags:
     - composer-extensions
     - latest
 
 # install doesn't appear to do extensions
 - name: Run composer update on MediaWiki for extensions
+  become: yes
+  become_user: "meza-ansible"
   composer:
     command: update
     working_dir: "{{ m_mediawiki }}"
+    no_dev: no
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
-  ignore_errors: yes
+  # ignore_errors: yes
   tags:
     - composer-extensions
     - latest
 
 - name: Ensure Git submodule requirements met for core meza extensions
+  become: yes
+  become_user: "meza-ansible"
   shell: |
     cd "{{ m_mediawiki }}/extensions/{{ item.name }}"
     git submodule update --init
@@ -164,6 +188,8 @@
     - latest
 
 - name: Ensure Git submodule requirements met for local meza extensions
+  become: yes
+  become_user: "meza-ansible"
   shell: |
     cd "{{ m_mediawiki }}/extensions/{{ item.name }}"
     git submodule update --init
@@ -183,6 +209,8 @@
     src: LocalSettings.php.j2
     dest: "{{ m_mediawiki }}/LocalSettings.php"
     backup: yes
+    owner: meza-ansible
+    group: wheel
 
 
 
