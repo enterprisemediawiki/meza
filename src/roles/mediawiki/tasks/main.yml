@@ -84,13 +84,6 @@
   tags:
     - always
 
-- name: Set variable holding list of local extensions
-  include_vars:
-    file: "{{ m_local_public }}/MezaLocalExtensions.yml"
-    name: meza_local_extensions
-  tags:
-    - always
-
 - name: Ensure core meza extensions installed (non-Composer)
   git:
     repo: "{{ item.repo }}"
@@ -104,12 +97,20 @@
     - git-core-extensions
     - latest
 
+- name: Set variable holding list of local extensions
+  include_vars:
+    file: "{{ m_local_public }}/MezaLocalExtensions.yml"
+    name: meza_local_extensions
+  tags:
+    - always
+
 - name: Ensure local meza extensions installed (non-Composer)
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
     version: "{{ item.version }}"
     umask: "0002"
+    key_file: "{{ item.key_file | default(None) }}"
   with_items: "{{ meza_local_extensions.list }}"
   when: meza_local_extensions.list[0] is defined and item.repo is defined
   tags:
