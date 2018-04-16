@@ -555,8 +555,14 @@ $wgDefaultUserOptions['watchcreations'] = 1;
 // fixes login issue for some users (login issue fixed in MW version 1.18.1 supposedly)
 $wgDisableCookieCheck = true;
 
-#Set Default Timezone
+# Read timezone from meza config
+{% if m_timezone is defined %}
+$wgLocaltimezone = "{{ m_timezone }}";
+{% else %}
+# Set Default Timezone for farm
 $wgLocaltimezone = "America/Chicago";
+{% endif %}
+
 $oldtz = getenv("TZ");
 putenv("TZ=$wgLocaltimezone");
 
