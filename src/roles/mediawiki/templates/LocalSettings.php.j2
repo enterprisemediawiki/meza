@@ -645,8 +645,6 @@ else if ( $mezaAuthType === 'anon-read' ) {
     $wgGroupPermissions['*']['edit'] = false;
     $wgGroupPermissions['user']['edit'] = true;
 
-	// do allow anonymous to edit talk pages
-	$wgGroupPermissions['*']['talk'] = true;
 }
 
 else if ( $mezaAuthType === 'user-edit' ) {
