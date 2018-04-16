@@ -556,7 +556,7 @@ $wgDefaultUserOptions['watchcreations'] = 1;
 $wgDisableCookieCheck = true;
 
 #Set Default Timezone
-$wgLocaltimezone = "America/Chicago";
+$wgLocaltimezone = '{{ m_timezone }}';
 $oldtz = getenv("TZ");
 putenv("TZ=$wgLocaltimezone");
 
