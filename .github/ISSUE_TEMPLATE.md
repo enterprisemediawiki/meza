@@ -1,5 +1,3 @@
-Please don't forget to check out [CONTRIBUTING.md](https://github.com/enterprisemediawiki/meza/blob/master/CONTRIBUTING.md) before submitting an issue.
-
 ### Environment
 
 - Machine or Virtual Machine details: (VirtualBox, VMWare, Digital Ocean, AWS, etc)

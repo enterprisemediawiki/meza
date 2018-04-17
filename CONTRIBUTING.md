@@ -9,19 +9,19 @@ You may help us by reporting bugs and feature request via the issue tracker. Ple
 
 ## Improve documentation
 
-meza is in very early stages of development, and as such the documentation may become quickly out-of-date. If you see any issues with documentation please submit an issue and/or an update to the documentation.
+Meza is in very early stages of development, and as such the documentation may become quickly out-of-date. Please make updates to documentation at https://www.mediawiki.org/wiki/Meza
 
 ## Provide patches
 
-We have a long list of features to add and bugs to fix. We'd greatly appreciate any assistance making meza better.
+We have a long list of features to add and bugs to fix. We'd greatly appreciate any assistance making Meza better.
 
 ## Run tests
 
 Meza pulls together many complex systems. Testing is a big job. We always need help testing pull requests.
 
-### Testing requirements
+### Testing suggestions
 
-#### Minimal requirements
+#### Minimal testing
 
 These tests should be performed on all changes
 

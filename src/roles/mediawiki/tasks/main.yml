@@ -56,6 +56,7 @@
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/core.git
     dest: "{{ m_mediawiki }}"
     version: "{{ mediawiki_version }}"
+    umask: "0002"
   tags:
     - latest
 
@@ -69,6 +70,7 @@
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git
     dest: "{{ m_mediawiki }}/skins/Vector"
     version: "{{ mediawiki_default_branch }}"
+    umask: "0002"
 
 
 
@@ -79,17 +81,15 @@
   include_vars:
     file: "{{ m_config_core }}/MezaCoreExtensions.yml"
     name: meza_core_extensions
-
-- name: Set variable holding list of local extensions
-  include_vars:
-    file: "{{ m_local_public }}/MezaLocalExtensions.yml"
-    name: meza_local_extensions
+  tags:
+    - always
 
 - name: Ensure core meza extensions installed (non-Composer)
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
     version: "{{ item.version }}"
+    umask: "0002"
   with_items: "{{ meza_core_extensions.list }}"
   when: meza_core_extensions.list[0] is defined and item.repo is defined
   tags:
@@ -97,11 +97,20 @@
     - git-core-extensions
     - latest
 
+- name: Set variable holding list of local extensions
+  include_vars:
+    file: "{{ m_local_public }}/MezaLocalExtensions.yml"
+    name: meza_local_extensions
+  tags:
+    - always
+
 - name: Ensure local meza extensions installed (non-Composer)
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
     version: "{{ item.version }}"
+    umask: "0002"
+    key_file: "{{ item.key_file | default(None) }}"
   with_items: "{{ meza_local_extensions.list }}"
   when: meza_local_extensions.list[0] is defined and item.repo is defined
   tags:
@@ -184,6 +193,7 @@
     repo: https://github.com/jamesmontalvo3/WikiBlender.git
     dest: "{{ m_htdocs }}/WikiBlender"
     version: "master"
+    umask: "0002"
 
 - name: Ensure BlenderSettings.php in place
   template:

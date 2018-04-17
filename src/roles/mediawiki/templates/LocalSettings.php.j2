@@ -8,9 +8,9 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 /**
  *  TABLE OF CONTENTS
- *{% if saml_secret is defined %}
- *    0) SAML AUTH{% endif %}
- *    1) WIKI-SPECIFIC SETUP
+ *
+{% if saml_secret is defined %} *    0) SAML AUTH
+{% endif %} *    1) WIKI-SPECIFIC SETUP
  *    2) DEBUG
  *    3) PATH SETUP
  *    4) EMAIL
@@ -552,13 +552,11 @@ $wgDefaultUserOptions['watchmoves'] = 1;
 $wgDefaultUserOptions['watchdeletion'] = 1;
 $wgDefaultUserOptions['watchcreations'] = 1;
 
-$wgEnableMWSuggest = true;
-
 // fixes login issue for some users (login issue fixed in MW version 1.18.1 supposedly)
 $wgDisableCookieCheck = true;
 
 #Set Default Timezone
-$wgLocaltimezone = "America/Chicago";
+$wgLocaltimezone = '{{ m_timezone }}';
 $oldtz = getenv("TZ");
 putenv("TZ=$wgLocaltimezone");
 
@@ -622,8 +620,12 @@ $wgUseRCPatrol = false;
  *
  *
  **/
+# Prevent new user registrations except by sysops
+$wgGroupPermissions['*']['createaccount'] = false;
+
+
 if ( ! isset( $mezaAuthType ) ) {
-	$mezaAuthType = 'anon-edit'; // default: wide open!
+	$mezaAuthType = 'anon-read'; // default: require creation by sysop
 }
 if ( $mezaAuthType === 'anon-edit' ) {
 
@@ -647,8 +649,6 @@ else if ( $mezaAuthType === 'anon-read' ) {
     $wgGroupPermissions['*']['edit'] = false;
     $wgGroupPermissions['user']['edit'] = true;
 
-	// do allow anonymous to edit talk pages
-	$wgGroupPermissions['*']['talk'] = true;
 }
 
 else if ( $mezaAuthType === 'user-edit' ) {
