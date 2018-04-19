@@ -88,7 +88,7 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: PageForms
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PageForms.git
-    version: tags/4.1.1
+    version: tags/4.3
   - name: DismissableSiteNotice
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DismissableSiteNotice.git
     version: "{{ mediawiki_default_branch }}"
