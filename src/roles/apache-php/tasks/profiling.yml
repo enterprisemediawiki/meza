@@ -35,7 +35,7 @@
     state: present
   with_items:
     - pecl/xhprof-beta
-    - pecl/mongo
+    - pecl/mongodb
 
 - name: Ensure XHGui present
   git:
