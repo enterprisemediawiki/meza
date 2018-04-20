@@ -4,7 +4,7 @@ require 'yaml'
 
 if not File.file?("#{File.dirname(__FILE__)}/.vagrant/id_rsa")
   system("
-    ssh-keygen -f './.vagrant/id_rsa' -t rsa -N '' -C 'vagrant@vagrant'
+    ssh-keygen -f \"./.vagrant/id_rsa\" -t rsa -N \"\" -C \"vagrant@vagrant\"
   ")
 end
 

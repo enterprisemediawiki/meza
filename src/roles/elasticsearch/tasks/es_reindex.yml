@@ -1,0 +1,11 @@
+---
+
+- name: Ensure Elasticsearch reindex script on elasticsearch servers
+  template:
+    src: elastic-reindex.sh.j2
+    dest: "{{ m_deploy }}/elastic-reindex.sh"
+    mode: 0644
+
+- name: Run Elasticsearch reindex script
+  shell: "bash {{ m_deploy }}/elastic-reindex.sh > {{ m_logs }}/elastic-reindex-{{ version_found.json.version.number }} 2>&1"
+

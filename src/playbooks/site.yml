@@ -75,6 +75,7 @@
   become: yes
   roles:
     - set-vars
+    - umask-set
     - init-controller-config
 
 # Ensure proper base setup on all servers in inventory, with the exception of
@@ -85,6 +86,7 @@
   become: yes
   roles:
     - set-vars
+    - umask-set
     - base
   tags: base
 
@@ -343,11 +345,17 @@
   tags: logging
   roles:
     - set-vars
-    - meza-log
+    - role: meza-log
+      when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 - hosts: all:!exclude-all:!load-balancers-unmanaged
   become: yes
-  tags: cron
+  tags:
+    - cron
+    - always
   roles:
     - set-vars
-    - cron
+    - role: cron
+      when: docker_skip_tasks is not defined or not docker_skip_tasks
+    - umask-unset
+

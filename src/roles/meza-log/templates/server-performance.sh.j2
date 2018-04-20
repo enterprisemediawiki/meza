@@ -150,10 +150,11 @@ sudo -u root mysql -e"$insert_sql"
 
 jsontitle="Performance Report"
 
+
 # at what level do we display amber color
-warninglevel="50"
+warninglevel="{{ server_performance_memory_usage_warning }}"
 # at what level to we display red color
-dangerlevel="75"
+dangerlevel="{{ server_performance_memory_usage_danger }}"
 slack_msg_color="good"
 memoryusedtext="Mem: ${memorypercentused}%"
 alerttext=""
@@ -200,7 +201,7 @@ if [ $notifyslack == "true" ] && [ $slack_token ]; then
 		"token=$slack_token $slack_channel \
 		msg='$report' \
 		username='$slack_username' \
-		icon_url=https://github.com/enterprisemediawiki/meza/raw/master/src/roles/configure-wiki/files/logo.png \
+		icon_url={{ server_performance_notification_icon }} \
 		link_names=1 \
 		color=$slack_msg_color"
 

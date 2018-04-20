@@ -8,9 +8,9 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 /**
  *  TABLE OF CONTENTS
- *{% if saml_secret is defined %}
- *    0) SAML AUTH{% endif %}
- *    1) WIKI-SPECIFIC SETUP
+ *
+{% if saml_secret is defined %} *    0) SAML AUTH
+{% endif %} *    1) WIKI-SPECIFIC SETUP
  *    2) DEBUG
  *    3) PATH SETUP
  *    4) EMAIL
@@ -29,7 +29,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  *  Perform authentication up front.
  *
  **/
-require_once "{{ m_deploy }}/samlLocalSettings.php";
+require "{{ m_deploy }}/samlLocalSettings.php";
 
 
 {% endif %}
@@ -41,7 +41,7 @@ require_once "{{ m_deploy }}/samlLocalSettings.php";
  *  from the WIKI environment variable (for command line scripts)
  **/
 
-require_once '/opt/.deploy-meza/config.php';
+require '/opt/.deploy-meza/config.php';
 
 if( $wgCommandLineMode ) {
 
@@ -575,8 +575,6 @@ $wgDefaultUserOptions['watchmoves'] = 1;
 $wgDefaultUserOptions['watchdeletion'] = 1;
 $wgDefaultUserOptions['watchcreations'] = 1;
 
-$wgEnableMWSuggest = true;
-
 // fixes login issue for some users (login issue fixed in MW version 1.18.1 supposedly)
 $wgDisableCookieCheck = true;
 
@@ -645,8 +643,12 @@ $wgUseRCPatrol = false;
  *
  *
  **/
+# Prevent new user registrations except by sysops
+$wgGroupPermissions['*']['createaccount'] = false;
+
+
 if ( ! isset( $mezaAuthType ) ) {
-	$mezaAuthType = 'anon-edit'; // default: wide open!
+	$mezaAuthType = 'anon-read'; // default: require creation by sysop
 }
 if ( $mezaAuthType === 'anon-edit' ) {
 
@@ -670,8 +672,6 @@ else if ( $mezaAuthType === 'anon-read' ) {
     $wgGroupPermissions['*']['edit'] = false;
     $wgGroupPermissions['user']['edit'] = true;
 
-	// do allow anonymous to edit talk pages
-	$wgGroupPermissions['*']['talk'] = true;
 }
 
 else if ( $mezaAuthType === 'user-edit' ) {
@@ -755,6 +755,7 @@ $wgCirrusSearchClusters['default'][] = 'localhost';
 $wgCirrusSearchClusters['default'][] = '{{ host }}';
 {% endif %}
 {% endfor %}
+$wgCirrusSearchWikimediaExtraPlugin['id_hash_mod_filter'] = true;
 
 
 /**

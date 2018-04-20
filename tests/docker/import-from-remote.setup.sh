@@ -63,3 +63,10 @@ ${docker_exec_2[@]} git clone \
 # Run script on controller to `meza deploy`, `meza create wiki` and
 # `meza backup`
 ${docker_exec_1[@]} bash /opt/meza/tests/deploys/import-from-remote.controller.sh "$env_name"
+
+
+# Delete Top Wiki (wiki_id = top)
+${docker_exec_1[@]} meza delete wiki-promptless "$env_name" "top"
+
+
+# FIXME: Perform checks that "Top Wiki" is gone, but system is still functional

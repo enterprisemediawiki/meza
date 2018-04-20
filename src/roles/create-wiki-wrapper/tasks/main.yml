@@ -7,6 +7,11 @@
     that: 'wiki_id is search("[a-zA-Z0-9_]")'
     msg: "Your wiki ID may only include letters, numbers and underscores"
 
+# Required to fix scope of wiki_id variable when set via prompt. Ref #954.
+- name: Set fact - wiki_id
+  set_fact:
+    wiki_id: "{{ wiki_id }}"
+
 - name: Sync configurations (FIXME do we need this)
   include_role:
     name: sync-configs

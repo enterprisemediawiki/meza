@@ -4,19 +4,20 @@
   git:
     repo: https://github.com/simplesamlphp/simplesamlphp.git
     dest: "{{ m_simplesamlphp_path }}"
-    version: "master"
+    version: "tags/v1.15.0"
+    umask: "0002"
   tags:
     - latest
 
 - name: Ensure SimpleSamlAuth (MediaWiki extension) installed
   git:
-    repo: https://github.com/jornane/mwSimpleSamlAuth.git
+    # Main version of this extension, jornane/mwSimpleSamlAuth, is slow to
+    # update. Use this fork instead, which should stay current with jornane
+    # until meza switches to Cicalese's Extension:SimpleSamlPhp.
+    repo: https://github.com/jamesmontalvo3/mwSimpleSamlAuth.git
     dest: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
-    
-    # Use hash for now, until version greater than v0.7 is released that fixes
-    # issues with MW 1.27 user creation.
-    # Ref: https://github.com/jornane/mwSimpleSamlAuth/issues/31#issuecomment-302759940
-    version: "2e0e7b7b6d08de2d97741a0561ea4a6b3c58d4f9"
+    version: master
+    umask: "0002"
   tags:
     - latest
 

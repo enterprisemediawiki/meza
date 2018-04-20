@@ -1,0 +1,33 @@
+---
+
+- hosts: elastic-servers
+  become: yes
+
+  vars_prompt:
+   - name: "seriously_delete_elasticsearch"
+     prompt: Type "yes" to delete elasticsearch
+     private: no
+     default: "No"
+
+
+  tasks:
+    # - name: Verify user wants to delete elasticsearch
+    #   pause: prompt='Please confirm you want to delete Elasticsearch! Press return to continue. Press Ctrl+c and then "a" to abort'
+
+    - name: Ensure Elasticsearch is removed
+      yum:
+        name: elasticsearch
+        state: absent
+      when: seriously_delete_elasticsearch == "yes"
+
+    - name: Remove {{ m_meza_data }}/elasticsearch
+      file:
+        path: "{{ m_meza_data }}/elasticsearch"
+        state: absent
+      when: seriously_delete_elasticsearch == "yes"
+
+    - name: Remove /etc/elasticsearch
+      file:
+        path: "/etc/elasticsearch"
+        state: absent
+      when: seriously_delete_elasticsearch == "yes"

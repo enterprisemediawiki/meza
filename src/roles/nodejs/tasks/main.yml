@@ -21,14 +21,75 @@
     state: present
   when: ansible_distribution_version.split('.')[1] | int <= 3
 
-- name: Ensure Node.js and npm are installed.
+# - name: Ensure Node.js and npm are installed.
+#   yum:
+#     name: "{{ item }}"
+#     state: present
+#     enablerepo: epel
+#   with_items:
+#     - nodejs
+#     - npm
+
+- name: Ensure Node.js and npm from yum are REMOVED
   yum:
     name: "{{ item }}"
-    state: present
-    enablerepo: epel
+    state: absent
   with_items:
     - nodejs
     - npm
+
+
+
+# ref: https://github.com/nodejs/help/wiki/Installation
+
+- name: What version of node, if any, is installed
+  shell: node --version
+  register: node_version
+  ignore_errors: yes
+
+- debug: { var: node_version }
+
+- name: Get Node.JS 8.11.1 tar.gz
+  get_url:
+    url: https://nodejs.org/dist/v8.11.1/node-v8.11.1-linux-x64.tar.xz
+    dest: /tmp/node.tar.xz
+    #checksum: sha256: TBD
+  when: "node_version.stdout != 'v8.11.1'"
+
+- name: Ensure existing node is removed
+  file:
+    state: absent
+    path: /usr/local/lib/node
+  when: "node_version.stdout != 'v8.11.1'"
+
+- name: Ensure existing node is removed
+  file:
+    state: directory
+    path: /usr/local/lib/node
+  when: "node_version.stdout != 'v8.11.1'"
+
+- name: Extract foo.tgz into /var/lib/foo
+  unarchive:
+    src: /tmp/node.tar.xz
+    dest: /usr/local/lib/node
+    extra_opts: [--strip-components=1]
+  when: "node_version.stdout != 'v8.11.1'"
+
+- name: "Ensure symlink in place for node and npm"
+  file:
+    # dest = symlink, src = dir linked to
+    src: "/usr/local/lib/node/bin/{{ item }}"
+    dest: "/usr/bin/{{ item }}"
+    state: link
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - node
+    - npm
+  when: "node_version.stdout !=  'v8.11.1'"
+
+
 
 - name: Define nodejs_install_npm_user
   set_fact:

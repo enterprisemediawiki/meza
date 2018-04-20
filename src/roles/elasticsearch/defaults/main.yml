@@ -5,3 +5,12 @@ elasticsearch_node_name: "meza_node_1"
 # How to connect to elasticsearch
 elasticsearch_network_host: 127.0.0.1
 elasticsearch_http_port: 9200
+elasticsearch_transport_port: 9300
+
+# FIXME: Pretty sure the elasticsearch docs have different values for these
+elasticsearch_disable_allocation:  '{"persistent":{"cluster.routing.allocation.enable":"none"}}'
+elasticsearch_enable_allocation: '{"persistent":{"cluster.routing.allocation.enable": "all"}}'
+
+# For a rolling upgrade (e.g. not from one major version to another) use these:
+# elasticsearch_disable_allocation:  '{"transient":{"cluster.routing.allocation.enable":"none"}}'
+# elasticsearch_enable_allocation: '{"transient":{"cluster.routing.allocation.enable": "all"}}'

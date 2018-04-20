@@ -1,0 +1,27 @@
+---
+
+- hosts: app-servers
+  become: yes
+  tasks:
+
+  - name: Set vars
+    include_role:
+      name: set-vars
+    tags:
+    - always
+
+  - name: Get individual wikis dirs from localhost
+    find:
+      paths: "{{ m_local_public }}/wikis/"
+      file_type: directory
+    register: wikis_dirs
+    delegate_to: localhost
+    run_once: yes
+
+  - name: Set fact - list of wikis
+    set_fact:
+      list_of_wikis: "{{ wikis_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+  - name: Run cleanupUploadStash.php
+    shell: WIKI={{ item }} php /opt/htdocs/mediawiki/maintenance/cleanupUploadStash.php
+    with_items: "{{ list_of_wikis }}"
