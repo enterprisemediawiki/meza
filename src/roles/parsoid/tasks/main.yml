@@ -28,17 +28,24 @@
   user:
     name: parsoid
     group: parsoid
-    createhome: no
+    move_home: yes
+    home: "{{ m_home }}/parsoid"
     append: yes
 
-- name: Ensure parsoid directory permissions
+- name: Ensure parsoid directory mode, not recursively
   file:
     path: "{{ m_parsoid_path }}"
     state: directory
     mode: 0755
+    recurse: no
+
+- name: Ensure parsoid directory ownership recursively
+  file:
+    path: "{{ m_parsoid_path }}"
+    state: directory
     owner: parsoid
     group: parsoid
-    recurse: no
+    recurse: yes
 
 # I think I read somewhere that there was a bug in Ansible that made it so you
 # had to separate "present" and "latest" states...couldn't just put "latest",
@@ -48,10 +55,20 @@
 #     path: "{{ m_parsoid_path }}"
 #     state: present
 
+
+# Previously the Ansible npm module was used here. It wasn't successfully
+# getting all dependencies. Instead use npm directly.
+#
+# Also it doesn't appear to work with node 8's npm version
+#
+# - name: Ensure Parsoid dependencies are latest
+#   npm:
+#     path: "{{ m_parsoid_path }}"
+#     state: latest
 - name: Ensure Parsoid dependencies are latest
-  npm:
-    path: "{{ m_parsoid_path }}"
-    state: latest
+  become: yes
+  become_user: parsoid
+  shell: "cd {{ m_parsoid_path }} && npm install"
   tags:
     - latest
     - parsoid-deps

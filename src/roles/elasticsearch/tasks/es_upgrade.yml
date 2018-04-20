@@ -1,0 +1,136 @@
+---
+# Ansible
+# Rolling Upgrade of Elasticsearch
+# Original author: Jeff Steinmetz, @jeffsteinmetz
+# Original URL: https://github.com/ekhoinc/ansible-examples/blob/master/elasticsearch-rolling-upgrade.yml
+# Adapted for meza by James Montalvo, @jamesmontalvo3
+
+# Per the 2.x docs [1] upgrading from 1.x requires a "full cluster restart"
+# Per the "full cluster restart" docs [2]
+
+# [1] https://www.elastic.co/guide/en/elasticsearch/reference/2.3/setup-upgrade.html
+
+
+# Upgrades will likely require new plugin versions. Remove plugins which were
+# once installed by meza. Any user-installed plugins will need to be manually
+# removed unless we come up with a way to remove all.
+#
+# Removing elasticsearch plugins. They're too much work to keep in sync with
+# Elasticsearch, and anyone who wants (and knows how) to use them can install
+# them manually.
+- name: Ensure elasticsearch plugins removed
+  shell: "/usr/share/elasticsearch/bin/plugin remove {{ item }}"
+  ignore_errors: True
+  with_items:
+    - bigdesk
+    - head
+    - kopf
+
+# This step is key!!! Don't restart more nodes until all shards have completed
+# recovery
+# Perhaps not required if doing a full restart
+# - name: Wait for cluster health to return to green
+#   uri:
+#     url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
+#     method: GET
+#   register: response
+#   until: "response.json.status == 'green'"
+#   retries: 50
+#   delay: 30
+
+
+# FIXME: Maybe add step to tell MediaWiki to trying to use Elasticsearch, in
+#        particular if this is a single ES node setup. Either way, having MW
+#        attempt to add to the index may be bad.
+
+
+- name: Disable shard allocation for the cluster
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/settings"
+    method: PUT
+    body: "{{ elasticsearch_disable_allocation | string }}"
+
+# Ref: https://www.elastic.co/guide/en/elasticsearch/reference/2.4/restart-upgrade.html#_step_2_perform_a_synced_flush
+# Ref: https://www.elastic.co/guide/en/elasticsearch/reference/2.4/indices-synced-flush.html
+- name: Perform synced flush
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}/_flush/synced"
+    method: POST
+
+# Shutdown all nodes
+- name: Shutdown elasticsearch node
+  service:
+    name: elasticsearch
+    state: stopped
+
+
+# For a rolling upgrade:
+#        If the above command shuts down elasticsearch, how is this hitting the
+#        Elasticsearch API? It definitely cannot be hitting anything if this ES
+#        node is the only ES node. As such, the "when" clause to skip this when
+#        number of ES servers is 1 has been added. The FIXME is that we need to
+#        actually test this in a multi-node setup.
+# - name: Wait for all shards to be reallocated
+#   uri:
+#     url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
+#     method: GET
+#   register: response
+#   until: "response.json.relocating_shards == 0"
+#   retries: 10
+#   delay: 30
+#   when: "groups['elastic-servers']|length|int > 1"
+
+- name: Ensure Elasticsearch is latest version
+  yum:
+    name: elasticsearch
+    state: latest
+
+- name: Start elasticsearch
+  service:
+    name: elasticsearch
+    enabled: yes
+    state: restarted
+    daemon_reload: yes
+
+- name: Wait for elasticsearch node to come back up
+  wait_for:
+    port: "{{ elasticsearch_transport_port }}"
+    delay: 35
+
+- name: Wait for cluster health to return to yellow or green
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
+    method: GET
+  register: response
+  until: "response.json.status == 'yellow' or response.json.status == 'green'"
+  retries: 5
+  delay: 30
+
+- name: Enable shard allocation for the cluster
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/settings"
+    method: PUT
+    body: "{{ elasticsearch_enable_allocation | string }}"
+  register: response
+  # next line is boolean not string, so no quotes around true
+  # use python truthiness
+  until: "response.json.acknowledged == true"
+  retries: 5
+  delay: 30
+
+
+#
+# No re-display Elasticsearch version
+#
+- name: Check current Elasticsearch version
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}"
+    method: GET
+  register: version_found
+  retries: 10
+  delay: 10
+
+- name: Re-display current Elasticsearch full version number after upgrade
+  debug:
+    var: version_found.json.version.number
+

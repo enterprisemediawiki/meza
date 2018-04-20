@@ -3,7 +3,7 @@ list:
 
   - name: Semantic MediaWiki
     composer: "mediawiki/semantic-media-wiki"
-    version: "2.5.3"
+    version: "2.5.6"
     config: |
       // Enable Semantic MediaWiki semantics
       enableSemantics( $wikiId );
@@ -27,7 +27,7 @@ list:
 
   - name: Semantic Result Formats
     composer: "mediawiki/semantic-result-formats"
-    version: "2.4.x"
+    version: "2.5.5"
     config: |
       // SemanticResultFormats formats enabled (beyond defaults)
       // These are disabled by default because they send data to external
@@ -49,10 +49,10 @@ list:
     version: "1.1.0"
   - name: SubPageList
     composer: "mediawiki/sub-page-list"
-    version: "~1.1"
+    version: "1.5.0"
   - name: Maps
     composer: "mediawiki/maps"
-    version: "~4.1"
+    version: "5.0.2"
 
   - name: DisplayTitle
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DisplayTitle.git
@@ -88,7 +88,7 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: PageForms
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PageForms.git
-    version: tags/4.1.1
+    version: tags/4.3
   - name: DismissableSiteNotice
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DismissableSiteNotice.git
     version: "{{ mediawiki_default_branch }}"
@@ -198,7 +198,7 @@ list:
     legacy_load: true
   - name: Arrays
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Arrays.git
-    version: "{{ mediawiki_default_branch }}"
+    version: "2166695159a9a5eb18cb96d4811cdefa0978ab8a"
     legacy_load: true
   - name: TalkRight
     repo: https://github.com/enterprisemediawiki/TalkRight.git

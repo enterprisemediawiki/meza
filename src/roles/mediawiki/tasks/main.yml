@@ -56,16 +56,26 @@
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/core.git
     dest: "{{ m_mediawiki }}"
     version: "{{ mediawiki_version }}"
+    track_submodules: no
+    recursive: no
     umask: "0002"
   tags:
     - latest
-
+- name: Ensure MediaWiki core owned by meza-ansible
+  file:
+    path: "{{ m_mediawiki }}"
+    owner: meza-ansible
+    group: wheel
+    state: directory
+    recurse: yes
 
 #
 # SKINS
 #
 # FIXME #819: Add skins in Meza(Core|Local)Extensions.yml
 - name: Ensure Vector skin installed
+  become: yes
+  become_user: "meza-ansible"
   git:
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git
     dest: "{{ m_mediawiki }}/skins/Vector"
@@ -85,6 +95,8 @@
     - always
 
 - name: Ensure core meza extensions installed (non-Composer)
+  become: yes
+  become_user: "meza-ansible"
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
@@ -105,6 +117,8 @@
     - always
 
 - name: Ensure local meza extensions installed (non-Composer)
+  become: yes
+  become_user: "meza-ansible"
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
@@ -123,6 +137,8 @@
   template:
     src: Extensions.php.j2
     dest: "{{ m_deploy }}/Extensions.php"
+    owner: meza-ansible
+    group: wheel
 
 # Adds extensions with composer param from MezaCoreExtensions.yml and
 # MezaLocalExtensions.yml
@@ -130,29 +146,39 @@
   template:
     src: composer.local.json.j2
     dest: "{{ m_mediawiki }}/composer.local.json"
+    owner: meza-ansible
+    group: wheel
 
 - name: Run composer install on MediaWiki for dependencies
+  become: yes
+  become_user: "meza-ansible"
   composer:
     command: install
     working_dir: "{{ m_mediawiki }}"
+    no_dev: no
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
-  ignore_errors: yes
+  # ignore_errors: yes
   tags:
     - composer-extensions
     - latest
 
 # install doesn't appear to do extensions
 - name: Run composer update on MediaWiki for extensions
+  become: yes
+  become_user: "meza-ansible"
   composer:
     command: update
     working_dir: "{{ m_mediawiki }}"
+    no_dev: no
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
-  ignore_errors: yes
+  # ignore_errors: yes
   tags:
     - composer-extensions
     - latest
 
 - name: Ensure Git submodule requirements met for core meza extensions
+  become: yes
+  become_user: "meza-ansible"
   shell: |
     cd "{{ m_mediawiki }}/extensions/{{ item.name }}"
     git submodule update --init
@@ -163,6 +189,8 @@
     - latest
 
 - name: Ensure Git submodule requirements met for local meza extensions
+  become: yes
+  become_user: "meza-ansible"
   shell: |
     cd "{{ m_mediawiki }}/extensions/{{ item.name }}"
     git submodule update --init
@@ -182,6 +210,8 @@
     src: LocalSettings.php.j2
     dest: "{{ m_mediawiki }}/LocalSettings.php"
     backup: yes
+    owner: meza-ansible
+    group: wheel
 
 
 
@@ -333,14 +363,48 @@
     - smw-rebuilddata
     - search-index
 
+# FIXME: Should search and SMW building be after update.php?
+
+# FIXME: REMOVE?
+# - name: Check if localhost has /tmp/elasticsearch_do_upgrade file
+#   stat:
+#     path: /tmp/elasticsearch_do_upgrade
+#   register: es_do_upgrade_stat
+#   delegate_to: localhost
+
+# - name: Remove /tmp/elasticsearch_do_upgrade file from localhost
+#   file:
+#     path: /tmp/elasticsearch_do_upgrade
+#     state: absent
+#   delegate_to: localhost
+
+# - name: Set es_do_upgrade to True if localhost file exists
+#   set_fact:
+#     es_do_upgrade: True
+#   when: es_do_upgrade_stat.stat.exists
+
+# - name: Set es_do_upgrade to False if localhost file does not exist
+#   set_fact:
+#     es_do_upgrade: False
+#   when: not es_do_upgrade_stat.stat.exists
+
+
+
+
 # Wikis are totally built at this point, but SMW and search need rebuilding
 # FIXME #811: Will this work when controller is not an app server?
 - name: "(Re-)build search index for: {{ wikis_to_rebuild_data | join(', ') }}"
   shell: "bash {{ m_deploy }}/elastic-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
   when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0)
+  # FIXME: REMOVE? and (not es_do_upgrade)
   run_once: true
   tags:
   - search-index
+
+# FIXME: Does this need to be run on all wikis or just one.
+- name: Verify metastore index upgraded
+  shell: WIKI={{ list_of_wikis[0] }} php /opt/htdocs/mediawiki/extensions/CirrusSearch/maintenance/metastore.php --upgrade
+  run_once: true
 
 - name: "(Re-)build SemanticMediaWiki data for: {{ wikis_to_rebuild_data | join(', ') }}"
   shell: "bash {{ m_deploy }}/smw-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""

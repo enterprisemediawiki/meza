@@ -1,12 +1,17 @@
 ---
 
-# INSTALL JAVA
+# INSTALL JAVA 1.8
 #
-# FIXME #814: should this increase to java-1.8.0-openjdk.x86_64 ??
-- name: Ensure Java is installed.
+- name: Ensure Java 1.7.0 OpenJDK is absent
   yum:
     name: java-1.7.0-openjdk
+    state: absent
+- name: Ensure Java 1.8.0 OpenJDK is installed
+  yum:
+    name: java-1.8.0-openjdk
     state: installed
+
+
 # Environment setup.
 - name: Set JAVA_HOME if configured.
   template:
@@ -21,7 +26,7 @@
     state: present
 - name: Add Elasticsearch repository.
   template:
-    src: elasticsearch.repo.j2
+    src: elasticsearch5.repo.j2
     dest: /etc/yum.repos.d/elasticsearch.repo
     mode: 0644
 - name: Install Elasticsearch.
@@ -59,8 +64,7 @@
     recurse: yes
   with_items:
     - "{{ m_meza_data }}/elasticsearch/data"
-    - "{{ m_meza_data }}/elasticsearch/work"
-    - "{{ m_meza_data }}/elasticsearch/plugins"
+    - "{{ m_meza_data }}/elasticsearch/scripts"
 
 
 # CONFIGURE AND START ELASTICSEARCH
@@ -73,28 +77,92 @@
     group: elasticsearch
     mode: 0750
   notify: restart elasticsearch
+
 - name: Start Elasticsearch.
-  service: name=elasticsearch state=started enabled=yes
+  service:
+    name: elasticsearch
+    state: started
+    enabled: yes
+  register: response
   when: docker_skip_tasks is not defined or not docker_skip_tasks
+
 - name: Make sure Elasticsearch is running before proceeding.
-  wait_for: host={{ elasticsearch_network_host }} port={{ elasticsearch_http_port }} delay=3 timeout=300
+  wait_for:
+    host: "{{ elasticsearch_network_host }}"
+    port: "{{ elasticsearch_http_port }}"
+    delay: 3
+    timeout: 300
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 
-# INSTALL PLUGINS: kopf, head
-# FIXME #815: Check for plugins first to avoid using ignore_errors
-- name: Install elasticsearch plugin Kopf
-  elasticsearch_plugin:
-    state: present
-    name: lmenezes/elasticsearch-kopf
-    version: '1.0'
-  ignore_errors: yes
-- name: Install elasticsearch plugin Head
-  elasticsearch_plugin:
-    state: present
-    name: mobz/elasticsearch-head
-  ignore_errors: yes
-# removed "polyfractal/elasticsearch-inquisitor" because it was failing and
-# we need to downselect anyway. Removed lukas-vlcek/bigdesk because it doesn't
-# support Elasticsearch 2.x
+# Previously, elasticsearch plugins Head and Kopf (and at one time Bigdesk and
+# Inquisitor) were installed here.
+
+
+#
+# Perform checks on Elasticsearch version
+#
+- name: Check current Elasticsearch version
+  uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}"
+    method: GET
+  register: version_found
+  retries: 10
+  delay: 10
+
+- name: Display current Elasticsearch full version number
+  debug:
+    var: version_found.json.version.number
+
+- name: Display desired Elasticsearch version
+  debug:
+    var: elasticsearch_major_version
+
+- name: Set the Elasticsearch major version numbers
+  set_fact:
+    es_version_found: "{{ version_found.json.version.number | list | first }}"
+    es_version_desired: "{{ elasticsearch_major_version | list | first }}"
+
+# Do false first. Then force_do_elasticsearch_upgrade can override
+- name: Set do_elasticsearch_upgrade to FALSE
+  set_fact:
+    do_elasticsearch_upgrade: False
+  when: es_version_found|int == es_version_desired|int
+
+# Note: force_do_elasticsearch_upgrade not set anywhere. This can be used with:
+#       `meza deploy ... --extra-vars "force_do_elasticsearch_upgrade=True"`
+- name: Set do_elasticsearch_upgrade to TRUE
+  set_fact:
+    do_elasticsearch_upgrade: True
+  when: (es_version_found|int != es_version_desired|int) or (force_do_elasticsearch_upgrade is defined and force_do_elasticsearch_upgrade)
+
+#
+# Upgrade Elasticsearch if required
+#
+- name: Temporarily set Elasticsearch yum repo to point to 2.x
+  template:
+    src: elasticsearch2.repo.j2
+    dest: /etc/yum.repos.d/elasticsearch.repo
+    mode: 0644
+  when: do_elasticsearch_upgrade and es_version_found|int == 1
+
+- name: Include upgrade tasks for ES 1.6 --> 2.x
+  include: es_upgrade.yml
+  when: do_elasticsearch_upgrade and es_version_found|int == 1
+
+- name: Do reindex if switching for ES 1.6 --> 2.x
+  include: es_reindex.yml
+  when: do_elasticsearch_upgrade and es_version_found|int == 1
+
+- name: Reset Elasticsearch yum repo to point to 5.x
+  template:
+    src: elasticsearch5.repo.j2
+    dest: /etc/yum.repos.d/elasticsearch.repo
+    mode: 0644
+  when: do_elasticsearch_upgrade and es_version_found|int == 1
+
+# Uncomment this when doing upgrade to 5.x
+- name: Include upgrade tasks for ES 2.x --> 5.x
+  include: es_upgrade.yml
+  when: do_elasticsearch_upgrade
 
