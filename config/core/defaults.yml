@@ -121,6 +121,8 @@ mediawiki_version: "1.30.0"
 # Branch to use on many extensions extensions and skins
 mediawiki_default_branch: "REL1_30"
 
+# PHP version
+php_ius_version: "php70u"
 
 # Parsoid v0.5.2 on May 2, 2016
 # MediaWiki REL1_28 branch point on 2016-10-25
