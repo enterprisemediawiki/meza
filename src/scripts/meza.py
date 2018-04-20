@@ -336,30 +336,32 @@ def meza_command_delete (argv):
 
 	sub_command = argv[0]
 
-	if sub_command in ("wiki", "wiki-promptless"):
+	if sub_command not in ("wiki", "wiki-promptless", "elasticsearch"):
+		print "{} is not a valid sub-command for delete".format(sub_command)
+		sys.exit(1)
 
-		if len(argv) < 2:
-			print "You must specify an environment: 'meza delete wiki ENV'"
-			sys.exit(1)
+	if len(argv) < 2:
+		print "You must specify an environment: 'meza delete {} ENV'".format(sub_command)
+		sys.exit(1)
 
-		env = argv[1]
+	env = argv[1]
 
-		rc = check_environment(env)
-		if rc > 0:
-			meza_shell_exec_exit(rc)
-
-		playbook = "delete-" + sub_command
-
-		if sub_command == "wiki-promptless":
-			if len(argv) < 3:
-				print "delete wiki-promptless requires wiki_id"
-				sys.exit(1)
-			shell_cmd = playbook_cmd( playbook, env, { 'wiki_id': argv[2] } )
-		else:
-			shell_cmd = playbook_cmd( playbook, env )
-
-		rc = meza_shell_exec( shell_cmd )
+	rc = check_environment(env)
+	if rc > 0:
 		meza_shell_exec_exit(rc)
+
+	playbook = "delete-" + sub_command
+
+	if sub_command == "wiki-promptless":
+		if len(argv) < 3:
+			print "delete wiki-promptless requires wiki_id"
+			sys.exit(1)
+		shell_cmd = playbook_cmd( playbook, env, { 'wiki_id': argv[2] } )
+	else:
+		shell_cmd = playbook_cmd( playbook, env )
+
+	rc = meza_shell_exec( shell_cmd )
+	meza_shell_exec_exit(rc)
 
 
 def meza_command_backup (argv):
