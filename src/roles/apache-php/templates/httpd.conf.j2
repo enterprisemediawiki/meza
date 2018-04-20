@@ -54,7 +54,6 @@ ServerRoot "/etc/httpd"
 # LoadModule foo_module modules/mod_foo.so
 #
 Include conf.modules.d/*.conf
-LoadModule php5_module		modules/libphp5.so
 
 <IfModule unixd_module>
 #
@@ -426,7 +425,7 @@ Listen 8080
 
 	{% if m_setup_php_profiling -%}
 	# Prepends file all files to initiate profiling
-	php_admin_value auto_prepend_file "{{ m_profiling_xhgui_directory }}/external/header.php"
+	# php_admin_value auto_prepend_file "{{ m_profiling_xhgui_directory }}/external/header.php"
 	{% endif %}
 
 </VirtualHost>
@@ -473,7 +472,7 @@ Listen 8090
 <FilesMatch "\.ph(p[2-6]?|tml)$">
 	SetHandler application/x-httpd-php
 </FilesMatch>
-<IfModule !php5_module>
+<IfModule !php7_module>
 	<FilesMatch "\.ph(p[2-6]?|tml)$">
 		Order allow,deny
 		Deny from all
