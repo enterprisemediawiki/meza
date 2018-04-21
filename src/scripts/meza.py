@@ -45,7 +45,8 @@ def main (argv):
 
 	# Every command has a sub-command. No second param, no sub-command. Display
 	# help for that specific sub-command.
-	if len(argv) == 1:
+	# sub-command "update" does not require additional directives
+	if len(argv) == 1 and argv[0] != "update":
 		display_docs(argv[0])
 		sys.exit(1)
 	elif len(argv) == 2 and argv[1] in ('--help','-h'):
@@ -129,6 +130,54 @@ def meza_command_setup (argv):
 		print
 		print sub_command + " is not a valid sub-command for setup"
 		sys.exit(1)
+
+def meza_command_update (argv):
+	import subprocess
+
+	check_remotes = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "remote" ] ).strip().split("\n")
+	if "mezaremote" not in check_remotes:
+		add_remote = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "remote", "add", "mezaremote", "https://github.com/enterprisemediawiki/meza.git" ] )
+
+	# Get latest commits and tags from mezaremote
+	fetch = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "fetch", "mezaremote" ] )
+	fetch = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "fetch", "mezaremote", "--tags" ] )
+	tags_text = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "tag", "-l" ] )
+
+	if len(argv) == 0:
+		# print fetch.strip()
+		print "The following versions are available:"
+		print tags_text.strip()
+		print ""
+		closest_tag = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "describe", "--tags" ] )
+		print "You are currently on version {}".format(closest_tag.strip())
+		print "To change versions, do 'sudo meza update <version>'"
+	elif len(argv) > 1:
+		print "Unknown argument {}".format(argv[1])
+	else:
+		status = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "status", "--untracked-files=no", "--porcelain" ] )
+		status = status.strip()
+		version = argv[0]
+		if status == "":
+			tags = tags_text.split("\n")
+			branches = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "branch" ] ).strip().split("\n")
+			branches = map(str.strip, branches)
+			if version in tags:
+				version_type = "at version"
+				tag_version = "tags/{}".format(version)
+				checkout = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "checkout", tag_version ], stderr=subprocess.STDOUT )
+			elif version in branches or "* {}".format(version) in branches:
+				version_type = "on branch"
+				checkout = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "checkout", version ], stderr=subprocess.STDOUT )
+				reset    = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "reset", "--hard", "mezaremote/{}".format(version) ] )
+			else:
+				print "{} is not a valid version or branch".format(version)
+				sys.exit(1)
+			print ""
+			print ""
+			print "Meza now {} {}".format(version_type, version)
+			print "Now deploy changes with 'sudo meza deploy <environment>'"
+		else:
+			print "Files have been modified in /opt/meza. Clean them up before proceeding."
 
 # FIXME #824: This function is big.
 def meza_command_setup_env (argv, return_not_exit=False):
@@ -381,9 +430,6 @@ def meza_command_backup (argv):
 def meza_command_destroy (argv):
 	print "command not yet built"
 
-
-def meza_command_update (argv):
-	print "command not yet built"
 
 # FIXME #825: It would be great to have this function automatically map all
 #             scripts in MediaWiki's maintenance directory to all wikis. Then
