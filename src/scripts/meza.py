@@ -134,41 +134,56 @@ def meza_command_setup (argv):
 def meza_command_update (argv):
 	import subprocess
 
-	check_remotes = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "remote" ] ).strip().split("\n")
-	if "mezaremote" not in check_remotes:
-		add_remote = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "remote", "add", "mezaremote", "https://github.com/enterprisemediawiki/meza.git" ] )
+	# This function executes many Git commands that need to be from /otp/meza
+	os.chdir("/opt/meza")
+
+	# Define a special git remote repository so we can control its settings
+	# Else, a user using Vagrant may have their origin remote setup for SSH
+	# but these commands need HTTPS.
+	meza_remote = "mezaremote"
+
+	check_remotes = subprocess.check_output( ["git", "remote" ] ).strip().split("\n")
+	if meza_remote not in check_remotes:
+		add_remote = subprocess.check_output( ["git", "remote", "add", meza_remote, "https://github.com/enterprisemediawiki/meza.git" ] )
 
 	# Get latest commits and tags from mezaremote
-	fetch = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "fetch", "mezaremote" ] )
-	fetch = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "fetch", "mezaremote", "--tags" ] )
-	tags_text = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "tag", "-l" ] )
+	fetch = subprocess.check_output( ["git", "fetch", meza_remote ] )
+	fetch = subprocess.check_output( ["git", "fetch", meza_remote, "--tags" ] )
+	tags_text = subprocess.check_output( ["git", "tag", "-l" ] )
 
 	if len(argv) == 0:
 		# print fetch.strip()
 		print "The following versions are available:"
 		print tags_text.strip()
 		print ""
-		closest_tag = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "describe", "--tags" ] )
+		closest_tag = subprocess.check_output( ["git", "describe", "--tags" ] )
 		print "You are currently on version {}".format(closest_tag.strip())
 		print "To change versions, do 'sudo meza update <version>'"
 	elif len(argv) > 1:
 		print "Unknown argument {}".format(argv[1])
 	else:
-		status = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "status", "--untracked-files=no", "--porcelain" ] )
+         # Needed else 'git status' gives bad response
+		status = subprocess.check_output( ["git", "status", "--untracked-files=no", "--porcelain" ] )
 		status = status.strip()
+		if status != "":
+			print "'git status' not empty:\n{}".format(status)
+
 		version = argv[0]
 		if status == "":
 			tags = tags_text.split("\n")
-			branches = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "branch" ] ).strip().split("\n")
+			branches = subprocess.check_output( ["git", "branch", "-a" ] ).strip().split("\n")
 			branches = map(str.strip, branches)
 			if version in tags:
 				version_type = "at version"
 				tag_version = "tags/{}".format(version)
-				checkout = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "checkout", tag_version ], stderr=subprocess.STDOUT )
+				checkout = subprocess.check_output( ["git", "checkout", tag_version ], stderr=subprocess.STDOUT )
 			elif version in branches or "* {}".format(version) in branches:
 				version_type = "on branch"
-				checkout = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "checkout", version ], stderr=subprocess.STDOUT )
-				reset    = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "reset", "--hard", "mezaremote/{}".format(version) ] )
+				checkout = subprocess.check_output( ["git", "checkout", version ], stderr=subprocess.STDOUT )
+				reset    = subprocess.check_output( ["git", "reset", "--hard", "mezaremote/{}".format(version) ] )
+			elif "remotes/{}/{}".format(meza_remote,version) in branches:
+				version_type = "on branch"
+				checkout = subprocess.check_output( ["git", "checkout", "-b", version, '-t', "{}/{}".format(meza_remote,version) ], stderr=subprocess.STDOUT )
 			else:
 				print "{} is not a valid version or branch".format(version)
 				sys.exit(1)
@@ -178,6 +193,7 @@ def meza_command_update (argv):
 			print "Now deploy changes with 'sudo meza deploy <environment>'"
 		else:
 			print "Files have been modified in /opt/meza. Clean them up before proceeding."
+			print "MSG: {}".format(status)
 
 # FIXME #824: This function is big.
 def meza_command_setup_env (argv, return_not_exit=False):
