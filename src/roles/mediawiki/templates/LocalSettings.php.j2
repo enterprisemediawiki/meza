@@ -43,21 +43,10 @@ require "{{ m_deploy }}/samlLocalSettings.php";
 
 require '/opt/.deploy-meza/config.php';
 
-if( $wgCommandLineMode ) {
+$mezaWikiEnvVarName='WIKI';
 
-	$mezaWikiEnvVarName='WIKI';
-
-	// get $wikiId from environment variable
-	$wikiId = getenv( $mezaWikiEnvVarName );
-
-}
-else {
-
-	// get $wikiId from URI
-	$uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
-	$wikiId = strtolower( $uriParts[1] ); // URI has leading slash, so $uriParts[0] is empty string
-
-}
+// get $wikiId from environment variable
+$wikiId = isset( $_GET['MEZAWIKI'] ) ? $_GET['MEZAWIKI'] : getenv( $mezaWikiEnvVarName );
 
 // get all directory names in /wikis, minus the first two: . and ..
 $wikis = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
@@ -230,7 +219,9 @@ else {
 $wgServer = 'https://{{ wiki_app_fqdn }}';
 
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
-$wgScriptPath = "/$wikiId";
+$wgScriptPath = "/mediawiki/$wikiId";
+$wgArticlePath = "/$wikiId/$1";
+$wgUsePathInfo = true;
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath
 $wgUploadPath = "$wgScriptPath/img_auth.php";
