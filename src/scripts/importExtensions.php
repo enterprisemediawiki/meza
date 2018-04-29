@@ -1,37 +1,71 @@
 <?php
 error_reporting(E_ALL);
 
-$HELP = <<<HERE
-Supply the full URL to your wiki API as the first argument. e.g.
-https://freephile.org/w/api.php to get a list of extensions which still need
-to be added locally.
+function cmp( $a , $b ) {
+  return strcmp( $a->name, $b->name );
+}
 
-If the Wiki API is access restricted, then execute a
+function nameFirst( $a, $b ) {
+//  echo "comparing $a with $b ";
+  if ($a == 'name') {
+    $return = -1; // if we make it 'less' it will be first in the array
+  } else if ($b == 'name') {
+    $return = 1;
+  } else {
+    $return = 0;
+  }
+//  echo "Returning $return\n";
+  return $return;
+}
+
+$HELP = <<<HERE
+This script helps you identify different extensions used in a 3rd-party wiki compared to Meza.
+
+It also compares those 3rd-party "custom" extensions to whatever you've setup in
+/opt/conf-meza/public/MezaLocalExtensions.yml as your improved distribution of Meza.
+ Note that if MezaLocalExtensions.yml is not found, this script will use the QualityBox
+ setup found at https://github.com/freephile/meza-conf-public/blob/master/MezaLocalExtensions.yml
+ (You would need to customize this script to use your own public config repo.)
+
+Supply the full URL to the external wiki API as the script argument. e.g.
+`php importExtensions.php https://freephile.org/w/api.php`
+to get a list of extensions which would need to be added locally.
+
+If the 3rd-party wiki API is access restricted, then execute a
 '?action=query&meta=siteinfo&siprop=extensions&format=json' API query in that
-environment and save the results to a file with a .json extension.
+environment and save the text output to a file with a .json extension.
 
 Then supply the path to that file as the argument to this function.
 HERE;
 
+$mezaCoreExtensionsFile = '/opt/meza/config/core/MezaCoreExtensions.yml';
+$mezaCoreExtensionsURL = 'https://raw.githubusercontent.com/freephile/meza/master/config/core/MezaCoreExtensions.yml';
+$localExtensionsFile = '/opt/conf-meza/public/MezaLocalExtensions.yml';
+$localExtensionsURL = 'https://raw.githubusercontent.com/freephile/meza-conf-public/master/MezaLocalExtensions.yml';
+$coreYml = ( file_exists( $mezaCoreExtensionsFile ) ) ? file_get_contents($mezaCoreExtensionsFile) : file_get_contents($mezaCoreExtensionsURL) ;
+$localYml = ( file_exists( $localExtensionsFile ) ) ? file_get_contents($localExtensionsFile) : file_get_contents($localExtensionsURL) ;
+
 # normalize names by removing any spaces
-$core  = `grep -Po 'name\: (.*)' /opt/meza/config/core/MezaCoreExtensions.yml | sort | awk --field-separator=: '{print $2}' | sed s'/[ \t]*//g'`;
-$local = `grep -Po 'name\: (.*)' /opt/conf-meza/public/MezaLocalExtensions.yml | sort | awk --field-separator=: '{print $2}' | sed s'/[ \t]*//g'`;
+# grep -Po 'name\: (.*)'  /opt/meza/config/core/MezaCoreExtensions.yml | sort | awk --field-separator=: '{print $2}' | sed s'/[ \t]*//g';
 
-print "Here are the extensions in core\n$core";
-
-print "\n\n Here are additional extensions from MezaLocalExtensions.yml\n$local";
-
-// $core is Meza, and $local are any local additions found in MezaLocalExtensions
-$core = explode("\n", trim($core));
-$local = explode("\n", trim($local));
+$pattern = '#name\: (.*)#';
+preg_match_all ($pattern, $coreYml, $matches);
+$core = $matches[1];
+preg_match_all ($pattern, $localYml, $matches);
+$local = $matches[1];
+sort($core);
+$core = str_replace(' ', '', $core);
+sort($local);
+$local = str_replace(' ', '', $local);
 
 $api = $argv[1];
-
+// show help if no argument is supplied
 if ( ($api == null) || ($api == false) || ($api == '') ) {
   fwrite(STDERR, $HELP);
   exit(1);
 }
 
+// sniff the argument and if it ends in 'api', use the api querystring. if it ends in json, just read
 if ( substr($api, -3) == 'api' ) {
   $endpoint = $api . '?action=query&meta=siteinfo&siprop=extensions&format=json';
 } else if ( substr($api, -4) == 'json' ) {
@@ -45,26 +79,14 @@ $extension_json = file_get_contents( $endpoint );
 // for bad old implementations where a BOM may exist
 $extension_json = utf8_encode( $extension_json );
 $extension_php = json_decode ( $extension_json );
-// print_r ($extension_php->{'query'}->{'extensions'});
+// use just the part we want
 $extension_php = $extension_php->{'query'}->{'extensions'};
 
-function cmp( $a , $b ) {
-  return strcmp( $a->name, $b->name );
-}
-
-function nameFirst( $a, $b ) {
-  if ($a == 'name') {
-    $return = -1; // if we make it 'less' it will be first in the array
-  } else if ($b == 'name') {
-    $return = 1;
-  } else {
-    $return = 0;
-  }
-  return $return;
-}
 // usort will sort the array in place
 // $extension_php is an array, each member is an object
 usort( $extension_php, 'cmp' );
+// print_r ($extension_php); die();
+// print "found " . count($extension_php) . " extensions\n";
 
 $names = array();
 $extensions = array();
@@ -80,9 +102,9 @@ $unhandled = array_diff( $names, $core, $local );
 $incore = array_intersect( $names, $core );
 $inlocal = array_intersect( $names, $local );
 
-echo count( $incore ) . " handled by Meza Core\n";
-echo count( $inlocal ) . " handled locally\n";
-echo "Left with " . count( $unhandled ) . " not in Core Meza or Locally\n";
+echo count( $incore ) . " handled by Core\n";
+echo count($inlocal ) . " handled by MezaLocalExtensions\n";
+echo "Left with " . count( $unhandled ) . " custom (not in Meza Core nor MezaLocalExtensions)\n";
 
 
 /**
@@ -103,18 +125,69 @@ These are the possible keys that you'll see
     [18] => credits
     [21] => namemsg
     [29] => description
+
+    @param array $extension - The extension information that you want to print out.
 */
+function printExtensionInfo ($extension) {
+    echo sprintf ("##  %s\n", $extension['name']);
+    foreach ( $extension as $k => $v ) {
+      if ($k != 'name') {
+            $v = trim($v);
+            echo "  $k : $v\n";
+        }
+    }
+}
+
+// $extension_php is an array of objects. each with several properties
+// We'll add a property 'handler' to group extensions by where they're handled.
+for ($i=0; $i < count($extensions); $i++ ) {
+  if ( in_array( $extensions[$i]['name'], $unhandled ) ) {
+    $extensions[$i]['handler'] = 'Proprietary';
+  } elseif ( in_array( $extensions[$i]['name'], $incore ) ) {
+    $extensions[$i]['handler'] = 'Meza Core';
+} elseif ( in_array( $extensions[$i]['name'], $inlocal ) ) {
+    $extensions[$i]['handler'] = 'QualityBox';
+} else {
+    $extensions[$i]['handler'] = 'Unknown';
+}
+
+}
+
+#################  OUTPUT #################################
+// Now we'll output the extensions grouped by where they're handled:
+
+echo  "=== Meza Core Extensions ===\n";
 foreach ( $extensions as $ext ) {
-  if ( in_array( $ext['name'], $unhandled ) ) {
-    echo "\n- CUSTOM\n";
-  } elseif ( in_array( $ext['name'], $incore ) ) {
-    echo "\n- Core\n";
-} elseif ( in_array( $ext['name'], $inlocal ) ) {
-    echo "\n- Local\n";
-  }
-  foreach ( $ext as $k => $v ) {
-    // sometimes the values have spurious newlines
-    $v = trim($v);
-    echo "  $k : $v\n";
+  if ($ext['handler'] === 'Meza Core') {
+      printExtensionInfo($ext);
+    }
+}
+
+
+echo  "=== QualityBox Added Extensions ===\n";
+foreach ( $extensions as $ext ) {
+  if ($ext['handler'] === 'QualityBox') {
+      printExtensionInfo($ext);
   }
 }
+
+echo  "=== Custom Extensions ===\n";
+foreach ( $extensions as $ext ) {
+  if ($ext['handler'] == 'Proprietary') {
+      printExtensionInfo($ext);
+  }
+}
+
+echo  "=== Unknown Extensions ===\n";
+foreach ( $extensions as $ext ) {
+  if ($ext['handler'] == 'Unknown') {
+      printExtensionInfo($ext);
+  }
+}
+
+// $allkeys = array_unique($allkeys, SORT_LOCALE_STRING);
+// print_r($allkeys);
+
+// $existing = yaml_parse_file( '/opt/meza/config/core/MezaCoreExtensions.yml' );
+
+// var_dump ($existing);
