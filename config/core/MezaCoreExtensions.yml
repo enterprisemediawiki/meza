@@ -60,7 +60,7 @@ list:
     
   - name: TemplateData
     repo: https://github.com/wikimedia/mediawiki-extensions-TemplateData.git
-    version: "REL1_27"
+    version: REL1_27
 
   #
   # Extensions loaded with wfLoadExtension
