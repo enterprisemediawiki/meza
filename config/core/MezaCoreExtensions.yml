@@ -57,7 +57,10 @@ list:
   - name: DisplayTitle
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DisplayTitle.git
     version: tags/1.2
-
+    
+  - name: TemplateData
+    repo: https://github.com/wikimedia/mediawiki-extensions-TemplateData.git
+    version: "REL1_27"
 
   #
   # Extensions loaded with wfLoadExtension
