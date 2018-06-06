@@ -8,7 +8,6 @@
   - re2c
   - gcc-c++
 
-
 # Install ODBC driver
 - name: install mssql-server repo (CentOS, RedHat)
   get_url:
@@ -24,7 +23,7 @@
   - unixODBC-utf16
   - unixODBC-utf16-devel
 
-- name: install ODBC driver package
+- name: install MS ODBC driver package
   yum:
     name: msodbcsql17
     state: latest
@@ -33,14 +32,17 @@
   notify:
   - restart apache
 
-# If mssql tools or unixODBC-devel dev headers desired:
+- name: install ODBC driver devel package
+  yum:
+    name: unixODBC-devel
+    state: latest
+
+
+# If mssql tools desired:
 # sudo ACCEPT_EULA=Y yum install mssql-tools
 # echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
 # echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
 # source ~/.bashrc
-# sudo yum install unixODBC-devel
-
-
 
 
 
@@ -74,7 +76,7 @@
 
 
 #
-# Install sqlsrv drivers
+# Install sqlsrv drivers from PECL
 #
 # Or maybe this is better?
 # sudo pecl install sqlsrv-5.2.0
