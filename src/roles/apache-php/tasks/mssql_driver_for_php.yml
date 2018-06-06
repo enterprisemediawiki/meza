@@ -1,0 +1,109 @@
+---
+
+- name: Ensure prerequisites for sqlsrv in place
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items:
+  - re2c
+  - gcc-c++
+
+
+# Install ODBC driver
+- name: install mssql-server repo (CentOS, RedHat)
+  get_url:
+    url: https://packages.microsoft.com/config/rhel/7/prod.repo
+    dest: /etc/yum.repos.d/mssql-release.repo
+  when: ansible_distribution in ['CentOS', 'RedHat']
+
+- name: Ensure conflicting ODBC drivers removed
+  yum:
+    name: "{{item}}"
+    state: absent
+  with_items:
+  - unixODBC-utf16
+  - unixODBC-utf16-devel
+
+- name: install ODBC driver package
+  yum:
+    name: msodbcsql17
+    state: latest
+  environment:
+    ACCEPT_EULA: 'y'
+  notify:
+  - restart apache
+
+# If mssql tools or unixODBC-devel dev headers desired:
+# sudo ACCEPT_EULA=Y yum install mssql-tools
+# echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+# echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+# source ~/.bashrc
+# sudo yum install unixODBC-devel
+
+
+
+
+
+#
+# Maybe require better gcc (or gcc-c++)
+#
+
+# CENTOS: sudo yum install centos-release-scl
+- name: install centos-release-scl
+  yum:
+    name: centos-release-scl
+    state: latest
+  when: ansible_distribution == "CentOS"
+
+- name: install devtoolset-7 on CentOS
+  yum:
+    name: devtoolset-7
+    state: latest
+  when: ansible_distribution == "CentOS"
+
+# REDHAT: sudo yum-config-manager --enable rhel-server-rhscl-7-rpms
+- name: enable rhel-server-rhscl-7-rpms
+  yum:
+    name: devtoolset-7
+    state: latest
+    enablerepo: rhel-server-rhscl-7-rpms
+  when: ansible_distribution == "RedHat"
+
+- name: Enable devtoolset-7 with SCL
+  shell: "scl enable devtoolset-7 bash"
+
+
+#
+# Install sqlsrv drivers
+#
+# Or maybe this is better?
+# sudo pecl install sqlsrv-5.2.0
+# sudo pecl install pdo_sqlsrv-5.2.0
+#
+- name: Install sqlsrv and pdo_sqlsrv PECL packages
+  pear:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - pecl/sqlsrv
+    - pecl/pdo_sqlsrv
+  notify:
+  - restart apache
+
+- template:
+    src: 30-pdo_sqlsrv.ini.j2
+    dest: /etc/php.d/30-pdo_sqlsrv.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+  - restart apache
+
+- template:
+    src: 20-sqlsrv.ini.j2
+    dest: /etc/php.d/20-sqlsrv.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+  - restart apache
