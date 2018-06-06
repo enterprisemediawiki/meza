@@ -45,34 +45,33 @@
 # source ~/.bashrc
 
 
-
 #
-# Maybe require better gcc (or gcc-c++)
+# Compiling the PHP drivers with PECL with PHP 7.2 requires a more recent GCC than the default:
 #
-
-# CENTOS: sudo yum install centos-release-scl
-- name: install centos-release-scl
-  yum:
-    name: centos-release-scl
-    state: latest
-  when: ansible_distribution == "CentOS"
-
-- name: install devtoolset-7 on CentOS
-  yum:
-    name: devtoolset-7
-    state: latest
-  when: ansible_distribution == "CentOS"
-
-# REDHAT: sudo yum-config-manager --enable rhel-server-rhscl-7-rpms
-- name: enable rhel-server-rhscl-7-rpms
-  yum:
-    name: devtoolset-7
-    state: latest
-    enablerepo: rhel-server-rhscl-7-rpms
-  when: ansible_distribution == "RedHat"
-
-- name: Enable devtoolset-7 with SCL
-  shell: "scl enable devtoolset-7 bash"
+#
+# # CENTOS: sudo yum install centos-release-scl
+# - name: install centos-release-scl
+#   yum:
+#     name: centos-release-scl
+#     state: latest
+#   when: ansible_distribution == "CentOS"
+#
+# - name: install devtoolset-7 on CentOS
+#   yum:
+#     name: devtoolset-7
+#     state: latest
+#   when: ansible_distribution == "CentOS"
+#
+# # REDHAT: sudo yum-config-manager --enable rhel-server-rhscl-7-rpms
+# - name: enable rhel-server-rhscl-7-rpms
+#   yum:
+#     name: devtoolset-7
+#     state: latest
+#     enablerepo: rhel-server-rhscl-7-rpms
+#   when: ansible_distribution == "RedHat"
+#
+# - name: Enable devtoolset-7 with SCL
+#   shell: "scl enable devtoolset-7 bash"
 
 
 #
