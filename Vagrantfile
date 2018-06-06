@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
 
     config.vm.define "app2" do |app2|
 
-      app2.vm.box = "bento/centos-7.3"
+      app2.vm.box = "bento/centos-7.4"
       app2.vm.hostname = 'app2'
 
       app2.vm.network :private_network, ip: "192.168.56.57"
@@ -79,7 +79,7 @@ Vagrant.configure("2") do |config|
 
     config.vm.define "db2" do |db2|
 
-      db2.vm.box = "bento/centos-7.3"
+      db2.vm.box = "bento/centos-7.4"
       db2.vm.hostname = 'db2'
 
       db2.vm.network :private_network, ip: "192.168.56.58"
@@ -128,7 +128,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "app1", primary: true do |app1|
 
     # app1.vm.box = "centos/7"
-    app1.vm.box = "bento/centos-7.3"
+    app1.vm.box = "bento/centos-7.4"
     # app1.vm.box = "geerlingguy/centos7"
     app1.vm.hostname = 'app1'
     # app1.vm.box_url = "ubuntu/precise64"
