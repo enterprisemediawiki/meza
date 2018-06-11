@@ -117,12 +117,12 @@
 - name: "{{ wiki_id }} - Set fact if INTEND overwrite data"
   set_fact:
     intend_overwrite_from_backup: True
-  when: force_overwrite_from_backup is defined and force_overwrite_from_backup == true
+  when: force_overwrite_from_backup is defined and force_overwrite_from_backup == true and wiki_id not in wikis_to_skip_overwrite
 
 - name: "{{ wiki_id }} - Set fact if NOT INTEND overwrite data"
   set_fact:
     intend_overwrite_from_backup: False
-  when: force_overwrite_from_backup is not defined or force_overwrite_from_backup == false
+  when: (force_overwrite_from_backup is not defined or force_overwrite_from_backup == false) or wiki_id in wikis_to_skip_overwrite
 
 
 #
