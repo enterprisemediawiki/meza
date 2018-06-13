@@ -122,13 +122,15 @@ class UniteTheWikis extends Maintenance {
 		}
 
 		// If not:
-		//   1. First go make sure everyone is pre-watching all the pages so
-		//      any page moves get recorded.
+		//   0. Ideally would ensure everyone is pre-watching all the pages so
+		//      any page moves get recorded, but this every file-import to show
+		//      up on peoples' watchlists.
+		//   1. Merge user groups (if they were sysop in one wiki, they're sysop in the merged)
 		//   2. Then go pull all the pages to merge from the source wikis
 		else {
-			$this->mergeWatchlists();
 			$this->mergeUserGroups();
 			$this->getPages();
+			$this->mergeWatchlists();
 		}
 
 		$this->output( "\n" ); // basically always want to end with a newline
