@@ -59,6 +59,33 @@ else {
 
 }
 
+
+{% if wiki_id_redirects is defined and wiki_id_redirects|length > 0 %}
+
+// array point wiki IDs to redirect from and to
+$wikiIdRedirects = [
+{% for from_id, to_id in wiki_id_redirects.items() %}
+	'{{ from_id }}' => '{{ to_id }}',
+{% endfor %}
+];
+
+// check if current wiki ID is a key in this array, and thus should redirect to another wiki
+if ( isset( $wikiIdRedirects[ $wikiId ] ) ) {
+
+        $newURI = preg_replace(
+		"/^\/([\w\d-_]+)/",
+		'/' . $wikiIdRedirects[$wikiId],
+		$_SERVER['REQUEST_URI']
+	);
+
+	// Redirect to target wiki with 301 code
+	header( 'Location: https://{{ wiki_app_fqdn }}' . $newURI , true, 301 );
+	exit;
+}
+{% endif %}
+
+
+
 // get all directory names in /wikis, minus the first two: . and ..
 $wikis = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
 
