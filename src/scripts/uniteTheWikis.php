@@ -103,11 +103,13 @@ class UniteTheWikis extends Maintenance {
 
 		$this->addOption( 'imports-remaining', 'How many imports left' );
 
+		$this->addOption( 'merge-watchlists', 'Do merging of watchlists' );
 	}
 
 	public function execute () {
 
 		if ( $this->hasOption( 'cleanup' ) ) {
+			$this->output( "Do cleanup" );
 			$this->cleanupDatabase();
 		}
 
@@ -116,8 +118,14 @@ class UniteTheWikis extends Maintenance {
 			return; // don't want the \n at the end of this function
 		}
 
+		else if ( $this->hasOption( 'merge-watchlists' ) ) {
+			$this->output( 'Merging watchlists...' );
+			$this->mergeWatchlists();
+		}
+
 		// if there's already stuff in the merge table, process it
 		else if ( $this->checkDB() ) {
+			$this->output( "Importing new set" );
 			$this->importSet();
 		}
 
@@ -128,9 +136,9 @@ class UniteTheWikis extends Maintenance {
 		//   1. Merge user groups (if they were sysop in one wiki, they're sysop in the merged)
 		//   2. Then go pull all the pages to merge from the source wikis
 		else {
+			$this->output( "Merge user groups, get pages" );
 			$this->mergeUserGroups();
 			$this->getPages();
-			$this->mergeWatchlists();
 		}
 
 		$this->output( "\n" ); // basically always want to end with a newline
@@ -591,6 +599,11 @@ class UniteTheWikis extends Maintenance {
 	 *
 	 */
 	protected function mergeWatchlists () {
+
+		if ( ! $this->checkDB() ) {
+			$this->output( "\nFailed to get config from database" );
+			exit;
+		}
 
 		// Get distinct list of users
 		$usersDBResult = $this->getWatchlistUsers();
