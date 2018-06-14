@@ -82,6 +82,9 @@ WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php" "--mergedwiki=$wiki_id" "--so
 # letting bash control repeated calls to the script gets around this.
 while [[ `WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php" --imports-remaining` != "0" ]]; do
 	echo -e "\n\n*********************\nANOTHER ROUND\n******************\n"
+	echo "Clean out hoards of temp files"
+	find /tmp -name "importupload*" -print0 | xargs -0 rm -f
+	echo "run uniteTheWikis.php again"
 	WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php"
 done;
 
@@ -107,7 +110,7 @@ echo "Beginning rebuildrecentchanges.php script"
 WIKI="$wiki_id" php "$m_mediawiki/maintenance/rebuildrecentchanges.php"
 
 # num_pages=$(WIKI="$wiki_id" php "$m_mediawiki/maintenance/showSiteStats.php" | grep "Total pages" | sed 's/[^0-9]*//g')
-num_pages=$(mysql -s -r -e"USE wiki_issmerged; SELECT page_id FROM page ORDER BY page_id DESC LIMIT 1;" | sed -n "1p")
+num_pages=$(mysql -s -r -e"USE wiki_$wiki_id; SELECT page_id FROM page ORDER BY page_id DESC LIMIT 1;" | sed -n "1p")
 end_id=0
 delta=2000
 
@@ -126,6 +129,9 @@ start_id=$(($end_id + 1))
 echo "Running final refreshLinks.php in case there are more pages beyond num_pages, beyond $start_id"
 WIKI="$wiki_id" php "$m_mediawiki/maintenance/refreshLinks.php" "$start_id"
 
+# Merge watchlists
+echo -e "\nMerging watchlists..."
+WIKI="$wiki_id" php "$m_scripts/uniteTheWikis.php" --merge-watchlists
 
 # Don't clean up merge table until rebuild all and images are imported. That
 # way if this needs to stop and restart it won't try to reimport.
