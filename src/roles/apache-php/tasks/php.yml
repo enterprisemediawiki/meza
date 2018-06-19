@@ -107,6 +107,10 @@
     # - php56u-mssql
 
 
+- name: Install MS SQL driver for PHP
+  include: mssql_driver_for_php.yml
+  when: install_ms_sql_driver is defined and install_ms_sql_driver
+
 
 - name: Write php.ini file
   template:

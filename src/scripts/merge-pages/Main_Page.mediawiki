@@ -1,0 +1,26 @@
+For some reason no Main Page was imported. I'm not sure why.
+
+== The basic method for the scripted merging of the wikis is ==
+
+# Get a list of all the pages across all wikis
+## If the same page name exists on multiple wikis, and all wikis have the same content, just import any one of them
+## If the same page name exists, but it has different content on different wikis, then create a [[Template:Disambig|Disambiguation Page]] that points to each page. Each page will be named like <nowiki>[[Original page name (BME)]]</nowiki> or <nowiki>[[Original page name (SPARTAN)]]</nowiki>
+# Get all file uploads from all wikis. If multiple wikis have the same file name, randomly pick which one wins (easiest solution for now...there aren't many of these).
+
+== Improvements required for the script ==
+
+# The "MediaWiki" namespace should not be disambiguated. This is also true for the File namespace, I think.
+# Figure out how to handle redirects and disambiguations
+# Import watchlists, Wiretap, and WatchAnalytics data
+# Force creation of
+## Template:Disambig
+## Main Page
+
+== What we need to do ==
+
+# Standardize templates, properties, forms, categories, and MediaWiki namespace pages.
+# Standardize ApprovedRevs stuff
+
+== Example pages ==
+
+* [[SSRMS]] is a disambiguation for EVA and ROBO. However, the content page on EVA is ''Space Station Remote Manipulator System'' and on ROBO it's ''SSRMS''. This creates an odd disambiguation situation.

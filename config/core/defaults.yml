@@ -75,6 +75,21 @@ m_language: en
 
 allow_backup_downloads: false
 
+# Allow skipping certain wikis when doing backups
+# Example:
+# wikis_to_skip_overwrite
+#   - mywiki
+#   - yourwiki
+wikis_to_skip_overwrite: []
+
+# Allow redirecting wiki IDs to other wikis. This is useful if if wikis are renamed or merged.
+# Example:
+# wiki_id_redirects:
+#   eva: iss
+#   oso: iss
+#   robo: iss
+wiki_id_redirects: {}
+
 m_force_debug: false
 
 enable_wiki_emails: true
