@@ -262,6 +262,18 @@ $wgScriptPath = "/$wikiId";
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath
 $wgUploadPath = "$wgScriptPath/img_auth.php";
 
+// Extensions are stored in a non-standard location to avoid conflicts with
+// extensions provided as submodules. These extensions, even if not initiating
+// the submodules, have empty directories in extensions/. This initially showed
+// up as a conflict with Extension:ReplaceText, which was defined in Meza with
+// a different version to checkout from what was specified in MediaWiki's
+// .gitmodules file.
+//
+// https://www.mediawiki.org/wiki/Manual:$wgExtensionDirectory
+// https://www.mediawiki.org/wiki/Manual:$wgExtensionAssetsPath
+$wgExtensionDirectory = "$IP/{{ m_mediawiki_extensions_dir }}";
+$wgExtensionAssetsPath = "$wgScriptPath/{{ m_mediawiki_extensions_dir }}";
+
 // https://www.mediawiki.org/wiki/Manual:$wgUploadDirectory
 $wgUploadDirectory = "{{ m_uploads_dir }}/$wikiId";
 

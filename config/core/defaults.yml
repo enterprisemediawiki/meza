@@ -44,6 +44,7 @@ m_backups: /opt/data-meza/backups
 # webserver variables
 m_htdocs: /opt/htdocs
 m_mediawiki: /opt/htdocs/mediawiki
+m_mediawiki_extensions_dir: extensions/meza-extensions-dir
 m_cert_private: /etc/pki/tls/private/meza.key
 m_cert_public: /etc/pki/tls/certs/meza.crt
 m_ca_cert: /etc/pki/tls/certs/meza-ca.crt

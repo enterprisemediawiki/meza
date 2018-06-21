@@ -69,6 +69,7 @@
     state: directory
     recurse: yes
 
+
 #
 # SKINS
 #
@@ -87,6 +88,13 @@
 #
 # EXTENSIONS
 #
+- name: Ensure meza's extension directory exists
+  file:
+    path: "{{ m_mediawiki }}/{{ m_mediawiki_extensions_dir }}"
+    owner: meza-ansible
+    group: wheel
+    state: directory
+
 - name: Set variable holding list of core extensions
   include_vars:
     file: "{{ m_config_core }}/MezaCoreExtensions.yml"
@@ -99,7 +107,7 @@
   become_user: "meza-ansible"
   git:
     repo: "{{ item.repo }}"
-    dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
+    dest: "{{ m_mediawiki }}/{{ m_mediawiki_extensions_dir }}/{{ item.name }}"
     version: "{{ item.version }}"
     umask: "0002"
   with_items: "{{ meza_core_extensions.list }}"
@@ -403,7 +411,7 @@
 
 # FIXME: Does this need to be run on all wikis or just one.
 - name: Verify metastore index upgraded
-  shell: WIKI={{ list_of_wikis[0] }} php /opt/htdocs/mediawiki/extensions/CirrusSearch/maintenance/metastore.php --upgrade
+  shell: MW_INSTALL_PATH={{ m_mediawiki }} WIKI={{ list_of_wikis[0] }} php {{ m_mediawiki }}/{{ m_mediawiki_extensions_dir }}/CirrusSearch/maintenance/metastore.php --upgrade
   run_once: true
 
 - name: "(Re-)build SemanticMediaWiki data for: {{ wikis_to_rebuild_data | join(', ') }}"
