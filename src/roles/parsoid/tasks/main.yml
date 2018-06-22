@@ -24,6 +24,39 @@
     name: parsoid
     state: present
 
+- name: Get current parsoid user home dir
+  shell: "getent passwd parsoid | cut -d: -f6"
+  register: parsoid_current_home
+
+- debug: { var: parsoid_current_home }
+
+- name: Set parsoid home directory
+  set_fact:
+    # parsoid_home: '"%s/parsoid".format( m_home )'
+    parsoid_home: "{{ m_home }}/parsoid"
+
+- debug: { var: parsoid_home }
+
+- name: Set fact if parsoid home is correct
+  set_fact:
+    modify_parsoid_user: False
+  # when: parsoid_current_home.stdout == "{{ m_home }}/parsoid"
+  when: parsoid_current_home.stdout == parsoid_home
+
+- name: Set fact if parsoid home is not correct
+  set_fact:
+    modify_parsoid_user: True
+  # when: parsoid_current_home.stdout != "{{ m_home }}/parsoid"
+  when: parsoid_current_home.stdout != parsoid_home
+
+- debug: { var: modify_parsoid_user }
+
+- name: Stop parsoid service if home is not correct
+  service:
+    name: parsoid
+    state: stopped
+  when: modify_parsoid_user
+
 - name: Ensure parsoid user exists
   user:
     name: parsoid
