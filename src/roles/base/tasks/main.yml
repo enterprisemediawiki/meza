@@ -155,6 +155,7 @@
     owner: root
     group: root
     mode: "0644"
+  when: use_default_ssh_config
 
 - name: Ensure SSH client and SSH Daemon configs in place
   template:
@@ -163,6 +164,7 @@
     owner: root
     group: root
     mode: "0600"
+  when: use_default_ssh_config
   notify:
     - restart sshd
 

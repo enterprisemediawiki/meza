@@ -124,7 +124,7 @@ do_cleanup_sql_backup: False
 # sshd_config defaults
 sshd_config_UsePAM: "yes"
 sshd_config_PasswordAuthentication: "yes"
-
+use_default_ssh_config: True
 
 #
 # Software versions

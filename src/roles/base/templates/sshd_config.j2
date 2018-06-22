@@ -90,7 +90,7 @@ ChallengeResponseAuthentication no
 #KerberosUseKuserok yes
 
 # GSSAPI options
-GSSAPIAuthentication no
+GSSAPIAuthentication yes
 GSSAPICleanupCredentials no
 #GSSAPIStrictAcceptorCheck yes
 #GSSAPIKeyExchange no
@@ -153,9 +153,17 @@ Subsystem       sftp    /usr/libexec/openssh/sftp-server
 #       ForceCommand cvs server
 UseDNS no
 
+Protocol 2
+
+# Exit ssh session after 48 hours inactivity
+ClientAliveInterval 2880
+
+ClientAliveCountMax 0
+
+PermitEmptyPasswords no
 
 # Ciphers allowed in order of preference
-Ciphers aes256-ctr,aes192-ctr,aes128-ctr,aes256-cbc,aes192-cbc,aes128-cbc
+Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc
 
 # MAC algorithms in order of preference
 MACs hmac-sha2-256,hmac-sha2-512,hmac-sha1
