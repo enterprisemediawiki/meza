@@ -68,12 +68,23 @@
     path: /usr/local/lib/node
   when: "node_version.stdout != 'v8.11.1'"
 
-- name: Extract foo.tgz into /var/lib/foo
+- name: Extract node.tar.xz into /usr/local/lib/node
   unarchive:
     src: /tmp/node.tar.xz
     dest: /usr/local/lib/node
     extra_opts: [--strip-components=1]
+    owner: root
+    group: root
+    mode: 0755
   when: "node_version.stdout != 'v8.11.1'"
+
+- name: Ensure good ownership andmod of Node directory
+  file:
+    state: directory
+    path: /usr/local/lib/node
+    owner: root
+    group: root
+    mode: 0775
 
 - name: "Ensure symlink in place for node and npm"
   file:
