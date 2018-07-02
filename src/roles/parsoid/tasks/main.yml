@@ -68,7 +68,7 @@
 - name: Ensure Parsoid dependencies are latest
   become: yes
   become_user: parsoid
-  shell: "cd {{ m_parsoid_path }} && npm install"
+  shell: "cd {{ m_parsoid_path }} && /usr/bin/npm install"
   tags:
     - latest
     - parsoid-deps
