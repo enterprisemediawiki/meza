@@ -29,6 +29,13 @@
   notify:
   - restart apache
 
+- name: Ensure Apache environment variables set properly
+  template:
+    src: etc-sysconfig-httpd.j2
+    dest: /etc/sysconfig/httpd
+  notify:
+    - restart apache
+
 - name: Install PHP
   include: php.yml
   # http://docs.ansible.com/ansible/playbooks_roles.html#dynamic-versus-static-includes
