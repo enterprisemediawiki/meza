@@ -8,7 +8,7 @@ list:
 
 # 
 # If you'd like to use any of these skins it is recommended that these lines
-# be placed in /opt/conf-public/public/MezaLocalSkins.yml
+# be placed in /opt/conf-meza/public/MezaLocalSkins.yml
 #
 #- name: Modern
 #  repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Modern.git
