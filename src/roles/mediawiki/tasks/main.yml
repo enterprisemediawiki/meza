@@ -83,23 +83,22 @@
           ignoreSubmodules = all
 
 #
-# SKINS
+# EXTENSIONS AND SKINS
 #
-# FIXME #819: Add skins in Meza(Core|Local)Extensions.yml
-- name: Ensure Vector skin installed
-  become: yes
-  become_user: "meza-ansible"
-  git:
-    repo: https://gerrit.wikimedia.org/r/p/mediawiki/skins/Vector.git
-    dest: "{{ m_mediawiki }}/skins/Vector"
-    version: "{{ mediawiki_default_branch }}"
-    umask: "0002"
+- name: Set variable holding list of core skins
+  include_vars:
+    file: "{{ m_config_core }}/MezaCoreSkins.yml"
+    name: meza_core_skins
+  tags:
+    - skins
 
+- name: Set variable holding list of local skins
+  include_vars:
+    file: "{{ m_local_public }}/MezaLocalSkins.yml"
+    name: meza_local_skins
+  tags:
+    - skins
 
-
-#
-# EXTENSIONS
-#
 - name: Set variable holding list of core extensions
   include_vars:
     file: "{{ m_config_core }}/MezaCoreExtensions.yml"
@@ -129,6 +128,17 @@
   tags:
     - always
 
+- name: Ensure core meza skins installed (non-Composer)
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ m_mediawiki }}/skins/{{ item.name }}"
+    version: "{{ item.version }}"
+  with_items: "{{ meza_core_skins.list }}"
+  when: meza_core_skins.list[0] is defined and item.repo is defined
+  tags:
+    - skins
+    - core-skins
+
 - name: Ensure local meza extensions installed (non-Composer)
   become: yes
   become_user: "meza-ansible"
@@ -145,7 +155,19 @@
     - git-local-extensions
     - latest
 
+- name: Ensure local meza skins installed (non-Composer)
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ m_mediawiki }}/skins/{{ item.name }}"
+    version: "{{ item.version }}"
+  with_items: "{{ meza_local_skins.list }}"
+  when: meza_local_skins.list[0] is defined and item.repo is defined
+  tags:
+    - skins
+    - local-skins
+
 # File holding extension loading and config for core and local extensions
+# as well as core and local skins
 - name: Ensure Extensions.php in place
   template:
     src: Extensions.php.j2
@@ -153,8 +175,8 @@
     owner: meza-ansible
     group: wheel
 
-# Adds extensions with composer param from MezaCoreExtensions.yml and
-# MezaLocalExtensions.yml
+# Adds extensions with composer param from MezaCoreExtensions.yml,
+# MezaLocalExtensions.yml, MezaCoreSkins.yml, and MezaLocalSkins.yml
 - name: Ensure composer.local.json in place to load composer-based extensions
   template:
     src: composer.local.json.j2
@@ -174,6 +196,7 @@
   tags:
     - composer-extensions
     - latest
+    - skins
 
 # install doesn't appear to do extensions
 - name: Run composer update on MediaWiki for extensions
@@ -188,6 +211,7 @@
   tags:
     - composer-extensions
     - latest
+    - skins
 
 - name: Ensure Git submodule requirements met for core meza extensions
   become: yes
@@ -213,7 +237,29 @@
     - git-submodules
     - latest
 
+# Are there skins that have submodules?
+- name: Ensure Git submodule requirements met for core meza skins
+  shell: |
+    cd "{{ m_mediawiki }}/skins/{{ item.name }}"
+    git submodule update --init
+  with_items: "{{ meza_core_skins.list }}"
+  when: meza_core_skins.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
+  tags:
+    - git-submodules
+    - skins
+    - latest
 
+- name: Ensure Git submodule requirements met for local meza skins
+  shell: |
+    cd "{{ m_mediawiki }}/skins/{{ item.name }}"
+    git submodule update --init
+  with_items: "{{ meza_local_skins.list }}"
+  when: meza_local_skins.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
+  tags:
+    - git-submodules
+    - skins
+    - local-skins
+    - latest
 
 #
 # LocalSettings.php
