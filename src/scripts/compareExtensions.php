@@ -28,15 +28,17 @@ It also compares those 3rd-party "custom" extensions to whatever you've setup in
  (You would need to customize this script to use your own public config repo.)
 
 Supply the full URL to the external wiki API as the script argument. e.g.
-`php importExtensions.php https://freephile.org/w/api.php`
+`php compareExtensions.php https://freephile.org/w/api.php`
 to get a list of extensions which would need to be added locally.
 
 If the 3rd-party wiki API is access restricted, then execute a
 '?action=query&meta=siteinfo&siprop=extensions&format=json' API query in that
 environment and save the text output to a file with a .json extension.
 
-Then supply the path to that file as the argument to this function.
+Then supply the path to that file as the argument to the script.
 HERE;
+
+/////////////////////// Configuration ///////////////////////////////////////////////////////////////////
 
 $mezaCoreExtensionsFile = '/opt/meza/config/core/MezaCoreExtensions.yml';
 $mezaCoreExtensionsURL = 'https://raw.githubusercontent.com/freephile/meza/master/config/core/MezaCoreExtensions.yml';
