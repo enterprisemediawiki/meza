@@ -227,9 +227,9 @@ list:
     repo: https://github.com/enterprisemediawiki/Wiretap.git
     version: master
   - name: ApprovedRevs
-    repo: https://github.com/jamesmontalvo3/MediaWiki-ApprovedRevs.git
-    version: master
-    legacy_load: true
+    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ApprovedRevs.git
+    # Use this commit until a release tag for v1.0 is created
+    version: a5c1ab94b3864c1f526e1cdc1b5ba6cc7ae1b039
     config: |
       $egApprovedRevsAutomaticApprovals = false;
   - name: ImagesLoaded
