@@ -36,12 +36,6 @@ global
 	# SSLStaplingReturnResponderErrors off
 	# SSLStaplingCache        shmcb:/var/run/ocsp(128000)
 
-	# HSTS
-	# Ref: https://www.haproxy.com/blog/haproxy-and-http-strict-transport-security-hsts-header-in-http-redirects/
-	# Note: slight modification for HAProxy 1.6+
-	http-response set-header Strict-Transport-Security max-age=16000000;\ includeSubDomains;\ preload;
-
-
 defaults
 	log	global
 	mode	http
@@ -83,6 +77,11 @@ backend www-backend
 		{%- endif %}
 
 	{% endfor %}
+
+	# HSTS
+	# Ref: https://www.haproxy.com/blog/haproxy-and-http-strict-transport-security-hsts-header-in-http-redirects/
+	# Note: slight modification for HAProxy 1.6+
+	http-response set-header Strict-Transport-Security max-age=16000000;\ includeSubDomains;\ preload;
 
 {% if m_setup_php_profiling %}
 listen php-profiling
