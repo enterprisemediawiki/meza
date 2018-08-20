@@ -486,3 +486,23 @@
   tags:
   - update.php
   when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+
+# Extension:SyntaxHighlight requires Python 3.x present in path as `python3` for
+# MediaWiki 1.31+.
+- name: Ensure Python3 present
+  yum:
+    name: python35u
+    state: latest
+  tags:
+  - latest
+
+- name: "Ensure python3 symlink in place"
+  file:
+    # dest = symlink, src = dir linked to
+    src: "/usr/bin/python3.5"
+    dest: "/usr/bin/python3"
+    state: link
+    owner: root
+    group: root
+    mode: 0755
