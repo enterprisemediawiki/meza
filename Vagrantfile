@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 require 'yaml'
+require 'fileutils'
 
 if not File.file?("#{File.dirname(__FILE__)}/.vagrant/id_rsa")
   system("
@@ -146,6 +147,17 @@ Vagrant.configure("2") do |config|
     # Disable default synced folder at /vagrant, instead put at /opt/meza
     app1.vm.synced_folder ".", "/vagrant", disabled: true
     app1.vm.synced_folder ".", "/opt/meza", type: "virtualbox", owner: "vagrant", group: "vagrant", mount_options: ["dmode=755,fmode=755"]
+
+    FileUtils.mkdir_p './opt/conf-meza'
+    FileUtils.mkdir_p './opt/data-meza'
+    FileUtils.mkdir_p './opt/.deploy-meza'
+    FileUtils.mkdir_p './opt/htdocs'
+
+    # Create synced folders for other important things in /opt
+    app1.vm.synced_folder "./opt/conf-meza", "/opt/conf-meza", type: "virtualbox", owner: "root", group: "root", mount_options: ["dmode=777,fmode=777"]
+    app1.vm.synced_folder "./opt/data-meza", "/opt/data-meza", type: "virtualbox", mount_options: ["dmode=777,fmode=777"]
+    app1.vm.synced_folder "./opt/.deploy-meza", "/opt/.deploy-meza", type: "virtualbox", owner: "root", group: "root", mount_options: ["dmode=777,fmode=777"]
+    app1.vm.synced_folder "./opt/htdocs", "/opt/htdocs", type: "virtualbox", mount_options: ["dmode=777,fmode=777"]
 
     # app1.vm.synced_folder ".", "/opt/meza", type: "smb"
     # app1.vm.synced_folder ".", "/opt/meza", type: "rsync",

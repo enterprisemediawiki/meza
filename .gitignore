@@ -2,3 +2,6 @@
 
 .vagrant/*
 vagrantconf.yml
+
+# local directories that could be synced to /opt/meza on a Vagrant machine
+opt/
