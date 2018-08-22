@@ -154,10 +154,10 @@ Vagrant.configure("2") do |config|
     FileUtils.mkdir_p './opt/htdocs'
 
     # Create synced folders for other important things in /opt
-    app1.vm.synced_folder "./opt/conf-meza", "/opt/conf-meza", type: "virtualbox", owner: "root", group: "root", mount_options: ["dmode=777,fmode=644"]
-    app1.vm.synced_folder "./opt/data-meza", "/opt/data-meza", type: "virtualbox", mount_options: ["dmode=777,fmode=644"]
-    app1.vm.synced_folder "./opt/.deploy-meza", "/opt/.deploy-meza", type: "virtualbox", owner: "root", group: "root", mount_options: ["dmode=777,fmode=644"]
-    app1.vm.synced_folder "./opt/htdocs", "/opt/htdocs", type: "virtualbox", mount_options: ["dmode=777,fmode=644"]
+    app1.vm.synced_folder "./opt/conf-meza", "/opt/conf-meza", type: "smb"
+    app1.vm.synced_folder "./opt/data-meza", "/opt/data-meza", type: "smb"
+    app1.vm.synced_folder "./opt/.deploy-meza", "/opt/.deploy-meza", type: "smb"
+    app1.vm.synced_folder "./opt/htdocs", "/opt/htdocs", type: "smb"
 
     # app1.vm.synced_folder ".", "/opt/meza", type: "smb"
     # app1.vm.synced_folder ".", "/opt/meza", type: "rsync",
