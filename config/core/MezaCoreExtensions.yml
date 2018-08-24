@@ -229,7 +229,7 @@ list:
   - name: ApprovedRevs
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ApprovedRevs.git
     # Use this commit until a release tag for v1.0 is created
-    version: a5c1ab94b3864c1f526e1cdc1b5ba6cc7ae1b039
+    version: 251cf4db3ab99366fa281ea535e725672fa2b6c3
     config: |
       $egApprovedRevsAutomaticApprovals = false;
   - name: ImagesLoaded
