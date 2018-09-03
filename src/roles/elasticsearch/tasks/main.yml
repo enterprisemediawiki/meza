@@ -65,6 +65,7 @@
   with_items:
     - "{{ m_meza_data }}/elasticsearch/data"
     - "{{ m_meza_data }}/elasticsearch/scripts"
+    - "{{ m_meza_data }}/elasticsearch/log"
 
 
 # CONFIGURE AND START ELASTICSEARCH
