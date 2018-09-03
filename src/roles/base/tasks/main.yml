@@ -56,6 +56,11 @@
 
 - name: upgrade all packages
   yum: name=* state=latest
+  environment:
+    # If `install_ms_sql_driver: True` is set in config, MS SQL drivers will be
+    # installed. When these drivers are updated they require accepting end user
+    # license agreements.
+    ACCEPT_EULA: 'y'
   tags:
   - latest
 
@@ -155,6 +160,7 @@
     owner: root
     group: root
     mode: "0644"
+  when: use_default_ssh_config
 
 - name: Ensure SSH client and SSH Daemon configs in place
   template:
@@ -163,6 +169,7 @@
     owner: root
     group: root
     mode: "0600"
+  when: use_default_ssh_config
   notify:
     - restart sshd
 

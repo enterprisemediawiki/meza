@@ -60,14 +60,20 @@ topheader=${topheader#top - }
 # uptime
 # TO-DO: Not sure how best to track uptime (consolidate into minutes?)
 
+# number of CPUs
+cpus=$(nproc)
+
 # 1-minute load average
 loadavgall3=${topheader#*average: }
 loadavg1=${loadavgall3%,*,*}
+loadavg1=$(awk -v loadavg1=$loadavg1 -v cpus=$cpus 'BEGIN { print ( loadavg1 / cpus ) }')
 # 5-minute load average
 loadavg5=${loadavgall3#*, }
 loadavg5=${loadavg5%,*}
+loadavg5=$(awk -v loadavg5=$loadavg5 -v cpus=$cpus 'BEGIN { print ( loadavg5 / cpus ) }')
 # 15-minute load average
 loadavg15=${loadavgall3#*,*, }
+loadavg15=$(awk -v loadavg15=$loadavg15 -v cpus=$cpus 'BEGIN { print ( loadavg15 / cpus ) }')
 
 topmemory=$(echo "$topdata" | grep "KiB Mem")
 # KiB Mem : 16269056 total,   275304 free,  2177008 used, 13816744 buff/cache

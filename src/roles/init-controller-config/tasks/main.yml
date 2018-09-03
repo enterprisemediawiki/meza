@@ -102,4 +102,5 @@
   run_once: true
   with_items:
     - MezaLocalExtensions.yml
+    - MezaLocalSkins.yml
     - public.yml

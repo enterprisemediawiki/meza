@@ -214,11 +214,9 @@ list:
   - name: BatchUserRights
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/BatchUserRights.git
     version: "{{ mediawiki_default_branch }}"
-    legacy_load: true
   - name: HeaderTabs
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/HeaderTabs.git
-    version: tags/1.1
-    legacy_load: true
+    version: tags/1.2
     config: |
       $wgHeaderTabsEditTabLink = false;
       $wgHeaderTabsRenderSingleTab = true;
@@ -243,13 +241,11 @@ list:
   - name: WatchAnalytics
     repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
     version: master
-    legacy_load: true
     config: |
       $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
   - name: Variables
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Variables.git
     version: "{{ mediawiki_default_branch }}"
-    legacy_load: true
   - name: ContributionScores
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ContributionScores.git
     version: "{{ mediawiki_default_branch }}"
@@ -290,13 +286,11 @@ list:
   - name: Echo
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Echo.git
     version: "{{ mediawiki_default_branch }}"
-    legacy_load: true
     config: |
       $wgEchoEmailFooterAddress = $wgPasswordSender;
   - name: UploadWizard
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/UploadWizard
     version: "{{ mediawiki_default_branch }}"
-    legacy_load: true
     config: |
       // Needed to make UploadWizard work in IE, see bug 39877
       // See also: https://www.mediawiki.org/wiki/Manual:$wgApiFrameOptions
@@ -344,9 +338,7 @@ list:
 
   - name: DataTransfer
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DataTransfer.git
-    version: tags/0.6.2
-    legacy_load: true
-
+    version: tags/1.0
   - name: PageImporter
     repo: https://github.com/enterprisemediawiki/PageImporter.git
     version: master

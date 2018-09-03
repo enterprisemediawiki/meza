@@ -1,0 +1,39 @@
+#
+# This file can be used to set additional environment variables for
+# the httpd process, or pass additional options to the httpd
+# executable.
+#
+# Note: With previous versions of httpd, the MPM could be changed by
+# editing an "HTTPD" variable here.  With the current version, that
+# variable is now ignored.  The MPM is a loadable module, and the
+# choice of MPM can be changed by editing the configuration file
+# /etc/httpd/conf.modules.d/00-mpm.conf.
+#
+
+#
+# To pass additional options (for instance, -D definitions) to the
+# httpd binary at startup, set OPTIONS here.
+#
+#OPTIONS=
+
+#
+# This setting ensures the httpd process is started in the "C" locale
+# by default.  (Some modules will not behave correctly if
+# case-sensitive string comparisons are performed in a different
+# locale.)
+#
+LANG=C
+
+
+#
+# This is required by Meza when using MSSQL Server Drivers [1] and if using
+# autofs to mount /home directories. The UnixODBC driver otherwise looks for the
+# file /home/.odbcinst.ini, and autofs will try to mount that file and creates a
+# long lag that can cause `systemctl start httpd` to timeout. Ref [2]. This
+# likely becomes obsolete when #750 [3] is closed
+#
+# [1] https://github.com/Microsoft/msphpsql
+# [2] https://github.com/Microsoft/msphpsql/issues/805
+# [3] https://github.com/enterprisemediawiki/meza/issues/750
+#
+HOME=/usr/share/httpd

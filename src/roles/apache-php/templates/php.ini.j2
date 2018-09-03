@@ -896,11 +896,14 @@ default_socket_timeout = 60
 ;extension=php_xsl.dll
 
 {% if m_setup_php_profiling %}
+; Profiling enabled using m_setup_php_profiling, but profiling has been disabled
+; in Meza 30.x and greater until a new profiler is identified.
+
 ; Enable profiling capabilities for PHP
-extension=xhprof.so
+; extension=xhprof.so
 
 ; Enable MongoDB to use XHGUI for XHProf
-extension=mongo.so
+; extension=mongo.so
 {% endif %}
 
 ;;;;;;;;;;;;;;;;;;;
