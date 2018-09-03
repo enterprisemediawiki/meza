@@ -145,7 +145,7 @@ path.conf: /etc/elasticsearch
 
 # Path to directory where to store index data allocated for this node.
 #
-path.data: /opt/data-meza/elasticsearch/data
+path.data: {{ m_meza_data }}/elasticsearch/data
 #
 # Can optionally include more than one location, causing data to be striped across
 # the locations (a la RAID 0) on a file level, favouring locations with most free
@@ -156,19 +156,19 @@ path.data: /opt/data-meza/elasticsearch/data
 # Path to temporary files:
 #
 # Appears to have been removed in Elasticsearch 0.90
-# path.work: /opt/data-meza/elasticsearch/work
+# path.work: {{ m_meza_data }}/elasticsearch/work
 
 # Added 5.x: Required for script.inline and/or script.stored (formerly script.indexed)
-path.scripts: /opt/data-meza/elasticsearch/scripts
+path.scripts: {{ m_meza_data }}/elasticsearch/scripts
 
 # Path to log files:
 #
-path.logs: /var/log/elasticsearch
+path.logs: {{ m_meza_data }}/elasticsearch/log
 
 # Path to where plugins are installed:
 #
 # Removed in Elasticsearch 2.x or 5.x
-# path.plugins: /opt/data-meza/elasticsearch/plugins
+# path.plugins: {{ m_meza_data }}/elasticsearch/plugins
 
 
 #################################### Plugin ###################################
