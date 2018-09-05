@@ -349,7 +349,7 @@ list:
     legacy_load: True
   - name: HeaderFooter
     repo: https://github.com/enterprisemediawiki/HeaderFooter.git
-    version: master
+    version: tags/2.2.1
     legacy_load: True
   - name: NumerAlpha
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/NumerAlpha.git
