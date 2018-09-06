@@ -144,7 +144,11 @@ list:
     config: |
       // Parsoid servers are defined based upon Ansible hosts file and thus
       // cannot be easily added to base-extensions.yml. As such, VisualEditor config
-      // is included directly in LocalSettings.php.j2
+      // is included directly in LocalSettings.php.j2 (mostly)
+
+      // Show visual diff on regular diff pages
+      $wgVisualEditorEnableDiffPage = true;
+
   - name: Elastica
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Elastica.git
     version: "{{ mediawiki_default_branch }}"
