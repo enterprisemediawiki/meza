@@ -52,7 +52,9 @@ list:
     version: "1.5.0"
   - name: Maps
     composer: "mediawiki/maps"
-    version: "5.0.2"
+    version: "6.0.1"
+    config: |
+      wfLoadExtension( 'Maps' );
 
   - name: DisplayTitle
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DisplayTitle.git
