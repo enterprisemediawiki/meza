@@ -147,6 +147,7 @@ list:
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git
     version: "{{ mediawiki_default_branch }}"
     git_submodules: True
+    discard_changes: Yes
     config: |
       // Parsoid servers are defined based upon Ansible hosts file and thus
       // cannot be easily added to base-extensions.yml. As such, VisualEditor config

@@ -341,6 +341,18 @@
     - parsoid
     - parsoid-settings
 
+# Rebaser needs to come after parsoid because Node/NPM need to exist. For now,
+# this only works when there's just one app-server and it's also the only Parsoid
+# server. DB, memcached, etc could be distributed elsewhere.
+- hosts: app-servers
+  become: yes
+  tags:
+    - rebaser
+  roles:
+    - set-vars
+    - role: rebaser
+      when: enable_ve_collab_pad is defined and enable_ve_collab_pad
+
 - hosts: logging-servers
   become: yes
   tags: logging

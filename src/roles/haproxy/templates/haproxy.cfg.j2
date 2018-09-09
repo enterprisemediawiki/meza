@@ -67,6 +67,21 @@ frontend www-https
 	# use_backend letsencrypt-backend if letsencrypt-acl
 	default_backend www-backend
 
+{% if enable_ve_collab_pad is defined and enable_ve_collab_pad %}
+frontend rebaser-https
+	bind *:8083 ssl crt /etc/haproxy/certs/meza.pem
+	reqadd X-Forwarded-Proto:\ https
+	default_backend rebaser-backend
+
+backend rebaser-backend
+    server apache1 127.0.0.1:8082 check
+
+	# HSTS
+	# Ref: https://www.haproxy.com/blog/haproxy-and-http-strict-transport-security-hsts-header-in-http-redirects/
+	# Note: slight modification for HAProxy 1.6+
+	http-response set-header Strict-Transport-Security max-age=16000000;\ includeSubDomains;\ preload;
+{% endif %}
+
 backend www-backend
 	redirect scheme https if !{ ssl_fc }
 	{% for host in groups['app-servers'] -%}

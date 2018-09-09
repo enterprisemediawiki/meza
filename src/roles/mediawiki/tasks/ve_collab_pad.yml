@@ -1,0 +1,133 @@
+---
+
+- name: Install build tools
+  yum:
+    name: "@Development tools"
+    state: present
+  become: yes
+
+- name: Ensure VE/lib/ve npm-installed
+  become: yes
+  become_user: meza-ansible
+  shell: "cd {{ m_mediawiki }}/extensions/VisualEditor/lib/ve && npm install"
+  tags:
+    - latest
+
+- name: Ensure VE rebaser installed
+  become: yes
+  become_user: meza-ansible
+  shell: "cd {{ m_mediawiki }}/extensions/VisualEditor/lib/ve/rebaser && npm install"
+  tags:
+    - latest
+
+- name: Copy rebaser server.js
+  copy:
+    src: "{{ m_mediawiki }}/extensions/VisualEditor/lib/ve/rebaser/server.js"
+    dest: "{{ m_mediawiki }}/extensions/VisualEditor/lib/ve/rebaser/server8082.js"
+    owner: meza-ansible
+    group: wheel
+    mode: 0644
+
+- name: Modify rebaser server.js, port 8011-->8082
+  shell: "sed -i -e 's/8081/8082/g' {{ m_mediawiki }}/extensions/VisualEditor/lib/ve/rebaser/server8082.js"
+  become: yes
+  become_user: meza-ansible
+
+- name: Ensure /etc/init.d/rebaser configured
+  template:
+    src: rebaser.initd.sh.j2
+    dest: /etc/init.d/rebaser
+    mode: 0755
+  notify:
+    - reload systemd
+    - restart rebaser
+
+- name: Enable rebaser service
+  service:
+    name: rebaser
+    state: started
+    enabled: yes
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- name: Ensure port 8083 open
+  firewalld:
+    zone: public
+    port: 8083/tcp
+    permanent: true
+    state: enabled
+
+
+# CollabPad
+# =========
+
+
+# make: g++: Command not found
+# make: *** [Release/obj.target/magic/src/binding.o] Error 127
+# make: Leaving directory `/opt/htdocs/mediawiki/extensions/VisualEditor/lib/ve/node_modules/mmmagic/build'
+# gyp ERR! build error
+# gyp ERR! stack Error: `make` failed with exit code: 2
+# gyp ERR! stack     at ChildProcess.onExit (/usr/local/lib/node/lib/node_modules/npm/node_modules/node-gyp/lib/build.js:258:23)
+# gyp ERR! stack     at emitTwo (events.js:126:13)
+# gyp ERR! stack     at ChildProcess.emit (events.js:214:7)
+# gyp ERR! stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:198:12)
+# gyp ERR! System Linux 3.10.0-693.21.1.el7.x86_64
+# gyp ERR! command "/usr/local/lib/node/bin/node" "/usr/local/lib/node/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js" "rebuild"
+# gyp ERR! cwd /opt/htdocs/mediawiki/extensions/VisualEditor/lib/ve/node_modules/mmmagic
+# gyp ERR! node -v v8.11.1
+# gyp ERR! node-gyp -v v3.6.2
+# gyp ERR! not ok
+
+# NEEDED:
+
+# sudo yum groupinstall "Development Tools"
+
+# Still getting:
+
+# npm WARN optional SKIPPING OPTIONAL DEPENDENCY: fsevents@1.2.4 (node_modules/fsevents):
+# npm WARN notsup SKIPPING OPTIONAL DEPENDENCY: Unsupported platform for fsevents@1.2.4: wanted {"os":"darwin","arch":"any"} (current: {"os":"linux","arch":"x64"})
+
+
+
+# sudo su meza-ansible
+
+# IP=/opt/htdocs/mediawiki
+
+
+# cd "$IP/extensions/VisualEditor/lib/ve"
+# npm install
+
+# npm install -g grunt
+# npm install -g grunt-cli
+
+
+# # This really necessary? Looks like it's done in `npm install`
+# grunt build
+
+
+# cd rebaser
+# npm install
+
+#   npm WARN notice [SECURITY] debug has the following vulnerability: 1 low. Go here for more details: https://nodesecurity.io/advisories?search=debug&version=2.3.3 - Run `npm i npm@latest -g` to upgrade your npm version, and then `npm audit` to get more info.
+#   npm WARN notice [SECURITY] debug has the following vulnerability: 1 low. Go here for more details: https://nodesecurity.io/advisories?search=debug&version=2.3.3 - Run `npm i npm@latest -g` to upgrade your npm version, and then `npm audit` to get more info.
+#   npm WARN notice [SECURITY] parsejson has the following vulnerability: 1 high. Go here for more details: https://nodesecurity.io/advisories?search=parsejson&version=0.0.3 - Run `npm i npm@latest -g` to upgrade your npm version, and then `npm audit` to get more info.
+#   npm notice created a lockfile as package-lock.json. You should commit this file.
+#   npm WARN ve-rebaser@0.0.1 No license field.
+
+# vim server.js --> port to 8082
+# npm start
+
+
+# # for testing: open port 8082
+# // sudo firewall-cmd --zone=public --add-port=8082/tcp
+
+
+
+# Add to localsettings:
+# $wgVisualEditorRebaserURL = 'http://localhost:8082';
+
+
+
+# TO DO
+# =====
+
+# * Make init script

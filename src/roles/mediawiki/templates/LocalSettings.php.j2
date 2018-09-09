@@ -869,13 +869,13 @@ $wgVirtualRestConfig['modules']['parsoid'] = array(
 // Define which namespaces will use VE
 // Per the docs, https://www.mediawiki.org/wiki/Extension:VisualEditor#Changing_active_namespaces
 // This is done a little differently in VE than in core or other extensions.
-// For VE, we use an array, keyed by the (string) canonical name of the namespace 
+// For VE, we use an array, keyed by the (string) canonical name of the namespace
 // and a (boolean) value for enabled or not
 
 // $wgContentNamespaces gets added automatically.
 
-// finally, it should be mentioned that the Extension Registry is what provides for the 
-// merge strategy 
+// finally, it should be mentioned that the Extension Registry is what provides for the
+// merge strategy
 
 $wgVisualEditorAvailableNamespaces = [
     "User" => true,
@@ -885,9 +885,12 @@ $wgVisualEditorAvailableNamespaces = [
 ];
 
 // quickly add a namespace, without figuring out what the merge strategy is
-// $wgVisualEditorAvailableNamespaces[] = NS_CUSTOM; 
-// $wgVisualEditorAvailableNamespaces[] = NS_PROJECT; 
+// $wgVisualEditorAvailableNamespaces[] = NS_CUSTOM;
+// $wgVisualEditorAvailableNamespaces[] = NS_PROJECT;
 
+{% if enable_ve_collab_pad is defined and enable_ve_collab_pad %}
+$wgVisualEditorRebaserURL = 'https://{{ wiki_app_fqdn }}:8083';
+{% endif %}
 
 
 /**

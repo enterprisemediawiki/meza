@@ -222,6 +222,9 @@ EOL
       # Make the vagrant environment configured for development
       echo 'm_use_production_settings: False' >> /opt/conf-meza/public/public.yml
 
+      # Add Special:CollabPad
+      echo 'enable_ve_collab_pad: True' >> /opt/conf-meza/public/public.yml
+
       cat /opt/conf-meza/public/public.yml
     SHELL
 
