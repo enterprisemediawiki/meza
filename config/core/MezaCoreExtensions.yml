@@ -149,6 +149,9 @@ list:
       // Show visual diff on regular diff pages
       $wgVisualEditorEnableDiffPage = true;
 
+  - name: TemplateData
+    repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/TemplateData.git
+    version: "{{ mediawiki_default_branch }}"
   - name: Elastica
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Elastica.git
     version: "{{ mediawiki_default_branch }}"
