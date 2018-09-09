@@ -114,6 +114,7 @@
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
     version: "{{ item.version }}"
     umask: "0002"
+    force: "{{ item.discard_changes | default(False) }}"
   with_items: "{{ meza_core_extensions.list }}"
   when: meza_core_extensions.list[0] is defined and item.repo is defined
   tags:
@@ -506,3 +507,7 @@
     owner: root
     group: root
     mode: 0755
+
+- name: Setup Visual Editor CollabPad
+  include: ve_collab_pad.yml
+  when: enable_ve_collab_pad is defined and enable_ve_collab_pad

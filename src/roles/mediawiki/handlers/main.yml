@@ -1,0 +1,11 @@
+---
+# handlers file for rebaser
+- name: reload systemd
+  command: systemctl daemon-reload
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- name: restart rebaser
+  service:
+    name: rebaser
+    state: restarted
+  when: docker_skip_tasks is not defined or not docker_skip_tasks

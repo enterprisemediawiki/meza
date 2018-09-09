@@ -876,8 +876,9 @@ $wgVisualEditorNamespaces = array_merge(
 	)
 );
 
-
-
+{% if enable_ve_collab_pad is defined and enable_ve_collab_pad %}
+$wgVisualEditorRebaserURL = 'http://localhost:8083';
+{% endif %}
 
 
 /**
