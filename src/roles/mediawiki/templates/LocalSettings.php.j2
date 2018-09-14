@@ -867,16 +867,26 @@ $wgVirtualRestConfig['modules']['parsoid'] = array(
 );
 
 // Define which namespaces will use VE
-$wgVisualEditorNamespaces = array_merge(
-	$wgContentNamespaces,
-	array(
-		NS_USER,
-		NS_HELP,
-		NS_PROJECT
-	)
-);
+// Per the docs, https://www.mediawiki.org/wiki/Extension:VisualEditor#Changing_active_namespaces
+// This is done a little differently in VE than in core or other extensions.
+// For VE, we use an array, keyed by the (string) canonical name of the namespace 
+// and a (boolean) value for enabled or not
 
+// $wgContentNamespaces gets added automatically.
 
+// finally, it should be mentioned that the Extension Registry is what provides for the 
+// merge strategy 
+
+$wgVisualEditorAvailableNamespaces = [
+    "User" => true,
+    "Project" => true,
+    "Help" => true,
+    "_merge_strategy" => "array_plus"
+];
+
+// quickly add a namespace, without figuring out what the merge strategy is
+// $wgVisualEditorAvailableNamespaces[] = NS_CUSTOM; 
+// $wgVisualEditorAvailableNamespaces[] = NS_PROJECT; 
 
 
 
