@@ -60,6 +60,15 @@
   ignore_errors: True
   tags:
     - mediawiki-core
+- name: Ensure MediaWiki core owned by meza-ansible
+  file:
+    path: "{{ m_mediawiki }}"
+    owner: meza-ansible
+    group: wheel
+    state: directory
+    recurse: yes
+  tags:
+    - mediawiki-core
 - name: Ensure proper MediaWiki git version installed
   become: yes
   become_user: "meza-ansible"
@@ -72,15 +81,6 @@
     umask: "0002"
   tags:
     - latest
-    - mediawiki-core
-- name: Ensure MediaWiki core owned by meza-ansible
-  file:
-    path: "{{ m_mediawiki }}"
-    owner: meza-ansible
-    group: wheel
-    state: directory
-    recurse: yes
-  tags:
     - mediawiki-core
 - name: Ensure MediaWiki core ignores submodules
   blockinfile:
