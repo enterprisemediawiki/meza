@@ -5,6 +5,11 @@
 m_install: /opt
 m_meza: /opt/meza
 
+# meza mode (development or production)
+# production being as performant and secure as possible
+# development being less secure and providing optional features useful for dev
+m_mode: production
+
 # config dir
 m_config_core: /opt/meza/config/core
 m_local_secret: /opt/conf-meza/secret
