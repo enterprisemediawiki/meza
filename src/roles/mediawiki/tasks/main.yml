@@ -58,7 +58,20 @@
       [diff]
           ignoreSubmodules = all
   ignore_errors: True
+  tags:
+    - mediawiki-core
+- name: Ensure MediaWiki core owned by meza-ansible
+  file:
+    path: "{{ m_mediawiki }}"
+    owner: meza-ansible
+    group: wheel
+    state: directory
+    recurse: yes
+  tags:
+    - mediawiki-core
 - name: Ensure proper MediaWiki git version installed
+  become: yes
+  become_user: "meza-ansible"
   git:
     repo: https://gerrit.wikimedia.org/r/p/mediawiki/core.git
     dest: "{{ m_mediawiki }}"
@@ -68,19 +81,15 @@
     umask: "0002"
   tags:
     - latest
-- name: Ensure MediaWiki core owned by meza-ansible
-  file:
-    path: "{{ m_mediawiki }}"
-    owner: meza-ansible
-    group: wheel
-    state: directory
-    recurse: yes
+    - mediawiki-core
 - name: Ensure MediaWiki core ignores submodules
   blockinfile:
     path: "{{ m_mediawiki }}/.git/config"
     block: |
       [diff]
           ignoreSubmodules = all
+  tags:
+    - mediawiki-core
 
 #
 # EXTENSIONS AND SKINS

@@ -271,3 +271,11 @@
 - name: Update CA trust if certs changed
   shell: update-ca-trust
   when: new_custom_pem_ca_certs.changed or new_custom_extended_ca_certs.changed
+
+- name: Ensure meza-ansible has .gitconfig
+  template:
+    src: "gitconfig.j2"
+    dest: "{{ m_home }}/meza-ansible/.gitconfig"
+    owner: "meza-ansible"
+    group: "wheel"
+    mode: 0644
