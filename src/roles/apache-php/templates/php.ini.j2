@@ -1855,14 +1855,14 @@ opcache.enable=1
 opcache.enable_cli=1
 
 ; The OPcache shared memory storage size
-opcache.memory_consumption=256
+opcache.memory_consumption={{ php_opcache_memory_consumption }}
 
 ; The amount of memory for interned strings in Mbytes
-opcache.interned_strings_buffer=16
+opcache.interned_strings_buffer={{ php_opcache_interned_strings_buffer }}
 
 ; The maximum number of keys (scripts) in the OPcache hash table
 ; Only numbers between 200 and 100000 are allowed
-opcache.max_accelerated_files=7963
+opcache.max_accelerated_files={{ php_opcache_max_accelerated_files }}
 
 ; The maximum percentage of "wasted" memory until a restart is scheduled
 ;opcache.max_wasted_percentage=5
@@ -1875,7 +1875,7 @@ opcache.max_accelerated_files=7963
 
 ; When disabled, you must reset the OPcache manually or restart the
 ; webserver for changes to the filesystem to take effect
-; In other words, 
+; In other words,
 ; IF YOU EDIT LIVE ON PRODUCTION, APACHE WON'T EVEN SEE YOUR CHANGES
 ; unless you restart the webserver. Rogue admins foiled! Do it right!
 {% if m_mode == "production" %}
@@ -1887,7 +1887,7 @@ opcache.validate_timestamps=1
 ; How often (in seconds) to check file timestamps for changes to the shared
 ; memory storage allocation. ("1" means validate once per second, but only
 ; once per request. "0" means always validate)
-opcache.revalidate_freq=0
+opcache.revalidate_freq={{ php_opcache_revalidate_freq }}
 
 ; Enables or disables file search in include_path optimization
 ;opcache.revalidate_path=0
