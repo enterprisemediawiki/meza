@@ -1878,7 +1878,7 @@ opcache.max_accelerated_files={{ php_opcache_max_accelerated_files }}
 ; In other words,
 ; IF YOU EDIT LIVE ON PRODUCTION, APACHE WON'T EVEN SEE YOUR CHANGES
 ; unless you restart the webserver. Rogue admins foiled! Do it right!
-{% if m_mode == "production" %}
+{% if m_environment_type == "production" %}
 opcache.validate_timestamps=0
 {% else %}
 opcache.validate_timestamps=1
@@ -1943,7 +1943,7 @@ opcache.error_log=/opt/data-meza/logs/opcache_error.log
 ; By default, only fatal errors (level 0) or errors (level 1) are logged.
 ; You can also enable warnings (level 2), info messages (level 3) or
 ; debug messages (level 4).
-{% if m_mode == "production" %}
+{% if m_environment_type == "production" %}
 opcache.log_verbosity_level=1
 {% else %}
 opcache.log_verbosity_level=2
