@@ -19,19 +19,20 @@ function nameFirst( $a, $b ) {
 }
 
 $HELP = <<<HERE
-This script helps you identify different extensions used in a 3rd-party wiki compared to Meza.
+This script helps you identify different extensions used in a 3rd-party wiki compared to Meza. It does not deploy Meza. It is only an informational tool.
 
-It also compares those 3rd-party "custom" extensions to whatever you've setup in
-/opt/conf-meza/public/MezaLocalExtensions.yml as your improved distribution of Meza.
- Note that if MezaLocalExtensions.yml is not found, this script will use the QualityBox
- setup found at https://github.com/freephile/meza-conf-public/blob/master/MezaLocalExtensions.yml
- (You would need to customize this script to use your own public config repo.)
+It actually does a three-way comparison between those 3rd-party "custom" extensions to whatever you've setup in
+/opt/conf-meza/public/MezaLocalExtensions.yml as your "improved" Meza.  The intention is to ensure that at the end of the day, your MezaLocalExtensions file will accurately include any and all extensions which are found on the 3rd-party wiki, but not found in Meza core.
 
-Supply the full URL to the external wiki API as the script argument. e.g.
+ Note that if MezaLocalExtensions.yml is not yet setup, this script will use the example
+ provided at config/core/MezaLocalExtensions.example.yml
+ (which serves as an example for what your local Extensions specification could look like.)
+
+Supply the full URL to the public wiki API as the script argument. e.g.
 `php compareExtensions.php https://freephile.org/w/api.php`
 to get a list of extensions which would need to be added locally.
 
-If the 3rd-party wiki API is access restricted, then execute a
+Sometimes, 3rd party wikis are not publicly accessible. In that case, this script can use a .json file to represent the external wiki. If the 3rd-party wiki API is access restricted, then execute a
 '?action=query&meta=siteinfo&siprop=extensions&format=json' API query in that
 environment and save the text output to a file with a .json extension.
 
@@ -43,9 +44,9 @@ HERE;
 $mezaCoreExtensionsFile = '/opt/meza/config/core/MezaCoreExtensions.yml';
 $mezaCoreExtensionsURL = 'https://raw.githubusercontent.com/freephile/meza/master/config/core/MezaCoreExtensions.yml';
 $localExtensionsFile = '/opt/conf-meza/public/MezaLocalExtensions.yml';
-$localExtensionsURL = 'https://raw.githubusercontent.com/freephile/meza-conf-public/master/MezaLocalExtensions.yml';
+
 $coreYml = ( file_exists( $mezaCoreExtensionsFile ) ) ? file_get_contents($mezaCoreExtensionsFile) : file_get_contents($mezaCoreExtensionsURL) ;
-$localYml = ( file_exists( $localExtensionsFile ) ) ? file_get_contents($localExtensionsFile) : file_get_contents($localExtensionsURL) ;
+$localYml = ( file_exists( $localExtensionsFile ) ) ? file_get_contents($localExtensionsFile) : file_get_contents('/opt/meza/config/core/MezaLocalExtensions.example.yml') ;
 
 # normalize names by removing any spaces
 # grep -Po 'name\: (.*)'  /opt/meza/config/core/MezaCoreExtensions.yml | sort | awk --field-separator=: '{print $2}' | sed s'/[ \t]*//g';
