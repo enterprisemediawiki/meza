@@ -219,6 +219,9 @@ sshd_config_PasswordAuthentication: "yes"
 EOL
       fi
 
+      # Make the vagrant environment configured for development
+      echo 'm_use_production_settings: False' >> /opt/conf-meza/public/public.yml
+
       cat /opt/conf-meza/public/public.yml
     SHELL
 

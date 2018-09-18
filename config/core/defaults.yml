@@ -5,6 +5,11 @@
 m_install: /opt
 m_meza: /opt/meza
 
+# Use development or production settings for this server
+# production being as performant and secure as possible
+# development being less secure and providing optional features useful for dev
+m_use_production_settings: True
+
 # config dir
 m_config_core: /opt/meza/config/core
 m_local_secret: /opt/conf-meza/secret
@@ -218,3 +223,35 @@ m_logs_group: wheel
 m_backups_mode: "0755"
 m_backups_owner: root
 m_backups_group: root
+
+
+#
+# PHP config
+#
+
+# The OPcache shared memory storage size
+php_opcache_memory_consumption: 256
+
+# The amount of memory for interned strings in Mbytes
+php_opcache_interned_strings_buffer: 16
+
+# It's important for this number to be greater than the number of PHP files on a
+# server.
+# sudo find /opt/htdocs -type f -print | grep php | wc -l
+#    On one server on 17-SEP-2018, 13859 files
+# sudo find /opt/conf-meza -type f -print | grep php | wc -l
+#    On one server on 17-SEP-2018, 134 files
+# sudo find /opt/simplesamlphp -type f -print | grep php | wc -l
+#    On one server on 17-SEP-2018, 5032 files
+# total = ~19000 files
+#
+# This number could be increased based on the number of extensions in a server's
+# MezaLocalExtensions.yml file. In order to leave plenty of room, pick a prime
+# number about 50% bigger than 19000.
+php_opcache_max_accelerated_files: 28001
+
+# How often (in seconds) to check file timestamps for changes to the shared
+# memory storage allocation. ("1" means validate once per second, but only
+# once per request. "0" means always validate)
+php_opcache_revalidate_freq: 0
+

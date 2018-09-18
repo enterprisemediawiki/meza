@@ -496,6 +496,18 @@
   - update.php
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
+# Required because of opcache settings. When opcache.validate_timestamps=0, for
+# the sake of stability and speed, an httpd reload is required to detect changes
+# to PHP files.
+# Ref: https://www.scalingphpbook.com/blog/2014/02/14/best-zend-opcache-settings.html
+- name: Reload (not restart) httpd to pick up changes to opcached php files
+  service:
+    name: httpd
+    state: reloaded
+  tags:
+    - httpd-reload
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
 
 # Extension:SyntaxHighlight requires Python 3.x present in path as `python3` for
 # MediaWiki 1.31+.
