@@ -4,7 +4,7 @@
   git:
     repo: https://github.com/simplesamlphp/simplesamlphp.git
     dest: "{{ m_simplesamlphp_path }}"
-    version: "tags/v1.15.4"
+    version: "tags/v1.16.1"
     umask: "0002"
   tags:
     - latest
