@@ -119,6 +119,15 @@
   notify:
   - restart apache
 
+- name: Write php.d ini files
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/php.d/{{ item }}"
+  with_items:
+  - 10-opcache.ini
+  notify:
+  - restart apache
+
 - name: Write freetds.conf file
   template:
     src: freetds.conf.j2
