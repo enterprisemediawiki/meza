@@ -9,40 +9,38 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 
-NOTIFY="$DIR/slack-notify.sh"
+SLACK_NOTIFY="$DIR/slack-notify.sh"
 
 
 ###FIXME DESPLOY TYPE###
-SLACK_MESSAGE="$DEPLOY_TYPE starting"
-source $NOTIFY
+source $SLACK_NOTIFY "$DEPLOY_TYPE starting" "good"
 
 
 if [ -z "$LOG_PREFIX" ]; then
 	LOG_PREFIX="deploy-"
 fi
 
-# Make two attempts at deploy
+
+# First try at deploy. Allow failures so we can capture them later
+set +e
 meza deploy "$ENVIRONMENT" $DEPLOY_ARGS \
-	> /opt/data-meza/logs/${LOG_PREFIX}`date "+%Y%m%d%H%M%S"`.log 2>&1 \
-	&& source $NOTIFY success \
-	|| ( \
-		(source $NOTIFY retry && meza deploy "$ENVIRONMENT" $DEPLOY_ARGS) \
-		> /opt/data-meza/logs/${LOG_PREFIX}`date "+%Y%m%d%H%M%S"`.log 2>&1 \
-		&& source $NOTIFY success \
-		|| source $NOTIFY fail
-	)
+	> /opt/data-meza/logs/${LOG_PREFIX}`date "+%Y%m%d%H%M%S"`.log 2>&1
+
+# If deploy success, notify. Else retry once.
+if [ $? -eq 0 ]; then
+	source $SLACK_NOTIFY "$DEPLOY_TYPE complete" "good"
+else
+	source $SLACK_NOTIFY "$DEPLOY_TYPE attempt failed. Retrying..." "warning"
+	meza deploy "$ENVIRONMENT" $DEPLOY_ARGS \
+		> /opt/data-meza/logs/${LOG_PREFIX}`date "+%Y%m%d%H%M%S"`.log 2>&1
+
+	if [ $? -eq 0 ]; then
+		source $SLACK_NOTIFY "$DEPLOY_TYPE complete" "good"
+	else
+		source $SLACK_NOTIFY "$DEPLOY_TYPE failed" "danger"
+	fi
+fi
 
 
 
-auto_backup_from_source:
-  my_env_name:
-    cron_time: "0 2 * * *"
-    yes_i_want_this_env_overwritten: True
-  my_other_env:
-    cron_time: "0 2 * * 6"
-    yes_i_want_this_env_overwritten: True
 
-autodeploy_times:
-  my_env_name: "0 * * * 1-5"
-  my_other_env: "30 * * * 1-5"
-  my_prod_env: "0 19 * * 1-4"

@@ -29,14 +29,24 @@ if [ -z "$SLACK_TOKEN" ];
 	exit 1;
 fi
 
+# if first param not empty, use it for SLACK_MESSAGE
+if [ ! -z "$1" ]; then
+	SLACK_MESSAGE="$1"
+elif [ -z "$SLACK_MESSAGE" ]; then
+	SLACK_MESSAGE="Empty message."
+fi
+
+# if second param not empty, use it for SLACK_COLOR
+if [ ! -z "$2" ]; then
+	SLACK_COLOR="$2"
+if [ -z "$SLACK_COLOR" ]; then
+	SLACK_COLOR="good" # assume all is well
+fi
+
 if [ -z "$SLACK_CHANNEL" ]; then
 	SLACK_CHANNEL_WITH_PARAM="channel=$SLACK_CHANNEL"
 else
 	SLACK_CHANNEL_WITH_PARAM="" # use default for token
-fi
-
-if [ -z "$SLACK_MESSAGE" ]; then
-	SLACK_MESSAGE="Empty message."
 fi
 
 if [ -z "$SLACK_USERNAME" ]; then
@@ -47,10 +57,6 @@ fi
 
 if [ -z "$SLACK_ICON_URL" ]; then
 	SLACK_ICON_URL="https://github.com/enterprisemediawiki/meza/raw/master/src/roles/configure-wiki/files/logo.png"
-fi
-
-if [ -z "$SLACK_COLOR" ]; then
-	SLACK_COLOR="good" # assume all is well
 fi
 
 

@@ -6,11 +6,20 @@ set -e
 echo "Start meza auto-deployer"
 echo $(date "+%Y-%m-%d %H:%M:%S")
 
+# Path to this file's directory
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # must be root or sudoer
 if [ "$(whoami)" != "root" ]; then
 	echo "Try running this script with sudo: \"sudo bash unite-the-wikis.sh\""
 	exit 1
 fi
+
+# Check if a deploy is happening.
+#
+# This will cause the script to exit if a deploy is currently underway, thus
+# preventing two deploys from happening at once.
+source "$DIR/check-deploy.sh"
 
 # Gets info about public config
 source /opt/.deploy-meza/config.sh
@@ -19,9 +28,9 @@ GIT_FETCH="$m_scripts/git-fetch.sh"
 SLACK_NOTIFY="$m_scripts/slack-notify.sh"
 
 # Set Slack notify variables that are the same for all notifications
-if [ ! -z "$autodeployer_slack_token" ];    then SLACK_TOKEN="$autodeployer_slack_token";       fi
+if [ ! -z "$autodeployer_slack_token"    ]; then    SLACK_TOKEN="$autodeployer_slack_token";    fi
 if [ ! -z "$autodeployer_slack_username" ]; then SLACK_USERNAME="$autodeployer_slack_username"; fi
-if [ ! -z "$autodeployer_slack_channel" ];  then SLACK_CHANNEL="$autodeployer_slack_channel";   fi
+if [ ! -z "$autodeployer_slack_channel"  ]; then  SLACK_CHANNEL="$autodeployer_slack_channel";  fi
 if [ ! -z "$autodeployer_slack_icon_url" ]; then SLACK_ICON_URL="$autodeployer_slack_icon_url"; fi
 
 # FIXME: For now, don't touch secret config. At some point find a way to
