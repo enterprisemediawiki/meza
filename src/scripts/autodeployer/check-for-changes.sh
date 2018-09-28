@@ -108,7 +108,7 @@ if [ $? -eq 0 ]; then
 	PUBLIC_CONFIG_AFTER_HASH=$(echo "$PUBLIC_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
 	echo "Before hash: $PUBLIC_CONFIG_BEFORE_HASH"
 	echo "After hash:  $PUBLIC_CONFIG_BEFORE_HASH"
-	PUBLIC_CONFIG_DIFF=$(cd "$DEST" && git diff "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
+	PUBLIC_CONFIG_DIFF=$(cd "$PUBLIC_CONFIG_DEST" && git diff "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
 else
 	PUBLIC_CONFIG_DIFF=""
 fi
@@ -220,3 +220,4 @@ DEPLOY_TYPE="Deploy"
 DEPLOY_ARGS="--tags base --skip-tags mediawiki" # autodeploy deploys everything ... but while testing keep it really light
 DEPLOY_LOG_PREFIX="deploy-after-config-change-"
 source "$DIR/do-deploy.sh"
+echo "Done"
