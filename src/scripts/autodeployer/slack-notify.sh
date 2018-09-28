@@ -69,23 +69,23 @@ set +e
 # for debug
 echo "DEBUG OUTPUT OF SLACK NOTIFY COMMAND"
 echo \
-	"token='$SLACK_TOKEN' \
-	$SLACK_CHANNEL_WITH_PARAM \
-	msg='$SLACK_MESSAGE' \
-	$SLACK_USERNAME_WITH_PARAM \
-	icon_url=$SLACK_ICON_URL \
-	link_names=1 \
-	color=$SLACK_COLOR"
+"token='$SLACK_TOKEN' \
+$SLACK_CHANNEL_WITH_PARAM \
+msg='$SLACK_MESSAGE' \
+$SLACK_USERNAME_WITH_PARAM \
+icon_url=$SLACK_ICON_URL \
+link_names=1 \
+color=$SLACK_COLOR"
 
 # Attempt to send message
 ansible localhost -m slack -a \
-	"token='$SLACK_TOKEN' \
-	$SLACK_CHANNEL_WITH_PARAM \
-	msg='$SLACK_MESSAGE' \
-	$SLACK_USERNAME_WITH_PARAM \
-	icon_url=$SLACK_ICON_URL \
-	link_names=1 \
-	color=$SLACK_COLOR"
+"token='$SLACK_TOKEN' \
+$SLACK_CHANNEL_WITH_PARAM \
+msg='$SLACK_MESSAGE' \
+$SLACK_USERNAME_WITH_PARAM \
+icon_url=$SLACK_ICON_URL \
+link_names=1 \
+color=$SLACK_COLOR"
 
 # If message fails, send a generic message
 if [ $? -eq 0 ]; then
@@ -95,13 +95,13 @@ else
 	echo "$SLACK_MESSAGE"
 	SLACK_MESSAGE="Slack message failed. See logs for attempted message."
 	ansible localhost -m slack -a \
-		"token='$SLACK_TOKEN' \
-		$SLACK_CHANNEL_WITH_PARAM \
-		msg='$SLACK_MESSAGE' \
-		$SLACK_USERNAME_WITH_PARAM \
-		icon_url=$SLACK_ICON_URL \
-		link_names=1 \
-		color=$SLACK_COLOR"
+"token='$SLACK_TOKEN' \
+$SLACK_CHANNEL_WITH_PARAM \
+msg='$SLACK_MESSAGE' \
+$SLACK_USERNAME_WITH_PARAM \
+icon_url=$SLACK_ICON_URL \
+link_names=1 \
+color=$SLACK_COLOR"
 fi
 
 # Turn off allowing errors
