@@ -39,7 +39,7 @@ fi
 # if second param not empty, use it for SLACK_COLOR
 if [ ! -z "$2" ]; then
 	SLACK_COLOR="$2"
-if [ -z "$SLACK_COLOR" ]; then
+elif [ -z "$SLACK_COLOR" ]; then
 	SLACK_COLOR="good" # assume all is well
 fi
 

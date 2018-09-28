@@ -174,8 +174,9 @@ if [ ! -z "$PUBLIC_CONFIG_DIFF" ]; then
 		Tracking version: $PUBLIC_CONFIG_VERSION
 
 		Diff:
-
+		```
 		$PUBLIC_CONFIG_DIFF
+		```
 END
 )
 
