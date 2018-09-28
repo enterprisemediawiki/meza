@@ -108,27 +108,10 @@ if [ $? -eq 0 ]; then
 	PUBLIC_CONFIG_AFTER_HASH=$(echo "$PUBLIC_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
 	echo "Before hash: $PUBLIC_CONFIG_BEFORE_HASH"
 	echo "After hash:  $PUBLIC_CONFIG_BEFORE_HASH"
-	echo
-	echo
-	echo "WHAT IS GOING ON"
-	echo "================"
-	echo cd "\"$PUBLIC_CONFIG_DEST\" && git diff \"$PUBLIC_CONFIG_BEFORE_HASH\" \"$PUBLIC_CONFIG_AFTER_HASH\" 2>&1"
-	echo
-	cd "$PUBLIC_CONFIG_DEST" && git diff "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" 2>&1
-	echo
 
 	pushd "$PUBLIC_CONFIG_DEST"
 	PUBLIC_CONFIG_DIFF=$(git diff "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
 	pushd
-
-	echo "first:"
-	echo $PUBLIC_CONFIG_DIFF
-	echo
-	echo "second:"
-	echo "$PUBLIC_CONFIG_DIFF"
-	echo
-	echo "==="
-	echo "END"
 else
 	PUBLIC_CONFIG_DIFF=""
 	PUBLIC_CONFIG_AFTER_HASH=""
@@ -195,9 +178,9 @@ if [ ! -z "$PUBLIC_CONFIG_AFTER_HASH" ]; then
 		Tracking version: $PUBLIC_CONFIG_VERSION
 
 		Diff:
-		```
+		\`\`\`
 		$PUBLIC_CONFIG_DIFF
-		```
+		\`\`\`
 END
 )
 
