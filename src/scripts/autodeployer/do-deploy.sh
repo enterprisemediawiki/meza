@@ -11,14 +11,30 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 SLACK_NOTIFY="$DIR/slack-notify.sh"
 
+# Setting configuration for DEPLOY_TYPE, DEPLOY_ARGS, and LOG_PREFIX
+#
+#  If any of them is being set via script argument $1, $2, or $3, respectively,
+#  then use that value. Otherwise check if they already have a value set earlier
+#  within the enviroment, and set a default if not.
+if [ ! -z "$1" ]; then
+	DEPLOY_TYPE="$1"
+elif [ -z "$DEPLOY_TYPE" ]; then
+	DEPLOY_TYPE="Deploy"
+fi
 
-###FIXME DESPLOY TYPE###
-source $SLACK_NOTIFY "$DEPLOY_TYPE starting" "good"
+if [ ! -z "$2" ]; then
+	DEPLOY_ARGS="$2"
+elif [ -z "$DEPLOY_ARGS" ]; then
+	DEPLOY_ARGS=""
+fi
 
-
-if [ -z "$LOG_PREFIX" ]; then
+if [ ! -z "$3" ]; then
+	LOG_PREFIX="$3"
+elif [ -z "$LOG_PREFIX" ]; then
 	LOG_PREFIX="deploy-"
 fi
+
+source $SLACK_NOTIFY "$DEPLOY_TYPE starting" "good"
 
 
 # First try at deploy. Allow failures so we can capture them later
