@@ -66,6 +66,15 @@ SLACK_MESSAGE=$(echo "$SLACK_MESSAGE" | sed "s/'/\\\'/g")
 # Turn on allowing failures
 set +e
 
+# for debug
+echo "token=$SLACK_TOKEN \
+	$SLACK_CHANNEL_WITH_PARAM \
+	msg='$SLACK_MESSAGE' \
+	$SLACK_USERNAME_WITH_PARAM \
+	icon_url=$SLACK_ICON_URL \
+	link_names=1 \
+	color=$SLACK_COLOR"
+
 # Attempt to send message
 ansible localhost -m slack -a \
 	"token=$SLACK_TOKEN \
