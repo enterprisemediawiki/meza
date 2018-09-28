@@ -24,7 +24,7 @@ cd /opt/meza/config/core/adhoc
 
 
 
-if [ -z "$SLACK_TOKEN" ];
+if [ -z "$SLACK_TOKEN" ]; then
 	>&2 echo "You need to set a SLACK_TOKEN variable"
 	exit 1;
 fi

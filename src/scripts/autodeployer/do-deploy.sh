@@ -9,8 +9,6 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 
-SLACK_NOTIFY="$DIR/slack-notify.sh"
-
 # Setting configuration for DEPLOY_TYPE, DEPLOY_ARGS, and LOG_PREFIX
 #
 #  If any of them is being set via script argument $1, $2, or $3, respectively,
@@ -34,8 +32,22 @@ elif [ -z "$LOG_PREFIX" ]; then
 	LOG_PREFIX="deploy-"
 fi
 
-source $SLACK_NOTIFY "$DEPLOY_TYPE starting" "good"
+# Gets info about public config
+source /opt/.deploy-meza/config.sh
 
+# If SLACK_TOKEN not set from outside this script, grab from config.sh
+if [ -z "$SLACK_TOKEN" ]; then
+	SLACK_TOKEN="$autodeployer_slack_token"
+fi
+
+# If SLACK_TOKEN is set, send notification via slack. Else, use no-notify script
+if [ -z "$SLACK_TOKEN" ]; then
+	NOTIFY="$DIR/slack-notify.sh"
+else
+	NOTIFY="$DIR/no-notify.sh"
+fi
+
+source $NOTIFY "$DEPLOY_TYPE starting" "good"
 
 # First try at deploy. Allow failures so we can capture them later
 set +e
@@ -44,16 +56,16 @@ meza deploy "$ENVIRONMENT" $DEPLOY_ARGS \
 
 # If deploy success, notify. Else retry once.
 if [ $? -eq 0 ]; then
-	source $SLACK_NOTIFY "$DEPLOY_TYPE complete" "good"
+	source $NOTIFY "$DEPLOY_TYPE complete" "good"
 else
-	source $SLACK_NOTIFY "$DEPLOY_TYPE attempt failed. Retrying..." "warning"
+	source $NOTIFY "$DEPLOY_TYPE attempt failed. Retrying..." "warning"
 	meza deploy "$ENVIRONMENT" $DEPLOY_ARGS \
 		> /opt/data-meza/logs/${LOG_PREFIX}`date "+%Y%m%d%H%M%S"`.log 2>&1
 
 	if [ $? -eq 0 ]; then
-		source $SLACK_NOTIFY "$DEPLOY_TYPE complete" "good"
+		source $NOTIFY "$DEPLOY_TYPE complete" "good"
 	else
-		source $SLACK_NOTIFY "$DEPLOY_TYPE failed" "danger"
+		source $NOTIFY "$DEPLOY_TYPE failed" "danger"
 	fi
 fi
 
