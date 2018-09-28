@@ -108,9 +108,21 @@ if [ $? -eq 0 ]; then
 	PUBLIC_CONFIG_AFTER_HASH=$(echo "$PUBLIC_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
 	echo "Before hash: $PUBLIC_CONFIG_BEFORE_HASH"
 	echo "After hash:  $PUBLIC_CONFIG_BEFORE_HASH"
+	echo
+	echo
+	echo "WHAT IS GOING ON"
+	echo "================"
+	echo cd "\"$PUBLIC_CONFIG_DEST\" && git diff \"$PUBLIC_CONFIG_BEFORE_HASH\" \"$PUBLIC_CONFIG_AFTER_HASH\" 2>&1"
+	echo
+	cd "$PUBLIC_CONFIG_DEST" && git diff "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" 2>&1
+	echo
 	PUBLIC_CONFIG_DIFF=$(cd "$PUBLIC_CONFIG_DEST" && git diff "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
+	echo
+	echo "==="
+	echo "END"
 else
 	PUBLIC_CONFIG_DIFF=""
+	PUBLIC_CONFIG_AFTER_HASH=""
 fi
 
 # Set MEZA version
@@ -156,7 +168,7 @@ set -e # end FIXME from above.
 #
 # Neither Meza mor config changed? Exit.
 #
-if [ -z "$PUBLIC_CONFIG_DIFF$MEZA_AFTER_HASH" ]; then
+if [ -z "$PUBLIC_CONFIG_AFTER_HASH$MEZA_AFTER_HASH" ]; then
 	echo "Nothing to deploy"
 	exit 0;
 fi
@@ -164,7 +176,7 @@ fi
 #
 # Notify if PUBLIC CONFIG changed
 #
-if [ ! -z "$PUBLIC_CONFIG_DIFF" ]; then
+if [ ! -z "$PUBLIC_CONFIG_AFTER_HASH" ]; then
 
 	MESSAGE=$(cat <<-END
 		Public config changed versions:
