@@ -79,6 +79,10 @@ PUBLIC_CONFIG_CHANGE=$($GIT_FETCH "$PUBLIC_CONFIG_REPO" "$PUBLIC_CONFIG_DEST" "$
 #
 # Check if attempt to git-pull PUBLIC CONFIG failed
 #
+# FIXME: For some reason the jq command below was not working if it was within
+#        the conditional, so it has to be out here, where it forces us to
+#        temporarily allow errors.
+set +e
 echo "$PUBLIC_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.failed' -e
 if [ $? -eq 0 ]; then
 	FAILED_MSG=$(echo "$PUBLIC_CONFIG_CHANGE" | jq .plays[0].tasks[0].hosts.localhost.msg -r)
@@ -138,6 +142,7 @@ if [ $? -eq 0 ]; then
 else
 	MEZA_AFTER_HASH=""
 fi
+set -e # end FIXME from above.
 
 
 #
