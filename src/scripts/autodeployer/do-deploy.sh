@@ -2,8 +2,26 @@
 #
 # Do deploy. Notify on success. Notify and retry on fail.
 #
-# # DEPLOY_TYPE="Deploy" bash /opt/meza-backup-notifier/do-deploy.sh "" "deploy-after-config-change-"
-
+# To use this script, either pass in DEPLOY_TYPE, DEPLOY_ARGS, AND LOG_PREFIX,
+# or set them ahead of time and `source` the script:
+#
+# 1. ./do-deploy.sh "Backup" "--skip-tags search-index" "test-deploy-"
+#
+# 2. DEPLOY_TYPE="Backup"
+#    DEPLOY_ARGS="--skip-tags search-index"
+#    LOG_PREFIX="test-deploy-"
+#
+# Args:
+#    DEPLOY_TYPE: Just used in notifications for type of deploy, e.g. "Backup
+#                 starting" or "Deploy starting" where "Backup" and "Deploy" are
+#                 the DEPLOY_TYPE
+#    DEPLOY_ARGS: Any arguments that are going to get added to the deploy
+#                 command. So if you want to do:
+#                     `meza deploy dev --tags mediawiki --skip-tags latest`
+#                 The DEPLOY_ARGS would be "--tags mediawiki --skip-tags latest"
+#    LOG_PREFIX:  Logs are written to /opt/data-meza/logs to a file ending in
+#                 the date/time and ".log". Prefix it with something like
+#                 "nightly-backup-" to make "nightly-backup-$DATETIME.log"
 
 # Path to this file's directory
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

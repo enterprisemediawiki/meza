@@ -1,4 +1,8 @@
 #!/bin/sh
+#
+# Check for changes to Meza and public config repository, then deploy as needed
+#
+#
 
 # Don't allow errors
 set -e
@@ -24,15 +28,7 @@ source "$DIR/check-deploy.sh"
 # Gets info about public config
 source /opt/.deploy-meza/config.sh
 
-GIT_FETCH="$m_scripts/git-fetch.sh"
-SLACK_NOTIFY="$m_scripts/slack-notify.sh"
-
-# Set Slack notify variables that are the same for all notifications
-if [ ! -z "$autodeployer_slack_token"    ]; then    SLACK_TOKEN="$autodeployer_slack_token";    fi
-if [ ! -z "$autodeployer_slack_username" ]; then SLACK_USERNAME="$autodeployer_slack_username"; fi
-if [ ! -z "$autodeployer_slack_channel"  ]; then  SLACK_CHANNEL="$autodeployer_slack_channel";  fi
-if [ ! -z "$autodeployer_slack_icon_url" ]; then SLACK_ICON_URL="$autodeployer_slack_icon_url"; fi
-
+#
 # FIXME: For now, don't touch secret config. At some point find a way to
 #        configure it's repo and version.
 
@@ -45,6 +41,21 @@ if [ -z "$enforce_meza_version" ]; then
 	>&2 echo "Auto-deploy requires 'enforce_meza_version' var set in public config"
 	exit 1;
 fi
+
+# Set Slack notify variables that are the same for all notifications
+if [ ! -z "$autodeployer_slack_token"    ]; then    SLACK_TOKEN="$autodeployer_slack_token";    fi
+if [ ! -z "$autodeployer_slack_username" ]; then SLACK_USERNAME="$autodeployer_slack_username"; fi
+if [ ! -z "$autodeployer_slack_channel"  ]; then  SLACK_CHANNEL="$autodeployer_slack_channel";  fi
+if [ ! -z "$autodeployer_slack_icon_url" ]; then SLACK_ICON_URL="$autodeployer_slack_icon_url"; fi
+
+# If SLACK_TOKEN is set, send notification via slack. Else, use no-notify script
+if [ ! -z "$SLACK_TOKEN" ]; then
+	NOTIFY="$DIR/slack-notify.sh"
+else
+	NOTIFY="$DIR/no-notify.sh"
+fi
+
+GIT_FETCH="$DIR/git-fetch.sh"
 
 # Set PUBLIC config version
 #
@@ -68,7 +79,7 @@ if [ $? -eq 0 ]; then
 	if [ ! -z "SLACK_TOKEN" ]; then
 		SLACK_MESSAGE="$FULL_MSG"
 		SLACK_COLOR="danger"
-		source $SLACK_NOTIFY
+		source $NOTIFY
 	fi
 	exit 1;
 fi
@@ -103,7 +114,7 @@ if [ $? -eq 0 ]; then
 	if [ ! -z "SLACK_TOKEN" ]; then
 		SLACK_MESSAGE="$FULL_MSG"
 		SLACK_COLOR="danger"
-		source $SLACK_NOTIFY
+		source $NOTIFY
 	fi
 	exit 1;
 fi
@@ -151,7 +162,7 @@ END
 	if [ ! -z "SLACK_TOKEN" ]; then
 		SLACK_MESSAGE="$MESSAGE"
 		SLACK_COLOR="good"
-		source $SLACK_NOTIFY
+		source $NOTIFY
 	fi
 fi
 
@@ -174,7 +185,7 @@ END
 	if [ ! -z "SLACK_TOKEN" ]; then
 		SLACK_MESSAGE="$MESSAGE"
 		SLACK_COLOR="good"
-		source $SLACK_NOTIFY
+		source $NOTIFY
 	fi
 fi
 
@@ -184,6 +195,6 @@ fi
 #
 echo "Deploying"
 DEPLOY_TYPE="Deploy"
-DEPLOY_ARGS="" # autodeploy deploys everything
+DEPLOY_ARGS="--tags base --skip-tags mediawiki" # autodeploy deploys everything ... but while testing keep it really light
 DEPLOY_LOG_PREFIX="deploy-after-config-change-"
 source "$DIR/do-deploy.sh"
