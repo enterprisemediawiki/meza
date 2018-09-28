@@ -41,7 +41,7 @@ if [ -z "$SLACK_TOKEN" ]; then
 fi
 
 # If SLACK_TOKEN is set, send notification via slack. Else, use no-notify script
-if [ -z "$SLACK_TOKEN" ]; then
+if [ ! -z "$SLACK_TOKEN" ]; then
 	NOTIFY="$DIR/slack-notify.sh"
 else
 	NOTIFY="$DIR/no-notify.sh"
@@ -51,7 +51,7 @@ source $NOTIFY "$DEPLOY_TYPE starting" "good"
 
 # First try at deploy. Allow failures so we can capture them later
 set +e
-meza deploy "$ENVIRONMENT" $DEPLOY_ARGS \
+meza deploy "$m_environment" $DEPLOY_ARGS \
 	> /opt/data-meza/logs/${LOG_PREFIX}`date "+%Y%m%d%H%M%S"`.log 2>&1
 
 # If deploy success, notify. Else retry once.
@@ -59,7 +59,7 @@ if [ $? -eq 0 ]; then
 	source $NOTIFY "$DEPLOY_TYPE complete" "good"
 else
 	source $NOTIFY "$DEPLOY_TYPE attempt failed. Retrying..." "warning"
-	meza deploy "$ENVIRONMENT" $DEPLOY_ARGS \
+	meza deploy "$m_environment" $DEPLOY_ARGS \
 		> /opt/data-meza/logs/${LOG_PREFIX}`date "+%Y%m%d%H%M%S"`.log 2>&1
 
 	if [ $? -eq 0 ]; then

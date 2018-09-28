@@ -1,6 +1,9 @@
 <?php
 // {{ ansible_managed }}
 
+# Name of the environment for this deploy
+$m_environment="{{ env }}";
+
 $wiki_app_fqdn = '{{ wiki_app_fqdn }}';
 
 ### DIRECTORY STRUCTURE ###
