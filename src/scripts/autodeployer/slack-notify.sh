@@ -44,7 +44,7 @@ elif [ -z "$SLACK_COLOR" ]; then
 fi
 
 if [ -z "$SLACK_CHANNEL" ]; then
-	SLACK_CHANNEL_WITH_PARAM="channel=$SLACK_CHANNEL"
+	SLACK_CHANNEL_WITH_PARAM="channel='$SLACK_CHANNEL'"
 else
 	SLACK_CHANNEL_WITH_PARAM="" # use default for token
 fi
@@ -67,7 +67,9 @@ SLACK_MESSAGE=$(echo "$SLACK_MESSAGE" | sed "s/'/\\\'/g")
 set +e
 
 # for debug
-echo "token=$SLACK_TOKEN \
+echo "DEBUG OUTPUT OF SLACK NOTIFY COMMAND"
+echo \
+	"token='$SLACK_TOKEN' \
 	$SLACK_CHANNEL_WITH_PARAM \
 	msg='$SLACK_MESSAGE' \
 	$SLACK_USERNAME_WITH_PARAM \
@@ -77,7 +79,7 @@ echo "token=$SLACK_TOKEN \
 
 # Attempt to send message
 ansible localhost -m slack -a \
-	"token=$SLACK_TOKEN \
+	"token='$SLACK_TOKEN' \
 	$SLACK_CHANNEL_WITH_PARAM \
 	msg='$SLACK_MESSAGE' \
 	$SLACK_USERNAME_WITH_PARAM \
@@ -93,7 +95,7 @@ else
 	echo "$SLACK_MESSAGE"
 	SLACK_MESSAGE="Slack message failed. See logs for attempted message."
 	ansible localhost -m slack -a \
-		"token=$SLACK_TOKEN \
+		"token='$SLACK_TOKEN' \
 		$SLACK_CHANNEL_WITH_PARAM \
 		msg='$SLACK_MESSAGE' \
 		$SLACK_USERNAME_WITH_PARAM \
