@@ -83,6 +83,7 @@ PUBLIC_CONFIG_CHANGE=$($GIT_FETCH "$PUBLIC_CONFIG_REPO" "$PUBLIC_CONFIG_DEST" "$
 #        the conditional, so it has to be out here, where it forces us to
 #        temporarily allow errors.
 set +e
+echo "Did git fetch fail on public config?"
 echo "$PUBLIC_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.failed' -e
 if [ $? -eq 0 ]; then
 	FAILED_MSG=$(echo "$PUBLIC_CONFIG_CHANGE" | jq .plays[0].tasks[0].hosts.localhost.msg -r)
@@ -100,11 +101,14 @@ fi
 #
 # Check if changes were made to PUBLIC CONFIG
 #
+echo "Were there changes to public config?"
 echo "$PUBLIC_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.changed' -e
 if [ $? -eq 0 ]; then
 	PUBLIC_CONFIG_BEFORE_HASH=$(echo "$PUBLIC_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.before' -r)
 	PUBLIC_CONFIG_AFTER_HASH=$(echo "$PUBLIC_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
-	PUBLIC_CONFIG_DIFF=$(cd "$DEST" && git diff "$PUBLIC_CONFIG_BEFORE_HASH..$PUBLIC_CONFIG_AFTER_HASH")
+	echo "Before hash: $PUBLIC_CONFIG_BEFORE_HASH"
+	echo "After hash:  $PUBLIC_CONFIG_BEFORE_HASH"
+	PUBLIC_CONFIG_DIFF=$(cd "$DEST" && git diff "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
 else
 	PUBLIC_CONFIG_DIFF=""
 fi
@@ -118,6 +122,7 @@ MEZA_CHANGE=$($GIT_FETCH "$MEZA_REPO" "$MEZA_DEST" "$MEZA_VERSION")
 #
 # Check if attempt to git-pull MEZA failed
 #
+echo "Did git fetch fail on Meza?"
 echo "$MEZA_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.failed' -e
 if [ $? -eq 0 ]; then
 	FAILED_MSG=$(echo "$MEZA_CHANGE" | jq .plays[0].tasks[0].hosts.localhost.msg -r)
@@ -135,10 +140,13 @@ fi
 #
 # Check if changes were made to MEZA
 #
+echo "Were there changes to Meza?"
 echo "$MEZA_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.changed' -e
 if [ $? -eq 0 ]; then
 	MEZA_BEFORE_HASH=$(echo "$MEZA_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.before' -r)
 	MEZA_AFTER_HASH=$(echo "$MEZA_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
+	echo "Before hash: $MEZA_BEFORE_HASH"
+	echo "After hash:  $MEZA_AFTER_HASH"
 else
 	MEZA_AFTER_HASH=""
 fi
