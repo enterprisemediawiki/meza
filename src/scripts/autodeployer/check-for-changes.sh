@@ -117,6 +117,12 @@ if [ $? -eq 0 ]; then
 	cd "$PUBLIC_CONFIG_DEST" && git diff "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" 2>&1
 	echo
 	PUBLIC_CONFIG_DIFF=$(cd "$PUBLIC_CONFIG_DEST" && git diff "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
+
+	echo "first:"
+	echo $PUBLIC_CONFIG_DIFF
+	echo
+	echo "second:"
+	echo "$PUBLIC_CONFIG_DIFF"
 	echo
 	echo "==="
 	echo "END"
