@@ -2,6 +2,13 @@
 #
 # Check for changes to Meza and public config repository, then deploy as needed
 #
+# Run this command without args:
+#
+#     sudo ./check-for-changes.sh
+#
+# Or in a passwordless sudoer's (e.g. root) crontab like:
+#
+#     22 * * * * /opt/meza/src/scripts/autodeployer/check-for-changes.sh >> /opt/data-meza/logs/autodeploy-`date "+\%Y-\%m-\%d"`.log 2>&1
 #
 
 # Don't allow errors
@@ -23,7 +30,9 @@ fi
 #
 # This will cause the script to exit if a deploy is currently underway, thus
 # preventing two deploys from happening at once.
-source "$DIR/check-deploy.sh"
+#
+# FIXME: not implemented yet
+# source "$DIR/check-deploy.sh"
 
 # Gets info about public config
 source /opt/.deploy-meza/config.sh
@@ -33,12 +42,12 @@ source /opt/.deploy-meza/config.sh
 #        configure it's repo and version.
 
 if [ -z "$local_config_repo_repo" ]; then
-	>&2 echo "Auto-deploy requires 'local_config_repo' var set in secret config"
+	>&2 echo "Auto-deploy requires 'local_config_repo' set in secret or public config"
 	exit 1;
 fi
 
 if [ -z "$enforce_meza_version" ]; then
-	>&2 echo "Auto-deploy requires 'enforce_meza_version' var set in public config"
+	>&2 echo "Auto-deploy requires 'enforce_meza_version' var set in public or secret config"
 	exit 1;
 fi
 
