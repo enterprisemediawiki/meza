@@ -112,6 +112,7 @@ if [ $? -eq 0 ]; then
 
 	pushd "$PUBLIC_CONFIG_DEST"
 	PUBLIC_CONFIG_DIFF=$(git diff "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
+	PUBLIC_CONFIG_COMMITS=$(git log --oneline "$PUBLIC_CONFIG_BEFORE_HASH...$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
 	pushd
 else
 	PUBLIC_CONFIG_DIFF=""
@@ -165,6 +166,11 @@ if [ $? -eq 0 ]; then
 	MEZA_AFTER_HASH=$(echo "$MEZA_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
 	echo "Before hash: $MEZA_BEFORE_HASH"
 	echo "After hash:  $MEZA_AFTER_HASH"
+
+	pushd "$MEZA_DEST"
+	MEZA_COMMITS=$(git log --oneline "$PUBLIC_CONFIG_BEFORE_HASH...$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
+	pushd
+
 else
 	MEZA_AFTER_HASH=""
 fi
@@ -190,6 +196,9 @@ if [ ! -z "$PUBLIC_CONFIG_AFTER_HASH" ]; then
 		  TO:   \`$PUBLIC_CONFIG_AFTER_HASH\`
 
 		Tracking version: \`$PUBLIC_CONFIG_VERSION\`
+
+		Commits:
+		$PUBLIC_CONFIG_COMMITS
 
 		Diff:
 		\`\`\`
@@ -218,6 +227,9 @@ if [ ! -z "$MEZA_AFTER_HASH" ]; then
 		  TO:   \`$MEZA_AFTER_HASH\`
 
 		Tracking version: \`$MEZA_VERSION\`
+
+		Commits:
+		$MEZA_COMMITS
 END
 )
 
