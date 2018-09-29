@@ -1,6 +1,9 @@
 <?php
 // {{ ansible_managed }}
 
+# Name of the environment for this deploy
+$m_environment="{{ env }}";
+
 $wiki_app_fqdn = '{{ wiki_app_fqdn }}';
 
 ### DIRECTORY STRUCTURE ###
@@ -345,3 +348,39 @@ $slack_webhook_token_disk_usage="{{ slack_webhook_token_disk_usage }}";
 # Slack username to display for webhook
 $slack_username_disk_usage="{{ slack_username_disk_usage }}";
 {% endif %}
+
+
+#
+# Auto-deployer
+#
+{% if local_config_repo is defined and local_config_repo.repo is defined %}
+# Info about local public config
+$local_config_repo_repo="{{ local_config_repo.repo }}";
+$local_config_repo_version="{{ local_config_repo.version | default('master') }}";
+$local_config_repo_force="{{ local_config_repo.force | default(false) | bool }}";
+{% endif %}
+
+{% if enforce_meza_version is defined %}
+# What Meza version to track
+$enforce_meza_version="{{ enforce_meza_version }}";
+{% endif %}
+
+{% if autodeployer is defined %}
+{% if autodeployer.slack_channel is defined %}
+autodeployer_slack_channel="{{ autodeployer.slack_channel }}"
+{% endif %}
+
+{% if autodeployer.slack_token is defined %}
+autodeployer_slack_token="{{ autodeployer.slack_token }}"
+{% endif %}
+
+{% if autodeployer.slack_username is defined %}
+autodeployer_slack_username="{{ autodeployer.slack_username }}"
+{% endif %}
+
+{% if autodeployer.slack_icon_url is defined %}
+autodeployer_slack_icon_url="{{ autodeployer.slack_icon_url }}"
+{% endif %}
+{% endif %}
+
+
