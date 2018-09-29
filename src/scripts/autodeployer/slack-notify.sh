@@ -60,8 +60,9 @@ if [ -z "$SLACK_ICON_URL" ]; then
 fi
 
 
-# Escape single quotes
+# Escape chars: '`
 SLACK_MESSAGE=$(echo "$SLACK_MESSAGE" | sed "s/'/\\\'/g")
+SLACK_MESSAGE=$(echo "$SLACK_MESSAGE" | sed "s/\`/\\\\\`/g")
 
 # Turn on allowing failures
 set +e
