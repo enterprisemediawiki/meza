@@ -210,17 +210,6 @@
     group: root
     mode: 0755
 
-- name: Ensure config variables available in PHP and shell files
-  template:
-    src: "config.{{ item }}.j2"
-    dest: "{{ m_deploy }}/config.{{ item }}"
-    owner: root
-    group: root
-    mode: 0755
-  with_items:
-    - "php"
-    - "sh"
-
 - name: "Ensure {{ m_tmp }} exists"
   file:
     path: "{{ m_tmp }}"

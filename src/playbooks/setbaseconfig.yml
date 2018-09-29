@@ -1,0 +1,11 @@
+---
+# Simple playbook to make sure config.sh, config.php, and any other simple
+# config scripts like them can be quickly deployed to servers.
+
+- hosts: all:!exclude-all:!load-balancers-unmanaged
+  become: yes
+  roles:
+    - set-vars
+    - umask-set
+    - base-config-scripts
+    - umask-unset

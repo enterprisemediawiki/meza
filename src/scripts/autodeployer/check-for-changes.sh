@@ -41,13 +41,13 @@ source /opt/.deploy-meza/config.sh
 # FIXME: For now, don't touch secret config. At some point find a way to
 #        configure it's repo and version.
 
+# Make sure config.sh is up-to-date in case there has been a secret config
+# change since the last deploy, which could impact local_config_repo var.
+meza setbaseconfig "$m_environment"
+
+
 if [ -z "$local_config_repo_repo" ]; then
 	>&2 echo "Auto-deploy requires 'local_config_repo' set in secret or public config"
-	exit 1;
-fi
-
-if [ -z "$enforce_meza_version" ]; then
-	>&2 echo "Auto-deploy requires 'enforce_meza_version' var set in public or secret config"
 	exit 1;
 fi
 
@@ -115,6 +115,18 @@ if [ $? -eq 0 ]; then
 else
 	PUBLIC_CONFIG_DIFF=""
 	PUBLIC_CONFIG_AFTER_HASH=""
+fi
+
+# Make sure config.sh is up-to-date after public config change above, since it
+# impacts what version of
+meza setbaseconfig "$m_environment"
+
+
+# This could change based upon changes to public config, so only check for it at
+# this point, not earlier.
+if [ -z "$enforce_meza_version" ]; then
+	>&2 echo "Auto-deploy requires 'enforce_meza_version' var set in public or secret config"
+	exit 1;
 fi
 
 # Set MEZA version

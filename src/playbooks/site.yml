@@ -88,6 +88,7 @@
     - set-vars
     - umask-set
     - base
+    - base-config-scripts
   tags: base
 
 - hosts: load-balancers
