@@ -44,6 +44,7 @@ source /opt/.deploy-meza/config.sh
 # Make sure config.sh is up-to-date in case there has been a secret config
 # change since the last deploy, which could impact local_config_repo var.
 meza setbaseconfig "$m_environment"
+source /opt/.deploy-meza/config.sh
 
 
 if [ -z "$local_config_repo_repo" ]; then
@@ -120,6 +121,7 @@ fi
 # Make sure config.sh is up-to-date after public config change above, since it
 # impacts what version of
 meza setbaseconfig "$m_environment"
+source /opt/.deploy-meza/config.sh
 
 
 # This could change based upon changes to public config, so only check for it at
