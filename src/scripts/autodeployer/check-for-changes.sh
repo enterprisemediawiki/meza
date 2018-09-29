@@ -222,7 +222,7 @@ fi
 #
 echo "Deploying"
 DEPLOY_TYPE="Deploy"
-DEPLOY_ARGS="--tags base --skip-tags mediawiki" # autodeploy deploys everything ... but while testing keep it really light
+DEPLOY_ARGS="--tags base --skip-tags latest,mediawiki" # autodeploy deploys everything ... but while testing keep it really light
 DEPLOY_LOG_PREFIX="deploy-after-config-change-"
 source "$DIR/do-deploy.sh"
 echo "Done"
