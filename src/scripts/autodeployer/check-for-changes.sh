@@ -172,10 +172,10 @@ if [ ! -z "$PUBLIC_CONFIG_AFTER_HASH" ]; then
 
 	MESSAGE=$(cat <<-END
 		Public config changed versions:
-		  FROM: $PUBLIC_CONFIG_BEFORE_HASH
-		  TO:   $PUBLIC_CONFIG_AFTER_HASH
+		  FROM: \`$PUBLIC_CONFIG_BEFORE_HASH\`
+		  TO:   \`$PUBLIC_CONFIG_AFTER_HASH\`
 
-		Tracking version: $PUBLIC_CONFIG_VERSION
+		Tracking version: \`$PUBLIC_CONFIG_VERSION\`
 
 		Diff:
 		\`\`\`
@@ -200,10 +200,10 @@ if [ ! -z "$MEZA_AFTER_HASH" ]; then
 
 	MESSAGE=$(cat <<-END
 		Meza application changed versions:
-		  FROM: $MEZA_BEFORE_HASH
-		  TO:   $MEZA_AFTER_HASH
+		  FROM: \`$MEZA_BEFORE_HASH\`
+		  TO:   \`$MEZA_AFTER_HASH\`
 
-		Tracking version: $MEZA_VERSION
+		Tracking version: \`$MEZA_VERSION\`
 END
 )
 
