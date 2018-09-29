@@ -43,13 +43,13 @@ elif [ -z "$SLACK_COLOR" ]; then
 	SLACK_COLOR="good" # assume all is well
 fi
 
-if [ -z "$SLACK_CHANNEL" ]; then
+if [ ! -z "$SLACK_CHANNEL" ]; then
 	SLACK_CHANNEL_WITH_PARAM="channel='$SLACK_CHANNEL'"
 else
 	SLACK_CHANNEL_WITH_PARAM="" # use default for token
 fi
 
-if [ -z "$SLACK_USERNAME" ]; then
+if [ ! -z "$SLACK_USERNAME" ]; then
 	SLACK_USERNAME_WITH_PARAM="username='$SLACK_USERNAME'"
 else
 	SLACK_USERNAME_WITH_PARAM="" # use default for token
