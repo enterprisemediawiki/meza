@@ -60,9 +60,9 @@ if [ -z "$SLACK_ICON_URL" ]; then
 fi
 
 
-# Escape chars: '`
+# Escape chars: '
 SLACK_MESSAGE=$(echo "$SLACK_MESSAGE" | sed "s/'/\\\'/g")
-SLACK_MESSAGE=$(echo "$SLACK_MESSAGE" | sed "s/\`/\\\\\`/g")
+# FIXME: also handle ``` inside diffs, which are wrapped in ```...so only escape the inner ones.
 
 # Turn on allowing failures
 set +e
