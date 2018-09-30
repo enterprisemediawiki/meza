@@ -168,7 +168,7 @@ if [ $? -eq 0 ]; then
 	echo "After hash:  $MEZA_AFTER_HASH"
 
 	pushd "$MEZA_DEST"
-	MEZA_COMMITS=$(git log --oneline "$PUBLIC_CONFIG_BEFORE_HASH...$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
+	MEZA_COMMITS=$(git log --oneline "$MEZA_BEFORE_HASH...$MEZA_AFTER_HASH" 2>&1)
 	pushd
 
 else
