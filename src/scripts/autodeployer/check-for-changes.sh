@@ -247,8 +247,9 @@ fi
 # Do deploy
 #
 echo "Deploying"
-DEPLOY_TYPE="Deploy"
-DEPLOY_ARGS="--tags base --skip-tags latest,mediawiki" # autodeploy deploys everything ... but while testing keep it really light
-DEPLOY_LOG_PREFIX="deploy-after-config-change-"
+# Allow overriding variables by only setting them if they're empty
+if [ -z "$DEPLOY_TYPE"       ]; then DEPLOY_TYPE="Deploy";                            fi
+if [ -z "$DEPLOY_ARGS"       ]; then DEPLOY_ARGS="";                                  fi
+if [ -z "$DEPLOY_LOG_PREFIX" ]; then DEPLOY_LOG_PREFIX="deploy-after-config-change-"; fi
 source "$DIR/do-deploy.sh"
 echo "Done"
