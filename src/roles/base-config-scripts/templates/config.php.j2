@@ -367,19 +367,19 @@ $enforce_meza_version="{{ enforce_meza_version }}";
 
 {% if autodeployer is defined %}
 {% if autodeployer.slack_channel is defined %}
-autodeployer_slack_channel="{{ autodeployer.slack_channel }}"
+$autodeployer_slack_channel="{{ autodeployer.slack_channel }}";
 {% endif %}
 
 {% if autodeployer.slack_token is defined %}
-autodeployer_slack_token="{{ autodeployer.slack_token }}"
+$autodeployer_slack_token="{{ autodeployer.slack_token }}";
 {% endif %}
 
 {% if autodeployer.slack_username is defined %}
-autodeployer_slack_username="{{ autodeployer.slack_username }}"
+$autodeployer_slack_username="{{ autodeployer.slack_username }}";
 {% endif %}
 
 {% if autodeployer.slack_icon_url is defined %}
-autodeployer_slack_icon_url="{{ autodeployer.slack_icon_url }}"
+$autodeployer_slack_icon_url="{{ autodeployer.slack_icon_url }}";
 {% endif %}
 {% endif %}
 
