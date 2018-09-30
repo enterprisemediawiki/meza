@@ -443,6 +443,20 @@ def meza_command_backup (argv):
 	meza_shell_exec_exit(rc)
 
 
+def meza_command_setbaseconfig (argv):
+
+	env = argv[0]
+
+	rc = check_environment(env)
+	if rc != 0:
+		meza_shell_exec_exit(rc)
+
+	shell_cmd = playbook_cmd( 'setbaseconfig', env ) + argv[1:]
+	rc = meza_shell_exec( shell_cmd )
+
+	meza_shell_exec_exit(rc)
+
+
 def meza_command_destroy (argv):
 	print "command not yet built"
 

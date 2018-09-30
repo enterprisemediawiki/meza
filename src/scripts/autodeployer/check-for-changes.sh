@@ -41,13 +41,14 @@ source /opt/.deploy-meza/config.sh
 # FIXME: For now, don't touch secret config. At some point find a way to
 #        configure it's repo and version.
 
+# Make sure config.sh is up-to-date in case there has been a secret config
+# change since the last deploy, which could impact local_config_repo var.
+meza setbaseconfig "$m_environment"
+source /opt/.deploy-meza/config.sh
+
+
 if [ -z "$local_config_repo_repo" ]; then
 	>&2 echo "Auto-deploy requires 'local_config_repo' set in secret or public config"
-	exit 1;
-fi
-
-if [ -z "$enforce_meza_version" ]; then
-	>&2 echo "Auto-deploy requires 'enforce_meza_version' var set in public or secret config"
 	exit 1;
 fi
 
@@ -111,10 +112,24 @@ if [ $? -eq 0 ]; then
 
 	pushd "$PUBLIC_CONFIG_DEST"
 	PUBLIC_CONFIG_DIFF=$(git diff "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
+	PUBLIC_CONFIG_COMMITS=$(git log --oneline "$PUBLIC_CONFIG_BEFORE_HASH...$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
 	pushd
 else
 	PUBLIC_CONFIG_DIFF=""
 	PUBLIC_CONFIG_AFTER_HASH=""
+fi
+
+# Make sure config.sh is up-to-date after public config change above, since it
+# impacts what version of
+meza setbaseconfig "$m_environment"
+source /opt/.deploy-meza/config.sh
+
+
+# This could change based upon changes to public config, so only check for it at
+# this point, not earlier.
+if [ -z "$enforce_meza_version" ]; then
+	>&2 echo "Auto-deploy requires 'enforce_meza_version' var set in public or secret config"
+	exit 1;
 fi
 
 # Set MEZA version
@@ -151,6 +166,11 @@ if [ $? -eq 0 ]; then
 	MEZA_AFTER_HASH=$(echo "$MEZA_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
 	echo "Before hash: $MEZA_BEFORE_HASH"
 	echo "After hash:  $MEZA_AFTER_HASH"
+
+	pushd "$MEZA_DEST"
+	MEZA_COMMITS=$(git log --oneline "$PUBLIC_CONFIG_BEFORE_HASH...$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
+	pushd
+
 else
 	MEZA_AFTER_HASH=""
 fi
@@ -176,6 +196,9 @@ if [ ! -z "$PUBLIC_CONFIG_AFTER_HASH" ]; then
 		  TO:   \`$PUBLIC_CONFIG_AFTER_HASH\`
 
 		Tracking version: \`$PUBLIC_CONFIG_VERSION\`
+
+		Commits:
+		$PUBLIC_CONFIG_COMMITS
 
 		Diff:
 		\`\`\`
@@ -204,6 +227,9 @@ if [ ! -z "$MEZA_AFTER_HASH" ]; then
 		  TO:   \`$MEZA_AFTER_HASH\`
 
 		Tracking version: \`$MEZA_VERSION\`
+
+		Commits:
+		$MEZA_COMMITS
 END
 )
 
@@ -221,8 +247,9 @@ fi
 # Do deploy
 #
 echo "Deploying"
-DEPLOY_TYPE="Deploy"
-DEPLOY_ARGS="--tags base --skip-tags mediawiki" # autodeploy deploys everything ... but while testing keep it really light
-DEPLOY_LOG_PREFIX="deploy-after-config-change-"
+# Allow overriding variables by only setting them if they're empty
+if [ -z "$DEPLOY_TYPE"       ]; then DEPLOY_TYPE="Deploy";                            fi
+if [ -z "$DEPLOY_ARGS"       ]; then DEPLOY_ARGS="";                                  fi
+if [ -z "$DEPLOY_LOG_PREFIX" ]; then DEPLOY_LOG_PREFIX="deploy-after-config-change-"; fi
 source "$DIR/do-deploy.sh"
 echo "Done"
