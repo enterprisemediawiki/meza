@@ -54,9 +54,20 @@ fi
 source /opt/.deploy-meza/config.sh
 
 # If SLACK_TOKEN not set from outside this script, grab from config.sh
-if [ -z "$SLACK_TOKEN" ]; then
+# Same goes for other slack vars
+if [ -z "$SLACK_TOKEN" ] && [ ! -z "$autodeployer_slack_token" ]; then
 	SLACK_TOKEN="$autodeployer_slack_token"
 fi
+if [ -z "$SLACK_USERNAME" ] && [ ! -z "$autodeployer_slack_username" ]; then
+	SLACK_USERNAME="$autodeployer_slack_username"
+fi
+if [ -z "$SLACK_CHANNEL" ] && [ ! -z "$autodeployer_slack_channel"  ]; then
+	SLACK_CHANNEL="$autodeployer_slack_channel"
+fi
+if [ -z "$SLACK_ICON_URL" ] && [ ! -z "$autodeployer_slack_icon_url" ]; then
+	SLACK_ICON_URL="$autodeployer_slack_icon_url"
+fi
+
 
 # If SLACK_TOKEN is set, send notification via slack. Else, use no-notify script
 if [ ! -z "$SLACK_TOKEN" ]; then
