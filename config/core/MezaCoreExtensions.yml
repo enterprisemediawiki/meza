@@ -88,8 +88,8 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: PageForms
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PageForms.git
-    # 30-SEP-2018 with several fixes since latest version 4.3.1
-    version: "b4c29bd2e2c4b30d51c180992386e7d2151c758e"
+    # 06-OCT-2018 with several fixes since latest version 4.3.1
+    version: "45dd98d6bf821a0754764021a3fc3a1085f273b5"
   - name: DismissableSiteNotice
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DismissableSiteNotice.git
     version: "{{ mediawiki_default_branch }}"
