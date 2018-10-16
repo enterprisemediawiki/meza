@@ -142,7 +142,7 @@ mediawiki_version: "1.31.1"
 mediawiki_default_branch: "REL1_31"
 
 # PHP version
-php_ius_version: "php70u"
+php_ius_version: "php71u"
 
 # Parsoid v0.5.2 on May 2, 2016
 # MediaWiki REL1_28 branch point on 2016-10-25

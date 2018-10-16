@@ -63,6 +63,24 @@
     - php56u-mcrypt
     - php56u-mssql
 
+
+# Check if the desired version of PHP is installed. If it is not, ensure any
+# other versions of PHP are not installed
+- name: "Check if {{ php_ius_version}} package is installed"
+  yum:
+    list: "{{ php_ius_version }}"
+  register: correct_php
+
+- debug:
+    var: correct_php
+
+- name: Remove any other PHP packages from IUS repo if correct PHP is not installed
+  package:
+    name: "php*u*"
+    state: absent
+  when: ansible_os_family == 'RedHat' and
+        correct_php.results|length == 0
+
 - name: Ensure PHP IUS packages installed
   yum:
     name: "{{item}}"
@@ -96,7 +114,9 @@
     - "{{ php_ius_version }}-mcrypt"
 
     # Available for php56u and php70u. NOT php71u or php72u
-    - "{{ php_ius_version }}-pear"
+    # - "{{ php_ius_version }}-pear"
+    # Post 7.0, use the pear1u package for all versions of PHP
+    - pear1u
 
     # Not available for PHP 7, due to being built into PHP 7
     # - php56u-pecl-jsonc
