@@ -29,6 +29,9 @@ list:
     composer: "mediawiki/semantic-result-formats"
     version: "3.0.0"
     config: |
+      // In SRF 3.0+ you need to do this, too:
+      wfLoadExtension( 'SemanticResultFormats' );
+
       // SemanticResultFormats formats enabled (beyond defaults)
       // These are disabled by default because they send data to external
       // web services for rendering, which may be considered a data leak
