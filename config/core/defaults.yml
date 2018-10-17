@@ -144,18 +144,7 @@ mediawiki_default_branch: "REL1_31"
 # PHP version
 php_ius_version: "php71u"
 
-# Parsoid v0.5.2 on May 2, 2016
-# MediaWiki REL1_28 branch point on 2016-10-25
-# Parsoid v0.5.3 on Oct 31, 2016 <-- Use this for MW1.28
-# Parsoid v0.6.0 on Nov 7, 2016 <-- Requires config.yml, not localsettings.js
-# Parsoid v0.6.1 on Nov 14, 2016
-# Parsoid v0.7.0 on Apr 3, 2017
-# Parsoid v0.7.1 on Apr 5, 2017 <-- Use this for MW1.29
-# MediaWiki REL1_29 branch point ~July 2017
-# Parsoid v0.8.0 on Oct 23, 2017 <-- Use this for MW1.30
-# MediaWiki REL1_30 branch point ~Nov 2017
-# Parsoid v0.9.0 on Mar 22, 2018 <-- Use this for MW1.31
-# MediaWiki REL1_31 branch point ~Apr 2018
+# Parsoid version
 m_parsoid_version: "tags/v0.9.0"
 
 # MediaWiki 1.27 and earlier require ElasticSearch 1.6
