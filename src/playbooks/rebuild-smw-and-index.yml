@@ -17,7 +17,7 @@
     - search-index
 
   - name: Rebuild SemanticMediaWiki data for each wiki
-    shell: "bash {{ m_deploy }}/smw-rebuild-all.sh"
+    shell: "bash {{ m_deploy }}/smw-rebuild-all.sh > {{ m_logs }}/smw-rebuilddata/smw-rebuild-all.log"
     run_once: true
     tags:
     - smw-data
