@@ -472,7 +472,7 @@
   - search-index
 
 - name: "(Re-)build SemanticMediaWiki data for: {{ wikis_to_rebuild_data | join(', ') }}"
-  shell: "bash {{ m_deploy }}/smw-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
+  shell: "bash {{ m_deploy }}/smw-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\"  > {{ m_logs }}/smw-rebuilddata/smw-rebuild-all.log"
   when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0)
   run_once: true
   tags:

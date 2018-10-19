@@ -46,6 +46,8 @@ for d in $do_wikis; do
 
 	while [ "$start_id" != "-1" ]; do
 
+		previous_start_id="$start_id"
+
 		WIKI="$wiki_id" \
 		php "{{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/rebuildData.php" \
 		-d 5 -v $dependent_option --ignore-exceptions \
@@ -55,12 +57,25 @@ for d in $do_wikis; do
 		--exception-log="$exception_log" \
 		>> "$out_log" 2>&1
 
+		# Set a new start id
+		start_id=$(cat "$start_id_file")
+
+		# If something happens to prevent start_id from incrementing, manually increment it.
+		if [ "$previous_start_id" = "$start_id" ]; then
+			last_id_logged=$(grep "... updating" "$out_log" | tail -1 | awk '{print $3}')
+			next_id=$((last_id_logged+1))
+			echo "Start ID not updating. Was $start_id. Last ID logged = $last_id_logged. Incrementing to $next_id" >> "$exception_log"
+			start_id="$next_id"
+		fi
+
 		# after first run, don't rebuild structure, but do skip rebuilding properties
 		dependent_option="--skip-properties"
 
-		start_id=$(cat "$start_id_file")
-
 		echo "next pass start id = $start_id"
+		echo "$(date +"%F_%T")"
+
+		echo "next pass start id = $start_id" >> "$out_log"
+		echo "$(date +"%F_%T")" >> "$out_log"
 
 	done
 
