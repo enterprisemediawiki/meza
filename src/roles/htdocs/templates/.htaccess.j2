@@ -4,6 +4,9 @@
     # Enable mod_rewrite engine
     RewriteEngine on
 
+    # deny access to git repository info
+    RewriteRule "^(.*/)?\.git/" - [F,L]
+
     RewriteBase /
 
     # This is needed for Links inside MS Office documents to resolve properly
