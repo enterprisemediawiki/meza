@@ -94,7 +94,8 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: PageForms
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PageForms.git
-    version: "4.4.1"
+    # commit includes spreadsheet sorting which didn't make PageForms 4.4.1
+    version: "730390a31a56c001af83948af1eefc5174abbe06"
   - name: DismissableSiteNotice
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DismissableSiteNotice.git
     version: "{{ mediawiki_default_branch }}"
