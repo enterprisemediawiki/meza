@@ -14,8 +14,14 @@ fi
 # clones and checkouts.
 umask 002
 
+# RedHat or Debian? Use Python to figure out
+# FIXME: currently doesn't check if non-RedHat is really Debian
+python -mplatform | grep -qi redhat && DISTRO="redhat" || DISTRO="debian"
+
+
+
 # Install epel if not installed
-if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
+if [ $DISTRO = "redhat" ] && [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 
 	distro=$(cat /etc/redhat-release | grep -q "CentOS" && echo "CentOS" || echo "RedHat")
 
@@ -29,7 +35,14 @@ if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 
 fi
 
-yum install -y git ansible libselinux-python
+if [ $DISTRO = "redhat" ]; then
+	yum install -y git ansible libselinux-python
+else
+	echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" >> /etc/apt/sources.list
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+	apt-get update
+	apt-get install -y git ansible python-yaml
+fi
 
 # if /opt/meza doesn't exist, clone into and use master branch (which is the
 # default, but should we make this configurable?)
