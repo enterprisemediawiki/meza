@@ -80,18 +80,16 @@
   include_role:
     name: firewalld
   vars:
-    # firewalld_service: http
-    firewalld_port: 27017
-    firewalld_protocol: tcp
-    firewalld_servers: "{{ groups['app-servers'] }}"
-    firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    firewall_port: 27017
+    firewall_protocol: tcp
+    firewall_servers: "{{ groups['app-servers'] }}"
+    firewall_zone: "{{m_private_networking_zone|default('public')}}"
 
 - name: Open port 8089 to load balancer
   include_role:
     name: firewalld
   vars:
-    # firewalld_service: http
-    firewalld_port: 8089
-    firewalld_protocol: tcp
-    firewalld_servers: "{{ groups['load-balancers'] }}"
-    firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    firewall_port: 8089
+    firewall_protocol: tcp
+    firewall_servers: "{{ groups['load-balancers'] }}"
+    firewall_zone: "{{m_private_networking_zone|default('public')}}"

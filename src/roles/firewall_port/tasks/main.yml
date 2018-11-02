@@ -1,0 +1,41 @@
+---
+# Open a firewall port from specific serves. Use firewalld for RedHat and UFW for Debian
+
+- name: Ensure firewalld port {{ firewall_port }} open for list of servers (RedHat/CentOS only)
+  firewalld:
+    rich_rule: 'rule family="ipv4" source address="{{ item }}/32" port port="{{ firewall_port }}" protocol="{{ firewall_protocol }}" accept'
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{firewall_zone|default('public')}}"
+
+  # strip "localhost" or inventory_hostname from list of servers to configure
+  with_items: "{{ firewall_servers | difference([ 'localhost', inventory_hostname ]) }}"
+
+  when:
+    - ansible_os_family == 'RedHat'
+    - firewall_port is defined and firewall_protocol is defined
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
+
+
+- name: Ensure UFW port {{ firewall_port }} open for list of servers (Debian only)
+  ufw:
+    rule: allow
+    src: '{{ item }}/32'
+    to_port: "{{ firewall_port }}"
+    proto: "{{ firewall_protocol }}"
+
+    # FIXME: consider adding these, optionally.
+    # interface: "{{ firewall_interface|default() }}" # example interface=eth0. with firewalld we have firewall_zone=public...hmm
+
+    comment: "allow {{ firewall_port }} "
+
+  # strip "localhost" or inventory_hostname from list of servers to configure
+  with_items: "{{ firewall_servers | difference([ 'localhost', inventory_hostname ]) }}"
+
+  when:
+    - ansible_os_family == 'Debian'
+    - firewall_port is defined
+    - firewall_protocol is defined
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
+
