@@ -1,0 +1,18 @@
+---
+
+# Package names
+package_openssh_client: openssh-clients
+package_cron: cronie
+
+
+# Services
+service_ntp: ntpd
+
+
+# Paths
+path_custom_pem_ca_trust: "/etc/pki/ca-trust/source/anchors/"
+path_custom_extended_ca_trust: "/etc/pki/ca-trust/source/"
+
+
+# Commands
+command_update_ca_trust: "update-ca-trust"

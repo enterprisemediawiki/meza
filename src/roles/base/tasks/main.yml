@@ -49,13 +49,19 @@
     line: 'alt-meza-ansible ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
 
-- name: ensure deltarpm is installed and latest
+- name: "Ensure deltarpm is installed and latest (RedHat only)"
   yum: name=deltarpm state=latest
+  when: ansible_os_family == "RedHat"
   tags:
   - latest
 
+- name: Ensure apt cache updated (Debian only)
+  apt:
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
 - name: upgrade all packages
-  yum: name=* state=latest
+  package: name=* state=latest
   environment:
     # If `install_ms_sql_driver: True` is set in config, MS SQL drivers will be
     # installed. When these drivers are updated they require accepting end user
@@ -65,7 +71,7 @@
   - latest
 
 # FIXME #807: for RedHat may need to enable "Optional RPMs"
-- name: ensure EPEL installed
+- name: Ensure EPEL installed via epel-release package (CentOS only)
   yum:
     name: epel-release
     state: installed
@@ -73,14 +79,15 @@
   tags:
   - latest
 
-- name: Check if EPEL repo is already configured.
+- name: Check if EPEL repo is already configured (RedHat only)
   stat:
     path: "/etc/yum.repos.d/epel.repo"
   register: epel_repofile_result
+  when: ansible_distribution == "RedHat"
   tags:
   - latest
 
-- name: Install EPEL repo.
+- name: Ensure EPEL installed via URL (RedHat only)
   yum:
     name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
     state: present
@@ -92,7 +99,7 @@
   tags:
   - latest
 
-- name: Import EPEL GPG key.
+- name: Import EPEL GPG key (RedHat only)
   rpm_key:
     key: "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
     state: present
@@ -101,42 +108,51 @@
   tags:
   - latest
 
-- name: Ensure optional repos enabled
+- name: Ensure optional repos enabled (RedHat Only)
   shell: subscription-manager repos --enable rhel-7-server-optional-rpms
   when: ansible_distribution == "RedHat"
   tags:
   - latest
 
-- name: ensure libselinux-python installed prior to SELinux
+- name: ensure libselinux-python installed prior to SELinux (RedHat/CentOS only)
   yum: name=libselinux-python state=installed
+  when: ansible_os_family == "RedHat"
   tags:
   - latest
 
-- name: Install base packages
-  yum: name={{item}} state=installed
+- name: Ensure base packages installed
+  package: name={{item}} state=installed
   with_items:
     - ntp
     - ntpdate
     - ntp-doc
     - openssh-server
-    - openssh-clients
+    - "{{ package_openssh_client }}"
     - vim
     - git
     - net-tools
     - firewalld
-    - selinux-policy
     - rsyslog
     - jq
     - tree
-    - cronie
+    - "{{ package_cron }}"
     - rsync
   tags:
   - latest
 
-- name: put SELinux in permissive mode
+- name: Ensure selinux-policy installed (RedHat/CentOS only)
+  yum:
+    name: selinux-policy
+    state: latest
+  when: ansible_os_family == "RedHat"
+  tags:
+  - latest
+
+- name: put SELinux in permissive mode (RedHat/CentOS only)
   selinux:
     policy: targeted
     state: permissive # log actions that would be blocked if state=enforcing
+  when: ansible_os_family == "RedHat"
 
 - name: ensure firewalld is running (and enable it at boot)
   service: name=firewalld state=started enabled=yes
@@ -178,14 +194,15 @@
 # chkconfig ntpd on # Activate service
 # ntpdate pool.ntp.org # Synchronize the system clock with 0.pool.ntp.org server
 # service ntpd start # Start service
+# FIXME: this is duplicated from above, right? No reason it needs to be here twice?
 - name: Install NTP
-  yum: name=ntp state=installed
+  package: name=ntp state=installed
   tags:
   - latest
 
 - name: Ensure NTP is running and enabled as configured.
   service:
-    name: ntpd
+    name: "{{ service_ntp }}"
     state: started
     enabled: yes
   when: docker_skip_tasks is not defined or not docker_skip_tasks
@@ -193,7 +210,7 @@
 - name: Copy the ntp.conf template file
   template: src=ntp.conf.j2 dest=/etc/ntp.conf
   notify:
-    - restart ntpd
+    - restart ntp
 
 # FIXME #809: PIP required first; has dependencies; needed on all hosts?
 # Speed up encrypt/decrypt operations
@@ -236,11 +253,17 @@
   # will fail
   ignore_errors: yes
 
+
+- name: Ensure CA package installed
+  package:
+    name: ca-certificates
+    state: present
+
 # Ref: http://docs.ansible.com/ansible/playbooks_loops.html#id4
 - name: Copy any custom PEM-format CA certs into place
   copy:
     src: "{{ item }}"
-    dest: "/etc/pki/ca-trust/source/anchors/"
+    dest: "{{ path_custom_pem_ca_trust }}"
     owner: root
     mode: "0755"
   with_fileglob:
@@ -250,7 +273,7 @@
 - name: Copy any custom OpenSSL extended-format CA certs into place
   copy:
     src: "{{ item }}"
-    dest: "/etc/pki/ca-trust/source/"
+    dest: "{{ path_custom_extended_ca_trust }}"
     owner: root
     mode: "0755"
   with_fileglob:
@@ -258,7 +281,7 @@
   register: new_custom_extended_ca_certs
 
 - name: Update CA trust if certs changed
-  shell: update-ca-trust
+  shell: "{{ command_update_ca_trust }}"
   when: new_custom_pem_ca_certs.changed or new_custom_extended_ca_certs.changed
 
 - name: Ensure meza-ansible has .gitconfig

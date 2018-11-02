@@ -1,0 +1,19 @@
+---
+
+# Package names
+package_openssh_client: openssh-client
+package_cron: cron
+
+
+# Services
+service_ntp: ntp
+
+
+# Paths
+path_custom_pem_ca_trust: "/usr/local/share/ca-certificates/"
+# Note: based on minimal research, Debian does not appear to use separate dirs for these
+path_custom_extended_ca_trust: "/usr/local/share/ca-certificates/"
+
+
+# Commands
+command_update_ca_trust: "update-ca-certificates"

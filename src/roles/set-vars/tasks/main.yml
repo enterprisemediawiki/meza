@@ -4,6 +4,10 @@
   include_vars:
     file: /opt/meza/config/core/defaults.yml
 
+- name: Set OS-family specific variables
+  include_vars:
+    files: "/opt/meza/config/core/{{ ansible_os_family }}.yml"
+
 - name: If using gluster (app-servers > 1), override m_uploads_dir
   set_fact:
     m_uploads_dir: "{{ gluster_mount_dir }}"
