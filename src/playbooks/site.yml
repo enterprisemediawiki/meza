@@ -93,7 +93,10 @@
 
 - hosts: load-balancers
   become: yes
-  tags: load-balancer
+  tags:
+    - load-balancer
+    - load-balancers
+    - haproxy
   roles:
     - set-vars
     - role: firewalld

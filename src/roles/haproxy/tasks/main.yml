@@ -7,7 +7,9 @@
 #     https://www.unixmen.com/configure-high-available-load-balancer-haproxy-keepalived/
 
 - name: Install haproxy packages
-  yum: name={{item}} state=installed
+  package:
+    name: "{{ item }}"
+    state: latest
   with_items:
     - haproxy
     - openssl
@@ -187,6 +189,7 @@
   with_items:
     - http
     - https
+  when: ansible_os_family == "RedHat"
 
 # Allow http and https through firewall
 #- name: Configure firewalld for haproxy via {{ item }}
