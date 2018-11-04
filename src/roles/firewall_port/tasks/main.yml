@@ -1,12 +1,22 @@
 ---
 # Open a firewall port from specific serves. Use firewalld for RedHat and UFW for Debian
 
-- name: Ensure firewalld port {{ firewall_port }} open for list of servers (RedHat/CentOS only)
+- set_fact:
+    firewalld_state: enabled
+    ufw_rule: allow
+  when: firewall_action is 'open'
+
+- set_fact:
+    firewalld_state: disabled
+    ufw_rule: deny
+  when: firewall_action is 'close'
+
+- name: Ensure firewalld port {{ firewall_port }} {{ firewall_action }} for list of servers (RedHat/CentOS only)
   firewalld:
-    rich_rule: 'rule family="ipv4" source address="{{ item }}/32" port port="{{ firewall_port }}" protocol="{{ firewall_protocol }}" accept'
+    rich_rule: 'rule family="ipv4" source address="{{ item }}" port port="{{ firewall_port }}" protocol="{{ firewall_protocol }}" accept'
     permanent: true
     immediate: true
-    state: enabled
+    state: "{{ firewalld_state }}"
     zone: "{{firewall_zone|default('public')}}"
 
   # strip "localhost" or inventory_hostname from list of servers to configure
@@ -14,21 +24,36 @@
 
   when:
     - ansible_os_family == 'RedHat'
-    - firewall_port is defined and firewall_protocol is defined
+    - firewall_servers != 'any'
+    - firewall_port is defined
+    - firewall_protocol is defined
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
 
+- name: Ensure firewalld port {{ firewall_port }} {{ firewall_action }} from all sources (RedHat/CentOS only)
+  firewalld:
+    port: "{{ firewall_port }}/{{ firewall_protocol }}"
+    permanent: true
+    immediate: true
+    state: "{{ firewalld_state }}"
+    zone: "{{firewall_zone|default('public')}}"
+  when:
+    - ansible_os_family == 'RedHat'
+    - firewall_servers == 'any'
+    - firewall_port is defined
+    - firewall_protocol is defined
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 - name: Ensure UFW port {{ firewall_port }} open for list of servers (Debian only)
   ufw:
-    rule: allow
-    src: '{{ item }}/32'
+    rule: {{ ufw_rule }}
+    src: '{{ item }}'
     to_port: "{{ firewall_port }}"
     proto: "{{ firewall_protocol }}"
 
     # FIXME: consider adding these, optionally.
     # interface: "{{ firewall_interface|default() }}" # example interface=eth0. with firewalld we have firewall_zone=public...hmm
 
-    comment: "allow {{ firewall_port }} "
+    comment: "{{ firewall_action }} {{ firewall_port }} "
 
   # strip "localhost" or inventory_hostname from list of servers to configure
   with_items: "{{ firewall_servers | difference([ 'localhost', inventory_hostname ]) }}"

@@ -100,11 +100,13 @@
   roles:
     - set-vars
     - role: firewall_port
+      firewall_action: open
       firewall_port: 8001
       firewall_protocol: tcp
       firewall_servers: "{{ groups['app-servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewall_port
+      firewall_action: open
       firewall_port: 8081
       firewall_protocol: tcp
       firewall_servers: "{{ groups['parsoid-servers'] }}"
@@ -118,17 +120,20 @@
   roles:
     - set-vars
     - role: firewall_port
+      firewall_action: open
       firewall_port: 8080
       firewall_protocol: tcp
       firewall_servers: "{{ groups['load-balancers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewall_port
+      firewall_action: open
       firewall_port: 8080
       firewall_protocol: tcp
       firewall_servers: "{{ groups['load-balancers-unmanaged'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "'load-balancers-unmanaged' in groups"
     - role: firewall_port
+      firewall_action: open
       firewall_port: 8080
       firewall_protocol: tcp
       firewall_servers: "{{ groups['parsoid-servers'] }}"
@@ -157,12 +162,14 @@
     # requests/replies and Gluster NFS server requests/replies. Gluster NFS
     # server operates over the following port numbers: 38465, 38466, and 38467.
     - role: firewall_port
+      firewall_action: open
       firewall_port: 111
       firewall_protocol: tcp
       firewall_servers: "{{ groups['app-servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
     - role: firewall_port
+      firewall_action: open
       firewall_port: 111
       firewall_protocol: udp
       firewall_servers: "{{ groups['app-servers'] }}"
@@ -182,12 +189,14 @@
     # guidelines. For example: if you have five bricks, you need to have ports
     # 49152 to 49156 open.
     - role: firewall_port
+      firewall_action: open
       firewall_port: 24007
       firewall_protocol: tcp
       firewall_servers: "{{ groups['app-servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
     - role: firewall_port
+      firewall_action: open
       firewall_port: 24008
       firewall_protocol: tcp
       firewall_servers: "{{ groups['app-servers'] }}"
@@ -197,24 +206,28 @@
     # One port required for each brick (in meza, this equals each server (one
     # brick per server))
     - role: firewall_port
+      firewall_action: open
       firewall_port: 49152
       firewall_protocol: tcp
       firewall_servers: "{{ groups['app-servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
     - role: firewall_port
+      firewall_action: open
       firewall_port: 49153
       firewall_protocol: tcp
       firewall_servers: "{{ groups['app-servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
     - role: firewall_port
+      firewall_action: open
       firewall_port: 49154
       firewall_protocol: tcp
       firewall_servers: "{{ groups['app-servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
     - role: firewall_port
+      firewall_action: open
       firewall_port: 49155
       firewall_protocol: tcp
       firewall_servers: "{{ groups['app-servers'] }}"
@@ -233,6 +246,7 @@
   roles:
     - set-vars
     - role: firewall_port
+      firewall_action: open
       firewall_port: 11211
       firewall_protocol: tcp
       firewall_servers: "{{ groups['app-servers'] }}"
@@ -288,21 +302,25 @@
   roles:
     - set-vars
     - role: firewall_port
+      firewall_action: open
       firewall_port: 9200
       firewall_protocol: tcp
       firewall_servers: "{{ groups['app-servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewall_port
+      firewall_action: open
       firewall_port: 9300
       firewall_protocol: tcp
       firewall_servers: "{{ groups['app-servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewall_port
+      firewall_action: open
       firewall_port: 9200
       firewall_protocol: tcp
       firewall_servers: "{{ groups['elastic-servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewall_port
+      firewall_action: open
       firewall_port: 9300
       firewall_protocol: tcp
       firewall_servers: "{{ groups['elastic-servers'] }}"
@@ -328,16 +346,19 @@
     - set-vars
     # Allow app servers to get to parsoid server(s) on port 8000
     - role: firewall_port
+      firewall_action: open
       firewall_port: 8000
       firewall_protocol: tcp
       firewall_servers: "{{ groups['app-servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewall_port
+      firewall_action: open
       firewall_port: 8000
       firewall_protocol: tcp
       firewall_servers: "{{ groups['load-balancers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewall_port
+      firewall_action: open
       firewall_port: 8000
       firewall_protocol: tcp
       firewall_servers: "{{ groups['load-balancers-unmanaged'] }}"
