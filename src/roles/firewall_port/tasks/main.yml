@@ -11,6 +11,12 @@
     ufw_rule: deny
   when: firewall_action == 'close'
 
+- set_fact:
+    firewall_servers: ['any']
+  when:
+    - firewall_servers is string
+    - firewall_servers == 'any'
+
 - name: Ensure firewalld port {{ firewall_port }} {{ firewall_action }} for list of servers (RedHat/CentOS only)
   firewalld:
     rich_rule: 'rule family="ipv4" source address="{{ item }}" port port="{{ firewall_port }}" protocol="{{ firewall_protocol }}" accept'
@@ -24,7 +30,7 @@
 
   when:
     - ansible_os_family == 'RedHat'
-    - firewall_servers != 'any'
+    - firewall_servers[0] != 'any'
     - firewall_port is defined
     - firewall_protocol is defined
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
@@ -38,7 +44,7 @@
     zone: "{{firewall_zone|default('public')}}"
   when:
     - ansible_os_family == 'RedHat'
-    - firewall_servers == 'any'
+    - firewall_servers[0] == 'any'
     - firewall_port is defined
     - firewall_protocol is defined
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
