@@ -4,12 +4,12 @@
 - set_fact:
     firewalld_state: enabled
     ufw_rule: allow
-  when: firewall_action is 'open'
+  when: firewall_action == 'open'
 
 - set_fact:
     firewalld_state: disabled
     ufw_rule: deny
-  when: firewall_action is 'close'
+  when: firewall_action == 'close'
 
 - name: Ensure firewalld port {{ firewall_port }} {{ firewall_action }} for list of servers (RedHat/CentOS only)
   firewalld:
