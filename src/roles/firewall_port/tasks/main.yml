@@ -45,15 +45,15 @@
 
 - name: Ensure UFW port {{ firewall_port }} open for list of servers (Debian only)
   ufw:
-    rule: {{ ufw_rule }}
-    src: '{{ item }}'
+    rule: "{{ ufw_rule }}"
+    src: "{{ item }}"
     to_port: "{{ firewall_port }}"
     proto: "{{ firewall_protocol }}"
 
     # FIXME: consider adding these, optionally.
     # interface: "{{ firewall_interface|default() }}" # example interface=eth0. with firewalld we have firewall_zone=public...hmm
 
-    comment: "{{ firewall_action }} {{ firewall_port }} "
+    comment: "{{ firewall_action }} {{ firewall_port }}"
 
   # strip "localhost" or inventory_hostname from list of servers to configure
   with_items: "{{ firewall_servers | difference([ 'localhost', inventory_hostname ]) }}"
