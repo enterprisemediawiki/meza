@@ -12,10 +12,17 @@
   when: firewall_action == 'close'
 
 - set_fact:
-    firewall_servers: ['any']
+    firewall_servers2: ['any']
   when:
     - firewall_servers is string
     - firewall_servers == 'any'
+
+- set_fact:
+    firewall_servers2: "{{ firewall_servers }}"
+  when:
+    - firewall_servers is string
+    - firewall_servers == 'any'
+
 
 - name: Ensure firewalld port {{ firewall_port }} {{ firewall_action }} for list of servers (RedHat/CentOS only)
   firewalld:
@@ -26,11 +33,11 @@
     zone: "{{firewall_zone|default('public')}}"
 
   # strip "localhost" or inventory_hostname from list of servers to configure
-  with_items: "{{ firewall_servers | difference([ 'localhost', inventory_hostname ]) }}"
+  with_items: "{{ firewall_servers2 | difference([ 'localhost', inventory_hostname ]) }}"
 
   when:
     - ansible_os_family == 'RedHat'
-    - firewall_servers[0] != 'any'
+    - firewall_servers2[0] != 'any'
     - firewall_port is defined
     - firewall_protocol is defined
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
@@ -44,7 +51,7 @@
     zone: "{{firewall_zone|default('public')}}"
   when:
     - ansible_os_family == 'RedHat'
-    - firewall_servers[0] == 'any'
+    - firewall_servers2[0] == 'any'
     - firewall_port is defined
     - firewall_protocol is defined
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
@@ -62,7 +69,7 @@
     comment: "{{ firewall_action }} {{ firewall_port }}"
 
   # strip "localhost" or inventory_hostname from list of servers to configure
-  with_items: "{{ firewall_servers | difference([ 'localhost', inventory_hostname ]) }}"
+  with_items: "{{ firewall_servers2 | difference([ 'localhost', inventory_hostname ]) }}"
 
   when:
     - ansible_os_family == 'Debian'
