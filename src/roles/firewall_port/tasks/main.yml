@@ -20,9 +20,7 @@
 - set_fact:
     firewall_servers2: "{{ firewall_servers }}"
   when:
-    - firewall_servers is string
-    - firewall_servers == 'any'
-
+    - firewall_servers is not string
 
 - name: Ensure firewalld port {{ firewall_port }} {{ firewall_action }} for list of servers (RedHat/CentOS only)
   firewalld:
