@@ -217,7 +217,6 @@
     firewall_action: open
     firewall_port: "{{ item }}"
     firewall_protocol: tcp
-    firewall_servers: any
     firewall_zone: "{{m_private_networking_zone|default('public')}}"
   with_items:
     - 80
@@ -232,7 +231,6 @@
     firewall_action: open
     firewall_port: 1936
     firewall_protocol: tcp
-    firewall_servers: any
     firewall_zone: "{{m_private_networking_zone|default('public')}}"
   when:
     - enable_haproxy_stats
@@ -245,7 +243,6 @@
     firewall_action: close
     firewall_port: 1936
     firewall_protocol: tcp
-    firewall_servers: any
     firewall_zone: "{{m_private_networking_zone|default('public')}}"
   when:
     - not enable_haproxy_stats
@@ -258,7 +255,6 @@
     firewall_action: open
     firewall_port: 8088
     firewall_protocol: tcp
-    firewall_servers: any
     firewall_zone: "{{m_private_networking_zone|default('public')}}"
   when:
     - m_setup_php_profiling
@@ -271,7 +267,6 @@
     firewall_action: close
     firewall_port: 8088
     firewall_protocol: tcp
-    firewall_servers: any
     firewall_zone: "{{m_private_networking_zone|default('public')}}"
   when:
     - not m_setup_php_profiling
