@@ -225,7 +225,7 @@ php_opcache_memory_consumption: 256
 php_opcache_interned_strings_buffer: 16
 
 # The amount of input variables that may be accepted
-max_input_vars: 2000 
+php_max_input_vars: 2000 
 
 # It's important for this number to be greater than the number of PHP files on a
 # server.
