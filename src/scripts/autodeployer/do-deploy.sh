@@ -88,6 +88,9 @@ if [ $? -eq 0 ]; then
 	source $NOTIFY "$DEPLOY_TYPE complete" "good"
 else
 	source $NOTIFY "$DEPLOY_TYPE attempt failed. Retrying..." "warning"
+
+	# sourcing scripts above may reset -e. Explicitly set prior to meza deploy
+	set +e
 	meza deploy "$m_environment" $DEPLOY_ARGS \
 		> /opt/data-meza/logs/${LOG_PREFIX}`date "+%Y%m%d%H%M%S"`.log 2>&1
 
@@ -98,6 +101,7 @@ else
 	fi
 fi
 
+set -e
 
 
 
