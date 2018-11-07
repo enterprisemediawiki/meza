@@ -1,10 +1,26 @@
 ---
-- name: Install apache packages
-  yum: name={{item}} state=installed
+- name: Ensure Apache webserver installed
+  package:
+    name: "{{ package_apache }}"
+    state: installed
+
+- name: Ensure Apache modules installed
+  yum:
+    name: "{{ item }}"
+    state: installed
   with_items:
-    - httpd-devel
     - mod_ssl
     - mod_proxy_html
+  when: ansible_os_family == 'RedHat'
+
+- name:
+  apache2_module:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - proxy_html
+    - ssl
+  when: ansible_os_family == 'Debian'
 
 - name: Make apache own htdocs directory
   file:
@@ -25,14 +41,16 @@
   - alt-meza-ansible
 
 - name: write the apache config file
-  template: "src=httpd.conf.j2 dest={{ m_apache_conf }}"
+  template:
+    src: httpd.conf.j2
+    dest: "{{ path_apache_conf }}"
   notify:
-  - restart apache
+    - restart apache
 
 - name: Ensure Apache environment variables set properly
   template:
     src: etc-sysconfig-httpd.j2
-    dest: /etc/sysconfig/httpd
+    dest: "{{ path_apache_startup_config }}"
   notify:
     - restart apache
 
@@ -66,7 +84,7 @@
 # Now that PHP is installed, start apache
 - name: ensure apache is running (and enable it at boot)
   service:
-    name: httpd
+    name: "{{ service_apache }}"
     state: started
     enabled: yes
   when: docker_skip_tasks is not defined or not docker_skip_tasks

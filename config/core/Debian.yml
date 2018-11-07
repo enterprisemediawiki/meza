@@ -3,17 +3,51 @@
 # Package names
 package_openssh_client: openssh-client
 package_cron: cron
-
+package_apache: apache2
+package_php_apache_deps:
+  - zlib-devel
+  - sqlite-devel
+  - bzip2-devel
+  - pcre-devel
+  - openssl-devel
+  - curl-devel
+  - libxml2-devel
+  - libXpm-devel
+  - gmp-devel
+  - libicu-devel
+  - t1lib-devel
+  - aspell-devel
+  - libcurl-devel
+  - libjpeg-devel
+  - libvpx-devel
+  - libpng-devel
+  - freetype-devel
+  - readline-devel
+  - libtidy-devel
+  - libmcrypt-devel
+  - pam-devel
+  - sendmail
+  - sendmail-cf
+  - m4
+  - xz-libs
+  - mariadb-libs
 
 # Services
 service_ntp: ntp
+service_apache: apache2
 
 
 # Paths
 path_custom_pem_ca_trust: "/usr/local/share/ca-certificates/"
 # Note: based on minimal research, Debian does not appear to use separate dirs for these
 path_custom_extended_ca_trust: "/usr/local/share/ca-certificates/"
-
+path_apache_conf: "/etc/apache2/apache2.conf"
+path_apache_startup_config: "/etc/default/apache2"
+path_apache_home: /usr/share/apache2
 
 # Commands
 command_update_ca_trust: "update-ca-certificates"
+
+
+
+

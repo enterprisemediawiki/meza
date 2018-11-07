@@ -3,36 +3,11 @@
   yum:
     name: "{{ item }}"
     state: installed
-  with_items:
-    - zlib-devel
-    - sqlite-devel
-    - bzip2-devel
-    - pcre-devel
-    - openssl-devel
-    - curl-devel
-    - libxml2-devel
-    - libXpm-devel
-    - gmp-devel
-    - libicu-devel
-    - t1lib-devel
-    - aspell-devel
-    - libcurl-devel
-    - libjpeg-devel
-    - libvpx-devel
-    - libpng-devel
-    - freetype-devel
-    - readline-devel
-    - libtidy-devel
-    - libmcrypt-devel
-    - pam-devel
-    - sendmail
-    - sendmail-cf
-    - m4
-    - xz-libs
-    - mariadb-libs
+  with_items: "{{ package_php_apache_deps }}"
 
 - name: Get IUS repository
   include: ius.yml
+  when: ansible_os_family == "RedHat"
 
 - name: Ensure PHP 5.6 packages removed
   yum:
@@ -62,17 +37,19 @@
     - php56u-mbstring
     - php56u-mcrypt
     - php56u-mssql
-
+  when: ansible_os_family == "RedHat"
 
 # Check if the desired version of PHP is installed. If it is not, ensure any
 # other versions of PHP are not installed
-- name: "Check if {{ php_ius_version}} package is installed"
+- name: "Check if {{ php_ius_version }} package is installed"
   yum:
     list: "{{ php_ius_version }}"
   register: correct_php
+  when: ansible_os_family == "RedHat"
 
 - debug:
     var: correct_php
+  when: ansible_os_family == "RedHat"
 
 - name: Remove any other PHP packages from IUS repo if correct PHP is not installed
   package:
@@ -80,6 +57,16 @@
     state: absent
   when: ansible_os_family == 'RedHat' and
         correct_php.results|length == 0
+
+
+#
+#
+#
+# PHP on DEBIAN: https://github.com/geerlingguy/ansible-role-php-versions/blob/master/tasks/setup-Debian.yml
+#
+#
+#
+
 
 - name: Ensure PHP IUS packages installed
   yum:
@@ -126,6 +113,7 @@
     # https://docs.microsoft.com/en-us/sql/connect/php/installation-tutorial-linux-mac?view=sql-server-2017#installing-the-drivers-on-red-hat-7
     # - php56u-mssql
 
+  when: ansible_os_family == "RedHat"
 
 - name: Install MS SQL driver for PHP
   include: mssql_driver_for_php.yml
