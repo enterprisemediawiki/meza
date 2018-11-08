@@ -23,14 +23,14 @@ package_php_apache_deps:
   - libpng-devel
   - freetype-devel
   - readline-devel
-  - libtidy-devel
+      - libtidy-dev
   - libmcrypt-devel
   - pam-devel
-  - sendmail
-  - sendmail-cf
+      - sendmail
+      - sendmail-cf
   - m4
   - xz-libs
-  - mariadb-libs
+      - mariadb-common
 
 # Services
 service_ntp: ntp
