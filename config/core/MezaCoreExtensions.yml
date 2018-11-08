@@ -167,6 +167,9 @@ list:
     version: "{{ mediawiki_default_branch }}"
     config: |
       $wgThanksConfirmationRequired = false;
+  - name: RevisionSlider
+    repo: https://github.com/wikimedia/mediawiki-extensions-RevisionSlider.git
+    version: "{{ mediawiki_default_branch }}"
   - name: CollapsibleVector
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CollapsibleVector
     version: "{{ mediawiki_default_branch }}"
