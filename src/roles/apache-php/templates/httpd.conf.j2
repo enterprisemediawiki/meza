@@ -28,7 +28,7 @@
 # same ServerRoot for multiple httpd daemons, you will need to change at
 # least PidFile.
 #
-ServerRoot "/etc/httpd"
+ServerRoot "{{ path_apache_server_root }}"
 
 #
 # Mutex: Allows you to set the mutex mechanism and mutex file directory
