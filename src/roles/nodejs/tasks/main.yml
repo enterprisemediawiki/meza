@@ -37,6 +37,7 @@
   with_items:
     - nodejs
     - npm
+  when: ansible_os_family == 'RedHat'
 
 
 
@@ -62,7 +63,7 @@
     path: /usr/local/lib/node
   when: "node_version.stdout != 'v8.11.1'"
 
-- name: Ensure existing node is removed
+- name: Ensure directory exists for node
   file:
     state: directory
     path: /usr/local/lib/node

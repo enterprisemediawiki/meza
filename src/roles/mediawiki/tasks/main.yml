@@ -510,10 +510,10 @@
 # MediaWiki 1.31+.
 - name: Ensure Python3 present
   yum:
-    name: python35u
+    name: "{{ package_python3 }}"
     state: latest
   tags:
-  - latest
+    - latest
 
 - name: "Ensure python3 symlink in place"
   file:
@@ -524,3 +524,5 @@
     owner: root
     group: root
     mode: 0755
+  when: ansible_os_family == 'RedHat'
+

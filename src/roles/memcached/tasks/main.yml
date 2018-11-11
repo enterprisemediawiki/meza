@@ -1,4 +1,8 @@
 ---
+
+# Setup user? See
+# https://github.com/geerlingguy/ansible-role-memcached/blob/master/tasks/main.yml
+
 - name: Ensure memcached and netcat packages latest
   yum:
     name: "{{ item }}"
@@ -12,7 +16,7 @@
 - name: Write the memcached config file
   template:
     src: memcached.j2
-    dest: "{{ m_memcached_conf }}"
+    dest: "{{ path_memcached_conf }}"
   notify:
   - restart memcached
 

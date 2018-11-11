@@ -9,6 +9,8 @@ package_apache: apache2
 # from when Meza installed Apache and PHP from source. They probably are not needed
 # anymore.
 package_php_apache_deps: []
+package_java: "default-jre"
+package_python3: python3
 
   # Did not immediately find a replacement package in Debian for these RH packages
   # - zlib-devel
@@ -61,9 +63,10 @@ path_custom_extended_ca_trust: "/usr/local/share/ca-certificates/"
 path_apache_conf: "/etc/apache2/apache2.conf"
 path_apache_startup_config: "/etc/default/apache2"
 path_apache_home: /usr/share/apache2
-php_conf_d_path: "/etc/php/{{ php_debian_version }}/cli/conf.d"
-php_conf_d_files:
+path_php_conf_d: "/etc/php/{{ php_debian_version }}/cli/conf.d"
+path_php_conf_d_files:
   - "10-opcache.ini"
+path_memcached_conf: /etc/memcached.conf
 
 # Commands
 command_update_ca_trust: "update-ca-certificates"

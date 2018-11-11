@@ -30,8 +30,8 @@
 - name: Write php.d ini files
   template:
     src: "{{ item }}.j2"
-    dest: "{{ php_conf_d_path }}/{{ item }}"
-  with_items: "{{ php_conf_d_files }}"
+    dest: "{{ path_php_conf_d }}/{{ item }}"
+  with_items: "{{ path_php_conf_d_files }}"
   notify:
     - restart apache
 

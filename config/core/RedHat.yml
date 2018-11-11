@@ -31,7 +31,8 @@ package_php_apache_deps:
   - m4
   - xz-libs
   - mariadb-libs
-
+package_java: java-1.8.0-openjdk
+package_python3: python35u
 
 # Services
 service_ntp: ntpd
@@ -44,9 +45,12 @@ path_custom_extended_ca_trust: "/etc/pki/ca-trust/source/"
 path_apache_conf: /etc/httpd/conf/httpd.conf
 path_apache_startup_config: "/etc/sysconfig/httpd"
 path_apache_home: /usr/share/httpd
-php_conf_d_path: "/etc/php.d/"
-php_conf_d_files:
+path_php_conf_d: "/etc/php.d/"
+path_php_conf_d_files:
   - "10-opcache.ini"
+# was: m_memcached_conf: /etc/sysconfig/memcached
+path_memcached_conf: /etc/sysconfig/memcached
+
 
 # Commands
 command_update_ca_trust: "update-ca-trust"
