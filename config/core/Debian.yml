@@ -9,9 +9,6 @@ package_apache: apache2
 # from when Meza installed Apache and PHP from source. They probably are not needed
 # anymore.
 package_php_apache_deps: []
-package_java: "default-jre"
-package_python3: python3
-
   # Did not immediately find a replacement package in Debian for these RH packages
   # - zlib-devel
   # - sqlite-devel
@@ -27,7 +24,6 @@ package_python3: python3
   # - pam-devel
   # - m4
   # - xz-libs
-
   # These are either named the same in RE vs Debian, or were easily found
   # - libcurl4-openssl-dev
   # - libssl-dev
@@ -40,7 +36,6 @@ package_python3: python3
   # - sendmail
   # - sendmail-cf
   # - mariadb-common
-
   # These are required to install PHP from source.
   # - libxpm-dev
   # - libmysqlclient-dev
@@ -49,6 +44,14 @@ package_python3: python3
   # - libxslt-dev
   # - libldb-dev
 
+package_java: "default-jre"
+package_python3: python3
+package_base_extras:
+  - expect
+  - perl
+  - wget
+  - gcc
+  - cifs-utils
 
 
 # Services
