@@ -4,33 +4,50 @@
 package_openssh_client: openssh-client
 package_cron: cron
 package_apache: apache2
-package_php_apache_deps:
-  - zlib-devel
-  - sqlite-devel
-  - bzip2-devel
-  - pcre-devel
-  - openssl-devel
-  - curl-devel
-  - libxml2-devel
-  - libXpm-devel
-  - gmp-devel
-  - libicu-devel
-  - t1lib-devel
-  - aspell-devel
-  - libcurl-devel
-  - libjpeg-devel
-  - libvpx-devel
-  - libpng-devel
-  - freetype-devel
-  - readline-devel
-      - libtidy-dev
-  - libmcrypt-devel
-  - pam-devel
-      - sendmail
-      - sendmail-cf
-  - m4
-  - xz-libs
-      - mariadb-common
+
+# RedHat install has a lot of php/apache dependencies, but these may be carry-overs
+# from when Meza installed Apache and PHP from source. They probably are not needed
+# anymore.
+package_php_apache_deps: []
+
+  # Did not immediately find a replacement package in Debian for these RH packages
+  # - zlib-devel
+  # - sqlite-devel
+  # - bzip2-devel
+  # - pcre-devel
+  # - libXpm-devel
+  # - gmp-devel
+  # - t1lib-devel
+  # - aspell-devel
+  # - libvpx-devel
+  # - readline-devel
+  # - libmcrypt-devel
+  # - pam-devel
+  # - m4
+  # - xz-libs
+
+  # These are either named the same in RE vs Debian, or were easily found
+  # - libcurl4-openssl-dev
+  # - libssl-dev
+  # - libxml2-dev
+  # - libicu-dev
+  # - libjpeg-dev
+  # - libpng-dev
+  # - libfreetype6-dev
+  # - libtidy-dev
+  # - sendmail
+  # - sendmail-cf
+  # - mariadb-common
+
+  # These are required to install PHP from source.
+  # - libxpm-dev
+  # - libmysqlclient-dev
+  # - libpq-dev
+  # - libldap2-dev
+  # - libxslt-dev
+  # - libldb-dev
+
+
 
 # Services
 service_ntp: ntp
@@ -44,10 +61,12 @@ path_custom_extended_ca_trust: "/usr/local/share/ca-certificates/"
 path_apache_conf: "/etc/apache2/apache2.conf"
 path_apache_startup_config: "/etc/default/apache2"
 path_apache_home: /usr/share/apache2
+php_conf_d_path: "/etc/php/{{ php_debian_version }}/cli/conf.d"
+php_conf_d_files:
+  - "10-opcache.ini"
 
 # Commands
 command_update_ca_trust: "update-ca-certificates"
-
 
 
 

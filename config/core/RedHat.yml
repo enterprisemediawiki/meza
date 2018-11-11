@@ -44,6 +44,9 @@ path_custom_extended_ca_trust: "/etc/pki/ca-trust/source/"
 path_apache_conf: /etc/httpd/conf/httpd.conf
 path_apache_startup_config: "/etc/sysconfig/httpd"
 path_apache_home: /usr/share/httpd
+php_conf_d_path: "/etc/php.d/"
+php_conf_d_files:
+  - "10-opcache.ini"
 
 # Commands
 command_update_ca_trust: "update-ca-trust"
