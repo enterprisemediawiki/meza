@@ -4,24 +4,6 @@
     name: "{{ package_apache }}"
     state: installed
 
-- name: Ensure Apache modules installed
-  yum:
-    name: "{{ item }}"
-    state: installed
-  with_items:
-    - mod_ssl
-    - mod_proxy_html
-  when: ansible_os_family == 'RedHat'
-
-- name:
-  apache2_module:
-    state: present
-    name: "{{ item }}"
-  with_items:
-    - proxy_html
-    - ssl
-  when: ansible_os_family == 'Debian'
-
 - name: Make apache own htdocs directory
   file:
     state: directory
@@ -46,6 +28,24 @@
     dest: "{{ path_apache_conf }}"
   notify:
     - restart apache
+
+- name: Ensure Apache modules installed (RedHat/CentOS only)
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - mod_ssl
+    - mod_proxy_html
+  when: ansible_os_family == 'RedHat'
+
+- name: Ensure Apache modules installed (Debian only)
+  apache2_module:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - proxy_html
+    - ssl
+  when: ansible_os_family == 'Debian'
 
 - name: Ensure Apache environment variables set properly
   template:
