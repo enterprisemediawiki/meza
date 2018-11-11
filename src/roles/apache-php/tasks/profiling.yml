@@ -48,8 +48,8 @@
 - name: Ensure XHGui directory owned by Apache
   file:
     path: "{{ m_profiling_xhgui_directory }}"
-    owner: apache
-    group: apache
+    owner: "{{ user_apache }}"
+    owner: "{{ group_apache }}"
     mode: 0755
     recurse: yes
     state: directory

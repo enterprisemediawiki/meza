@@ -8,15 +8,15 @@
   file:
     state: directory
     path: "{{ m_htdocs }}"
-    owner: apache
-    group: apache
+    owner: "{{ user_apache }}"
+    owner: "{{ group_apache }}"
     mode: 0775
 
 - name: Ensure user meza-ansible and alt-meza-ansible in group "apache"
   user:
     name: "{{ item }}"
     # add onto groups
-    groups: apache
+    groups: "{{ group_apache }}"
     append: yes
   with_items:
   - meza-ansible

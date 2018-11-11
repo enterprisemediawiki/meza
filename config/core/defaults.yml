@@ -191,8 +191,8 @@ clean_upload_stash_crontime: "0 18 * * *"
 
 # uploads directory. Note: user meza-ansible is in group "apache"
 m_uploads_dir_mode: "0775"
-m_uploads_dir_owner: apache
-m_uploads_dir_group: apache
+m_uploads_dir_owner: "{{ user_apache }}"
+m_uploads_dir_owner: "{{ group_apache }}"
 
 # Per [1] this should not be accessible from the web and should have mode of
 # 0700. However, we need it to be accessible by apache httpd for page requests
@@ -202,8 +202,8 @@ m_uploads_dir_group: apache
 #
 # [1] https://www.mediawiki.org/wiki/Manual:$wgCacheDirectory
 m_cache_directory_mode: "0770"
-m_cache_directory_owner: apache
-m_cache_directory_group: apache
+m_cache_directory_owner: "{{ user_apache }}"
+m_cache_directory_owner: "{{ group_apache }}"
 
 
 m_logs_mode: "0755"

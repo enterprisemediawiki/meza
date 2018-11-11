@@ -1,6 +1,8 @@
 ---
 
+#
 # Package names
+#
 package_openssh_client: openssh-client
 package_cron: cron
 package_apache: apache2
@@ -53,13 +55,16 @@ package_base_extras:
   - gcc
   - cifs-utils
 
-
+#
 # Services
+#
 service_ntp: ntp
 service_apache: apache2
 
 
+#
 # Paths
+#
 path_custom_pem_ca_trust: "/usr/local/share/ca-certificates/"
 # Note: based on minimal research, Debian does not appear to use separate dirs for these
 path_custom_extended_ca_trust: "/usr/local/share/ca-certificates/"
@@ -71,8 +76,15 @@ path_php_conf_d_files:
   - "10-opcache.ini"
 path_memcached_conf: /etc/memcached.conf
 
+
+#
 # Commands
+#
 command_update_ca_trust: "update-ca-certificates"
 
 
-
+#
+# Users and groups
+#
+user_apache: www-data
+group_apache: www-data
