@@ -250,7 +250,7 @@ list:
     version: tags/0.1.0
   - name: MasonryMainPage
     repo: https://github.com/enterprisemediawiki/MasonryMainPage.git
-    version: master
+    version: tags/0.3.0
   - name: WatchAnalytics
     repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
     version: tags/0.1.0
