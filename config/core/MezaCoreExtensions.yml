@@ -354,7 +354,7 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: PageImporter
     repo: https://github.com/enterprisemediawiki/PageImporter.git
-    version: master
+    version: tags/0.1.0
     legacy_load: True
   - name: SemanticMeetingMinutes
     repo: https://github.com/enterprisemediawiki/SemanticMeetingMinutes.git
