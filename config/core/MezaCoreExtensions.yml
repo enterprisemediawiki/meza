@@ -238,7 +238,7 @@ list:
     version: master
   - name: Wiretap
     repo: https://github.com/enterprisemediawiki/Wiretap.git
-    version: master
+    version: tags/0.1.0
   - name: ApprovedRevs
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ApprovedRevs.git
     # Use this commit until a release tag for v1.0 is created
