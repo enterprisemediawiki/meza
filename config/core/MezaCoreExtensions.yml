@@ -247,7 +247,7 @@ list:
       $egApprovedRevsAutomaticApprovals = false;
   - name: ImagesLoaded
     repo: https://github.com/enterprisemediawiki/ImagesLoaded.git
-    version: master
+    version: tags/0.1.0
   - name: MasonryMainPage
     repo: https://github.com/enterprisemediawiki/MasonryMainPage.git
     version: master
