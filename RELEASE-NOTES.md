@@ -1,6 +1,68 @@
 Release Notes
 =============
 
+## Meza 32.2.1
+
+Optional brief description of any common themes of this release.
+
+### Commits since previous release
+
+* 531b203 Reset +e prior to autodeployer deploys else second deploy fails (#1058)
+* 324fa8b Update php.ini.j2 for `php_max_input_vars`
+* 27730de Update defaults.yml for `php_max_input_vars`
+* 60d50a5 Add fix for `php_max_input_vars` setting
+* c64df3a Update robots.txt.j2
+
+### Contributors
+
+@bryandamon, @krisfield, @jamesmontalvo3
+
+### Mediawiki.org pages updated
+
+* https://www.mediawiki.org/wiki/Meza/Configuration_options added information about `php_max_input_vars`, which needs to be increased if using Page Forms with 1000s of inputs
+
+## Meza 31.2.0
+
+This release has two major changes. One, it bumps Semantic MediaWiki to v3.0.0, as well as updating related extensions. Two, it makes the 31.x branch as close as possible to what is required for running MW 1.32, including some tweaks to Parsoid and Elasticsearch settings, bumping PHP to 7.1, and upgrading Extension:Maps.
+
+### Commits since 31.1.0
+
+* dee80ba Bump PageForms to version that adds spreadsheet sorting (#1050)
+* 532ffbc DataTransfer 1.0 doesn't have fixes for MW 1.31, use release branch instead (#1048)
+* a8e3486 SMW rebuildData: better logging and attempt error handling
+* 115cfa8 Use wfLoadExtension for SRF
+* 8213181 Upgrade Pageforms to Version 4.4.1
+* cfb4014 wfLoadExtension for SRF; bump Maps version slightly
+* c85013f Cleanup parsoid version comments
+* d432fb5 Update Extension:Maps to 6.0.1 (#1044)
+* 98c0ff1 Upgrade Pageforms to Version 4.4.1
+* be439a8 Bump PHP 7.0 to 7.1; include checks to remove old PHP versions
+* 113c229 Set Parsoid strictAcceptCheck = false
+* 1b27616 Upgrade CirrusSearch metastore before (re)indexing
+* 69b5169 Bump SMW and SRF to 3.0.0. Bump SemanticCompoundQueries to 1.2.0 (#1040)
+* e65045e Update pageforms to fix spreadsheet sorting (this didn't really fix it)
+
+### Contributors
+
+* @jamesmontalvo3
+* @krisfield
+
+### Mediawiki.org pages updated
+
+* https://www.mediawiki.org/wiki/Meza added information on how to upgrade Meza, and bumped PHP version.
+
+## Meza 31.1.1
+
+Fix for change to Ansible's support of `enablerepo` option
+
+### Commits since 31.1.0
+
+* 7d1472e Update enablerepo functionality to work better with Ansible 2.7.0 (#1038)
+
+### Contributors
+
+@jamesmontalvo3
+
 ## Meza 31.1.0
 
 Fix for PHP opcache, addition of Autodeployer, bump PageForms versions
