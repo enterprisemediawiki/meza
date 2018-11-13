@@ -216,7 +216,7 @@ list:
     legacy_load: true
   - name: TalkRight
     repo: https://github.com/enterprisemediawiki/TalkRight.git
-    version: master
+    version: tags/2.0.0
     legacy_load: true
   - name: AdminLinks
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/AdminLinks.git
