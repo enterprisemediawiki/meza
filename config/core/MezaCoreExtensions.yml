@@ -88,7 +88,7 @@ list:
       $wgCiteEnablePopups = true;
   - name: ParserFunctionHelper
     repo: https://github.com/enterprisemediawiki/ParserFunctionHelper.git
-    version: master
+    version: tags/1.0.0
   - name: CharInsert
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CharInsert.git
     version: "{{ mediawiki_default_branch }}"
@@ -179,7 +179,7 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: MezaExt
     repo: https://github.com/enterprisemediawiki/MezaExt.git
-    version: "master"
+    version: tags/0.1.0
   # Extension:PdfHandler (breaks on very large PDFs)
   # https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler
   # // Location of PdfHandler dependencies
@@ -216,7 +216,7 @@ list:
     legacy_load: true
   - name: TalkRight
     repo: https://github.com/enterprisemediawiki/TalkRight.git
-    version: master
+    version: tags/2.0.0
     legacy_load: true
   - name: AdminLinks
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/AdminLinks.git
@@ -235,10 +235,10 @@ list:
       $wgHeaderTabsRenderSingleTab = true;
   - name: CopyWatchers
     repo: https://github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git
-    version: master
+    version: tags/0.10.0
   - name: Wiretap
     repo: https://github.com/enterprisemediawiki/Wiretap.git
-    version: master
+    version: tags/0.1.0
   - name: ApprovedRevs
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ApprovedRevs.git
     # Use this commit until a release tag for v1.0 is created
@@ -247,13 +247,13 @@ list:
       $egApprovedRevsAutomaticApprovals = false;
   - name: ImagesLoaded
     repo: https://github.com/enterprisemediawiki/ImagesLoaded.git
-    version: master
+    version: tags/0.1.0
   - name: MasonryMainPage
     repo: https://github.com/enterprisemediawiki/MasonryMainPage.git
-    version: master
+    version: tags/0.3.0
   - name: WatchAnalytics
     repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
-    version: master
+    version: tags/0.1.0
     config: |
       $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
   - name: Variables
@@ -354,16 +354,16 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: PageImporter
     repo: https://github.com/enterprisemediawiki/PageImporter.git
-    version: master
+    version: tags/0.1.0
     legacy_load: True
   - name: SemanticMeetingMinutes
     repo: https://github.com/enterprisemediawiki/SemanticMeetingMinutes.git
-    version: master
+    version: tags/1.0.0
     legacy_load: True
   - name: HeaderFooter
     repo: https://github.com/enterprisemediawiki/HeaderFooter.git
     version: tags/3.0.0
   - name: NumerAlpha
     repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/NumerAlpha.git
-    version: master
+    version: tags/0.7.0
     legacy_load: True
