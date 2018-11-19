@@ -111,11 +111,11 @@ topapache=$(echo "$topdata" | grep "apache")
 # 11925 apache    20   0  706516  77052  50568 S   0.0  0.5   0:06.94 httpd
 
 # calculate total memory% used by all tasks of each application
-mysqltotalmem=$(echo "$topdata" | grep "mysql" | awk '{ sum += $10 } END { print sum }')
-elastictotalmem=$(echo "$topdata" | grep "elastic" | awk '{ sum += $10 } END { print sum }')
-memcachedtotalmem=$(echo "$topdata" | grep "memcach" | awk '{ sum += $10 } END { print sum }')
-parsoidtotalmem=$(echo "$topdata" | grep "parsoid" | awk '{ sum += $10 } END { print sum }')
-apachetotalmem=$(echo "$topdata" | grep "apache" | awk '{ sum += $10 } END { print sum }')
+mysqltotalmem=$(echo "$topdata" | grep "mysql" | awk 'BEGIN { sum = 0 } { sum += $10 } END { print sum }')
+elastictotalmem=$(echo "$topdata" | grep "elastic" | awk 'BEGIN { sum = 0 } { sum += $10 } END { print sum }')
+memcachedtotalmem=$(echo "$topdata" | grep "memcach" | awk 'BEGIN { sum = 0 } { sum += $10 } END { print sum }')
+parsoidtotalmem=$(echo "$topdata" | grep "parsoid" | awk 'BEGIN { sum = 0 } { sum += $10 } END { print sum }')
+apachetotalmem=$(echo "$topdata" | grep "apache" | awk 'BEGIN { sum = 0 } { sum += $10 } END { print sum }')
 
 
 insert_sql=`cat <<EOF
@@ -212,6 +212,3 @@ if [ $notifyslack == "true" ] && [ $slack_token ]; then
 		color=$slack_msg_color"
 
 fi
-
-
-
