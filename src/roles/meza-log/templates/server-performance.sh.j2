@@ -118,7 +118,7 @@ parsoidtotalmem=$(echo "$topdata" | grep "parsoid" | awk 'BEGIN { sum = 0 } { su
 apachetotalmem=$(echo "$topdata" | grep "apache" | awk 'BEGIN { sum = 0 } { sum += $10 } END { print sum }')
 
 
-insert_sql=`cat <<EOF
+insert_sql=`printf "
 	INSERT INTO meza_server_log.performance
 	(
 		datetime,
@@ -133,21 +133,19 @@ insert_sql=`cat <<EOF
 		apache,
 		jobs
 	)
-	VALUES
-	(
-		'$datetime',
-		$loadavg1,
-		$loadavg5,
-		$loadavg15,
-		$memorypercentused,
-		$mysqltotalmem,
-		$elastictotalmem,
-		$memcachedtotalmem,
-		$parsoidtotalmem,
-		$apachetotalmem,
-		$jobs
-	);
-EOF`
+	VALUES ( '%s', %f, %f, %f, %f, %f, %f, %f, %f, %f, %f );" \
+		"$datetime"                	   	   	   	   	   	  	  \
+		"$loadavg1"				  							  \
+		"$loadavg5"				  							  \
+		"$loadavg15"			  							  \
+		"$memorypercentused"	  							  \
+		"$mysqltotalmem"		  							  \
+		"$elastictotalmem"		  							  \
+		"$memcachedtotalmem"	  							  \
+		"$parsoidtotalmem"		  							  \
+		"$apachetotalmem"		  							  \
+		"$jobs"`
+
 
 
 # add data point to database
