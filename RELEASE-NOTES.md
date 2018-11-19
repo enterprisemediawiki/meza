@@ -1,6 +1,6 @@
 Release Notes
 =============
-## Meza 32.2.2
+## Meza 31.2.2
 
 ### Commits since previous release
 
@@ -27,7 +27,7 @@ Release Notes
 
 * None
 
-## Meza 32.2.1
+## Meza 31.2.1
 
 ### Commits since previous release
 
