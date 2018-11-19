@@ -1,9 +1,33 @@
 Release Notes
 =============
+## Meza 32.2.2
+
+### Commits since previous release
+
+* d544d8b Bumps WatchAnalytics to 2.0.0
+* 1230747 Use GitHub mirrors for Gerrit repos
+* 8be750b Merge pull request #1060 from enterprisemediawiki/ext-wa-0.1.0
+* 9baa1d6 Change Extension:CopyWatchers from master to 0.10.0
+* cde132c Change Extension:MezaExt from master to 0.1.0
+* a92c786 Change Extension:ParserFunctionHelper from master to 1.0.0
+* 2a75abc Change Extension:TalkRight from master to 2.0.0
+* 87522d3 Change Extension:PageImporter from master to 0.1.0
+* ffd07c7 Change Extension:SemanticMeetingMinutes from master to 1.0.0
+* 00c178e Change Extension:NumerAlpha from master to 0.7.0
+* 7313d78 Change Extension:MasonryMainPage from master to 0.3.0
+* 296a47c Change Extension:ImagesLoaded from master to 0.1.0
+* 3760316 Change Extension:Wiretap from master to 0.1.0
+* 3026847 Change WatchAnalytics from master to 0.1.0
+
+### Contributors
+
+@jamesmontalvo3, @krisfield
+
+### Mediawiki.org pages updated
+
+* None
 
 ## Meza 32.2.1
-
-Optional brief description of any common themes of this release.
 
 ### Commits since previous release
 
@@ -136,5 +160,3 @@ Fix for PHP opcache, addition of Autodeployer, bump PageForms versions
 ### Contributors
 
 @jamesmontalvo3, @freephile, @darenwelsh, @djflux
-
-
