@@ -61,7 +61,7 @@ list:
       wfLoadExtension( 'Maps' );
 
   - name: DisplayTitle
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DisplayTitle.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-DisplayTitle.git
     version: tags/1.2
 
 
@@ -69,20 +69,20 @@ list:
   # Extensions loaded with wfLoadExtension
   #
   - name: ParserFunctions
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ParserFunctions.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-ParserFunctions.git
     version: "{{ mediawiki_default_branch }}"
     config: |
       // Also enable StringFunctions, like len, pos, sub, replace, explode
       // https://www.mediawiki.org/wiki/Extension:StringFunctions
       $wgPFEnableStringFunctions = true;
   - name: ExternalData
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ExternalData.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-ExternalData.git
     version: "{{ mediawiki_default_branch }}"
   - name: LabeledSectionTransclusion
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/LabeledSectionTransclusion.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-LabeledSectionTransclusion.git
     version: "{{ mediawiki_default_branch }}"
   - name: Cite
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Cite.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-Cite.git
     version: "{{ mediawiki_default_branch }}"
     config: |
       $wgCiteEnablePopups = true;
@@ -90,17 +90,17 @@ list:
     repo: https://github.com/enterprisemediawiki/ParserFunctionHelper.git
     version: tags/1.0.0
   - name: CharInsert
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CharInsert.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-CharInsert.git
     version: "{{ mediawiki_default_branch }}"
   - name: PageForms
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PageForms.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-PageForms.git
     # commit includes spreadsheet sorting which didn't make PageForms 4.4.1
     version: "730390a31a56c001af83948af1eefc5174abbe06"
   - name: DismissableSiteNotice
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/DismissableSiteNotice.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-DismissableSiteNotice.git
     version: "{{ mediawiki_default_branch }}"
   - name: WikiEditor
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/WikiEditor.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-WikiEditor.git
     version: "{{ mediawiki_default_branch }}"
     config: |
       $wgDefaultUserOptions['usebetatoolbar'] = 1;
@@ -108,27 +108,27 @@ list:
       $wgDefaultUserOptions['wikieditor-publish'] = 1; # displays publish button
       $wgDefaultUserOptions['wikieditor-preview'] = 1; # Displays the Preview and Changes tabs
 
-  # consider replacing with https://gerrit.wikimedia.org/r/mediawiki/extensions/SyntaxHighlight_Pygments.git
+  # consider replacing with https://github.com/wikimedia/mediawiki-extensions-SyntaxHighlight_Pygments.git
   - name: SyntaxHighlight_GeSHi
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SyntaxHighlight_GeSHi.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-SyntaxHighlight_GeSHi.git
     version: "{{ mediawiki_default_branch }}"
     composer_merge: True
   - name: InputBox
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/InputBox.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-InputBox.git
     version: "{{ mediawiki_default_branch }}"
   - name: ReplaceText
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ReplaceText.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-ReplaceText.git
     version: tags/1.4
   - name: Interwiki
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Interwiki.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-Interwiki.git
     version: "{{ mediawiki_default_branch }}"
     config: |
       $wgGroupPermissions['sysop']['interwiki'] = true;
   - name: YouTube
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/YouTube.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-YouTube.git
     version: "{{ mediawiki_default_branch }}"
   - name: UniversalLanguageSelector
-    repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UniversalLanguageSelector.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-UniversalLanguageSelector
     version: "{{ mediawiki_default_branch }}"
     config: |
       // Disable international phoenetic alphabet selector that breaks searching for
@@ -144,7 +144,7 @@ list:
       $wgULSIMEEnabled = false;
 
   - name: VisualEditor
-    repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/VisualEditor.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-VisualEditor.git
     version: "{{ mediawiki_default_branch }}"
     git_submodules: True
     config: |
@@ -156,14 +156,14 @@ list:
       $wgVisualEditorEnableDiffPage = true;
 
   - name: TemplateData
-    repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/TemplateData.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-TemplateData.git
     version: "{{ mediawiki_default_branch }}"
   - name: Elastica
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Elastica.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-Elastica.git
     version: "{{ mediawiki_default_branch }}"
     composer_merge: True
   - name: Thanks
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Thanks.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-Thanks.git
     version: "{{ mediawiki_default_branch }}"
     config: |
       $wgThanksConfirmationRequired = false;
@@ -171,20 +171,20 @@ list:
     repo: https://github.com/wikimedia/mediawiki-extensions-RevisionSlider.git
     version: "{{ mediawiki_default_branch }}"
   - name: CollapsibleVector
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CollapsibleVector
+    repo: https://github.com/wikimedia/mediawiki-extensions-CollapsibleVector
     version: "{{ mediawiki_default_branch }}"
   - name: SimpleMathJax
     repo: https://github.com/jamesmontalvo3/SimpleMathJax.git
     version: e94afaffcdde8d926b166fdd166162f9519beaa1
     legacy_load: True
   - name: ImageMap
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ImageMap
+    repo: https://github.com/wikimedia/mediawiki-extensions-ImageMap
     version: "{{ mediawiki_default_branch }}"
   - name: MezaExt
     repo: https://github.com/enterprisemediawiki/MezaExt.git
     version: tags/0.1.0
   # Extension:PdfHandler (breaks on very large PDFs)
-  # https://gerrit.wikimedia.org/r/mediawiki/extensions/PdfHandler
+  # https://github.com/wikimedia/mediawiki-extensions-PdfHandler
   # // Location of PdfHandler dependencies
   # // $wgPdfProcessor = '/usr/bin/gs'; // installed via yum
   # // $wgPdfPostProcessor = '/usr/local/bin/convert'; // built from source
@@ -197,24 +197,24 @@ list:
   # Extensions loaded with legacy require_once method
   #
   - name: StringFunctionsEscaped
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/StringFunctionsEscaped.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-StringFunctionsEscaped.git
     version: "{{ mediawiki_default_branch }}"
     legacy_load: true
   - name: WhoIsWatching
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/WhoIsWatching.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-WhoIsWatching.git
     version: "{{ mediawiki_default_branch }}"
     config: |
       $wgPageShowWatchingUsers = true;
   - name: SemanticInternalObjects
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticInternalObjects.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-SemanticInternalObjects.git
     version: "{{ mediawiki_default_branch }}"
     legacy_load: true
   - name: SemanticDrilldown
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/SemanticDrilldown.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-SemanticDrilldown.git
     version: "{{ mediawiki_default_branch }}"
     legacy_load: true
   - name: Arrays
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Arrays.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-Arrays.git
     version: "2166695159a9a5eb18cb96d4811cdefa0978ab8a"
     legacy_load: true
   - name: TalkRight
@@ -222,16 +222,16 @@ list:
     version: tags/2.0.0
     legacy_load: true
   - name: AdminLinks
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/AdminLinks.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-AdminLinks.git
     version: "{{ mediawiki_default_branch }}"
     legacy_load: true
     config: |
       $wgGroupPermissions['sysop']['adminlinks'] = true;
   - name: BatchUserRights
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/BatchUserRights.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-BatchUserRights.git
     version: "{{ mediawiki_default_branch }}"
   - name: HeaderTabs
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/HeaderTabs.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-HeaderTabs.git
     version: tags/1.2
     config: |
       $wgHeaderTabsEditTabLink = false;
@@ -243,7 +243,7 @@ list:
     repo: https://github.com/enterprisemediawiki/Wiretap.git
     version: tags/0.1.0
   - name: ApprovedRevs
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ApprovedRevs.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git
     # Use this commit until a release tag for v1.0 is created
     version: 251cf4db3ab99366fa281ea535e725672fa2b6c3
     config: |
@@ -256,14 +256,14 @@ list:
     version: tags/0.3.0
   - name: WatchAnalytics
     repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
-    version: tags/0.1.0
+    version: tags/2.0.0
     config: |
       $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
   - name: Variables
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Variables.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-Variables.git
     version: "{{ mediawiki_default_branch }}"
   - name: ContributionScores
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/ContributionScores.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-ContributionScores.git
     version: "{{ mediawiki_default_branch }}"
     legacy_load: true
     config: |
@@ -288,11 +288,11 @@ list:
 
 
   - name: PipeEscape
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/PipeEscape.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-PipeEscape.git
     version: "{{ mediawiki_default_branch }}"
     legacy_load: true
   - name: CirrusSearch
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/CirrusSearch.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-CirrusSearch.git
     version: "{{ mediawiki_default_branch }}"
     legacy_load: true
     config: |
@@ -300,12 +300,12 @@ list:
       // cannot be easily added to base-extensions.yml. As such, CirrusSearch config
       // is included directly in LocalSettings.php.j2
   - name: Echo
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/Echo.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-Echo.git
     version: "{{ mediawiki_default_branch }}"
     config: |
       $wgEchoEmailFooterAddress = $wgPasswordSender;
   - name: UploadWizard
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/UploadWizard
+    repo: https://github.com/wikimedia/mediawiki-extensions-UploadWizard
     version: "{{ mediawiki_default_branch }}"
     config: |
       // Needed to make UploadWizard work in IE, see bug 39877
@@ -353,7 +353,7 @@ list:
       );
 
   - name: DataTransfer
-    repo: https://gerrit.wikimedia.org/r/p/mediawiki/extensions/DataTransfer.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-DataTransfer.git
     version: "{{ mediawiki_default_branch }}"
   - name: PageImporter
     repo: https://github.com/enterprisemediawiki/PageImporter.git
@@ -367,6 +367,6 @@ list:
     repo: https://github.com/enterprisemediawiki/HeaderFooter.git
     version: tags/3.0.0
   - name: NumerAlpha
-    repo: https://gerrit.wikimedia.org/r/mediawiki/extensions/NumerAlpha.git
+    repo: https://github.com/wikimedia/mediawiki-extensions-NumerAlpha.git
     version: tags/0.7.0
     legacy_load: True

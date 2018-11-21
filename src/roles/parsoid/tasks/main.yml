@@ -8,7 +8,7 @@
 # the repo in the following step (optionally, if we want <img> tags)
 - name: Get Parsoid repository
   git:
-    repo: https://gerrit.wikimedia.org/r/p/mediawiki/services/parsoid
+    repo: https://github.com/wikimedia/parsoid.git
     dest: "{{ m_parsoid_path }}"
     version: "{{ m_parsoid_version }}"
     force: yes
