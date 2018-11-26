@@ -61,7 +61,7 @@
     path: "{{ m_htdocs }}/wikis/{{ wiki_id }}"
     state: directory
     owner: "{{ user_apache }}"
-    owner: "{{ group_apache }}"
+    group: "{{ group_apache }}"
     mode: 0755
 - name: "{{ wiki_id }} - Ensure wiki config symlink in place"
   file:
@@ -70,7 +70,7 @@
     dest: "{{ m_htdocs }}/wikis/{{ wiki_id }}/config"
     state: link
     owner: "{{ user_apache }}"
-    owner: "{{ group_apache }}"
+    group: "{{ group_apache }}"
     mode: 0755
 
 

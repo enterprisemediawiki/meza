@@ -23,7 +23,7 @@
     path: "/opt/conf-meza/public/wikis/{{ wiki_id }}"
     state: directory
     owner: "{{ user_apache }}"
-    owner: "{{ group_apache }}"
+    group: "{{ group_apache }}"
     mode: 0755
   delegate_to: localhost
   run_once: true
@@ -37,7 +37,7 @@
     # force=no: this will not overwrite
     force: no
     owner: "{{ user_apache }}"
-    owner: "{{ group_apache }}"
+    group: "{{ group_apache }}"
     mode: 0755
   with_items:
     - favicon.ico
@@ -50,7 +50,7 @@
     path: "/opt/conf-meza/public/wikis/{{ wiki_id }}/{{ item }}"
     state: directory
     owner: "{{ user_apache }}"
-    owner: "{{ group_apache }}"
+    group: "{{ group_apache }}"
     mode: 0755
   delegate_to: localhost
   run_once: true
@@ -65,7 +65,7 @@
     # force=no: Non-default for templates. Destination files will not be overwritten
     force: no
     owner: "{{ user_apache }}"
-    owner: "{{ group_apache }}"
+    group: "{{ group_apache }}"
     mode: 0755
   with_items:
     - preLocalSettings.d/base.php

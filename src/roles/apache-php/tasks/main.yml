@@ -9,7 +9,7 @@
     state: directory
     path: "{{ m_htdocs }}"
     owner: "{{ user_apache }}"
-    owner: "{{ group_apache }}"
+    group: "{{ group_apache }}"
     mode: 0775
 
 - name: Ensure user meza-ansible and alt-meza-ansible in group "apache"

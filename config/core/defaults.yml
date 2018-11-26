@@ -192,7 +192,7 @@ clean_upload_stash_crontime: "0 18 * * *"
 # uploads directory. Note: user meza-ansible is in group "apache"
 m_uploads_dir_mode: "0775"
 m_uploads_dir_owner: "{{ user_apache }}"
-m_uploads_dir_owner: "{{ group_apache }}"
+m_uploads_dir_group: "{{ group_apache }}"
 
 # Per [1] this should not be accessible from the web and should have mode of
 # 0700. However, we need it to be accessible by apache httpd for page requests
@@ -203,7 +203,7 @@ m_uploads_dir_owner: "{{ group_apache }}"
 # [1] https://www.mediawiki.org/wiki/Manual:$wgCacheDirectory
 m_cache_directory_mode: "0770"
 m_cache_directory_owner: "{{ user_apache }}"
-m_cache_directory_owner: "{{ group_apache }}"
+m_cache_directory_group: "{{ group_apache }}"
 
 
 m_logs_mode: "0755"
@@ -245,4 +245,3 @@ php_opcache_max_accelerated_files: 28001
 # memory storage allocation. ("1" means validate once per second, but only
 # once per request. "0" means always validate)
 php_opcache_revalidate_freq: 0
-
