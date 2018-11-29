@@ -41,6 +41,8 @@ ServerRoot "{{ path_apache_server_root }}"
 # Mutex default:logs
 
 
+{% if ansible_os_family == 'RedHat' %}
+
 #
 # Dynamic Shared Object (DSO) Support
 #
@@ -55,6 +57,24 @@ ServerRoot "{{ path_apache_server_root }}"
 #
 Include conf.modules.d/*.conf
 
+{$ else %}
+
+# Include module configuration:
+IncludeOptional mods-enabled/*.load
+IncludeOptional mods-enabled/*.conf
+
+# Include list of ports to listen on
+Include ports.conf
+
+# Include generic snippets of statements
+IncludeOptional conf-enabled/*.conf
+
+# Include the virtual host configurations:
+IncludeOptional sites-enabled/*.conf
+
+{% endif %}
+
+
 <IfModule unixd_module>
 #
 # If you wish httpd to run as a different user or group, you must run
@@ -64,8 +84,8 @@ Include conf.modules.d/*.conf
 # It is usually good practice to create a dedicated user and group for
 # running httpd, as with most system services.
 #
-User apache
-Group apache
+User {{ user_apache }}
+Group {{ group_apache }}
 
 </IfModule>
 
@@ -479,6 +499,9 @@ Listen 8090
 	</FilesMatch>
 </IfModule>
 
+
+
+
 # Don't allow access to images directories. Will allow access via img_auth.php
 # FIXME #805: No images are here anymore anyway. We actually have no method of NOT
 #             using img_auth.php now. Remove me.
@@ -486,3 +509,5 @@ Listen 8090
 	Order Allow,Deny
 	Deny From All
 </DirectoryMatch>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
