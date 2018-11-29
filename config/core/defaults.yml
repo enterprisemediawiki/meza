@@ -154,6 +154,39 @@ m_parsoid_version: "tags/v0.9.0"
 # MediaWiki 1.29 and higher require ElasticSearch 5.x
 elasticsearch_major_version: "5.x"
 
+# This can't be in Debian.yml, because that is loaded prior to defaults.yml...hmmm...
+packages_php_debian:
+  - php{{ php_debian_version }}-common
+  - php{{ php_debian_version }}-cli
+  - php{{ php_debian_version }}-dev
+  # - php{{ php_debian_version }}-fpm
+  - libpcre3-dev
+  - php{{ php_debian_version }}-gd
+  - php{{ php_debian_version }}-curl
+  - php{{ php_debian_version }}-imap
+  # - php{{ php_debian_version }}-json
+  - php{{ php_debian_version }}-opcache
+  - php{{ php_debian_version }}-xml
+  - php{{ php_debian_version }}-mbstring
+  - php{{ php_debian_version }}-mysql
+  - php{{ php_debian_version }}-odbc
+  - php{{ php_debian_version }}-pspell
+  - php{{ php_debian_version }}-snmp
+  - php{{ php_debian_version }}-xmlrpc
+  - php{{ php_debian_version }}-bcmath
+  - php{{ php_debian_version }}-intl
+  - php{{ php_debian_version }}-soap
+  - php-sqlite3
+  - php-apcu
+  - php-pear
+  - php-memcached
+
+  # No PHP 7.2 version of this (just like with IUS)
+  - php{{ php_debian_version }}-mcrypt
+
+  # No apt package corresponding to:
+  #   "{{ php_ius_version }}-process"
+  #   "{{ php_ius_version }}-pdo"
 
 
 #
