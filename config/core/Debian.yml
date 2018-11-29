@@ -71,10 +71,7 @@ path_custom_extended_ca_trust: "/usr/local/share/ca-certificates/"
 path_apache_conf: "/etc/apache2/apache2.conf"
 path_apache_startup_config: "/etc/default/apache2"
 path_apache_home: /usr/share/apache2
-# used in config.sh.j2 to set the app location
-m_apache: /etc/apache2
-# used in httpd.conf to set the document root
-path_apache_server_root: "/var/www"
+path_apache_server_root: "/etc/apache2"
 path_php_conf_d: "/etc/php/{{ php_debian_version }}/cli/conf.d"
 path_php_conf_d_files:
   - "10-opcache.ini"
