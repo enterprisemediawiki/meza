@@ -3,6 +3,7 @@
 #
 # Package names
 #
+package_firewall: ufw
 package_openssh_client: openssh-client
 package_cron: cron
 package_apache: apache2

@@ -138,7 +138,7 @@
     - vim
     - git
     - net-tools
-    - firewalld
+    - "{{ package_firewall }}"
     - rsyslog
     - jq
     - tree
