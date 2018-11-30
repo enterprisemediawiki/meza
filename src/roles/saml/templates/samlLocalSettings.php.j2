@@ -96,7 +96,7 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 			return array_reduce( $addressesToCheck, function ( $carry, $check ) {
 				// Check if incoming address is IPv4
 				if ( filter_var( $ipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
-					list ( $subnet, $bits ) = explode( '/', $range );
+					list ( $subnet, $bits ) = explode( '/', $check );
 					
 					// Allows passing in CIDR or maskless IP
 					if ( $bits === null ) {
@@ -125,7 +125,7 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 						 $binaryip .= str_pad( decbin( ord( $char ) ), 8, '0', STR_PAD_LEFT );
 					}
 
-					list( $subnet, $bits ) = explode( '/', $cidrnet );
+					list( $subnet, $bits ) = explode( '/', $check );
 					if ( $bits === null) {
 						$bits = 128;
 					}
