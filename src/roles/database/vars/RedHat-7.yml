@@ -6,7 +6,7 @@ __mysql_packages:
   - mariadb-libs
   - MySQL-python
   - perl-DBD-MySQL
-__mysql_slow_query_log_file: /var/log/mysql-slow.log
+__mysql_slow_query_log_file: /var/log/mariadb/slow-queries.log
 __mysql_log_error: /var/log/mariadb/mariadb.log
 __mysql_syslog_tag: mariadb
 __mysql_pid_file: /var/run/mariadb/mariadb.pid
