@@ -141,12 +141,7 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 				}
 				
 				return $carry || false;
-			}, false)
-			
-			
-			elseif ( in_array( $ipaddr, $wgMezaAllowSkipSamlUsers[$username] ) ) {
-				return true;
-			}
+			}, false);
 		}
 
 		$forbidden();
