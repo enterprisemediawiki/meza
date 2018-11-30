@@ -55,6 +55,8 @@ package_base_extras:
   - wget
   - gcc
   - cifs-utils
+package_nmap: nmap
+
 
 #
 # Services

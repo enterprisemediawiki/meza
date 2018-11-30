@@ -11,7 +11,7 @@
   - latest
   with_items:
   - memcached
-  - nmap-ncat
+  - "{{ package_nmap }}"
 
 - name: Write the memcached config file
   template:
