@@ -55,6 +55,7 @@ package_base_extras:
   - wget
   - gcc
   - cifs-utils
+  - curl
 package_nmap: nmap
 
 
@@ -63,6 +64,7 @@ package_nmap: nmap
 #
 service_ntp: ntp
 service_apache: apache2
+service_cron: cron
 
 
 #

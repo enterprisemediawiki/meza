@@ -50,6 +50,7 @@ package_nmap: nmap-ncat
 #
 service_ntp: ntpd
 service_apache: httpd
+service_cron: crond
 
 #
 # Paths

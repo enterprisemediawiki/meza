@@ -45,6 +45,7 @@
   with_items:
     - proxy_html
     - ssl
+    - rewrite
   when: ansible_os_family == 'Debian'
 
 - name: Ensure Apache environment variables set properly

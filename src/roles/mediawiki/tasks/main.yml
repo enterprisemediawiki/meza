@@ -499,7 +499,7 @@
 # Ref: https://www.scalingphpbook.com/blog/2014/02/14/best-zend-opcache-settings.html
 - name: Reload (not restart) httpd to pick up changes to opcached php files
   service:
-    name: httpd
+    name: "{{ service_apache }}"
     state: reloaded
   tags:
     - httpd-reload
