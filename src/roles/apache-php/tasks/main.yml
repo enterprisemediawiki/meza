@@ -39,6 +39,14 @@
   when: ansible_os_family == 'RedHat'
 
 - name: Ensure Apache modules installed (Debian only)
+  apt:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - "libapache2-mod-php{{ php_debian_version }}"
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure Apache modules enabled (Debian only)
   apache2_module:
     state: present
     name: "{{ item }}"
@@ -46,7 +54,6 @@
     - proxy_html
     - ssl
     - rewrite
-    - "libapache2-mod-php{{ php_debian_version }}"
   when: ansible_os_family == 'Debian'
 
 - name: Ensure Apache environment variables set properly
