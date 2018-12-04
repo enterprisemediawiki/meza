@@ -79,3 +79,4 @@ command_update_ca_trust: "update-ca-trust"
 #
 user_apache: apache
 group_apache: apache
+user_memcached: memcached

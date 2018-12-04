@@ -94,3 +94,4 @@ command_update_ca_trust: "update-ca-certificates"
 #
 user_apache: www-data
 group_apache: www-data
+user_memcached: memcache

@@ -1,5 +1,14 @@
-PORT="11211"
-USER="memcached"
-MAXCONN="1024"
-CACHESIZE="512"
+{% if ansible_os_family == "RedHat" %}
+PORT="{{ memcached_port }}"
+USER="{{ user_memcached }}"
+MAXCONN="{{ memcached_max_connections }}"
+CACHESIZE="{{ memcached_memory }}"
 OPTIONS=""
+
+{% else %}
+-p {{ memcached_port }}
+-u {{ user_memcached }}
+-c {{ memcached_max_connections }}
+-m {{ memcached_memory }}
+
+{% endif %}

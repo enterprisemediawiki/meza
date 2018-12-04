@@ -278,3 +278,22 @@ php_opcache_max_accelerated_files: 28001
 # memory storage allocation. ("1" means validate once per second, but only
 # once per request. "0" means always validate)
 php_opcache_revalidate_freq: 0
+
+
+#
+# Memcached config
+#
+
+# Port to use
+memcached_port: 11211
+
+# Limit the number of simultaneous incoming connections.
+memcached_max_connections: 1024
+
+# Max amount of memory to use. Note that the daemon will grow to this size, but
+# does not start out holding this much
+memcached_memory: 512
+
+# User to run memcached
+# user_memcached: see RedHat.yml and Debian.yml
+
