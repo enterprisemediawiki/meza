@@ -161,9 +161,22 @@
     state: permissive # log actions that would be blocked if state=enforcing
   when: ansible_os_family == "RedHat"
 
-- name: ensure firewalld is running (and enable it at boot)
-  service: name=firewalld state=started enabled=yes
-  when: docker_skip_tasks is not defined or not docker_skip_tasks
+- name: Ensure firewalld is running and enable it at boot (RedHat/CentOS only)
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+  when:
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - ansible_os_family == "RedHat"
+
+- name: Ensure UFW is enabled and denying access by default (Debian only)
+  ufw:
+    state: enabled
+    policy: deny
+  when:
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - ansible_os_family == "Debian"
 
 
 #
