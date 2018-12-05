@@ -43,7 +43,7 @@
     state: present
     name: "{{ item }}"
   with_items:
-    - "libapache2-mod-php"
+    - "libapache2-mod-php{{ php_debian_version }}"
   when: ansible_os_family == 'Debian'
 
 - name: Ensure Apache modules enabled (Debian only)
