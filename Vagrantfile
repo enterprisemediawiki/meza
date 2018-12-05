@@ -58,8 +58,10 @@ Vagrant.configure("2") do |config|
 
     config.vm.define "app2" do |app2|
 
+      hostname = 'meza-app2-' + box_os
+
       app2.vm.box = baseBox
-      app2.vm.hostname = 'app2-' + box_os + '-' + mezaInstallUnique
+      app2.vm.hostname = hostname
 
       app2.vm.network :private_network, ip: "192.168.56.57"
 
@@ -68,7 +70,7 @@ Vagrant.configure("2") do |config|
         v.customize ['modifyvm', :id, '--cableconnected1', 'on']
         v.customize ["modifyvm", :id, "--memory", configuration["app2"]["memory"] ]
         v.customize ["modifyvm", :id, "--cpus", configuration["app2"]["cpus"] ]
-        v.customize ["modifyvm", :id, "--name", "app2"]
+        v.customize ["modifyvm", :id, "--name", hostname + '-' + mezaInstallUnique]
       end
 
       # Non-controlling server should not have meza
@@ -109,8 +111,10 @@ Vagrant.configure("2") do |config|
 
     config.vm.define "db2" do |db2|
 
+      hostname = 'meza-db2-' + box_os
+
       db2.vm.box = baseBox
-      db2.vm.hostname = 'db2-' + box_os + '-' + mezaInstallUnique
+      db2.vm.hostname = hostname
 
       db2.vm.network :private_network, ip: "192.168.56.58"
 
@@ -119,7 +123,7 @@ Vagrant.configure("2") do |config|
         v.customize ['modifyvm', :id, '--cableconnected1', 'on']
         v.customize ["modifyvm", :id, "--memory", configuration["db2"]["memory"] ]
         v.customize ["modifyvm", :id, "--cpus", configuration["db2"]["cpus"] ]
-        v.customize ["modifyvm", :id, "--name", "db2"]
+        v.customize ["modifyvm", :id, "--name", hostname + '-' + mezaInstallUnique]
       end
 
       # Non-controlling server should not have meza
@@ -157,11 +161,10 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "app1", primary: true do |app1|
 
-    # app1.vm.box = "centos/7"
+    hostname = 'meza-app1-' + box_os
+
     app1.vm.box = baseBox
-    # app1.vm.box = "geerlingguy/centos7"
-    app1.vm.hostname = 'app1-' + box_os + '-' + mezaInstallUnique
-    # app1.vm.box_url = "ubuntu/precise64"
+    app1.vm.hostname = hostname
 
     app1.vm.network :private_network, ip: "192.168.56.56"
 
@@ -170,7 +173,7 @@ Vagrant.configure("2") do |config|
       v.customize ['modifyvm', :id, '--cableconnected1', 'on']
       v.customize ["modifyvm", :id, "--memory", configuration["app1"]["memory"] ]
       v.customize ["modifyvm", :id, "--cpus", configuration["app1"]["cpus"] ]
-      v.customize ["modifyvm", :id, "--name", "app1"]
+      v.customize ["modifyvm", :id, "--name", hostname + '-' + mezaInstallUnique]
     end
 
     # Disable default synced folder at /vagrant, instead put at /opt/meza
