@@ -170,9 +170,9 @@ Vagrant.configure("2") do |config|
     app1.vm.box = baseBox
     app1.vm.hostname = hostname
 
-    ip_address = configuration["app1"]["ip_address"]
+    app1_ip_address = configuration["app1"]["ip_address"]
 
-    app1.vm.network :private_network, ip: ip_address
+    app1.vm.network :private_network, ip: app1_ip_address
 
     app1.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
@@ -219,22 +219,22 @@ Vagrant.configure("2") do |config|
     #
     envvars = {}
     if configuration.key?("app2") || configuration.key?("db2")
-      envvars[:default_servers] = "192.168.56.56"
+      envvars[:default_servers] = app1_ip_address
     end
 
     if configuration.key?("app2")
-      envvars[:app_servers] = "192.168.56.56,192.168.56.57"
+      envvars[:app_servers] = app1_ip_address + "," + configuration["app2"]["ip_address"]
     end
 
     if configuration.key?("db2")
-      envvars[:db_master] = "192.168.56.56"
-      envvars[:db_slaves] = "192.168.56.58"
+      envvars[:db_master] = app1_ip_address
+      envvars[:db_slaves] = configuration["db2"]["ip_address"]
     end
 
     # Create vagrant environment if it doesn't exist
     app1.vm.provision "setupenv", type: "shell", preserve_order: true, env: envvars, inline: <<-SHELL
       if [ ! -d /opt/conf-meza/secret/vagrant ]; then
-        meza setup env vagrant --fqdn=192.168.56.56 --db_pass=1234 --private_net_zone=public
+        meza setup env vagrant --fqdn=#{app1_ip_address} --db_pass=1234 --private_net_zone=public
       fi
     SHELL
 
@@ -269,6 +269,8 @@ EOL
     #
     if configuration.key?("app2") || configuration.key?("db2")
 
+      app2_ip_address = configuration["app2"]["ip_address"]
+
       app1.vm.provision "keytransfer", type: "shell", preserve_order: true, inline: <<-SHELL
 
         # Turn off host key checking for user meza-ansible, to avoid prompts
@@ -287,16 +289,16 @@ EOL
         # sudo su meza-ansible
 
         # Copy id_rsa.pub to each minion
-        # sshpass -p 1234 ssh meza-ansible@192.168.56.57 "echo \"$pubkey\" >> /opt/conf-meza/users/meza-ansible/.ssh/authorized_keys"
+        # sshpass -p 1234 ssh meza-ansible@#{app2_ip_address} "echo \"$pubkey\" >> /opt/conf-meza/users/meza-ansible/.ssh/authorized_keys"
 
         # Remove password-based authentication for $ansible_user
         #echo "delete password"
-        #ssh 192.168.56.57 "sudo passwd --delete meza-ansible"
+        #ssh #{app2_ip_address} "sudo passwd --delete meza-ansible"
 
         # Allow SSH login
         # WARNING: This is INSECURE and for test environment only
         # echo "setup sshd_config"
-        # ssh 192.168.56.57 "sudo sed -r -i 's/UsePAM yes/UsePAM no/g;' /etc/ssh/sshd_config && sudo systemctl restart sshd"
+        # ssh #{app2_ip_address} "sudo sed -r -i 's/UsePAM yes/UsePAM no/g;' /etc/ssh/sshd_config && sudo systemctl restart sshd"
       SHELL
 
       # else
