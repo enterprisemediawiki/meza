@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 require 'yaml'
+require 'digest/sha1'
 
 if not File.file?("#{File.dirname(__FILE__)}/.vagrant/id_rsa")
   system("
@@ -14,11 +15,34 @@ else
   configuration = YAML::load(File.read("#{File.dirname(__FILE__)}/vagrantconf.default.yml"))
 end
 
-if configuration.key?("baseBox") and configuration["baseBox"] == "debian"
-  baseBox = "debian/contrib-stretch64"
+if configuration.key?("baseBox")
+
+  # Allow custom setting of base bax
+  baseBox = configuration["baseBox"]
+
+  # Since we can't determine the OS of an arbitrary base box, just say "custom"
+  box_os = "custom"
+
+elsif configuration.key?("box_os")
+
+  box_os = configuration["box_os"]
+
+  if box_os == "debian"
+    baseBox = "debian/contrib-stretch64"
+  elsif box_os == "centos"
+    baseBox = "bento/centos-7.4"
+  else
+    raise Vagrant::Errors::VagrantError.new, "Configuration option 'box_os' must be 'debian' or 'centos'"
+  end
+
 else
+  # default to CentOS
   baseBox = "bento/centos-7.4"
+  box_os = "centos"
 end
+
+mezaInstallUnique = Digest::SHA1.hexdigest File.dirname(__FILE__)
+
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -35,7 +59,7 @@ Vagrant.configure("2") do |config|
     config.vm.define "app2" do |app2|
 
       app2.vm.box = baseBox
-      app2.vm.hostname = 'app2'
+      app2.vm.hostname = 'app2-' + box_os + '-' + mezaInstallUnique
 
       app2.vm.network :private_network, ip: "192.168.56.57"
 
@@ -86,7 +110,7 @@ Vagrant.configure("2") do |config|
     config.vm.define "db2" do |db2|
 
       db2.vm.box = baseBox
-      db2.vm.hostname = 'db2'
+      db2.vm.hostname = 'db2-' + box_os + '-' + mezaInstallUnique
 
       db2.vm.network :private_network, ip: "192.168.56.58"
 
@@ -136,7 +160,7 @@ Vagrant.configure("2") do |config|
     # app1.vm.box = "centos/7"
     app1.vm.box = baseBox
     # app1.vm.box = "geerlingguy/centos7"
-    app1.vm.hostname = 'app1'
+    app1.vm.hostname = 'app1-' + box_os + '-' + mezaInstallUnique
     # app1.vm.box_url = "ubuntu/precise64"
 
     app1.vm.network :private_network, ip: "192.168.56.56"
