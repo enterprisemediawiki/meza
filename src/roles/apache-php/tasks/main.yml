@@ -29,6 +29,23 @@
   notify:
     - restart apache
 
+- name: Ensure Apache environment variables set properly
+  template:
+    src: etc-sysconfig-httpd.j2
+    dest: "{{ path_apache_startup_config }}"
+  notify:
+    - restart apache
+
+- name: Install PHP
+  include: php.yml
+  # http://docs.ansible.com/ansible/playbooks_roles.html#dynamic-versus-static-includes
+  static: yes
+
+#
+# Apache modules
+# For Debian these need to be after php.yml since repo provided there provides
+# proper version of apache php module (constraint may go away with PHP FPM)
+#
 - name: Ensure Apache modules installed (RedHat/CentOS only)
   yum:
     name: "{{ item }}"
@@ -56,18 +73,9 @@
     - rewrite
   when: ansible_os_family == 'Debian'
 
-- name: Ensure Apache environment variables set properly
-  template:
-    src: etc-sysconfig-httpd.j2
-    dest: "{{ path_apache_startup_config }}"
-  notify:
-    - restart apache
-
-- name: Install PHP
-  include: php.yml
-  # http://docs.ansible.com/ansible/playbooks_roles.html#dynamic-versus-static-includes
-  static: yes
-
+#
+# Composer
+#
 - name: Ensure Composer configured
   include_role:
     name: composer
