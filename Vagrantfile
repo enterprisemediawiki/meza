@@ -63,7 +63,9 @@ Vagrant.configure("2") do |config|
       app2.vm.box = baseBox
       app2.vm.hostname = hostname
 
-      app2.vm.network :private_network, ip: "192.168.56.57"
+      ip_address = configuration["app2"]["ip_address"]
+
+      app2.vm.network :private_network, ip: ip_address
 
       app2.vm.provider :virtualbox do |v|
         v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
@@ -116,7 +118,9 @@ Vagrant.configure("2") do |config|
       db2.vm.box = baseBox
       db2.vm.hostname = hostname
 
-      db2.vm.network :private_network, ip: "192.168.56.58"
+      ip_address = configuration["db2"]["ip_address"]
+
+      db2.vm.network :private_network, ip: ip_address
 
       db2.vm.provider :virtualbox do |v|
         v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
@@ -166,7 +170,9 @@ Vagrant.configure("2") do |config|
     app1.vm.box = baseBox
     app1.vm.hostname = hostname
 
-    app1.vm.network :private_network, ip: "192.168.56.56"
+    ip_address = configuration["app1"]["ip_address"]
+
+    app1.vm.network :private_network, ip: ip_address
 
     app1.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
