@@ -474,8 +474,14 @@ $wgSessionCacheType = CACHE_MEMCACHED;
 ## is writable, then set this to true:
 $wgEnableUploads = true;
 $wgMaxUploadSize = 1024*1024*100; // 100 MB
+
 $wgUseImageMagick = true;
-$wgImageMagickConvertCommand = "/usr/bin/convert";
+{% if ansible_os_family == "RedHat" %}
+$wgImageMagickConvertCommand = '/usr/local/bin/convert';
+{% else %}
+$wgImageMagickConvertCommand = 'convert';
+{% endif %}
+
 
 # InstantCommons allows wiki to use images from http://commons.wikimedia.org
 $wgUseInstantCommons = false;
@@ -600,9 +606,6 @@ $wgMaxImageArea = 1.25e10; // Images on [[Snorkel]] fail without this
 // ini_set( 'pcre.backtrack_limit', 10000000 ); //10million
 ini_set( 'pcre.backtrack_limit', 1000000000 ); //1 billion
 
-
-$wgUseImageMagick = true;
-$wgImageMagickConvertCommand = '/usr/local/bin/convert';
 
 // Allowed file types
 $wgFileExtensions = array(
@@ -869,13 +872,13 @@ $wgVirtualRestConfig['modules']['parsoid'] = array(
 // Define which namespaces will use VE
 // Per the docs, https://www.mediawiki.org/wiki/Extension:VisualEditor#Changing_active_namespaces
 // This is done a little differently in VE than in core or other extensions.
-// For VE, we use an array, keyed by the (string) canonical name of the namespace 
+// For VE, we use an array, keyed by the (string) canonical name of the namespace
 // and a (boolean) value for enabled or not
 
 // $wgContentNamespaces gets added automatically.
 
-// finally, it should be mentioned that the Extension Registry is what provides for the 
-// merge strategy 
+// finally, it should be mentioned that the Extension Registry is what provides for the
+// merge strategy
 
 $wgVisualEditorAvailableNamespaces = [
     "User" => true,
@@ -885,8 +888,8 @@ $wgVisualEditorAvailableNamespaces = [
 ];
 
 // quickly add a namespace, without figuring out what the merge strategy is
-// $wgVisualEditorAvailableNamespaces[] = NS_CUSTOM; 
-// $wgVisualEditorAvailableNamespaces[] = NS_PROJECT; 
+// $wgVisualEditorAvailableNamespaces[] = NS_CUSTOM;
+// $wgVisualEditorAvailableNamespaces[] = NS_PROJECT;
 
 
 
