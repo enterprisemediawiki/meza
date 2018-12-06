@@ -64,10 +64,11 @@
     #             sudo and the other to not.
     - name: Ensure test-user is passwordless sudoer
       lineinfile:
-        dest: /etc/sudoers
+        dest: /etc/sudoers.d/test-user
         state: present
         line: 'test-user ALL=(ALL) NOPASSWD: ALL'
-        validate: 'visudo -cf %s'
+        # FIXME: does this work for files other than /etc/sudoers
+        # validate: 'visudo -cf %s'
 
     - name: Ensure test-user .ssh dir configured
       file:

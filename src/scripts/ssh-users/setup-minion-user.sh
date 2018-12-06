@@ -87,4 +87,4 @@ sed -r -i "s/^Defaults\\s+requiretty/#Defaults requiretty/g;" /etc/sudoers
 sed -r -i "s/^Defaults\\s+\!visiblepw/#Defaults \\!visiblepw/g;" /etc/sudoers
 
 # Add $ansible_user to sudoers as a passwordless user
-bash -c "echo 'meza-ansible ALL=(ALL) NOPASSWD: ALL' | (EDITOR='tee -a' visudo)"
+echo 'meza-ansible ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/meza-ansible

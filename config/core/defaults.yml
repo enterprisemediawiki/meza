@@ -132,6 +132,9 @@ sshd_config_UsePAM: "yes"
 sshd_config_PasswordAuthentication: "yes"
 use_default_ssh_config: True
 
+m_modify_etc_sudoers: true
+m_meza_sudeoers_file: "/etc/sudoers.d/meza-ansible"
+
 #
 # Software versions
 #
@@ -261,7 +264,7 @@ php_opcache_memory_consumption: 256
 php_opcache_interned_strings_buffer: 16
 
 # The amount of input variables that may be accepted
-php_max_input_vars: 2000 
+php_max_input_vars: 2000
 
 # It's important for this number to be greater than the number of PHP files on a
 # server.
