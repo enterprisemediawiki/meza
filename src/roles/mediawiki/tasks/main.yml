@@ -73,7 +73,7 @@
   become: yes
   become_user: "meza-ansible"
   git:
-    repo: https://gerrit.wikimedia.org/r/p/mediawiki/core.git
+    repo: https://github.com/wikimedia/mediawiki.git
     dest: "{{ m_mediawiki }}"
     version: "{{ mediawiki_version }}"
     track_submodules: no
