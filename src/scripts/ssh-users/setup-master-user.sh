@@ -25,7 +25,7 @@ chmod 600 "$meza_user_dir/$ansible_user/.ssh/authorized_keys"
 chown -R "$ansible_user:$ansible_user" "$meza_user_dir/$ansible_user/.ssh"
 
 # Add $ansible_user to sudoers as a passwordless user
-echo '$ansible_user ALL=(ALL) NOPASSWD: ALL' >> "$m_meza_sudeoers_file"
+echo "$ansible_user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/meza-ansible
 
 
 # echo
