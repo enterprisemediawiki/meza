@@ -1,5 +1,22 @@
 Release Notes
 =============
+
+## Meza 31.2.3
+
+Fixing bug in Extension:WatchAnalytics
+
+### Commits since 31.2.2
+
+* eea7891 bump WatchAnalytics to 2.0.1 (#1066)
+
+### Contributors
+
+Kris Field
+
+### Mediawiki.org pages updated
+
+None
+
 ## Meza 31.2.2
 
 ### Commits since previous release
