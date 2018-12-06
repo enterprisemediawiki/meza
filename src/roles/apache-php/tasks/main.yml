@@ -1,38 +1,38 @@
 ---
-- name: Install apache packages
-  yum: name={{item}} state=installed
-  with_items:
-    - httpd-devel
-    - mod_ssl
-    - mod_proxy_html
+- name: Ensure Apache webserver installed
+  package:
+    name: "{{ package_apache }}"
+    state: installed
 
 - name: Make apache own htdocs directory
   file:
     state: directory
     path: "{{ m_htdocs }}"
-    owner: apache
-    group: apache
+    owner: "{{ user_apache }}"
+    group: "{{ group_apache }}"
     mode: 0775
 
 - name: Ensure user meza-ansible and alt-meza-ansible in group "apache"
   user:
     name: "{{ item }}"
     # add onto groups
-    groups: apache
+    groups: "{{ group_apache }}"
     append: yes
   with_items:
   - meza-ansible
   - alt-meza-ansible
 
 - name: write the apache config file
-  template: "src=httpd.conf.j2 dest={{ m_apache_conf }}"
+  template:
+    src: httpd.conf.j2
+    dest: "{{ path_apache_conf }}"
   notify:
-  - restart apache
+    - restart apache
 
 - name: Ensure Apache environment variables set properly
   template:
     src: etc-sysconfig-httpd.j2
-    dest: /etc/sysconfig/httpd
+    dest: "{{ path_apache_startup_config }}"
   notify:
     - restart apache
 
@@ -41,6 +41,41 @@
   # http://docs.ansible.com/ansible/playbooks_roles.html#dynamic-versus-static-includes
   static: yes
 
+#
+# Apache modules
+# For Debian these need to be after php.yml since repo provided there provides
+# proper version of apache php module (constraint may go away with PHP FPM)
+#
+- name: Ensure Apache modules installed (RedHat/CentOS only)
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - mod_ssl
+    - mod_proxy_html
+  when: ansible_os_family == 'RedHat'
+
+- name: Ensure Apache modules installed (Debian only)
+  apt:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - "libapache2-mod-php{{ php_debian_version }}"
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure Apache modules enabled (Debian only)
+  apache2_module:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - proxy_html
+    - ssl
+    - rewrite
+  when: ansible_os_family == 'Debian'
+
+#
+# Composer
+#
 - name: Ensure Composer configured
   include_role:
     name: composer
@@ -66,7 +101,7 @@
 # Now that PHP is installed, start apache
 - name: ensure apache is running (and enable it at boot)
   service:
-    name: httpd
+    name: "{{ service_apache }}"
     state: started
     enabled: yes
   when: docker_skip_tasks is not defined or not docker_skip_tasks

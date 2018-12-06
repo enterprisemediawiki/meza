@@ -7,7 +7,9 @@
 #     https://www.unixmen.com/configure-high-available-load-balancer-haproxy-keepalived/
 
 - name: Install haproxy packages
-  yum: name={{item}} state=installed
+  package:
+    name: "{{ item }}"
+    state: latest
   with_items:
     - haproxy
     - openssl
@@ -169,6 +171,12 @@
     # - 503
     # - 504
 
+
+
+
+
+
+
 # FIXME #746: Why does HAProxy specify this different method for firewall? Is
 # it an SELinux thing (which at present we don't have in enforcing)?
 - name: Ensure firewalld haproxy service files in place
@@ -181,12 +189,14 @@
   with_items:
     - http
     - https
+  when: ansible_os_family == "RedHat"
 
 - name: Ensure SELinux context for firewalld haproxy service files
   shell: restorecon /etc/firewalld/services/haproxy-{{ item }}.xml
   with_items:
     - http
     - https
+  when: ansible_os_family == "RedHat"
 
 # Allow http and https through firewall
 #- name: Configure firewalld for haproxy via {{ item }}
@@ -200,54 +210,67 @@
 #    - http
 #    - https
 
-- name: Configure firewalld for haproxy via port 80 and 443
-  firewalld:
-    port: "{{ item }}/tcp"
-    permanent: true
-    immediate: true
-    state: enabled
-    zone: "{{m_public_networking_zone|default('public')}}"
+- name: Ensure port 80 and 443 open for haproxy
+  include_role:
+    name: firewall_port
+  vars:
+    firewall_action: open
+    firewall_port: "{{ item }}"
+    firewall_protocol: tcp
+    firewall_zone: "{{m_private_networking_zone|default('public')}}"
   with_items:
     - 80
     - 443
-  when: docker_skip_tasks is not defined or not docker_skip_tasks
+  when:
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
 
-- name: Ensure firewalld port 1936 OPEN when haproxy stats ENABLED
-  firewalld:
-    port: "1936/tcp"
-    permanent: true
-    immediate: true
-    state: enabled
-    zone: "{{m_public_networking_zone|default('public')}}"
-  when: enable_haproxy_stats and (docker_skip_tasks is not defined or not docker_skip_tasks)
+- name: Ensure firewall port 1936 OPEN when haproxy stats ENABLED
+  include_role:
+    name: firewall_port
+  vars:
+    firewall_action: open
+    firewall_port: 1936
+    firewall_protocol: tcp
+    firewall_zone: "{{m_private_networking_zone|default('public')}}"
+  when:
+    - enable_haproxy_stats
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
 
-- name: Ensure firewalld port 1936 CLOSED when haproxy stats DISABLED
-  firewalld:
-    port: "1936/tcp"
-    permanent: true
-    immediate: true
-    state: disabled
-    zone: "{{m_public_networking_zone|default('public')}}"
-  when: not enable_haproxy_stats and (docker_skip_tasks is not defined or not docker_skip_tasks)
+- name: Ensure firewall port 1936 CLOSED when haproxy stats DISABLED
+  include_role:
+    name: firewall_port
+  vars:
+    firewall_action: close
+    firewall_port: 1936
+    firewall_protocol: tcp
+    firewall_zone: "{{m_private_networking_zone|default('public')}}"
+  when:
+    - not enable_haproxy_stats
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
 
-- name: Ensure firewalld port 8088 OPEN when PHP profiling ENABLED
-  firewalld:
-    port: "8088/tcp"
-    permanent: true
-    immediate: true
-    state: enabled
-    zone: "{{m_public_networking_zone|default('public')}}"
-  when: m_setup_php_profiling and (docker_skip_tasks is not defined or not docker_skip_tasks)
+- name: Ensure firewall port 8088 OPEN when PHP profiling ENABLED
+  include_role:
+    name: firewall_port
+  vars:
+    firewall_action: open
+    firewall_port: 8088
+    firewall_protocol: tcp
+    firewall_zone: "{{m_private_networking_zone|default('public')}}"
+  when:
+    - m_setup_php_profiling
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
 
-- name: Ensure firewalld port 8088 CLOSED when PHP profiling DISABLED
-  firewalld:
-    port: "8088/tcp"
-    permanent: true
-    immediate: true
-    state: disabled
-    zone: "{{m_public_networking_zone|default('public')}}"
-  when: not m_setup_php_profiling and (docker_skip_tasks is not defined or not docker_skip_tasks)
-
+- name: Ensure firewall port 8088 CLOSED when PHP profiling DISABLED
+  include_role:
+    name: firewall_port
+  vars:
+    firewall_action: close
+    firewall_port: 8088
+    firewall_protocol: tcp
+    firewall_zone: "{{m_private_networking_zone|default('public')}}"
+  when:
+    - not m_setup_php_profiling
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 # FIXME #747: haproxy will need to handle reverse proxy for Elasticsearch plugins
 # - name: Configure firewalld for Elasticsearch reverse proxy

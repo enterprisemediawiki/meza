@@ -1,5 +1,10 @@
 ---
 
+# Note: OS-family vars come before defaults.yml, so they can drive defaults.yml values
+- name: Set OS-family specific variables
+  include_vars:
+    file: "/opt/meza/config/core/{{ ansible_os_family }}.yml"
+
 - name: Set meza-core path variables
   include_vars:
     file: /opt/meza/config/core/defaults.yml

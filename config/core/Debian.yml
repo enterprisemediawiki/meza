@@ -1,0 +1,97 @@
+---
+
+#
+# Package names
+#
+package_firewall: ufw
+package_openssh_client: openssh-client
+package_cron: cron
+package_apache: apache2
+
+# RedHat install has a lot of php/apache dependencies, but these may be carry-overs
+# from when Meza installed Apache and PHP from source. They probably are not needed
+# anymore.
+package_php_apache_deps: []
+  # Did not immediately find a replacement package in Debian for these RH packages
+  # - zlib-devel
+  # - sqlite-devel
+  # - bzip2-devel
+  # - pcre-devel
+  # - libXpm-devel
+  # - gmp-devel
+  # - t1lib-devel
+  # - aspell-devel
+  # - libvpx-devel
+  # - readline-devel
+  # - libmcrypt-devel
+  # - pam-devel
+  # - m4
+  # - xz-libs
+  # These are either named the same in RE vs Debian, or were easily found
+  # - libcurl4-openssl-dev
+  # - libssl-dev
+  # - libxml2-dev
+  # - libicu-dev
+  # - libjpeg-dev
+  # - libpng-dev
+  # - libfreetype6-dev
+  # - libtidy-dev
+  # - sendmail
+  # - sendmail-cf
+  # - mariadb-common
+  # These are required to install PHP from source.
+  # - libxpm-dev
+  # - libmysqlclient-dev
+  # - libpq-dev
+  # - libldap2-dev
+  # - libxslt-dev
+  # - libldb-dev
+
+package_java: "default-jre"
+package_python3: python3
+package_base_extras:
+  - expect
+  - perl
+  - wget
+  - gcc
+  - cifs-utils
+  - curl
+package_nmap: nmap
+
+
+#
+# Services
+#
+service_ntp: ntp
+service_apache: apache2
+service_cron: cron
+
+
+#
+# Paths
+#
+path_custom_pem_ca_trust: "/usr/local/share/ca-certificates/"
+# Note: based on minimal research, Debian does not appear to use separate dirs for these
+path_custom_extended_ca_trust: "/usr/local/share/ca-certificates/"
+path_apache_conf: "/etc/apache2/apache2.conf"
+path_apache_startup_config: "/etc/default/apache2"
+path_apache_home: /usr/share/apache2
+path_apache_server_root: "/etc/apache2"
+path_php_conf_d: "/etc/php/{{ php_debian_version }}/cli/conf.d"
+path_php_conf_d_files:
+  - "10-opcache.ini"
+path_memcached_conf: /etc/memcached.conf
+
+
+#
+# Commands
+#
+command_update_ca_trust: "update-ca-certificates"
+
+
+#
+# Users and groups
+#
+user_apache: www-data
+group_apache: www-data
+user_memcached: memcache

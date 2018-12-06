@@ -1,6 +1,6 @@
 ---
-- name: restart ntpd
-  service: name=ntpd state=restarted
+- name: restart ntp
+  service: name={{ service_ntp }} state=restarted
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 - name: restart sshd

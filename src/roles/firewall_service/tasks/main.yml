@@ -1,0 +1,39 @@
+---
+
+- name: Ensure firewalld service {{ firewall_service }} allowed for list of servers (RedHat/CentOS only)
+  firewalld:
+    rich_rule: 'rule family="ipv4" source address="{{ item }}/32" service name="{{ firewall_service }}" accept'
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{firewall_zone|default('public')}}"
+
+  # strip "localhost" or inventory_hostname from list of servers to configure
+  with_items: "{{ firewall_servers | difference([ 'localhost', inventory_hostname ]) }}"
+
+  when:
+    - ansible_os_family == 'RedHat'
+    - firewall_service is defined
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
+
+
+- name: "Ensure UFW service {{ firewall_service }} (port {{ ufw_service_ports['{{ firewall_service }}'] }}) allowed for list of servers (Debian only)"
+  ufw:
+    rule: allow
+    src: '{{ item }}/32'
+    to_port: "{{ ufw_service_ports['{{ firewall_service }}'].port }}"
+    proto: "{{ ufw_service_ports['{{ firewall_service }}'].protocol }}"
+
+    # FIXME: consider adding these, optionally.
+    # interface: "{{ firewall_interface|default() }}" # example interface=eth0. with firewalld we have firewall_zone=public...hmm
+
+    comment: "allow {{ firewall_service }}"
+
+  # strip "localhost" or inventory_hostname from list of servers to configure
+  with_items: "{{ firewall_servers | difference([ 'localhost', inventory_hostname ]) }}"
+
+  when:
+    - ansible_os_family == 'Debian'
+    - firewall_service is defined
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
+

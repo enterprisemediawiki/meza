@@ -56,9 +56,7 @@ m_ca_cert: /etc/pki/tls/certs/meza-ca.crt
 
 # app locations
 m_apache: /etc/httpd
-m_apache_conf: /etc/httpd/conf/httpd.conf
 m_php_ini: /etc/php.ini
-m_memcached_conf: /etc/sysconfig/memcached
 m_parsoid_path: /etc/parsoid
 m_simplesamlphp_path: /opt/simplesamlphp
 m_profiling_xhgui_directory: /opt/xhgui
@@ -71,6 +69,9 @@ m_db_replication_log_pos: /opt/data-meza/db_master_log_pos
 
 
 m_timezone: "America/Chicago"
+
+# Poorly documented and not really used method to specify networking zone
+m_private_networking_zone: public
 
 meza_server_log_db: meza_server_log
 
@@ -109,7 +110,7 @@ m_setup_php_profiling: false
 # Enable slow query log
 mysql_slow_query_log_enabled: yes
 mysql_slow_query_time: "5"
-mysql_slow_query_log_file: /var/log/mariadb/slow-queries.log
+# mysql_slow_query_log_file: /var/log/mariadb/slow-queries.log
 
 # Default to using the performance schema
 # But allow it to be turned OFF easily in low mem environments
@@ -143,6 +144,7 @@ mediawiki_default_branch: "REL1_32"
 
 # PHP version
 php_ius_version: "php71u"
+php_debian_version: "7.1"
 
 # Parsoid version
 # e6b708 is commit on 16-OCT-2018, the day the REL1_32 branch was made
@@ -153,6 +155,39 @@ m_parsoid_version: "e6b708b3d7ff50a314d021295dce874574aa3e9e"
 # MediaWiki 1.29 and higher require ElasticSearch 5.x
 elasticsearch_major_version: "5.x"
 
+# This can't be in Debian.yml, because that is loaded prior to defaults.yml...hmmm...
+packages_php_debian:
+  - php{{ php_debian_version }}-common
+  - php{{ php_debian_version }}-cli
+  - php{{ php_debian_version }}-dev
+  # - php{{ php_debian_version }}-fpm
+  - libpcre3-dev
+  - php{{ php_debian_version }}-gd
+  - php{{ php_debian_version }}-curl
+  - php{{ php_debian_version }}-imap
+  # - php{{ php_debian_version }}-json
+  - php{{ php_debian_version }}-opcache
+  - php{{ php_debian_version }}-xml
+  - php{{ php_debian_version }}-mbstring
+  - php{{ php_debian_version }}-mysql
+  - php{{ php_debian_version }}-odbc
+  - php{{ php_debian_version }}-pspell
+  - php{{ php_debian_version }}-snmp
+  - php{{ php_debian_version }}-xmlrpc
+  - php{{ php_debian_version }}-bcmath
+  - php{{ php_debian_version }}-intl
+  - php{{ php_debian_version }}-soap
+  - php-sqlite3
+  - php-apcu
+  - php-pear
+  - php-memcached
+
+  # No PHP 7.2 version of this (just like with IUS)
+  - php{{ php_debian_version }}-mcrypt
+
+  # No apt package corresponding to:
+  #   "{{ php_ius_version }}-process"
+  #   "{{ php_ius_version }}-pdo"
 
 
 #
@@ -190,8 +225,8 @@ clean_upload_stash_crontime: "0 18 * * *"
 
 # uploads directory. Note: user meza-ansible is in group "apache"
 m_uploads_dir_mode: "0775"
-m_uploads_dir_owner: apache
-m_uploads_dir_group: apache
+m_uploads_dir_owner: "{{ user_apache }}"
+m_uploads_dir_group: "{{ group_apache }}"
 
 # Per [1] this should not be accessible from the web and should have mode of
 # 0700. However, we need it to be accessible by apache httpd for page requests
@@ -201,8 +236,8 @@ m_uploads_dir_group: apache
 #
 # [1] https://www.mediawiki.org/wiki/Manual:$wgCacheDirectory
 m_cache_directory_mode: "0770"
-m_cache_directory_owner: apache
-m_cache_directory_group: apache
+m_cache_directory_owner: "{{ user_apache }}"
+m_cache_directory_group: "{{ group_apache }}"
 
 
 m_logs_mode: "0755"
@@ -247,4 +282,22 @@ php_opcache_max_accelerated_files: 28001
 # memory storage allocation. ("1" means validate once per second, but only
 # once per request. "0" means always validate)
 php_opcache_revalidate_freq: 0
+
+
+#
+# Memcached config
+#
+
+# Port to use
+memcached_port: 11211
+
+# Limit the number of simultaneous incoming connections.
+memcached_max_connections: 1024
+
+# Max amount of memory to use. Note that the daemon will grow to this size, but
+# does not start out holding this much
+memcached_memory: 512
+
+# User to run memcached
+# user_memcached: see RedHat.yml and Debian.yml
 

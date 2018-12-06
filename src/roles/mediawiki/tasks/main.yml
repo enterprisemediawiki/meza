@@ -499,7 +499,7 @@
 # Ref: https://www.scalingphpbook.com/blog/2014/02/14/best-zend-opcache-settings.html
 - name: Reload (not restart) httpd to pick up changes to opcached php files
   service:
-    name: httpd
+    name: "{{ service_apache }}"
     state: reloaded
   tags:
     - httpd-reload
@@ -510,10 +510,10 @@
 # MediaWiki 1.31+.
 - name: Ensure Python3 present
   yum:
-    name: python35u
+    name: "{{ package_python3 }}"
     state: latest
   tags:
-  - latest
+    - latest
 
 - name: "Ensure python3 symlink in place"
   file:
@@ -524,3 +524,5 @@
     owner: root
     group: root
     mode: 0755
+  when: ansible_os_family == 'RedHat'
+

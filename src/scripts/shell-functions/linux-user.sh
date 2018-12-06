@@ -29,6 +29,10 @@ mf_add_ssh_user() {
 	mkdir -p "$meza_user_dir/$1/.ssh"
 	chown -R "$1:$1" "$meza_user_dir/$1/.ssh"
 	chmod 700 "$meza_user_dir/$1/.ssh"
+
+	# Make sure user dir properly owned. Not having this was never an issue on
+	# RedHat, but causes errors on Debian.
+	chown "$1:$1" "$meza_user_dir/$1"
 }
 
 mf_add_ssh_user_with_private_key() {

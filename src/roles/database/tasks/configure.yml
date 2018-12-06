@@ -73,6 +73,12 @@
     mode: 0644
   notify: restart mysql
 
+- name: Create datadir if it does not exist
+  shell: "mysql_install_db --datadir={{ mysql_datadir }}"
+  when:
+    - ansible_os_family == "Debian"
+    - mysql_initially_installed_debian.stat.exists == false
+
 - name: Ensure MySQL is started and enabled on boot.
   service: "name={{ mysql_daemon }} state=started enabled={{ mysql_enabled_on_startup }}"
   register: mysql_service_configuration

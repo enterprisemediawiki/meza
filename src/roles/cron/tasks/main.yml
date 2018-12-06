@@ -8,7 +8,7 @@
 
 - name: Ensure cron is running (and enable it at boot)
   service:
-    name: crond
+    name: "{{ service_cron }}"
     state: started
     enabled: yes
 
