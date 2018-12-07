@@ -9,6 +9,13 @@
 # meza since we can't be certain of consistent method of accessing install.sh.
 source "/opt/.deploy-meza/config.sh"
 
+echo "Ansible user: $ansible_user"
+if [ -z "$ansible_user" ]; then
+	echo "Ansible user empty! Setting to meza-ansible."
+	ansible_user="meza-ansible"
+	echo "Ansible user: $ansible_user"
+fi
+
 source "$m_scripts/shell-functions/base.sh"
 rootCheck
 
