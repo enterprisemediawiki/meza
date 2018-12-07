@@ -91,7 +91,7 @@
     - base-config-scripts
   tags: base
 
-- hosts: load-balancers
+- hosts: load-balancers,internal-load-balancers,external-load-balancers
   become: yes
   tags:
     - load-balancer

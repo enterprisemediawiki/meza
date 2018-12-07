@@ -6,6 +6,60 @@
 #     https://gist.github.com/thisismitch/7c91e9b2b63f837a0c4b
 #     https://www.unixmen.com/configure-high-available-load-balancer-haproxy-keepalived/
 
+
+- name: Set fact if this load balancer will handle external connections (80/443)
+  set_fact:
+    load_balancer_handle_external: True
+  when: >
+    (
+      'load-balancers' in groups
+      and inventory_hostname in groups['load-balancers']
+    ) or (
+      'external-load-balancers' in groups
+      and inventory_hostname in groups['external-load-balancers']
+    )
+
+- name: Set fact if this load balancer will NOT handle external connections
+  set_fact:
+    load_balancer_handle_external: False
+  when: >
+    not (
+      (
+        'load-balancers' in groups
+        and inventory_hostname in groups['load-balancers']
+      ) or (
+        'external-load-balancers' in groups
+        and inventory_hostname in groups['external-load-balancers']
+      )
+    )
+
+- name: Set fact if this load balancer will handle internal connections
+  set_fact:
+    load_balancer_handle_internal: True
+  when: >
+    (
+      'load-balancers' in groups
+      and inventory_hostname in groups['load-balancers']
+    ) or (
+      'internal-load-balancers' in groups
+      and inventory_hostname in groups['internal-load-balancers']
+    )
+
+- name: Set fact if this load balancer will NOT handle internal connections
+  set_fact:
+    load_balancer_handle_internal: False
+  when: >
+    not (
+      (
+        'load-balancers' in groups
+        and inventory_hostname in groups['load-balancers']
+      ) or (
+        'internal-load-balancers' in groups
+        and inventory_hostname in groups['internal-load-balancers']
+      )
+    )
+
+
 - name: Install haproxy packages
   package:
     name: "{{ item }}"
@@ -43,6 +97,7 @@
   delegate_to: localhost
   run_once: True
 
+# FIXME: Better would be "if not exists setup letsencrypt"
 - name: If not exists, create self-signed SSL cert on CONTROLLER
   command: |
     openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
@@ -173,10 +228,6 @@
 
 
 
-
-
-
-
 # FIXME #746: Why does HAProxy specify this different method for firewall? Is
 # it an SELinux thing (which at present we don't have in enforcing)?
 - name: Ensure firewalld haproxy service files in place
@@ -189,14 +240,20 @@
   with_items:
     - http
     - https
-  when: ansible_os_family == "RedHat"
+  when:
+    - ansible_os_family == "RedHat"
+    - inventory_hostname in groups['load-balancers'] or inventory_hostname in groups['external-load-balancers']
+
 
 - name: Ensure SELinux context for firewalld haproxy service files
   shell: restorecon /etc/firewalld/services/haproxy-{{ item }}.xml
   with_items:
     - http
     - https
-  when: ansible_os_family == "RedHat"
+  when:
+    - ansible_os_family == "RedHat"
+    - inventory_hostname in groups['load-balancers'] or inventory_hostname in groups['external-load-balancers']
+
 
 # Allow http and https through firewall
 #- name: Configure firewalld for haproxy via {{ item }}
@@ -223,6 +280,7 @@
     - 443
   when:
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
+    - inventory_hostname in groups['load-balancers'] or inventory_hostname in groups['external-load-balancers']
 
 - name: Ensure firewall port 1936 OPEN when haproxy stats ENABLED
   include_role:
