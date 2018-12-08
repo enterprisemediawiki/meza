@@ -15,8 +15,8 @@
       'load-balancers' in groups
       and inventory_hostname in groups['load-balancers']
     ) or (
-      'external-load-balancers' in groups
-      and inventory_hostname in groups['external-load-balancers']
+      'load-balancers-external' in groups
+      and inventory_hostname in groups['load-balancers-external']
     )
 
 - name: Set fact if this load balancer will NOT handle external connections
@@ -28,8 +28,8 @@
         'load-balancers' in groups
         and inventory_hostname in groups['load-balancers']
       ) or (
-        'external-load-balancers' in groups
-        and inventory_hostname in groups['external-load-balancers']
+        'load-balancers-external' in groups
+        and inventory_hostname in groups['load-balancers-external']
       )
     )
 
@@ -41,8 +41,8 @@
       'load-balancers' in groups
       and inventory_hostname in groups['load-balancers']
     ) or (
-      'internal-load-balancers' in groups
-      and inventory_hostname in groups['internal-load-balancers']
+      'load-balancers-internal' in groups
+      and inventory_hostname in groups['load-balancers-internal']
     )
 
 - name: Set fact if this load balancer will NOT handle internal connections
@@ -54,8 +54,8 @@
         'load-balancers' in groups
         and inventory_hostname in groups['load-balancers']
       ) or (
-        'internal-load-balancers' in groups
-        and inventory_hostname in groups['internal-load-balancers']
+        'load-balancers-internal' in groups
+        and inventory_hostname in groups['load-balancers-internal']
       )
     )
 
@@ -242,7 +242,7 @@
     - https
   when:
     - ansible_os_family == "RedHat"
-    - inventory_hostname in groups['load-balancers'] or inventory_hostname in groups['external-load-balancers']
+    - inventory_hostname in groups['load-balancers'] or inventory_hostname in groups['load-balancers-external']
 
 
 - name: Ensure SELinux context for firewalld haproxy service files
@@ -252,7 +252,7 @@
     - https
   when:
     - ansible_os_family == "RedHat"
-    - inventory_hostname in groups['load-balancers'] or inventory_hostname in groups['external-load-balancers']
+    - inventory_hostname in groups['load-balancers'] or inventory_hostname in groups['load-balancers-external']
 
 
 # Allow http and https through firewall
@@ -280,7 +280,7 @@
     - 443
   when:
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
-    - inventory_hostname in groups['load-balancers'] or inventory_hostname in groups['external-load-balancers']
+    - inventory_hostname in groups['load-balancers'] or inventory_hostname in groups['load-balancers-external']
 
 - name: Ensure firewall port 1936 OPEN when haproxy stats ENABLED
   include_role:

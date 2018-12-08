@@ -82,7 +82,7 @@
 # servers in "exclude-all" group. At present, the intent of this group is to
 # allow servers which serve as sources for database and user-uploaded files,
 # but are not managed by this meza install.
-- hosts: all:!exclude-all:!load-balancers-unmanaged
+- hosts: all:!exclude-all:!load-balancers-unmanaged:!load-balancers-unmanaged-external:!load-balancers-unmanaged-internal
   become: yes
   roles:
     - set-vars
@@ -91,7 +91,7 @@
     - base-config-scripts
   tags: base
 
-- hosts: load-balancers,internal-load-balancers,external-load-balancers
+- hosts: load-balancers,load-balancers-internal,load-balancers-external
   become: yes
   tags:
     - load-balancer
@@ -129,9 +129,23 @@
       firewall_action: open
       firewall_port: 8080
       firewall_protocol: tcp
+      firewall_servers: "{{ groups['load-balancers-external'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
+      when: "'load-balancers-external' in groups"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 8080
+      firewall_protocol: tcp
       firewall_servers: "{{ groups['load-balancers-unmanaged'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "'load-balancers-unmanaged' in groups"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 8080
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['load-balancers-unmanaged-external'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
+      when: "'load-balancers-unmanaged-external' in groups"
     - role: firewall_port
       firewall_action: open
       firewall_port: 8080
@@ -376,7 +390,7 @@
     - role: meza-log
       when: docker_skip_tasks is not defined or not docker_skip_tasks
 
-- hosts: all:!exclude-all:!load-balancers-unmanaged
+- hosts: all:!exclude-all:!load-balancers-unmanaged:!load-balancers-unmanaged-external:!load-balancers-unmanaged-internal
   become: yes
   tags:
     - cron

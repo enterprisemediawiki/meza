@@ -434,6 +434,7 @@ $wgSquidServersNoPurge = array(
 	'{{ server }}',
 	{%- endif -%}
 	{%- endfor %}
+
 	{% if 'load-balancers-unmanaged' in groups and groups['load-balancers-unmanaged']|length|int > 0 %}
 	# unmanaged load-balancers, e.g. load balancers not maintained by meza,
 	# such as AWS or Digital Ocean
@@ -441,6 +442,15 @@ $wgSquidServersNoPurge = array(
 	'{{ server }}',
 	{%- endfor %}
 	{% endif %}
+
+	{% if 'load-balancers-unmanaged-external' in groups and groups['load-balancers-unmanaged-external']|length|int > 0 %}
+	# unmanaged load-balancers, e.g. load balancers not maintained by meza,
+	# such as AWS or Digital Ocean
+	{% for server in groups['load-balancers-unmanaged-external'] -%}
+	'{{ server }}',
+	{%- endfor %}
+	{% endif %}
+
 );
 
 // memcached settings
