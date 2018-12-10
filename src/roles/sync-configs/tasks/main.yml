@@ -4,9 +4,9 @@
   file:
     path: "{{ m_deploy }}/public"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_public_config_deployed_owner }}"
+    group: "{{ m_public_config_deployed_group }}"
+    mode: "{{ m_public_config_deployed_mode }}"
     recurse: yes
 
 # At this point the controller must have a local config. Now force it upon the
@@ -28,8 +28,8 @@
   file:
     path: "{{ m_deploy }}"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_public_config_deployed_owner }}"
+    group: "{{ m_public_config_deployed_group }}"
+    mode: "{{ m_public_config_deployed_mode }}"
     recurse: yes
 

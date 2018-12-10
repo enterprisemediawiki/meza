@@ -55,9 +55,9 @@
   file:
     path: "{{ m_local_public }}"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_public_config_owner }}"
+    group: "{{ m_public_config_group }}"
+    mode: "{{ m_public_config_mode }}"
     recurse: true
   delegate_to: localhost
   run_once: true
@@ -69,9 +69,9 @@
   file:
     path: "{{ m_local_public }}/wikis"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_public_config_owner }}"
+    group: "{{ m_public_config_group }}"
+    mode: "{{ m_public_config_mode }}"
   delegate_to: localhost
   run_once: true
 
@@ -80,9 +80,9 @@
   file:
     path: "/opt/conf-meza/public/{{ item }}"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_public_config_owner }}"
+    group: "{{ m_public_config_group }}"
+    mode: "{{ m_public_config_mode }}"
   delegate_to: localhost
   run_once: true
   with_items:
@@ -94,9 +94,9 @@
   template:
     src: "templates/{{ item }}.j2"
     dest: "{{ m_local_public }}/{{ item }}"
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_public_config_owner }}"
+    group: "{{ m_public_config_group }}"
+    mode: "{{ m_public_config_mode }}"
     force: no
   delegate_to: localhost
   run_once: true
