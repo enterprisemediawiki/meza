@@ -251,7 +251,7 @@ m_backups_group: root
 # in `m_local_public`). That directory is deployed to all servers into the
 # /opt/.deploy-meza/public directory. Below allows setting mode and ownership
 # for each destination.
-m_public_config_mode: "0755"
+m_public_config_mode: "0644"
 m_public_config_owner: root
 m_public_config_group: root
 m_public_config_deployed_mode: "0755"
