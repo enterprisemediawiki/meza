@@ -178,6 +178,15 @@
     - docker_skip_tasks is not defined or not docker_skip_tasks
     - ansible_os_family == "Debian"
 
+# Make sure we don't block SSH right away. Not sure why this isn't required for
+# firewalld/centos...must be different defaults.
+- ufw:
+    rule: allow
+    name: OpenSSH
+  when:
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - ansible_os_family == "Debian"
+
 
 #
 # SSH config
