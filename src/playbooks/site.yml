@@ -123,29 +123,8 @@
       firewall_action: open
       firewall_port: 8080
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['load-balancers'] }}"
+      firewall_servers: "{{ load_balancers_all }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewall_port
-      firewall_action: open
-      firewall_port: 8080
-      firewall_protocol: tcp
-      firewall_servers: "{{ groups['load-balancers-meza-external'] }}"
-      firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'load-balancers-meza-external' in groups"
-    - role: firewall_port
-      firewall_action: open
-      firewall_port: 8080
-      firewall_protocol: tcp
-      firewall_servers: "{{ groups['load-balancers-nonmeza'] }}"
-      firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'load-balancers-nonmeza' in groups"
-    - role: firewall_port
-      firewall_action: open
-      firewall_port: 8080
-      firewall_protocol: tcp
-      firewall_servers: "{{ groups['load-balancers-nonmeza-external'] }}"
-      firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'load-balancers-nonmeza-external' in groups"
     - role: firewall_port
       firewall_action: open
       firewall_port: 8080
@@ -369,15 +348,8 @@
       firewall_action: open
       firewall_port: 8000
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['load-balancers'] }}"
+      firewall_servers: "{{ load_balancers_all }} + {{ load_balancers_internal }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewall_port
-      firewall_action: open
-      firewall_port: 8000
-      firewall_protocol: tcp
-      firewall_servers: "{{ groups['load-balancers-nonmeza'] }}"
-      firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'load-balancers-nonmeza' in groups"
     - nodejs
     - parsoid
     - parsoid-settings
