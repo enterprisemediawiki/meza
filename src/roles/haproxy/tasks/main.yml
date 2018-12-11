@@ -280,7 +280,10 @@
     - 443
   when:
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
-    - inventory_hostname in groups['load-balancers'] or inventory_hostname in groups['load-balancers-meza-external']
+    - >
+      ('load-balancers' in groups and inventory_hostname in groups['load-balancers'])
+      or
+      ('load-balancers-meza-external' in groups and inventory_hostname in groups['load-balancers-meza-external'])
 
 - name: Ensure firewall port 1936 OPEN when haproxy stats ENABLED
   include_role:
