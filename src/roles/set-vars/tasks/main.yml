@@ -37,4 +37,4 @@
     file: "{{ m_local_secret }}/{{ env }}/secret.yml"
   # Can't load secret.yml when it doesn't exist yet, so skip this while setting
   # up an environment
-  when: not allow_missing_secret_config
+  when: not allow_missing_secret_config|default(false)
