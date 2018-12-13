@@ -39,7 +39,7 @@
     owner: meza-ansible
     group: wheel
     mode: "{{ item.mode }}"
-  ignore_errors: True
+  failed_when: False
   with_items:
   - name: known_hosts
     mode: "0600"
@@ -57,7 +57,7 @@
     block: |
       [diff]
           ignoreSubmodules = all
-  ignore_errors: True
+  failed_when: False
   tags:
     - mediawiki-core
 - name: Ensure MediaWiki core owned by meza-ansible
