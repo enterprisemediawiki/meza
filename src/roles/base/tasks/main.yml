@@ -263,6 +263,21 @@
     mode: "{{ m_logs_mode }}"
     state: directory
 
+- name: "Ensure {{ m_logs }} sub directories exist"
+  file:
+    path: "{{ m_logs }}/{{ item }}"
+    owner: "{{ m_logs_owner }}"
+    group: "{{ m_logs_group }}"
+    mode: "{{ m_logs_mode }}"
+    state: directory
+  with_items:
+    - jobqueue
+    - php
+    - deploy
+    - deploy-output
+    - usr
+    - cleanup
+
 # Prevent runJobs and other scripts from running when application may be in
 # indeterminate state
 - name: Ensure crontab empty for meza-ansible when overwriting wikis
