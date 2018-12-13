@@ -56,7 +56,7 @@
     ansible-vault encrypt
     {{ item }}
     --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
-  ignore_errors: True
+  failed_when: False
   delegate_to: localhost
   run_once: True
   with_items:

@@ -11,7 +11,7 @@
   tasks:
   - name: Ensure no password on meza-ansible user on controller
     shell: passwd --delete meza-ansible
-    ignore_errors: yes
+    failed_when: False
 
   - name: Ensure controller has user alt-meza-ansible
     user:
@@ -49,7 +49,7 @@
       owner: alt-meza-ansible
       group: wheel
       mode: "{{ item.mode }}"
-    ignore_errors: True
+    failed_when: False
     with_items:
     - name: known_hosts
       mode: "0600"
@@ -59,7 +59,7 @@
       ansible-vault encrypt
       /opt/conf-meza/secret/{{ env }}/secret.yml
       --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
-    ignore_errors: True
+    failed_when: False
 
   # Note: without this, the encryption above changes mode to 0600 and ownership
   # to root:root. This makes it impossible to include_vars later.
