@@ -45,7 +45,7 @@
 - name: What version of node, if any, is installed
   shell: node --version
   register: node_version
-  ignore_errors: yes
+  failed_when: False
 
 - debug: { var: node_version }
 

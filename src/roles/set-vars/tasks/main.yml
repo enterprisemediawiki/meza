@@ -13,7 +13,7 @@
   include_vars:
     file: "{{ m_local_public }}/public.yml"
   # Ingore errors so this file is not required to be included
-  ignore_errors: yes
+  failed_when: False
 
 - name: Get individual wikis dirs from localhost
   find:
@@ -30,10 +30,11 @@
   include_vars:
     file: "{{ m_local_public }}/env/{{ env }}.yml"
   # Ingore errors so this file is not required to be included
-  ignore_errors: yes
+  failed_when: False
 
 - name: Set meza local secret variables
   include_vars:
     file: "{{ m_local_secret }}/{{ env }}/secret.yml"
-  # DO NOT ingore errors generally, except when setting up an env
-  ignore_errors: "{{ allow_missing_secret_config | default(false) }}"
+  # Can't load secret.yml when it doesn't exist yet, so skip this while setting
+  # up an environment
+  when: not allow_missing_secret_config

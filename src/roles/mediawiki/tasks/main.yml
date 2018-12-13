@@ -201,7 +201,7 @@
     working_dir: "{{ m_mediawiki }}"
     no_dev: no
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
-  # ignore_errors: yes
+  # failed_when: False
   tags:
     - composer-extensions
     - latest
@@ -216,7 +216,7 @@
     working_dir: "{{ m_mediawiki }}"
     no_dev: no
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
-  # ignore_errors: yes
+  # failed_when: False
   tags:
     - composer-extensions
     - latest

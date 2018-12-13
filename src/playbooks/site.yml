@@ -11,7 +11,7 @@
   tasks:
   - name: Ensure no password on meza-ansible user on controller
     shell: passwd --delete meza-ansible
-    ignore_errors: yes
+    failed_when: False
 
   - name: Ensure controller has user alt-meza-ansible
     user:
