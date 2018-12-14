@@ -93,7 +93,7 @@
   shell: 'mysqlshow "wiki_{{ wiki_id }}" | grep -v Wildcard | grep -o wiki_{{ wiki_id }}'
   register: wiki_exists_check
   delegate_to: "{{ groups['db-master'][0] }}"
-  ignore_errors: yes
+  failed_when: False
   run_once: true
 
 - name: "{{ wiki_id }} - Set fact if database wiki_{{ wiki_id }} DOES exist"

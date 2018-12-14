@@ -67,7 +67,7 @@ m_db_replication_dump_file: /opt/data-meza/db_master_for_replication.sql
 m_db_replication_log_file: /opt/data-meza/db_master_log_file
 m_db_replication_log_pos: /opt/data-meza/db_master_log_pos
 
-
+m_httpd_server_admin: "admin@example.com"
 m_timezone: "America/Chicago"
 
 # Poorly documented and not really used method to specify networking zone
@@ -261,7 +261,7 @@ php_opcache_memory_consumption: 256
 php_opcache_interned_strings_buffer: 16
 
 # The amount of input variables that may be accepted
-php_max_input_vars: 2000 
+php_max_input_vars: 2000
 
 # It's important for this number to be greater than the number of PHP files on a
 # server.

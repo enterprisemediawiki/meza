@@ -39,7 +39,7 @@
 
 - name: Ensure no password on alt-meza-ansible user
   shell: passwd --delete alt-meza-ansible
-  ignore_errors: yes
+  failed_when: False
 
 # Add line to visudo file if it does not exist
 - name: Ensure alt-meza-ansible is passwordless sudoer
@@ -286,7 +286,7 @@
 
   # Ignore errors due issue #699: If a crontab doesn't exist yet this command
   # will fail
-  ignore_errors: yes
+  failed_when: False
 
 
 - name: Ensure CA package installed

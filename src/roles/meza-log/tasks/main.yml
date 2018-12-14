@@ -3,7 +3,7 @@
 - name: "Check if server log database exists"
   shell: 'mysqlshow "{{ meza_server_log_db }}" | grep -v Wildcard | grep -o {{ meza_server_log_db }}'
   register: register_server_log
-  ignore_errors: yes
+  failed_when: False
   run_once: true
 
 - name: "Set fact if server log database DOES exist"
@@ -31,7 +31,7 @@
 - name: "Check if disk_space table exists"
   shell: "sudo mysql -e\"USE {{ meza_server_log_db }}; SHOW TABLES LIKE 'disk_space'\" | grep disk_space"
   register: register_disk_space
-  ignore_errors: yes
+  failed_when: False
   run_once: true
 
 - name: "Set fact if disk_space table DOES exist"
