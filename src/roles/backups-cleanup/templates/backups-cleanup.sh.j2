@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# change directory to backups location
+cd {{ m_backups }}/{{ env }}
+
+# remove all odd-numbered days (keep only even-numbered days)
+{% for removal_rule in backups_cleanup.removal_rules %}
+rm {{ removal_rule }} -f
+{% endfor %}
+
+# compress all SQL files
+echo "gzip start time: $(date +\"%T\")"
+gzip -9 ./*/*.sql
+echo "gzip end time: $(date +\"%T\")"

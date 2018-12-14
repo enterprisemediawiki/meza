@@ -87,6 +87,13 @@
     - umask-set
     - init-controller-config
 
+- hosts: localhost
+  become: yes
+  roles:
+    - set-vars
+    - role: autodeployer
+      when: force_deploy is defined or autodeployer is defined
+
 # Ensure proper base setup on all servers in inventory, with the exception of
 # servers in "exclude-all" group. At present, the intent of this group is to
 # allow servers which serve as sources for database and user-uploaded files,
@@ -369,6 +376,15 @@
     - set-vars
     - role: meza-log
       when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- hosts: backup-servers
+  become: yes
+  tags:
+    - backup-cleanup
+  roles:
+    - set-vars
+    - role: backups-cleanup
+      when: backups_cleanup is defined and backups_cleanup.crontime is defined
 
 - hosts: all:!exclude-all:!load-balancers-unmanaged
   become: yes

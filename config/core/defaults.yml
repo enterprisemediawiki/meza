@@ -214,6 +214,10 @@ m_backups_mode: "0755"
 m_backups_owner: root
 m_backups_group: root
 
+# mode/ownership for anything in /etc/cron.d
+m_crond_mode: "0644"
+m_crond_owner: root
+m_crond_group: root
 
 m_config_public_mode: "0755"
 m_config_public_owner: meza-ansible
