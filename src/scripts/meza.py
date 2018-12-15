@@ -315,7 +315,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	print
 	print "Please review your host file. Run command:"
 	print "  sudo vi /opt/conf-meza/secret/{}/hosts".format(env)
-	print "Please review your secret config. It is encrypted, so edit by running:"
+	print "Please review your secret config. Run command:"
 	print "  sudo vi /opt/conf-meza/secret/{}/secret.yml".format(env)
 	if return_not_exit:
 		return rc
@@ -597,7 +597,7 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 		meza_chown( secret_file, 'meza-ansible', 'wheel' )
 		os.chmod( secret_file, 0o660 )
 
-		# Setup password file if not exists (environment info is encrypted)
+		# Setup password file if not exists (environment info is potentially encrypted)
 		vault_pass_file = get_vault_pass_file( env )
 
 		command = command + [ '-i', host_file, '--vault-password-file', vault_pass_file ]
