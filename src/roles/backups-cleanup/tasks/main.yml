@@ -1,0 +1,17 @@
+---
+
+- name: Ensure backups cleanup script in place
+  template:
+    src: "backups-cleanup.sh.j2"
+    dest: "{{ m_deploy }}/backups-cleanup.sh"
+    owner: root
+    group: root
+    mode: "0744"
+
+- name: Ensure backups cleanup cron in place
+  template:
+    src: "meza-cron-backups-cleanup.j2"
+    dest: "/etc/cron.d/meza-cron-backups-cleanup-{{ env }}"
+    owner: "{{ m_crond_owner }}"
+    group: "{{ m_crond_group }}"
+    mode: "{{ m_crond_mode }}"
