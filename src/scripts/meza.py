@@ -775,6 +775,85 @@ def meza_command_maint_cleanuploadstash (argv):
 	meza_shell_exec_exit(rc)
 
 
+def meza_command_maint_encrypt_string (argv):
+
+	env = argv[0]
+
+	rc = check_environment(env)
+
+	# return code != 0 means failure
+	if rc != 0:
+		meza_shell_exec_exit(rc)
+
+	# strip environment off of it
+	argv = argv[1:]
+
+	if len(argv) == 0:
+		print "encrypt_string requires value to encrypt. Ex:"
+		print "  sudo meza maint encrypt_string <env> somesecretvalue"
+		print "Additionally, you can supply the variable name. Ex:"
+		print "  sudo meza maint encrypt_string <env> somesecretvalue var_name"
+		sys.exit(1)
+
+	varvalue = argv[0]
+	vault_pass_file = get_vault_pass_file( env )
+
+	shell_cmd = ["ansible-vault","encrypt_string","--vault-id",vault_pass_file,varvalue]
+
+	# If name argument passed in, use it
+	if len(argv) == 2:
+		shell_cmd = shell_cmd + ["--name",argv[1]]
+
+	rc = meza_shell_exec( shell_cmd )
+
+	# exit with same return code as ansible command
+	meza_shell_exec_exit(rc)
+
+
+# sudo meza maint decrypt_string <env> <encrypted_string>
+def meza_command_maint_decrypt_string (argv):
+
+	env = argv[0]
+
+	rc = check_environment(env)
+
+	# return code != 0 means failure
+	if rc != 0:
+		meza_shell_exec_exit(rc)
+
+	# strip environment off of it
+	argv = argv[1:]
+
+	if len(argv) == 0:
+		print "decrypt_string requires you to supply encrypted string. Ex:"
+		print """
+sudo meza maint decrypt_string <env> '$ANSIBLE_VAULT;1.1;AES256
+31386561343430626435373766393066373464656262383063303630623032616238383838346132
+6162313461666439346337616166396133616466363935360a373333313165343535373761333634
+62636634306632633539306436363866323639363332613363346663613235653138373837303337
+6133383864613430370a623661653462336565376565346638646238643132636663383761613966
+6566'
+"""
+		sys.exit(1)
+
+	encrypted_string = argv[0]
+	vault_pass_file = get_vault_pass_file( env )
+
+	tmp_file = write_vault_decryption_tmp_file( env, encrypted_string )
+
+	shell_cmd = ["ansible-vault","decrypt",tmp_file,"--vault-password-file",vault_pass_file]
+	rc = meza_shell_exec( shell_cmd )
+
+	decrypted_value = read_vault_decryption_tmp_file( env )
+
+	print ""
+	print "Decrypted value:"
+	print decrypted_value
+
+	# exit with same return code as ansible command
+	meza_shell_exec_exit(rc)
+
+
 def meza_command_docker (argv):
 
 	if argv[0] == "run":
@@ -940,6 +1019,31 @@ def get_vault_pass_file ( env ):
 	os.chmod( vault_pass_file, 0o600 )
 
 	return vault_pass_file
+
+def write_vault_decryption_tmp_file ( env, value ):
+	home_dir = defaults['m_home']
+	temp_decrypt_file = '{}/meza-ansible/.vault-temp-decrypt-{}.txt'.format(home_dir,env)
+
+	with open( temp_decrypt_file, 'w' ) as filetowrite:
+	    filetowrite.write( value )
+	    filetowrite.close()
+
+	return temp_decrypt_file
+
+def read_vault_decryption_tmp_file ( env ):
+	home_dir = defaults['m_home']
+	temp_decrypt_file = '{}/meza-ansible/.vault-temp-decrypt-{}.txt'.format(home_dir,env)
+
+	f = open( temp_decrypt_file, "r" )
+	if f.mode == 'r':
+		contents = f.read()
+		f.close()
+		os.remove( temp_decrypt_file )
+	else:
+		contents = "[decryption error]"
+
+	return contents
+
 
 def meza_chown ( path, username, groupname ):
 	import pwd
