@@ -579,7 +579,8 @@ def meza_command_maint_encrypt_string (argv):
 	if len(argv) == 2:
 		shell_cmd = shell_cmd + ["--name",argv[1]]
 
-	rc = meza_shell_exec( shell_cmd )
+	# false = don't print command prior to running
+	rc = meza_shell_exec( shell_cmd, False )
 
 	# exit with same return code as ansible command
 	meza_shell_exec_exit(rc)
@@ -617,7 +618,9 @@ sudo meza maint decrypt_string <env> '$ANSIBLE_VAULT;1.1;AES256
 	tmp_file = write_vault_decryption_tmp_file( env, encrypted_string )
 
 	shell_cmd = ["ansible-vault","decrypt",tmp_file,"--vault-password-file",vault_pass_file]
-	rc = meza_shell_exec( shell_cmd )
+
+	# false = don't print command prior to running
+	rc = meza_shell_exec( shell_cmd, False )
 
 	decrypted_value = read_vault_decryption_tmp_file( env )
 
@@ -697,7 +700,7 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 
 # FIXME install --> setup dev-networking, setup docker, deploy monolith (special case)
 
-def meza_shell_exec ( shell_cmd ):
+def meza_shell_exec ( shell_cmd, print_command=True ):
 
 	# Get errors with user meza-ansible trying to write to the calling-user's
 	# home directory if don't cd to a neutral location. By cd'ing to this
@@ -728,7 +731,8 @@ def meza_shell_exec ( shell_cmd ):
 	else:
 		cmd = ' '.join(shell_cmd)
 
-	print cmd
+	if print_command:
+		print cmd
 	rc = os.system(cmd)
 
 	# Move back to original working directory
