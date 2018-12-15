@@ -537,20 +537,11 @@ def meza_command_setup_env (argv, return_not_exit=False):
 
 	os.remove(extra_vars_file)
 
-	# Now that the env is setup, generate a vault password file and use it to
-	# encrypt secret.yml
-	vault_pass_file = get_vault_pass_file( env )
-	secret_yml = "/opt/conf-meza/secret/{}/secret.yml".format(env)
-	cmd = "ansible-vault encrypt {} --vault-password-file {}".format(secret_yml, vault_pass_file)
-	os.system(cmd)
-
-
-
 	print
 	print "Please review your host file. Run command:"
 	print "  sudo vi /opt/conf-meza/secret/{}/hosts".format(env)
 	print "Please review your secret config. It is encrypted, so edit by running:"
-	print "  sudo ansible-vault edit /opt/conf-meza/secret/{}/secret.yml --vault-password-file {}".format(env,vault_pass_file)
+	print "  sudo vi /opt/conf-meza/secret/{}/secret.yml".format(env)
 	if return_not_exit:
 		return rc
 	else:
