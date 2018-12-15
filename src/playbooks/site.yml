@@ -54,13 +54,6 @@
     - name: known_hosts
       mode: "0600"
 
-  - name: Ensure secret.yml encrypted
-    shell: >
-      ansible-vault encrypt
-      /opt/conf-meza/secret/{{ env }}/secret.yml
-      --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
-    failed_when: False
-
   # Note: without this, the encryption above changes mode to 0600 and ownership
   # to root:root. This makes it impossible to include_vars later.
   - name: Ensure secret.yml owned by meza-ansible
