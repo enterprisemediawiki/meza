@@ -277,7 +277,7 @@
   template:
     src: LocalSettings.php.j2
     dest: "{{ m_mediawiki }}/LocalSettings.php"
-    backup: yes
+    # backup: yes
     owner: meza-ansible
     group: wheel
 
