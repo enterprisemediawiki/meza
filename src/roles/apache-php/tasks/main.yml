@@ -37,9 +37,8 @@
     - restart apache
 
 - name: Install PHP
-  include: php.yml
+  import_tasks: php.yml
   # http://docs.ansible.com/ansible/playbooks_roles.html#dynamic-versus-static-includes
-  static: yes
 
 #
 # Apache modules
@@ -78,9 +77,8 @@
     name: composer
 
 # - name: Ensure PHP profiling configured
-#   include: profiling.yml
+#   import_tasks: profiling.yml
 #   # http://docs.ansible.com/ansible/playbooks_roles.html#dynamic-versus-static-includes
-#   static: yes
 #   when: m_setup_php_profiling
 
 # If profiling not enabled, disable MongoDB if it exists (e.g. profiling had
