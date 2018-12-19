@@ -31,6 +31,7 @@ m_meza_data: /opt/data-meza
 m_cache_directory: /opt/data-meza/cache
 m_tmp: /opt/data-meza/tmp
 m_logs: /opt/data-meza/logs
+m_logs_deploy: /opt/data-meza/logs/deploy/deploy.log
 
 # uploads dir. This WILL BE OVERIDDEN if multiple app servers are used, and
 # instead will use /opt/data-meza/uploads-gluster to use GlusterFS distributed

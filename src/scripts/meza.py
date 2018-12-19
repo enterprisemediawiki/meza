@@ -84,6 +84,9 @@ def meza_command_deploy (argv):
 	# strip environment off of it
 	argv = argv[1:]
 
+	# save state of args before stripping -o and --overwrite
+	args_string = ' '.join( argv )
+
 	# if argv[1:] includes -o or --overwrite
 	if len( set(argv).intersection({"-o", "--overwrite"}) ) > 0:
 		# remove -o and --overwrite from args;
@@ -91,15 +94,13 @@ def meza_command_deploy (argv):
 
 		more_extra_vars = { 'force_overwrite_from_backup': True }
 
-	# This breaks continuous integration. FIXME to get it back.
-	# THIS WAS WRITTEN WHEN `meza` WAS A BASH SCRIPT
-	# echo "You are about to deploy to the $ansible_env environment"
-	# read -p "Do you want to proceed? " -n 1 -r
-	# if [[ $REPLY =~ ^[Yy]$ ]]; then
-		# do dangerous stuff
 
-		# stuff below was in here
-	# fi
+	import hashlib
+	start = get_datetime_string()
+	unique = hashlib.sha1( start + env ).hexdigest()[:8]
+
+
+	write_deploy_log( start, env, unique, 'start', args_string )
 
 	shell_cmd = playbook_cmd( 'site', env, more_extra_vars )
 	if len(argv) > 0:
@@ -107,10 +108,71 @@ def meza_command_deploy (argv):
 
 	return_code = meza_shell_exec( shell_cmd )
 
+	if return_code == 0:
+		condition = 'complete'
+	else:
+		condition = 'failed'
+
+	end = get_datetime_string()
+	write_deploy_log( end, env, unique, condition, args_string )
+
 	meza_shell_exec_exit( return_code )
 
 
+def write_deploy_log( datetime, env, unique, condition, args_string ):
+	import subprocess, os
 
+	deploy_log = defaults['m_logs_deploy']
+
+	line = "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(
+		datetime,
+		env,
+		unique,
+		condition,
+		get_git_descripe_tags( "/opt/meza" ),
+		get_git_hash( "/opt/meza" ),
+		get_git_hash( "/opt/conf-meza/secret" ),
+		get_git_hash( "/opt/conf-meza/public" ),
+		args_string
+	)
+
+	log_dir = os.path.dirname( os.path.realpath( deploy_log ) )
+
+	if not os.path.isdir( log_dir ):
+		os.makedirs( log_dir )
+
+	with open(deploy_log, "a") as myfile:
+	    myfile.write(line)
+
+
+def get_git_hash ( dir ):
+	import subprocess, os
+
+	git_dir = "{}/.git".format( dir )
+
+	if os.path.isdir( git_dir ):
+		try:
+			commit = subprocess.check_output( ["git", "--git-dir={}".format( git_dir), "rev-parse", "HEAD" ] ).strip()
+		except:
+			commit = "git-error"
+		return commit
+	else:
+		return "not-a-git-repo"
+
+
+def get_git_descripe_tags ( dir ):
+	import subprocess, os
+
+	git_dir = "{}/.git".format( dir )
+
+	if os.path.isdir( git_dir ):
+		try:
+			tags = subprocess.check_output( ["git", "--git-dir={}".format( git_dir ), "describe", "--tags" ] ).strip()
+		except:
+			tags = "git-error"
+		return tags
+	else:
+		return "not-a-git-repo"
 
 # env
 # dev
@@ -907,6 +969,12 @@ def copy (src, dst):
 		if exc.errno == errno.ENOTDIR:
 			shutil.copy(src, dst)
 		else: raise
+
+def get_datetime_string():
+	import time, datetime
+	ts = time.time()
+	st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+	return st
 
 
 if __name__ == "__main__":
