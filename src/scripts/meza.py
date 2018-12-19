@@ -136,6 +136,7 @@ def write_deploy_log( datetime, env, unique, condition, args_string ):
 		args_string
 	)
 
+	os.makedirs( os.path.dirname( os.path.realpath( deploy_log ) ) )
 	with open(deploy_log, "a") as myfile:
 	    myfile.write(line)
 
