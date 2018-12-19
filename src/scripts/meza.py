@@ -15,7 +15,7 @@ def load_yaml ( filepath ):
 			print(exc)
 
 
-defaults = load_yaml( "/opt/meza/config/core/defaults.yml" )
+defaults = load_yaml( "/opt/meza/config/defaults.yml" )
 
 # Hard-coded for now, because I'm not sure where to set it yet
 language = "en"
@@ -768,7 +768,7 @@ def meza_shell_exec ( shell_cmd, print_command=True ):
 	# home directory if don't cd to a neutral location. By cd'ing to this
 	# location you can pick up ansible.cfg and use vars there.
 	starting_wd = os.getcwd()
-	os.chdir( "/opt/meza/config/core" )
+	os.chdir( "/opt/meza/config" )
 
 	# import subprocess
 	# # child = subprocess.Popen(shell_cmd, stdout=subprocess.PIPE)
