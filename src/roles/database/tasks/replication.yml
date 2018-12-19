@@ -2,7 +2,6 @@
 #
 # The following conditionals are reused many times in the tasks in this file.
 # As such, they've been encapsulated in these tasks and registered to vars.
-# FIXME #812: The logic "not role_is_valid_slave|skipped" is awkward
 - name: Check if valid slave
   command: /bin/true
   register: role_is_valid_slave
@@ -10,6 +9,10 @@
     (mysql_replication_role == 'slave')
     and mysql_replication_user
     and (mysql_replication_master != '')
+- set_fact:
+    role_is_valid_slave: False
+  when: role_is_valid_slave is skipped
+
 - name: Check if valid master
   command: /bin/true
   register: role_is_valid_master
@@ -17,6 +20,10 @@
     (mysql_replication_role == 'master')
     and mysql_replication_user
     and (mysql_replication_master != '')
+- set_fact:
+    role_is_valid_master: False
+  when: role_is_valid_master is skipped
+
 
 
 #
@@ -29,8 +36,7 @@
     password: "{{ mysql_replication_user.password }}"
     priv: "{{ mysql_replication_user.priv | default('*.*:REPLICATION SLAVE') }}"
     state: present
-  when: >
-    not role_is_valid_master|skipped
+  when: role_is_valid_master
 
 #
 # Get slave replication status
@@ -39,8 +45,7 @@
   mysql_replication: mode=getslave
   failed_when: False
   register: slave
-  when: >
-    not role_is_valid_slave|skipped
+  when: role_is_valid_slave
 - debug: { var: slave }
 
 #
@@ -52,7 +57,7 @@
   when: >
     (
       (slave.Is_Slave is defined and not slave.Is_Slave)
-      or (slave.Is_Slave is not defined and slave|failed)
+      or (slave.Is_Slave is not defined and slave is failed)
       or (slave.Slave_IO_Running is defined and slave.Slave_SQL_Running == 'No')
       or (mysql_force_slave_configuration is defined and mysql_force_slave_configuration)
     )
@@ -66,9 +71,9 @@
   mysql_replication: mode=getmaster
   delegate_to: "{{ mysql_replication_master }}"
   register: master
-  when: >
-    not slave_needs_configuration|skipped
-    and not role_is_valid_slave|skipped
+  when:
+    - slave_needs_configuration
+    - role_is_valid_slave
 - debug: { var: master }
 
 
@@ -82,16 +87,16 @@
   command: mysql -NBe "SELECT DISTINCT(TABLE_SCHEMA) FROM information_schema.tables WHERE TABLE_SCHEMA NOT IN ('information_schema', 'performance_schema', 'mysql')"
   register: mysql_content_databases
   delegate_to: "{{ mysql_replication_master }}"
-  when: >
-    not slave_needs_configuration|skipped
-    and not role_is_valid_slave|skipped
+  when:
+    - slave_needs_configuration
+    - role_is_valid_slave
 
 - name: export dump file on master
   shell: "mysqldump --databases {{ mysql_content_databases.stdout }} | gzip > {{ m_tmp }}/mysqldump-onmaster.sql.gz"
   delegate_to: "{{ mysql_replication_master }}"
-  when: >
-    not slave_needs_configuration|skipped
-    and not role_is_valid_slave|skipped
+  when:
+    - slave_needs_configuration
+    - role_is_valid_slave
 
 
 
@@ -108,16 +113,16 @@
     dest: "{{ m_tmp }}/mysqldump-oncontrol.sql.gz"
     flat: yes
   delegate_to: "{{ mysql_replication_master }}"
-  when: >
-    not slave_needs_configuration|skipped
-    and not role_is_valid_slave|skipped
+  when:
+    - slave_needs_configuration
+    - role_is_valid_slave
 - name: put dump file
   copy:
     src: "{{ m_tmp }}/mysqldump-oncontrol.sql.gz"
     dest: "{{ m_tmp }}/mysqldump-onslave.sql.gz"
-  when: >
-    not slave_needs_configuration|skipped
-    and not role_is_valid_slave|skipped
+  when:
+    - slave_needs_configuration
+    - role_is_valid_slave
 
 #
 # Import SQL file from above
@@ -127,18 +132,18 @@
     state: import
     name: all
     target: "{{ m_tmp }}/mysqldump-onslave.sql.gz"
-  when: >
-    not slave_needs_configuration|skipped
-    and not role_is_valid_slave|skipped
+  when:
+    - slave_needs_configuration
+    - role_is_valid_slave
 
 #
 # Stop slave, configure, start slave.
 #
 - mysql_replication:
     mode: stopslave
-  when: >
-    not slave_needs_configuration|skipped
-    and not role_is_valid_slave|skipped
+  when:
+    - slave_needs_configuration
+    - role_is_valid_slave
 - name: Configure replication on the slave.
   mysql_replication:
     mode: changemaster
@@ -148,11 +153,11 @@
     master_log_file: "{{ master.File }}"
     master_log_pos: "{{ master.Position }}"
   failed_when: False
-  when: >
-    not slave_needs_configuration|skipped
-    and not role_is_valid_slave|skipped
+  when:
+    - slave_needs_configuration
+    - role_is_valid_slave
 - name: Start replication.
   mysql_replication: mode=startslave
-  when: >
-    not slave_needs_configuration|skipped
-    and not role_is_valid_slave|skipped
+  when:
+    - slave_needs_configuration
+    - role_is_valid_slave
