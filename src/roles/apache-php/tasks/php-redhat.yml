@@ -17,32 +17,31 @@
 
 - name: Ensure PHP 5.6 packages removed
   yum:
-    name: "{{item}}"
+    name:
+      - php56u
+      - php56u-cli
+      - php56u-common
+      - php56u-devel
+      - php56u-gd
+      - php56u-pecl-memcache
+      - php56u-pspell
+      - php56u-snmp
+      - php56u-xml
+      - php56u-xmlrpc
+      - php56u-mysqlnd
+      - php56u-pdo
+      - php56u-odbc
+      - php56u-pear
+      - php56u-pecl-jsonc
+      - php56u-process
+      - php56u-bcmath
+      - php56u-intl
+      - php56u-opcache
+      - php56u-soap
+      - php56u-mbstring
+      - php56u-mcrypt
+      - php56u-mssql
     state: absent
-  with_items:
-    - php56u
-    - php56u-cli
-    - php56u-common
-    - php56u-devel
-    - php56u-gd
-    - php56u-pecl-memcache
-    - php56u-pspell
-    - php56u-snmp
-    - php56u-xml
-    - php56u-xmlrpc
-    - php56u-mysqlnd
-    - php56u-pdo
-    - php56u-odbc
-    - php56u-pear
-    - php56u-pecl-jsonc
-    - php56u-process
-    - php56u-bcmath
-    - php56u-intl
-    - php56u-opcache
-    - php56u-soap
-    - php56u-mbstring
-    - php56u-mcrypt
-    - php56u-mssql
 
 # Check if the desired version of PHP is installed. If it is not, ensure any
 # other versions of PHP are not installed
@@ -62,45 +61,44 @@
 
 - name: Ensure PHP IUS packages installed
   yum:
-    name: "{{item}}"
+    name:
+      # The following items exist in php56u, php70u, php71u, and php72u
+      - "{{ php_ius_version }}"
+      - "{{ php_ius_version }}-cli"
+      - "{{ php_ius_version }}-common"
+      - "{{ php_ius_version }}-devel"
+      - "{{ php_ius_version }}-gd"
+      - "{{ php_ius_version }}-pspell"
+      - "{{ php_ius_version }}-snmp"
+      - "{{ php_ius_version }}-xml"
+      - "{{ php_ius_version }}-xmlrpc"
+      - "{{ php_ius_version }}-mysqlnd"
+      - "{{ php_ius_version }}-pdo"
+      - "{{ php_ius_version }}-odbc"
+      - "{{ php_ius_version }}-process"
+      - "{{ php_ius_version }}-bcmath"
+      - "{{ php_ius_version }}-intl"
+      - "{{ php_ius_version }}-opcache"
+      - "{{ php_ius_version }}-soap"
+      - "{{ php_ius_version }}-mbstring"
+
+      # php56u has memcache and memcached; php7Xu only has memcached
+      # legacy Meza used php56u-pecl-memcache
+      - "{{ php_ius_version }}-pecl-memcached"
+
+      # Available for php56u, php70u, and php71u. NOT for php72u.
+      - "{{ php_ius_version }}-mcrypt"
+
+      # Available for php56u and php70u. NOT php71u or php72u
+      # - "{{ php_ius_version }}-pear"
+      # Post 7.0, use the pear1u package for all versions of PHP
+      - pear1u
+
+      # Not available for PHP 7, due to being built into PHP 7
+      # - php56u-pecl-jsonc
+
+      # Not available in PHP 7
+      # Get alternative method of accessing SQL Server:
+      # https://docs.microsoft.com/en-us/sql/connect/php/installation-tutorial-linux-mac?view=sql-server-2017#installing-the-drivers-on-red-hat-7
+      # - php56u-mssql
     state: installed
-  with_items:
-    # The following items exist in php56u, php70u, php71u, and php72u
-    - "{{ php_ius_version }}"
-    - "{{ php_ius_version }}-cli"
-    - "{{ php_ius_version }}-common"
-    - "{{ php_ius_version }}-devel"
-    - "{{ php_ius_version }}-gd"
-    - "{{ php_ius_version }}-pspell"
-    - "{{ php_ius_version }}-snmp"
-    - "{{ php_ius_version }}-xml"
-    - "{{ php_ius_version }}-xmlrpc"
-    - "{{ php_ius_version }}-mysqlnd"
-    - "{{ php_ius_version }}-pdo"
-    - "{{ php_ius_version }}-odbc"
-    - "{{ php_ius_version }}-process"
-    - "{{ php_ius_version }}-bcmath"
-    - "{{ php_ius_version }}-intl"
-    - "{{ php_ius_version }}-opcache"
-    - "{{ php_ius_version }}-soap"
-    - "{{ php_ius_version }}-mbstring"
-
-    # php56u has memcache and memcached; php7Xu only has memcached
-    # legacy Meza used php56u-pecl-memcache
-    - "{{ php_ius_version }}-pecl-memcached"
-
-    # Available for php56u, php70u, and php71u. NOT for php72u.
-    - "{{ php_ius_version }}-mcrypt"
-
-    # Available for php56u and php70u. NOT php71u or php72u
-    # - "{{ php_ius_version }}-pear"
-    # Post 7.0, use the pear1u package for all versions of PHP
-    - pear1u
-
-    # Not available for PHP 7, due to being built into PHP 7
-    # - php56u-pecl-jsonc
-
-    # Not available in PHP 7
-    # Get alternative method of accessing SQL Server:
-    # https://docs.microsoft.com/en-us/sql/connect/php/installation-tutorial-linux-mac?view=sql-server-2017#installing-the-drivers-on-red-hat-7
-    # - php56u-mssql

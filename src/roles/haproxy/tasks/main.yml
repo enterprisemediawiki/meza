@@ -8,12 +8,11 @@
 
 - name: Install haproxy packages
   package:
-    name: "{{ item }}"
+    name:
+      - haproxy
+      - openssl
+      # - keepalived ?
     state: latest
-  with_items:
-    - haproxy
-    - openssl
-    # - keepalived ?
 
 - name: Ensure haproxy certs directory exists
   file:

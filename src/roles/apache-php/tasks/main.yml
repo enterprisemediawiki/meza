@@ -48,29 +48,26 @@
 #
 - name: Ensure Apache modules installed (RedHat/CentOS only)
   yum:
-    name: "{{ item }}"
+    name:
+      - mod_ssl
+      - mod_proxy_html
     state: installed
-  with_items:
-    - mod_ssl
-    - mod_proxy_html
   when: ansible_os_family == 'RedHat'
 
 - name: Ensure Apache modules installed (Debian only)
   apt:
+    name:
+      - "libapache2-mod-php{{ php_debian_version }}"
     state: present
-    name: "{{ item }}"
-  with_items:
-    - "libapache2-mod-php{{ php_debian_version }}"
   when: ansible_os_family == 'Debian'
 
 - name: Ensure Apache modules enabled (Debian only)
   apache2_module:
+    name:
+      - proxy_html
+      - ssl
+      - rewrite
     state: present
-    name: "{{ item }}"
-  with_items:
-    - proxy_html
-    - ssl
-    - rewrite
   when: ansible_os_family == 'Debian'
 
 #
