@@ -13,14 +13,13 @@
   tasks:
     - name: Ensure packages installed
       yum:
-        name: "{{item}}"
+        name:
+          - mariadb
+          - mariadb-server
+          - mariadb-libs
+          - MySQL-python
+          - perl-DBD-MySQL
         state: installed
-      with_items:
-        - mariadb
-        - mariadb-server
-        - mariadb-libs
-        - MySQL-python
-        - perl-DBD-MySQL
 
     - name: Ensure backups repo in place
       git:

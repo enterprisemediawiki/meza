@@ -2,11 +2,10 @@
 
 - name: Ensure prerequisites for sqlsrv in place
   yum:
-    name: "{{item}}"
+    name:
+      - re2c
+      - gcc-c++
     state: installed
-  with_items:
-  - re2c
-  - gcc-c++
 
 # Install ODBC driver
 - name: install mssql-server repo (CentOS, RedHat)
@@ -17,11 +16,10 @@
 
 - name: Ensure conflicting ODBC drivers removed
   yum:
-    name: "{{item}}"
+    name:
+      - unixODBC-utf16
+      - unixODBC-utf16-devel
     state: absent
-  with_items:
-  - unixODBC-utf16
-  - unixODBC-utf16-devel
 
 - name: install MS ODBC driver package
   yum:

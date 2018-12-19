@@ -128,22 +128,23 @@
   - latest
 
 - name: Ensure base packages installed
-  package: name={{item}} state=installed
-  with_items:
-    - ntp
-    - ntpdate
-    - ntp-doc
-    - openssh-server
-    - "{{ package_openssh_client }}"
-    - vim
-    - git
-    - net-tools
-    - "{{ package_firewall }}"
-    - rsyslog
-    - jq
-    - tree
-    - "{{ package_cron }}"
-    - rsync
+  package:
+    name:
+      - ntp
+      - ntpdate
+      - ntp-doc
+      - openssh-server
+      - "{{ package_openssh_client }}"
+      - vim
+      - git
+      - net-tools
+      - "{{ package_firewall }}"
+      - rsyslog
+      - jq
+      - tree
+      - "{{ package_cron }}"
+      - rsync
+    state: installed
   tags:
   - latest
 

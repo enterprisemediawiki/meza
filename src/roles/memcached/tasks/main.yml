@@ -5,13 +5,12 @@
 
 - name: Ensure memcached and netcat packages latest
   yum:
-    name: "{{ item }}"
+    name:
+      - memcached
+      - "{{ package_nmap }}"
     state: latest
   tags:
-  - latest
-  with_items:
-  - memcached
-  - "{{ package_nmap }}"
+    - latest
 
 - name: Write the memcached config file
   template:
