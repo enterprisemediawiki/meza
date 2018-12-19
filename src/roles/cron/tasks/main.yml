@@ -4,7 +4,7 @@
 # - name: Ensure cron installed
 #   yum:
 #     name: cronie
-#     state: installed
+#     state: present
 
 - name: Ensure cron is running (and enable it at boot)
   service:

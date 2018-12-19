@@ -12,7 +12,7 @@
 - name: Ensure Java 1.8.0 OpenJDK is installed
   yum:
     name: "{{ package_java }}"
-    state: installed
+    state: present
 
 
 # Environment setup.

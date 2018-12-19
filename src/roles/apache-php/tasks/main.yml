@@ -2,7 +2,7 @@
 - name: Ensure Apache webserver installed
   package:
     name: "{{ package_apache }}"
-    state: installed
+    state: present
 
 - name: Make apache own htdocs directory
   file:
@@ -50,7 +50,7 @@
     name:
       - mod_ssl
       - mod_proxy_html
-    state: installed
+    state: present
   when: ansible_os_family == 'RedHat'
 
 - name: Ensure Apache modules installed (Debian only)

@@ -5,7 +5,7 @@
     name:
       - re2c
       - gcc-c++
-    state: installed
+    state: present
 
 # Install ODBC driver
 - name: install mssql-server repo (CentOS, RedHat)
