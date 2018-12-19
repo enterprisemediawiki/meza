@@ -27,7 +27,7 @@ sed -r -i 's/NM_CONTROLLED=yes/NM_CONTROLLED=no/g;' "$net_scripts/$network_adapt
 
 # note: prefix with \ removes root's alias in .bashrc to "cp -i" which forces cp
 # to ask the user if they want to overwrite existing. We do want to overwrite.
-curl -L "https://raw.github.com/enterprisemediawiki/meza/master/config/core/template/$network_adapter2" > "$net_scripts/$network_adapter2"
+curl -L "https://raw.github.com/enterprisemediawiki/meza/master/config/template/$network_adapter2" > "$net_scripts/$network_adapter2"
 
 # modify IP address as required:
 sed -r -i "s/IPADDR=192.168.56.56/IPADDR=$ipaddr/g;" "$net_scripts/$network_adapter2"

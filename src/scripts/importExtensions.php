@@ -1,7 +1,7 @@
 <?php
 error_reporting(E_ALL);
 # normalize names by removing any spaces
-$core  = `grep -Po 'name\: (.*)' /opt/meza/config/core/MezaCoreExtensions.yml | sort | awk --field-separator=: '{print $2}' | sed s'/[ \t]*//g'`;
+$core  = `grep -Po 'name\: (.*)' /opt/meza/config/MezaCoreExtensions.yml | sort | awk --field-separator=: '{print $2}' | sed s'/[ \t]*//g'`;
 $local = `grep -Po 'name\: (.*)' /opt/conf-meza/public/MezaLocalExtensions.yml | sort | awk --field-separator=: '{print $2}' | sed s'/[ \t]*//g'`;
 
 print "Here are the extensions in core\n$core";
@@ -60,6 +60,6 @@ foreach ( $extension_php as $ext ) {
   }
 }
 
-// $existing = yaml_parse_file( '/opt/meza/config/core/MezaCoreExtensions.yml' );
+// $existing = yaml_parse_file( '/opt/meza/config/MezaCoreExtensions.yml' );
 
 // var_dump ($existing);

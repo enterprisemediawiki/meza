@@ -11,7 +11,7 @@ m_meza: /opt/meza
 m_use_production_settings: True
 
 # config dir
-m_config_core: /opt/meza/config/core
+m_config_core: /opt/meza/config
 m_local_secret: /opt/conf-meza/secret
 m_local_public: /opt/conf-meza/public
 m_home: /opt/conf-meza/users
@@ -63,7 +63,7 @@ m_simplesamlphp_path: /opt/simplesamlphp
 m_profiling_xhgui_directory: /opt/xhgui
 
 # files
-m_i18n: /opt/meza/config/core/i18n
+m_i18n: /opt/meza/config/i18n
 m_db_replication_dump_file: /opt/data-meza/db_master_for_replication.sql
 m_db_replication_log_file: /opt/data-meza/db_master_log_file
 m_db_replication_log_pos: /opt/data-meza/db_master_log_pos
