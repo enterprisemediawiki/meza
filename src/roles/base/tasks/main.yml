@@ -63,7 +63,7 @@
 - name: Ensure aptitude installed in order to use Ansible 'package' (Debian only)
   apt:
     name: aptitude
-    state: installed
+    state: present
     force_apt_get: yes
   when: ansible_os_family == "Debian"
 
@@ -81,7 +81,7 @@
 - name: Ensure EPEL installed via epel-release package (CentOS only)
   yum:
     name: epel-release
-    state: installed
+    state: present
   when: ansible_distribution == "CentOS"
   tags:
   - latest
@@ -144,7 +144,7 @@
       - tree
       - "{{ package_cron }}"
       - rsync
-    state: installed
+    state: present
   tags:
   - latest
 

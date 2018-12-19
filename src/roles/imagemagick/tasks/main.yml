@@ -2,7 +2,7 @@
 - name: Ensure ghostscript installed
   package:
     name: ghostscript
-    state: installed
+    state: present
 
 - name: Install Imagemagick from meza repo (RedHat/CentOS only)
   yum:

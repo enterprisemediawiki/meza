@@ -19,7 +19,7 @@
           - mariadb-libs
           - MySQL-python
           - perl-DBD-MySQL
-        state: installed
+        state: present
 
     - name: Ensure backups repo in place
       git:

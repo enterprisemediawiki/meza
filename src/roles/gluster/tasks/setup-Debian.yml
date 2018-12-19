@@ -20,5 +20,5 @@
     name:
       - glusterfs-server
       - glusterfs-client
-    state: installed
+    state: present
     default_release: "{{ glusterfs_default_release }}"

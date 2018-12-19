@@ -12,7 +12,7 @@
 - name: Install mongodb-org package
   yum:
     name: mongodb-org
-    state: installed
+    state: present
   run_once: yes
 
 - name: Ensure MongoDB conf file in place

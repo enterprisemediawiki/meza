@@ -2,7 +2,7 @@
 - name: Install php dependency packages
   package:
     name: "{{ package_php_apache_deps }}"
-    state: installed
+    state: present
 
 - name: Install PHP (RedHat/CentOS only)
   include: php-redhat.yml

@@ -2,4 +2,4 @@
 - name: Install base-extras packages
   package:
     name: "{{ package_base_extras }}"
-    state: installed
+    state: present
