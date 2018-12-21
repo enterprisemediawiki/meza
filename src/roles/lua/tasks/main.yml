@@ -1,5 +1,9 @@
 ---
 
-- name: Install luasandbox
-  include: luasandbox.yml
-  when: m_install_lua
+- name: Install luasandbox (Debian)
+  include: luasandbox-debian.yml
+  when: m_install_lua and ansible_os_family == 'Debian'
+
+- name: Install luasandbox (RedHat)
+  include: luasandbox-redhat.yml
+  when: m_install_lua and ansible_os_family == 'RedHat'

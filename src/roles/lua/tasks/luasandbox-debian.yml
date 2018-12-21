@@ -1,0 +1,6 @@
+---
+
+- name: install lua packages
+  yum:
+    name: php-luasandbox
+    state: present
