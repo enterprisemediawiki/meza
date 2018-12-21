@@ -1,0 +1,47 @@
+---
+
+- name: install lua packages
+  yum:
+    name: ['luajit', 'luajit-devel']
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: install lua packages
+  apt:
+    name: ['luajit', 'libluajit-5.1-dev', 'pkg-config', 're2c']
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: check out luasandbox from git
+  git:
+    repo=https://phabricator.wikimedia.org/diffusion/MLUS/php-luasandbox.git
+    dest=/usr/src/luasandbox
+    version=master
+
+- name: compile and install luasandbox
+  shell: phpize && ./configure --prefix=/usr/lib/php && make all install
+  args:
+    chdir: /usr/src/luasandbox
+  when: ansible_os_family == 'Debian'
+
+- name: compile and install luasandbox
+  shell: phpize && ./configure --prefix=/usr/lib64/php && make all install
+  args:
+    chdir: /usr/src/luasandbox
+  when: ansible_os_family == 'RedHat'
+
+- name: copy luasandbox initialization file
+  copy:
+    src=luasandbox.ini
+    dest=/etc/php/7.0/apache2/conf.d/20-luasandbox.ini
+    mode=0600
+    owner=root
+  when: ansible_os_family == 'Debian'
+
+- name: copy luasandbox initialization file
+  copy:
+    src=luasandbox.ini
+    dest=/etc/php.d/luasandbox.ini
+    mode=0600
+    owner=root
+  when: ansible_os_family == 'RedHat'
