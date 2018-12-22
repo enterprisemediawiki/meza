@@ -19,6 +19,6 @@
 - name: copy luasandbox initialization file
   copy:
     src=luasandbox.ini
-    dest=/etc/php/7.1/apache2/conf.d/20-luasandbox.ini
+    dest="/etc/php/{{ php_debian_version }}/apache2/conf.d/20-luasandbox.ini"
     mode=0600
     owner=root
