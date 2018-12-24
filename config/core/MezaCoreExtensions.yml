@@ -60,6 +60,8 @@ list:
   - name: "Semantic Scribunto"
     composer: "mediawiki/semantic-scribunto"
     version: 2.0.0
+    config: |
+      wfLoadExtension( 'SemanticScribunto' );
   - name: SubPageList
     composer: "mediawiki/sub-page-list"
     version: "1.5.0"
