@@ -103,7 +103,7 @@
 
 - name: Set variable holding list of local skins
   include_vars:
-    file: "{{ m_local_public }}/MezaLocalSkins.yml"
+    file: "{{ m_deploy }}/public/MezaLocalSkins.yml"
     name: meza_local_skins
   tags:
     - skins
@@ -132,7 +132,7 @@
 
 - name: Set variable holding list of local extensions
   include_vars:
-    file: "{{ m_local_public }}/MezaLocalExtensions.yml"
+    file: "{{ m_deploy }}/public/MezaLocalExtensions.yml"
     name: meza_local_extensions
   tags:
     - always

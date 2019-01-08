@@ -239,15 +239,24 @@ m_cache_directory_mode: "0770"
 m_cache_directory_owner: "{{ user_apache }}"
 m_cache_directory_group: "{{ group_apache }}"
 
-
 m_logs_mode: "0755"
 m_logs_owner: meza-ansible
 m_logs_group: wheel
 
-
 m_backups_mode: "0755"
 m_backups_owner: root
 m_backups_group: root
+
+# Public config is present on the controller at /opt/conf-meza/public (set above
+# in `m_local_public`). That directory is deployed to all servers into the
+# /opt/.deploy-meza/public directory. Below allows setting mode and ownership
+# for each destination.
+m_public_config_mode: "0644"
+m_public_config_owner: root
+m_public_config_group: root
+m_public_config_deployed_mode: "0755"
+m_public_config_deployed_owner: root
+m_public_config_deployed_group: root
 
 
 #
@@ -261,7 +270,7 @@ php_opcache_memory_consumption: 256
 php_opcache_interned_strings_buffer: 16
 
 # The amount of input variables that may be accepted
-php_max_input_vars: 2000 
+php_max_input_vars: 2000
 
 # It's important for this number to be greater than the number of PHP files on a
 # server.
