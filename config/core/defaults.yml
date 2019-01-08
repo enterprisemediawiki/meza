@@ -158,6 +158,9 @@ m_parsoid_version: "e6b708b3d7ff50a314d021295dce874574aa3e9e"
 # MediaWiki 1.29 and higher require ElasticSearch 5.x
 elasticsearch_major_version: "5.x"
 
+# Whether or not to install Lua/luasandbox
+m_install_lua: true
+
 # This can't be in Debian.yml, because that is loaded prior to defaults.yml...hmmm...
 packages_php_debian:
   - php{{ php_debian_version }}-common

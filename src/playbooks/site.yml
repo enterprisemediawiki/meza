@@ -327,7 +327,8 @@
   roles:
     - set-vars
     - htdocs
-    - lua
+    - role: lua
+      when: m_install_lua
     - mediawiki
 
 
