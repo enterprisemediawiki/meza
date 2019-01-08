@@ -119,6 +119,8 @@
   shell: "{{ mysqldump_command }}"
   delegate_to: "{{ target_server }}"
   when: source_wiki_exists
+  tags:
+    - backup
 
 
 #
