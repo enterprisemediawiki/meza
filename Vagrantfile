@@ -269,8 +269,6 @@ EOL
     #
     if configuration.key?("app2") || configuration.key?("db2")
 
-      app2_ip_address = configuration["app2"]["ip_address"]
-
       app1.vm.provision "keytransfer", type: "shell", preserve_order: true, inline: <<-SHELL
 
         # Turn off host key checking for user meza-ansible, to avoid prompts
@@ -289,16 +287,16 @@ EOL
         # sudo su meza-ansible
 
         # Copy id_rsa.pub to each minion
-        # sshpass -p 1234 ssh meza-ansible@#{app2_ip_address} "echo \"$pubkey\" >> /opt/conf-meza/users/meza-ansible/.ssh/authorized_keys"
+        # sshpass -p 1234 ssh meza-ansible@INSERT_APP2_IP "echo \"$pubkey\" >> /opt/conf-meza/users/meza-ansible/.ssh/authorized_keys"
 
         # Remove password-based authentication for $ansible_user
         #echo "delete password"
-        #ssh #{app2_ip_address} "sudo passwd --delete meza-ansible"
+        #ssh INSERT_APP2_IP "sudo passwd --delete meza-ansible"
 
         # Allow SSH login
         # WARNING: This is INSECURE and for test environment only
         # echo "setup sshd_config"
-        # ssh #{app2_ip_address} "sudo sed -r -i 's/UsePAM yes/UsePAM no/g;' /etc/ssh/sshd_config && sudo systemctl restart sshd"
+        # ssh INSERT_APP2_IP "sudo sed -r -i 's/UsePAM yes/UsePAM no/g;' /etc/ssh/sshd_config && sudo systemctl restart sshd"
       SHELL
 
       # else
