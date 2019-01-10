@@ -1,5 +1,24 @@
 ---
 
-- name: Install luasandbox
-  include: luasandbox.yml
-  when: m_install_lua
+- name: install lua packages
+  package:
+    name: "{{ package_lua }}"
+    state: present
+
+- name: check out luasandbox from git
+  git:
+    repo: https://github.com/wikimedia/mediawiki-php-luasandbox.git
+    dest: /usr/src/luasandbox
+    version: master
+
+- name: compile and install luasandbox
+  shell: "phpize && ./configure --prefix={{ path_php_lib }} && make all install"
+  args:
+    chdir: /usr/src/luasandbox
+
+- name: copy luasandbox initialization file
+  copy:
+    src: luasandbox.ini
+    dest: "{{ path_php_apache_conf_d }}/20-luasandbox.ini"
+    mode: 0600
+    owner: root
