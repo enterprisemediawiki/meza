@@ -133,6 +133,9 @@ sshd_config_UsePAM: "yes"
 sshd_config_PasswordAuthentication: "yes"
 use_default_ssh_config: True
 
+m_modify_etc_sudoers: true
+m_meza_sudeoers_file: "/etc/sudoers.d/meza-ansible"
+
 #
 # Software versions
 #
@@ -155,6 +158,9 @@ m_parsoid_version: "e6b708b3d7ff50a314d021295dce874574aa3e9e"
 # MediaWiki 1.28 and higher require ElasticSearch 2.x
 # MediaWiki 1.29 and higher require ElasticSearch 5.x
 elasticsearch_major_version: "5.x"
+
+# Whether or not to install Lua/luasandbox
+m_install_lua: true
 
 # This can't be in Debian.yml, because that is loaded prior to defaults.yml...hmmm...
 packages_php_debian:
@@ -306,3 +312,44 @@ memcached_memory: 512
 # User to run memcached
 # user_memcached: see RedHat.yml and Debian.yml
 
+
+
+#
+# Helpers to group load balancer types
+#
+
+# All load balancer types
+load_balancers_all: >
+  {{ groups['load-balancers'] | default([]) }} +
+  {{ groups['load-balancers-meza-internal'] | default([]) }} +
+  {{ groups['load-balancers-meza-external'] | default([]) }} +
+  {{ groups['load-balancers-nonmeza'] | default([]) }} +
+  {{ groups['load-balancers-nonmeza-internal'] | default([]) }} +
+  {{ groups['load-balancers-nonmeza-external'] | default([]) }}
+
+# Just load balancers for handling internal services
+load_balancers_internal: >
+  {{ groups['load-balancers-meza-internal'] | default([]) }} +
+  {{ groups['load-balancers-nonmeza-internal'] | default([]) }}
+
+# Just load balancers for handling external traffic
+load_balancers_external: >
+  {{ groups['load-balancers-meza-external'] | default([]) }} +
+  {{ groups['load-balancers-nonmeza-external'] | default([]) }}
+
+# Just load balancers that handle internal and external
+load_balancers_full: >
+  {{ groups['load-balancers'] | default([]) }} +
+  {{ groups['load-balancers-nonmeza'] | default([]) }}
+
+# Just load balancers managed by Meza
+load_balancers_meza: >
+  {{ groups['load-balancers'] | default([]) }} +
+  {{ groups['load-balancers-meza-internal'] | default([]) }} +
+  {{ groups['load-balancers-meza-external'] | default([]) }}
+
+# Just unmanaged load balancers (AWS, etc).
+load_balancers_nonmeza: >
+  {{ groups['load-balancers-nonmeza'] | default([]) }} +
+  {{ groups['load-balancers-nonmeza-internal'] | default([]) }} +
+  {{ groups['load-balancers-nonmeza-external'] | default([]) }}

@@ -41,13 +41,13 @@
   shell: passwd --delete alt-meza-ansible
   failed_when: False
 
-# Add line to visudo file if it does not exist
-- name: Ensure alt-meza-ansible is passwordless sudoer
-  lineinfile:
-    dest: /etc/sudoers
-    state: present
-    line: 'alt-meza-ansible ALL=(ALL) NOPASSWD: ALL'
-    validate: 'visudo -cf %s'
+- name: Ensure /etc/sudoers.d/meza-ansible in place
+  template:
+    src: "sudoers_meza-ansible.j2"
+    dest: "{{ m_meza_sudeoers_file }}"
+    owner: root
+    group: root
+    mode: "0644"
 
 - name: "Ensure deltarpm is installed and latest (RedHat only)"
   yum: name=deltarpm state=latest
@@ -175,6 +175,15 @@
   ufw:
     state: enabled
     policy: deny
+  when:
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - ansible_os_family == "Debian"
+
+# Make sure we don't block SSH right away. Not sure why this isn't required for
+# firewalld/centos...must be different defaults.
+- ufw:
+    rule: allow
+    name: OpenSSH
   when:
     - docker_skip_tasks is not defined or not docker_skip_tasks
     - ansible_os_family == "Debian"

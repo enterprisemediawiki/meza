@@ -44,6 +44,7 @@ package_base_extras:
   - gcc
   - cifs-utils
 package_nmap: nmap-ncat
+package_lua: [ 'lua', 'lua-devel' ]
 
 #
 # Services
@@ -64,6 +65,8 @@ path_apache_server_root: "/etc/httpd"
 path_php_conf_d: "/etc/php.d/"
 path_php_conf_d_files:
   - "10-opcache.ini"
+path_php_apache_conf_d: "/etc/php.d"
+path_php_lib: "/usr/lib64/php"
 # was: m_memcached_conf: /etc/sysconfig/memcached
 path_memcached_conf: /etc/sysconfig/memcached
 
