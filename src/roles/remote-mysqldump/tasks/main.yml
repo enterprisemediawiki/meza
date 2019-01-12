@@ -62,15 +62,46 @@
 #
 # Verify wiki exists on source server before attempting to dump from it
 #
+
+#
+# If remote_server != target_server, use SSH to run mysqlshow. Else, doit locally
+#
+# FIXME #818: Remove StrictHostKeyChecking=no when tests properly add host keys (users should do so, too, of course)
+- name: remote_server ({{ remote_server }}) != target_server ({{ target_server }}); run mysqlshow over SSH
+  set_fact:
+    mysqlshow_command: >
+      ssh
+      -o StrictHostKeyChecking=no
+      -i /root/meza-ansible-id_rsa
+      -o UserKnownHostsFile=/root/meza-ansible-known_hosts
+      {{ remote_server_ssh_user }}@{{ remote_server }}
+      "mysqlshow
+      {{ user_option }}
+      {{ password_option }}
+      {{ dump_database }}
+      | grep -v Wildcard
+      | grep -o {{ dump_database }}"
+  when: remote_server != target_server
+- name: remote_server == target_server ({{ target_server }}); run mysqlshow locally
+  set_fact:
+    mysqlshow_command: >
+      mysqlshow
+      {{ user_option }}
+      {{ password_option }}
+      {{ dump_database }}
+      | grep -v Wildcard
+      | grep -o {{ dump_database }}
+  when: remote_server == target_server
+- debug: { msg: "{{ mysqlshow_command }}" }
+
 - name: "{{ wiki_id }} - check if wiki database exists ON SOURCE SERVER"
-  shell: 'mysqlshow "wiki_{{ wiki_id }}" | grep -v Wildcard | grep -o wiki_{{ wiki_id }}'
+  shell: "{{ mysqlshow_command }}"
   register: source_wiki_exists_check
-  delegate_to: "{{ target_server }}"
   failed_when: False
   run_once: true
-
 - debug:
     var: source_wiki_exists_check
+
 
 - name: "{{ wiki_id }} - Set fact if database wiki_{{ wiki_id }} DOES exist ON SOURCE SERVER"
   set_fact:
