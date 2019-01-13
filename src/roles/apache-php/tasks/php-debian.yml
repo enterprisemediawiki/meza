@@ -42,19 +42,23 @@
     - php_ondrej_debian_repo.changed
     - (ansible_distribution == "Debian")
 
-# PHP package purges.
-- name: Purge PHP version packages.
-  apt:
-    name:
+- name: Set fact for list of PHP versions to ensure absent
+  set_fact:
+    remove_php_versions:
       - php5.6-common
       - php7.0-common
       - php7.1-common
       - php7.2-common
       - php7.3-common
+
+
+# PHP package purges.
+- name: Purge PHP version packages.
+  apt:
+    name: "{{ remove_php_versions | difference(['php' + php_debian_version + '-common']) }}"
     state: absent
     purge: true
     force: true
-  when: "'php' + php_debian_version not in item"
 
 
 #

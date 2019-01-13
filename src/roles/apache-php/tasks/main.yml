@@ -62,11 +62,12 @@
 
 - name: Ensure Apache modules enabled (Debian only)
   apache2_module:
-    name:
-      - proxy_html
-      - ssl
-      - rewrite
+    name: "{{ item }}"
     state: present
+  with_items:
+    - proxy_html
+    - ssl
+    - rewrite
   when: ansible_os_family == 'Debian'
 
 #
