@@ -91,38 +91,35 @@
     - slave_needs_configuration
     - role_is_valid_slave
 
-- name: export dump file on master
-  shell: "mysqldump --databases {{ mysql_content_databases.stdout }} | gzip > {{ m_tmp }}/mysqldump-onmaster.sql.gz"
-  delegate_to: "{{ mysql_replication_master }}"
-  when:
-    - slave_needs_configuration
-    - role_is_valid_slave
-
-
 
 #
-# Copying SQL files from one server to another *appears* to be somewhat
-# complicated by the fact that the control server could *be* either the master
-# or slave server. To get around this, copy all files into /tmp directories
-# with different names.
-# FIXME #788: Use role remote-mysqldump to send direct; don't create tmp files
+# FIXME #788: This was changed to use role remote-mysqldump, which partially
+#             satisfies #788. This still could be inefficient if you have many
+#             replica servers, however, since it will do a new mysqldump/gzip
+#             for each one. It would be more efficient to dump a gzipped file on
+#             the master server, then rsync over to all replicas.
 #
-- name: fetch dump file
-  fetch:
-    src: "{{ m_tmp }}/mysqldump-onmaster.sql.gz"
-    dest: "{{ m_tmp }}/mysqldump-oncontrol.sql.gz"
-    flat: yes
-  delegate_to: "{{ mysql_replication_master }}"
+#             However, this is still less complicated then what was being done
+#             before, which created a file on master, moved it to the control
+#             server, then moved it to the replicas...and the controller could
+#             be the master, a replica, or neither.
+#
+- name: "mysqldump from master to replica"
+  import_role:
+    name: remote-mysqldump
+  vars:
+    remote_server:      "{{ mysql_replication_master }}"
+
+    # initial intent of dump_database was to hold the name of the database to be
+    # dumped. However, the method below should work to dump all databases found
+    # in mysql_content_databases above.
+    dump_database:      "--databases {{ mysql_content_databases.stdout }}"
+    target_server:      "{{ inventory_hostname }}"
+    target_server_path: "{{ m_tmp }}/mysqldump-onslave.sql.gz"
   when:
     - slave_needs_configuration
     - role_is_valid_slave
-- name: put dump file
-  copy:
-    src: "{{ m_tmp }}/mysqldump-oncontrol.sql.gz"
-    dest: "{{ m_tmp }}/mysqldump-onslave.sql.gz"
-  when:
-    - slave_needs_configuration
-    - role_is_valid_slave
+
 
 #
 # Import SQL file from above
