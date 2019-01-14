@@ -3,7 +3,7 @@
   user:
     name: "{{ item }}"
     # primary group
-    group: wheel
+    group: "{{ group_wheel }}"
     move_home: yes
     home: "{{ m_home }}/{{ item }}"
   with_items:
@@ -14,7 +14,7 @@
   file:
     path: "{{ m_home }}/alt-meza-ansible/.ssh"
     owner: alt-meza-ansible
-    group: wheel
+    group: "{{ group_wheel }}"
     mode: 0700
     state: directory
 
@@ -25,7 +25,7 @@
   file:
     path: "{{ m_home }}/{{ item }}/.ssh/authorized_keys"
     owner: "{{ item }}"
-    group: wheel
+    group: "{{ group_wheel }}"
     mode: 0644
   with_items:
   - meza-ansible
@@ -262,7 +262,7 @@
   file:
     path: "{{ m_tmp }}"
     owner: meza-ansible
-    group: wheel
+    group: "{{ group_wheel }}"
     mode: 0755
     state: directory
 
@@ -335,5 +335,5 @@
     src: "gitconfig.j2"
     dest: "{{ m_home }}/meza-ansible/.gitconfig"
     owner: "meza-ansible"
-    group: "wheel"
+    group: "{{ group_wheel }}"
     mode: 0644

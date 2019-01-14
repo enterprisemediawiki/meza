@@ -83,4 +83,5 @@ command_update_ca_trust: "update-ca-trust"
 #
 user_apache: apache
 group_apache: apache
+group_wheel: wheel
 user_memcached: memcached

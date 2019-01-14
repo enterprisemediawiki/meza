@@ -259,7 +259,7 @@ m_cache_directory_group: "{{ group_apache }}"
 
 m_logs_mode: "0755"
 m_logs_owner: meza-ansible
-m_logs_group: wheel
+m_logs_group: "{{ group_wheel }}" 
 
 
 m_backups_mode: "0755"
