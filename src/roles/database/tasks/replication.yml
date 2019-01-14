@@ -115,7 +115,7 @@
     # in mysql_content_databases above.
     dump_database:      "--databases {{ mysql_content_databases.stdout }}"
     target_server:      "{{ inventory_hostname }}"
-    target_server_path: "{{ m_tmp }}/mysqldump-onslave.sql.gz"
+    target_server_path: "{{ m_tmp }}/mysqldump-onslave.sql"
   when:
     - slave_needs_configuration
     - role_is_valid_slave
@@ -128,7 +128,7 @@
   mysql_db:
     state: import
     name: all
-    target: "{{ m_tmp }}/mysqldump-onslave.sql.gz"
+    target: "{{ m_tmp }}/mysqldump-onslave.sql"
   when:
     - slave_needs_configuration
     - role_is_valid_slave
