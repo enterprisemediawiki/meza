@@ -326,3 +326,10 @@
     owner: "meza-ansible"
     group: "wheel"
     mode: 0644
+
+- name: Ensure meza-ansible can use the ssh-agent of the deploy user
+  lineinfile:
+    dest: /etc/sudoers
+    insertafter: '^#?\s*Defaults\s+env_keep\b'
+    line: 'Defaults    env_keep += "SSH_AUTH_SOCK"'
+
