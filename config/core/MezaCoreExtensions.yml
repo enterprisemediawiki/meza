@@ -149,7 +149,7 @@ list:
     git_submodules: True
     config: |
       // Parsoid servers are defined based upon Ansible hosts file and thus
-      // cannot be easily added to base-extensions.yml. As such, VisualEditor config
+      // cannot be easily added to MezaCoreExtensions.yml. As such, VisualEditor config
       // is included directly in LocalSettings.php.j2 (mostly)
 
       // Show visual diff on regular diff pages
@@ -297,7 +297,7 @@ list:
     legacy_load: true
     config: |
       // CirrusSearch cluster(s) are defined based upon Ansible hosts file and thus
-      // cannot be easily added to base-extensions.yml. As such, CirrusSearch config
+      // cannot be easily added to MezaCoreExtensions.yml. As such, CirrusSearch config
       // is included directly in LocalSettings.php.j2
   - name: Echo
     repo: https://github.com/wikimedia/mediawiki-extensions-Echo.git
