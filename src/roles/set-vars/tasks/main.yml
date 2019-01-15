@@ -3,11 +3,11 @@
 # Note: OS-family vars come before defaults.yml, so they can drive defaults.yml values
 - name: Set OS-family specific variables
   include_vars:
-    file: "/opt/meza/config/core/{{ ansible_os_family }}.yml"
+    file: "/opt/meza/config/{{ ansible_os_family }}.yml"
 
 - name: Set meza-core path variables
   include_vars:
-    file: /opt/meza/config/core/defaults.yml
+    file: /opt/meza/config/defaults.yml
 
 - name: If using gluster (app-servers > 1), override m_uploads_dir
   set_fact:
@@ -18,7 +18,7 @@
   include_vars:
     file: "{{ m_local_public }}/public.yml"
   # Ingore errors so this file is not required to be included
-  ignore_errors: yes
+  failed_when: False
 
 - name: Get individual wikis dirs from localhost
   find:
@@ -35,10 +35,11 @@
   include_vars:
     file: "{{ m_local_public }}/env/{{ env }}.yml"
   # Ingore errors so this file is not required to be included
-  ignore_errors: yes
+  failed_when: False
 
 - name: Set meza local secret variables
   include_vars:
     file: "{{ m_local_secret }}/{{ env }}/secret.yml"
-  # DO NOT ingore errors generally, except when setting up an env
-  ignore_errors: "{{ allow_missing_secret_config | default(false) }}"
+  # Can't load secret.yml when it doesn't exist yet, so skip this while setting
+  # up an environment
+  when: not allow_missing_secret_config|default(false)

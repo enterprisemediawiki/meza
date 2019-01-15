@@ -58,7 +58,7 @@ elif [ "$test_type" == "monolith-from-import" ]; then
 
 	# Test Ansible syntax
 	# FIXME #829: syntax check all playbooks
-	${docker_exec[@]} ANSIBLE_CONFIG=/opt/meza/config/core/ansible.cfg ansible-playbook /opt/meza/src/playbooks/site.yml --syntax-check
+	${docker_exec[@]} ANSIBLE_CONFIG=/opt/meza/config/ansible.cfg ansible-playbook /opt/meza/src/playbooks/site.yml --syntax-check
 
 	${docker_exec[@]} bash /opt/meza/tests/deploys/monolith-from-import.controller.sh "$docker_ip"
 

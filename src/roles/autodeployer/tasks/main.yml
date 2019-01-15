@@ -1,0 +1,58 @@
+---
+
+# Enable force_deploy by putting something like the following in secret.yml
+#
+# force_deploy:
+#   crontime: "0 18 * * 0"
+#   overwrite: true
+#   extra_options: "--skip-tags smw-data,search-index"
+
+
+- name:
+  set_fact:
+    _force_deploy_notify_prefix: "Backup"
+    _force_deploy_options: "--overwrite {{ force_deploy.extra_options|default('') }}"
+  when:
+    - force_deploy is defined
+    - force_deploy.overwrite is defined
+    - force_deploy.overwrite
+
+- name:
+  set_fact:
+    _force_deploy_notify_prefix: "Deploy"
+    _force_deploy_options: "{{ force_deploy.extra_options|default('') }}"
+  when:
+    - force_deploy is defined
+    - >
+      force_deploy.overwrite is not defined
+      or (force_deploy.overwrite is defined and not force_deploy.overwrite)
+
+- name: "Ensure {{ m_deploy }}/autodeployer exists"
+  file:
+    path: "{{ m_deploy }}/autodeployer"
+    owner: root
+    group: root
+    mode: 0644
+    state: directory
+
+- name: Ensure autodeployer scripts in place
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ m_deploy }}/autodeployer/{{ item }}"
+    owner: root
+    group: root
+    mode: "0744"
+  with_items:
+    - "check-for-changes.sh"
+    - "do-deploy.sh"
+    - "git-fetch.sh"
+    - "no-notify.sh"
+    - "slack-notify.sh"
+
+- name: Ensure autodeployer cron in place
+  template:
+    src: "meza-autodeployer-cron.j2"
+    dest: "/etc/cron.d/meza-autodeployer-cron-{{ env }}"
+    owner: "{{ m_crond_owner }}"
+    group: "{{ m_crond_group }}"
+    mode: "{{ m_crond_mode }}"

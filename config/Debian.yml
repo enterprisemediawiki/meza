@@ -57,6 +57,7 @@ package_base_extras:
   - cifs-utils
   - curl
 package_nmap: nmap
+package_lua: [ 'liblua5.1-0-dev', 'liblua50-dev', 'liblualib50-dev' ]
 
 
 #
@@ -80,7 +81,9 @@ path_apache_server_root: "/etc/apache2"
 path_php_conf_d: "/etc/php/{{ php_debian_version }}/cli/conf.d"
 path_php_conf_d_files:
   - "10-opcache.ini"
-path_memcached_conf: /etc/memcached.conf
+path_php_apache_conf_d: "/etc/php/{{ php_debian_version }}/apache2/conf.d"
+path_php_lib: "/usr/lib/php"
+path_memcached_conf: "/etc/memcached.conf"
 
 
 #

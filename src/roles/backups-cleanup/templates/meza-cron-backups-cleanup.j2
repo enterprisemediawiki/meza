@@ -1,0 +1,6 @@
+# Cleanup backup files for environment "{{ env }}"
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+{{ backups_cleanup.crontime }} root {{ m_deploy }}/backups-cleanup.sh > {{ m_logs }}/cleanup/backups-cleanup-`date "+\%Y\%m\%d"`.log 2>&1

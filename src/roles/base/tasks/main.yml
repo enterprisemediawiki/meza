@@ -39,15 +39,15 @@
 
 - name: Ensure no password on alt-meza-ansible user
   shell: passwd --delete alt-meza-ansible
-  ignore_errors: yes
+  failed_when: False
 
-# Add line to visudo file if it does not exist
-- name: Ensure alt-meza-ansible is passwordless sudoer
-  lineinfile:
-    dest: /etc/sudoers
-    state: present
-    line: 'alt-meza-ansible ALL=(ALL) NOPASSWD: ALL'
-    validate: 'visudo -cf %s'
+- name: Ensure /etc/sudoers.d/meza-ansible in place
+  template:
+    src: "sudoers_meza-ansible.j2"
+    dest: "{{ m_meza_sudeoers_file }}"
+    owner: root
+    group: root
+    mode: "0644"
 
 - name: "Ensure deltarpm is installed and latest (RedHat only)"
   yum: name=deltarpm state=latest
@@ -63,7 +63,7 @@
 - name: Ensure aptitude installed in order to use Ansible 'package' (Debian only)
   apt:
     name: aptitude
-    state: installed
+    state: present
     force_apt_get: yes
   when: ansible_os_family == "Debian"
 
@@ -81,7 +81,7 @@
 - name: Ensure EPEL installed via epel-release package (CentOS only)
   yum:
     name: epel-release
-    state: installed
+    state: present
   when: ansible_distribution == "CentOS"
   tags:
   - latest
@@ -128,22 +128,23 @@
   - latest
 
 - name: Ensure base packages installed
-  package: name={{item}} state=installed
-  with_items:
-    - ntp
-    - ntpdate
-    - ntp-doc
-    - openssh-server
-    - "{{ package_openssh_client }}"
-    - vim
-    - git
-    - net-tools
-    - "{{ package_firewall }}"
-    - rsyslog
-    - jq
-    - tree
-    - "{{ package_cron }}"
-    - rsync
+  package:
+    name:
+      - ntp
+      - ntpdate
+      - ntp-doc
+      - openssh-server
+      - "{{ package_openssh_client }}"
+      - vim
+      - git
+      - net-tools
+      - "{{ package_firewall }}"
+      - rsyslog
+      - jq
+      - tree
+      - "{{ package_cron }}"
+      - rsync
+    state: present
   tags:
   - latest
 
@@ -174,6 +175,15 @@
   ufw:
     state: enabled
     policy: deny
+  when:
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - ansible_os_family == "Debian"
+
+# Make sure we don't block SSH right away. Not sure why this isn't required for
+# firewalld/centos...must be different defaults.
+- ufw:
+    rule: allow
+    name: OpenSSH
   when:
     - docker_skip_tasks is not defined or not docker_skip_tasks
     - ansible_os_family == "Debian"
@@ -286,7 +296,7 @@
 
   # Ignore errors due issue #699: If a crontab doesn't exist yet this command
   # will fail
-  ignore_errors: yes
+  failed_when: False
 
 
 - name: Ensure CA package installed

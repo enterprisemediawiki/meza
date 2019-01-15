@@ -1,6 +1,5 @@
 ---
 - name: Install base-extras packages
   package:
-    name: "{{ item }}"
-    state: installed
-  with_items: "{{ package_base_extras }}"
+    name: "{{ package_base_extras }}"
+    state: present

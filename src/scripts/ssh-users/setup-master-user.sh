@@ -9,6 +9,13 @@
 # meza since we can't be certain of consistent method of accessing install.sh.
 source "/opt/.deploy-meza/config.sh"
 
+echo "Ansible user: $ansible_user"
+if [ -z "$ansible_user" ]; then
+	echo "Ansible user empty! Setting to meza-ansible."
+	ansible_user="meza-ansible"
+	echo "Ansible user: $ansible_user"
+fi
+
 source "$m_scripts/shell-functions/base.sh"
 rootCheck
 
@@ -25,7 +32,9 @@ chmod 600 "$meza_user_dir/$ansible_user/.ssh/authorized_keys"
 chown -R "$ansible_user:$ansible_user" "$meza_user_dir/$ansible_user/.ssh"
 
 # Add $ansible_user to sudoers as a passwordless user
-bash -c "echo '$ansible_user ALL=(ALL) NOPASSWD: ALL' | (EDITOR='tee -a' visudo)"
+echo "Adding the following to /etc/sudoers.d/meza-ansible:"
+echo "$ansible_user ALL=(ALL) NOPASSWD: ALL"
+echo "$ansible_user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/meza-ansible
 
 
 # echo

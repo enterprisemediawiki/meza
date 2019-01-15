@@ -23,20 +23,18 @@
 
 # - name: Ensure Node.js and npm are installed.
 #   yum:
-#     name: "{{ item }}"
+#     name:
+#       - nodejs
+#       - npm
 #     state: present
 #     enablerepo: epel
-#   with_items:
-#     - nodejs
-#     - npm
 
 - name: Ensure Node.js and npm from yum are REMOVED
   yum:
-    name: "{{ item }}"
+    name:
+      - nodejs
+      - npm
     state: absent
-  with_items:
-    - nodejs
-    - npm
   when: ansible_os_family == 'RedHat'
 
 
@@ -46,7 +44,7 @@
 - name: What version of node, if any, is installed
   shell: node --version
   register: node_version
-  ignore_errors: yes
+  failed_when: False
 
 - debug: { var: node_version }
 

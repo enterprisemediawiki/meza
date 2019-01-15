@@ -15,14 +15,13 @@
   tasks:
     - name: Ensure CentOS-provided Docker repos are removed
       yum:
-        name: "{{ item }}"
+        name:
+          - docker
+          - docker-common
+          - container-selinux
+          - docker-selinux
+          - docker-engine
         state: absent
-      with_items:
-        - docker
-        - docker-common
-        - container-selinux
-        - docker-selinux
-        - docker-engine
 
     - name: Ensure yum-utils present
       yum:

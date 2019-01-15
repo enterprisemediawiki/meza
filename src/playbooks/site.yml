@@ -11,7 +11,7 @@
   tasks:
   - name: Ensure no password on meza-ansible user on controller
     shell: passwd --delete meza-ansible
-    ignore_errors: yes
+    failed_when: False
 
   - name: Ensure controller has user alt-meza-ansible
     user:
@@ -49,20 +49,14 @@
       owner: alt-meza-ansible
       group: wheel
       mode: "{{ item.mode }}"
-    ignore_errors: True
+    failed_when: False
     with_items:
     - name: known_hosts
       mode: "0600"
 
-  - name: Ensure secret.yml encrypted
-    shell: >
-      ansible-vault encrypt
-      /opt/conf-meza/secret/{{ env }}/secret.yml
-      --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
-    ignore_errors: True
-
-  # Note: without this, the encryption above changes mode to 0600 and ownership
-  # to root:root. This makes it impossible to include_vars later.
+  # Note: without this, if the user decides to encrypt secret.yml with Ansible
+  # vault then it changes mode to 0600 and ownership to root:root. This makes it
+  # impossible to include_vars later.
   - name: Ensure secret.yml owned by meza-ansible
     file:
       path: "/opt/conf-meza/secret/{{ env }}/secret.yml"
@@ -78,11 +72,18 @@
     - umask-set
     - init-controller-config
 
+- hosts: localhost
+  become: yes
+  roles:
+    - set-vars
+    - role: autodeployer
+      when: force_deploy is defined or autodeployer is defined
+
 # Ensure proper base setup on all servers in inventory, with the exception of
 # servers in "exclude-all" group. At present, the intent of this group is to
 # allow servers which serve as sources for database and user-uploaded files,
 # but are not managed by this meza install.
-- hosts: all:!exclude-all:!load-balancers-unmanaged
+- hosts: all:!exclude-all:!load-balancers-nonmeza:!load-balancers-nonmeza-external:!load-balancers-nonmeza-internal
   become: yes
   roles:
     - set-vars
@@ -91,7 +92,7 @@
     - base-config-scripts
   tags: base
 
-- hosts: load-balancers
+- hosts: load-balancers,load-balancers-meza-internal,load-balancers-meza-external
   become: yes
   tags:
     - load-balancer
@@ -123,15 +124,8 @@
       firewall_action: open
       firewall_port: 8080
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['load-balancers'] }}"
+      firewall_servers: "{{ load_balancers_all }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewall_port
-      firewall_action: open
-      firewall_port: 8080
-      firewall_protocol: tcp
-      firewall_servers: "{{ groups['load-balancers-unmanaged'] }}"
-      firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'load-balancers-unmanaged' in groups"
     - role: firewall_port
       firewall_action: open
       firewall_port: 8080
@@ -334,6 +328,8 @@
   roles:
     - set-vars
     - htdocs
+    - role: lua
+      when: m_install_lua
     - mediawiki
 
 
@@ -355,15 +351,8 @@
       firewall_action: open
       firewall_port: 8000
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['load-balancers'] }}"
+      firewall_servers: "{{ load_balancers_all }} + {{ load_balancers_internal }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewall_port
-      firewall_action: open
-      firewall_port: 8000
-      firewall_protocol: tcp
-      firewall_servers: "{{ groups['load-balancers-unmanaged'] }}"
-      firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'load-balancers-unmanaged' in groups"
     - nodejs
     - parsoid
     - parsoid-settings
@@ -376,7 +365,16 @@
     - role: meza-log
       when: docker_skip_tasks is not defined or not docker_skip_tasks
 
-- hosts: all:!exclude-all:!load-balancers-unmanaged
+- hosts: backup-servers
+  become: yes
+  tags:
+    - backup-cleanup
+  roles:
+    - set-vars
+    - role: backups-cleanup
+      when: backups_cleanup is defined and backups_cleanup.crontime is defined
+
+- hosts: all:!exclude-all:!load-balancers-nonmeza:!load-balancers-nonmeza-external:!load-balancers-nonmeza-internal
   become: yes
   tags:
     - cron

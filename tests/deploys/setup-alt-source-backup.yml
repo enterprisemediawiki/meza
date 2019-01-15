@@ -13,14 +13,13 @@
   tasks:
     - name: Ensure packages installed
       yum:
-        name: "{{item}}"
-        state: installed
-      with_items:
-        - mariadb
-        - mariadb-server
-        - mariadb-libs
-        - MySQL-python
-        - perl-DBD-MySQL
+        name:
+          - mariadb
+          - mariadb-server
+          - mariadb-libs
+          - MySQL-python
+          - perl-DBD-MySQL
+        state: present
 
     - name: Ensure backups repo in place
       git:
@@ -62,12 +61,20 @@
     # FIXME #827: This is really bad that a backup-retrieval-user needs sudo,
     #             but unfortunately synchronize doesn't allow one end to be
     #             sudo and the other to not.
+    - name: Ensure /etc/sudoers.d/test-user exists
+      file:
+        path: /etc/sudoers.d/test-user
+        owner: root
+        group: root
+        mode: 0644
+        state: touch
     - name: Ensure test-user is passwordless sudoer
       lineinfile:
-        dest: /etc/sudoers
+        dest: /etc/sudoers.d/test-user
         state: present
         line: 'test-user ALL=(ALL) NOPASSWD: ALL'
-        validate: 'visudo -cf %s'
+        # FIXME: does this work for files other than /etc/sudoers
+        # validate: 'visudo -cf %s'
 
     - name: Ensure test-user .ssh dir configured
       file:
@@ -93,5 +100,5 @@
 
     - name: Ensure no password on test-user
       shell: passwd --delete test-user
-      ignore_errors: yes
+      failed_when: False
 

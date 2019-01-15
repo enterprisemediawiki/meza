@@ -37,7 +37,11 @@ mf_add_ssh_user() {
 
 mf_add_ssh_user_with_private_key() {
 	mf_add_ssh_user "$1"
-	ssh-keygen -f "$meza_user_dir/$1/.ssh/id_rsa" -t rsa -N '' -C "$1@`hostname`"
+	if [ -f "$meza_user_dir/$1/.ssh/id_rsa" ]; then
+		echo "SSH keys exist for user $1. Moving on."
+	else
+		ssh-keygen -f "$meza_user_dir/$1/.ssh/id_rsa" -t rsa -N '' -C "$1@`hostname`"
+	fi
 	chown -R "$1:$1" "$meza_user_dir/$1/.ssh"
 }
 

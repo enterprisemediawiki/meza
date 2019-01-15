@@ -4,7 +4,7 @@
 # - name: Ensure cron installed
 #   yum:
 #     name: cronie
-#     state: installed
+#     state: present
 
 - name: Ensure cron is running (and enable it at boot)
   service:
@@ -35,12 +35,15 @@
     regexp: '^Defaults\s+requiretty'
     line: '#Defaults requiretty'
     validate: 'visudo -cf %s'
+  when: m_modify_etc_sudoers
+
 - lineinfile:
     dest: /etc/sudoers
     state: present
     regexp: '^Defaults\s+!visiblepw'
     line: '#Defaults !visiblepw'
     validate: 'visudo -cf %s'
+  when: m_modify_etc_sudoers
 
 - name: Ensure crontab up-to-date from file
   shell: crontab -u meza-ansible {{ m_home }}/meza-ansible/.ansible-cronfile
