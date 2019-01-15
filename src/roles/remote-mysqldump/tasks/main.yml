@@ -69,6 +69,9 @@
   failed_when: False
   run_once: true
 
+- debug:
+    var: source_wiki_exists_check
+
 - name: "{{ wiki_id }} - Set fact if database wiki_{{ wiki_id }} DOES exist ON SOURCE SERVER"
   set_fact:
     source_wiki_exists: True
@@ -119,6 +122,8 @@
   shell: "{{ mysqldump_command }}"
   delegate_to: "{{ target_server }}"
   when: source_wiki_exists
+  tags:
+    - backup
 
 
 #

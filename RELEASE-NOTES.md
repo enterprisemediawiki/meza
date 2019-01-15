@@ -1,6 +1,26 @@
 Release Notes
 =============
 
+## Meza 31.2.4
+
+### Commits since 31.2.3
+
+* 7b3a067 Add debug to troubleshoot backup issue (#1094)
+* d5272fb Make backup a tag so that you can at least skip it
+* 073a64f Make apache ServerAdmin email configurable (#1086)
+* 48b3b13 Move prolific log files into sub-directories
+* 619bea6 Use failed_when instead of ignore_errors (#1083)
+* 368fd1b Use printf and quoting to preserve params
+* 2028087 Add BEGIN rules to awk scripts
+
+### Contributors
+
+@jamesmontalvo3, @hexmode, @freephile
+
+### Mediawiki.org pages updated
+
+* Updated https://www.mediawiki.org/wiki/Meza/Directory_structure with log file locations
+
 ## Meza 31.2.3
 
 Fixing bug in Extension:WatchAnalytics
