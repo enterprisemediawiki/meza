@@ -1,0 +1,67 @@
+---
+
+## Add test to see if it's already installed and skip if it is
+- name: Check if Netdata is present
+  stat:
+    path: /opt/netdata
+  register: netdata_present
+
+- debug: msg="netdata not installed"
+  when: netdata_present.stat.exists == False
+
+- debug: msg="netdata installed"
+  when: netdata_present.stat.exists == True
+
+## It will be running once installed
+- name: Install Intel/AMD 64bit static build of Netdata
+  shell: bash <(curl -Ss https://my-netdata.io/kickstart-static64.sh) --dont-wait
+  become: no
+  when: netdata_present.stat.exists == False
+
+- name: Ensure port 20000 allowed for list of servers (RedHat/CentOS only)
+  firewalld:
+    port: 20000/tcp
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{firewall_zone|default('public')}}"
+
+  # strip "localhost" or inventory_hostname from list of servers to configure
+  with_items: "{{ firewall_servers | difference([ 'localhost', inventory_hostname ]) }}"
+
+  when:
+    - ansible_os_family == 'RedHat'
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
+
+
+- name: "Ensure port 20000 allowed for list of servers (Debian only)"
+  ufw:
+    rule: allow
+    port: 20000
+    proto: tcp
+    comment: "allow netdata"
+
+  # strip "localhost" or inventory_hostname from list of servers to configure
+  with_items: "{{ firewall_servers | difference([ 'localhost', inventory_hostname ]) }}"
+
+  when:
+    - ansible_os_family == 'Debian'
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
+
+- name: Configure HAProxy to allow Netdata
+  blockinfile:
+      path: /etc/haproxy/haproxy.cfg
+      block: |
+          frontend netdata
+            bind *:20000 ssl crt {{ ssl_certificate_file }}
+            mode http
+            default_backend netdata-back
+
+          backend netdata-back
+            server nd1 127.0.0.1:19999
+      insertafter: EOF
+      state: present
+      # validation is done 'before' insertion
+      validate: haproxy -f %s -c
+  when: netdata_present.stat.exists == False
+  notify: restart haproxy
