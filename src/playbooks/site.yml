@@ -135,6 +135,7 @@
     - base-extras
     - imagemagick
     - apache-php
+    - netdata
 
 # Keeping this as a separate play, since at some point it will make sense to
 # configure app-servers as gluster clients and have separate gluster servers
@@ -384,4 +385,3 @@
     - role: cron
       when: docker_skip_tasks is not defined or not docker_skip_tasks
     - umask-unset
-
