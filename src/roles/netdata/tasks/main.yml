@@ -1,5 +1,6 @@
 ---
-
+## We're called from the site.yml playbook and the haproxy role takes care of front-end and back-end port handling
+##
 ## Add test to see if it's already installed and skip if it is
 - name: Check if Netdata is present
   stat:
@@ -19,31 +20,3 @@
     executable: /bin/bash
   become: no
   when: netdata_present.stat.exists == False
-
-- name: Ensure port 20000 allowed for list of servers
-  include_role:
-    name: firewall_port
-  vars:
-    firewall_action: open
-    firewall_port: 20000
-    firewall_protocol: tcp
-# Don't define this, or the rule won't get added to localhost
-#    firewall_servers: "{{ groups['app-servers'] }}"
-    firewall_zone: "{{m_private_networking_zone|default('public')}}"
-
-- name: Configure HAProxy to allow Netdata
-  blockinfile:
-      path: /etc/haproxy/haproxy.cfg
-      block: |
-          frontend netdata
-            bind *:20000 ssl crt {{ ssl_certificate_file }}
-            mode http
-            default_backend netdata-back
-
-          backend netdata-back
-            server nd1 127.0.0.1:19999
-      insertafter: EOF
-      state: present
-      # validation is done 'before' insertion
-      validate: haproxy -f %s -c
-  notify: restart haproxy

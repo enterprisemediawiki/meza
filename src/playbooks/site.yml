@@ -135,7 +135,14 @@
     - base-extras
     - imagemagick
     - apache-php
-    - netdata
+    - role: netdata
+      when: m_install_netdata
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 19999
+      firewall_protocol: tcp
+      firewall_servers: "{{ load_balancers_all }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
 
 # Keeping this as a separate play, since at some point it will make sense to
 # configure app-servers as gluster clients and have separate gluster servers

@@ -266,7 +266,18 @@
 #    - http
 #    - https
 
-- name: Ensure port 80 and 443 open for haproxy
+- name: Create list of ports to open to the world
+  set_fact:
+    fully_open_ports:
+      - 80
+      - 443
+
+- name: Add port 20000 to world-accessible list if installing netdata
+  set_fact:
+    fully_open_ports: "{{ fully_open_ports }} + [ 20000 ]"
+  when: m_install_netdata
+
+- name: Ensure port {{ fully_open_ports | join(', ') }} open to the world for haproxy
   include_role:
     name: firewall_port
   vars:
@@ -274,15 +285,16 @@
     firewall_port: "{{ item }}"
     firewall_protocol: tcp
     firewall_zone: "{{m_private_networking_zone|default('public')}}"
-  with_items:
-    - 80
-    - 443
+  with_items: "{{ fully_open_ports }}"
   when:
+      # only external load balancers
+    - load_balancer_handle_external
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
     - >
       ('load-balancers' in groups and inventory_hostname in groups['load-balancers'])
       or
       ('load-balancers-meza-external' in groups and inventory_hostname in groups['load-balancers-meza-external'])
+
 
 - name: Ensure firewall port 1936 OPEN when haproxy stats ENABLED
   include_role:
