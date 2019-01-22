@@ -17,9 +17,11 @@
 		{%- endfor -%}
 
 		{%- for ext in meza_core_extensions['list'] if ext.composer is defined %}
-		"{{ ext.composer }}": "{{ ext.version }}"
-		{%- if not loop.last -%},{%- endif %}
+		"{{ ext.composer }}": "{{ ext.version }}",
+		{# Note: pear/net_smtp is part of MW core in 1.32+. Need to add conditional comma here when pear/net_smtp is removed below. %}
 		{%- endfor %}
+
+		"pear/net_smtp": "1.8.0"
 
 	},
 	"extra": {
