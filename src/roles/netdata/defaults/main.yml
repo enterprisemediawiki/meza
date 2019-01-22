@@ -1,4 +1,0 @@
----
-
-## If you've installed a custom cert, you can override the self-signed default
-ssl_certificate_file: /etc/haproxy/certs/meza.pem
