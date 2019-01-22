@@ -43,13 +43,3 @@
   notify:
     - restart apache
   when: ansible_os_family == "RedHat"
-
-- name: Ensure PEAR Mail and Net_SMTP packages installed
-  pear:
-    name: "{{ item }}"
-    state: latest
-  tags:
-    - latest
-  with_items:
-    - Mail
-    - Net_SMTP
