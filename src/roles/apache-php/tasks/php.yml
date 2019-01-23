@@ -116,7 +116,9 @@
     # Available for php56u and php70u. NOT php71u or php72u
     # - "{{ php_ius_version }}-pear"
     # Post 7.0, use the pear1u package for all versions of PHP
-    - pear1u
+    # PEAR is no longer a requirement for Meza. Mail and Net_SMTP installed with
+    # Composer via MW core (MW 1.32+) or composer.local.json (MW 1.31 and lower)
+    # - pear1u
 
     # Not available for PHP 7, due to being built into PHP 7
     # - php56u-pecl-jsonc
@@ -154,13 +156,3 @@
     dest: /etc/freetds.conf
   notify:
   - restart apache
-
-- name: Ensure PEAR Mail and Net_SMTP packages installed
-  pear:
-    name: "{{ item }}"
-    state: latest
-  tags:
-  - latest
-  with_items:
-  - Mail
-  - Net_SMTP
