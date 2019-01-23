@@ -93,5 +93,5 @@
 
     - name: Ensure no password on test-user
       shell: passwd --delete test-user
-      ignore_errors: yes
+      failed_when: False
 

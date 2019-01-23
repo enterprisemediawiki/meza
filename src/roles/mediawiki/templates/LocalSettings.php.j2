@@ -190,7 +190,7 @@ if ( $debug ) {
 	ini_set( 'log_errors', 1 );
 
 	// Output errors to log file
-	ini_set( 'error_log', "$m_meza_data/logs/php.log" );
+	ini_set( 'error_log', "$m_meza_data/logs/php/php_errors.log" );
 
 
 	// Displays debug data at the bottom of the content area in a formatted
@@ -869,13 +869,13 @@ $wgVirtualRestConfig['modules']['parsoid'] = array(
 // Define which namespaces will use VE
 // Per the docs, https://www.mediawiki.org/wiki/Extension:VisualEditor#Changing_active_namespaces
 // This is done a little differently in VE than in core or other extensions.
-// For VE, we use an array, keyed by the (string) canonical name of the namespace 
+// For VE, we use an array, keyed by the (string) canonical name of the namespace
 // and a (boolean) value for enabled or not
 
 // $wgContentNamespaces gets added automatically.
 
-// finally, it should be mentioned that the Extension Registry is what provides for the 
-// merge strategy 
+// finally, it should be mentioned that the Extension Registry is what provides for the
+// merge strategy
 
 $wgVisualEditorAvailableNamespaces = [
     "User" => true,
@@ -885,8 +885,8 @@ $wgVisualEditorAvailableNamespaces = [
 ];
 
 // quickly add a namespace, without figuring out what the merge strategy is
-// $wgVisualEditorAvailableNamespaces[] = NS_CUSTOM; 
-// $wgVisualEditorAvailableNamespaces[] = NS_PROJECT; 
+// $wgVisualEditorAvailableNamespaces[] = NS_CUSTOM;
+// $wgVisualEditorAvailableNamespaces[] = NS_PROJECT;
 
 
 

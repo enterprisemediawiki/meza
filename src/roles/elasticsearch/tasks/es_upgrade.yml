@@ -20,7 +20,7 @@
 # them manually.
 - name: Ensure elasticsearch plugins removed
   shell: "/usr/share/elasticsearch/bin/plugin remove {{ item }}"
-  ignore_errors: True
+  failed_when: False
   with_items:
     - bigdesk
     - head

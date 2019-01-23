@@ -389,7 +389,7 @@ max_input_time = 60
 ;max_input_nesting_level = 64
 
 ; How many GET/POST/COOKIE input variables may be accepted
-; max_input_vars = 1000
+max_input_vars = {{ php_max_input_vars }}
 
 ; Maximum amount of memory a script may consume (128MB)
 ; http://php.net/memory-limit
@@ -572,7 +572,7 @@ html_errors = On
 ; empty.
 ; http://php.net/error-log
 ; Example:
-error_log = {{ m_logs }}/php_errors.log
+error_log = {{ m_logs }}/php/php_errors.log
 ; Log errors to syslog (Event Log on Windows).
 ;error_log = syslog
 
@@ -1937,7 +1937,7 @@ opcache.fast_shutdown=1
 opcache.force_restart_timeout=3600
 
 ; OPcache error_log file name. Empty string assumes "stderr".
-opcache.error_log=/opt/data-meza/logs/opcache_error.log
+opcache.error_log=/opt/data-meza/logs/php/opcache_error.log
 
 ; All OPcache errors go to the Web server log.
 ; By default, only fatal errors (level 0) or errors (level 1) are logged.
