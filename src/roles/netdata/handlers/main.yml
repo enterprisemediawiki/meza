@@ -1,0 +1,6 @@
+---
+# Handlers for Netdata role
+- name: restart haproxy
+  service:
+    name: haproxy
+    state: restarted

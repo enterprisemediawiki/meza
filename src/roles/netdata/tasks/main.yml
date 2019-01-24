@@ -1,0 +1,22 @@
+---
+## We're called from the site.yml playbook and the haproxy role takes care of front-end and back-end port handling
+##
+## Add test to see if it's already installed and skip if it is
+- name: Check if Netdata is present
+  stat:
+    path: /opt/netdata
+  register: netdata_present
+
+- debug: msg="netdata not installed"
+  when: netdata_present.stat.exists == False
+
+- debug: msg="netdata installed"
+  when: netdata_present.stat.exists == True
+
+## It will be running once installed
+- name: Install Intel/AMD 64bit static build of Netdata
+  shell: bash <(curl -Ss https://my-netdata.io/kickstart-static64.sh) --dont-wait
+  args:
+    executable: /bin/bash
+  become: no
+  when: netdata_present.stat.exists == False
