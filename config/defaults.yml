@@ -125,6 +125,14 @@ mysql_performance_schema: "on"
 load_balancer_unmanaged_parsoid_port: 8000
 load_balancer_unmanaged_mediawiki_port: 8080
 
+# Netdata is a monitoring and alerting system 
+m_install_netdata: True
+# we need a certificate to bind to port 20000
+ssl_certificate_file: /etc/haproxy/certs/meza.pem
+# netdata runs on 19999 by default. We'll expose it at 20000
+netdata_internal_port: 19999
+netdata_external_port: 20000
+
 # If false, keep all SQL files on backup servers. If true, only keep the latest
 do_cleanup_sql_backup: False
 

@@ -88,6 +88,17 @@ backend www-backend
 	# Note: slight modification for HAProxy 1.6+
 	http-response set-header Strict-Transport-Security max-age=16000000;\ includeSubDomains;\ preload;
 
+    # @FIXME loop w/ index and tie all
+	# app servers together with controller as registry 
+	{% if m_install_netdata %}
+	frontend netdata
+		bind *:20000 ssl crt {{ ssl_certificate_file }}
+		mode http
+		default_backend netdata-back
+	backend netdata-back
+		server nd1 127.0.0.1:19999
+	{% endif %}
+
 {% endif %}
 
 
