@@ -54,6 +54,8 @@ m_cert_private: /etc/pki/tls/private/meza.key
 m_cert_public: /etc/pki/tls/certs/meza.crt
 m_ca_cert: /etc/pki/tls/certs/meza-ca.crt
 
+# name of web accessible directory
+m_public_html: public_html
 
 # app locations
 m_apache: /etc/httpd
@@ -125,7 +127,7 @@ mysql_performance_schema: "on"
 load_balancer_unmanaged_parsoid_port: 8000
 load_balancer_unmanaged_mediawiki_port: 8080
 
-# Netdata is a monitoring and alerting system 
+# Netdata is a monitoring and alerting system
 m_install_netdata: True
 # we need a certificate to bind to port 20000
 ssl_certificate_file: /etc/haproxy/certs/meza.pem

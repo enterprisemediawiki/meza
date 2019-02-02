@@ -25,6 +25,9 @@
     # Allow access to ServerPerformance plot page and support files
     RewriteRule ^ServerPerformance(?:/|$)(.*)$ - [L]
 
+    # Allow access to public_html directory for site assets
+    RewriteRule ^{{ m_public_html }}(?:/|$)(.*)$ - [L]
+
     {% if allow_backup_downloads %}
     # Allow access to BackupDownload function
     RewriteRule ^BackupDownload(?:/|$)(.*)$ - [L]

@@ -12,6 +12,14 @@
     group: "{{ group_apache }}"
     mode: 0775
 
+- name: Make apache own htdocs/public_html directory
+  file:
+    state: directory
+    path: "{{ m_htdocs }}/{{ m_public_html }}"
+    owner: "{{ user_apache }}"
+    group: "{{ group_apache }}"
+    mode: 0775
+
 - name: Ensure user meza-ansible and alt-meza-ansible in group "apache"
   user:
     name: "{{ item }}"
