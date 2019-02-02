@@ -34,6 +34,5 @@
 
   when:
     - ansible_os_family == 'Debian'
-    - firewall_service is defined
+    - "{{ firewall_service }} is defined"
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
-
