@@ -42,22 +42,32 @@ require "{{ m_deploy }}/samlLocalSettings.php";
 
 require '/opt/.deploy-meza/config.php';
 
+$mezaWikiEnvVarName='WIKI';
 if( $wgCommandLineMode ) {
-	$mezaWikiEnvVarName='WIKI';
 	// get $wikiId from environment variable
 	$wikiId = getenv( $mezaWikiEnvVarName );
 } else {
 {% if m_wiki_url_stlye is defined and m_wiki_url_style == "subdomain" %}
-            // get $wikiId from subdomain
-            // FIXME make regex a config variable
-            // FIXME add 'ignore' list like 'www' that should not be a wiki
-      if ( preg_match( '%([a-z]+)\.([a-z]+)\..{2,4}\:?[\d]*$%im', $_SERVER['HTTP_HOST'], $matches ) ) {
+
+    // get $wikiId from subdomain
+    // FIXME make regex a config variable
+    // FIXME add 'ignore' list like 'www' that should not be a wiki
+
+
+    $wikiId = isset( $_GET['MEZAWIKI'] ) ? $_GET['MEZAWIKI'] : getenv( $mezaWikiEnvVarName );
+
+    if ( preg_match( '%([a-z]+)\.([a-z]+)\..{2,4}\:?[\d]*$%im', $_SERVER['HTTP_HOST'], $matches ) ) {
         $wikiId = $matches[1];
- {% elseif m_wiki_url_stlye is defined and m_wiki_url_style == "path" %}
-            // get $wikiId from URI
-        $uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
-        $wikiId = strtolower( $uriParts[1] ); // URI has leading slash, so $uriParts[0] is empty string
-      }
+    }
+{% elif m_wiki_url_stlye is defined and m_wiki_url_style == "path" %}
+    // get $wikiId from URI
+    $uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
+    $uriPart = $m_path_token ? 2 : 1;
+    //URI has leading slash, so $uriParts[0] is empty string
+    $wikiId = strtolower( $uriParts[$uriPart] );
+
+    $wikiId = isset( $_GET['MEZAWIKI'] ) ? $_GET['MEZAWIKI'] : getenv( $mezaWikiEnvVarName );
+
 {% else %}
     die ('unable to determine valid m_wiki_url_style');
 {% endif %}
@@ -285,7 +295,9 @@ $wgArticlePath = "/wiki/$1";
 {% else %}
 // $wgServer for path mode
 $wgServer = 'https://{{ wiki_app_fqdn }}';
-$wgScriptPath = "/$wikiId";
+$wgScriptPath = "/mediawiki/$wikiId";
+$wgArticlePath = "/$wikiId/$1";
+$wgUsePathInfo = true;
 {% endif %}
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath

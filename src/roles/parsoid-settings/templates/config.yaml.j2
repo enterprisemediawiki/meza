@@ -46,16 +46,16 @@ services:
 
           {% if groups['app-servers']|length|int == 1 and groups['parsoid-servers']|length|int == 1 and groups['app-servers'][0] == groups['parsoid-servers'][0] -%}
 
-          uri: 'http://127.0.0.1:8080/{{ wiki }}/api.php'
+          uri: 'http://127.0.0.1:8080/mediawiki/{{ wiki }}/api.php'
 
           {%- elif 'load-balancers' not in groups or groups['load-balancers']|length|int == 0 -%}
 
-          uri: 'http://{{ groups["load-balancers-nonmeza"][0] }}:{{ load_balancer_unmanaged_mediawiki_port }}/{{ wiki }}/api.php'
+          uri: 'http://{{ groups["load-balancers-nonmeza"][0] }}:{{ load_balancer_unmanaged_mediawiki_port }}/mediawiki/{{ wiki }}/api.php'
           # proxy: { uri: 'http://{{ groups["load-balancers-nonmeza"][0] }}:{{ load_balancer_unmanaged_mediawiki_port }}/' }
 
           {%- else -%}
 
-          uri: 'http://{{ groups["load-balancers"][0] }}:8081/{{ wiki }}/api.php'
+          uri: 'http://{{ groups["load-balancers"][0] }}:8081/mediawiki/{{ wiki }}/api.php'
           # proxy: { uri: 'http://{{ groups["load-balancers"][0] }}:8081/' }
 
           {%- endif %}
