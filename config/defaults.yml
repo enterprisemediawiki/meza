@@ -10,6 +10,16 @@ m_meza: /opt/meza
 # development being less secure and providing optional features useful for dev
 m_use_production_settings: True
 
+# URL style and setup
+# use short 'pretty' URLs
+# wiki/Main_Page instead of wiki/index.php/Main_Page
+m_pretty: True
+# use action-verbs in a REST style
+# Main_Page/history instead of Main_Page?action=history
+m_extra_pretty: True
+# valid options are 'path' or 'subdomain'
+m_wiki_url_stlye: path
+
 # config dir
 m_config_core: /opt/meza/config
 m_local_secret: /opt/conf-meza/secret
@@ -125,7 +135,7 @@ mysql_performance_schema: "on"
 load_balancer_unmanaged_parsoid_port: 8000
 load_balancer_unmanaged_mediawiki_port: 8080
 
-# Netdata is a monitoring and alerting system 
+# Netdata is a monitoring and alerting system
 m_install_netdata: True
 # we need a certificate to bind to port 20000
 ssl_certificate_file: /etc/haproxy/certs/meza.pem

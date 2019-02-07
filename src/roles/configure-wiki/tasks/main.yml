@@ -73,3 +73,15 @@
     - postLocalSettings.d/README.md
   delegate_to: localhost
   run_once: true
+
+- name: Ensure alias exists in Apache for sub-domain based meza
+  blockinfile:
+    path: /etc/httpd/conf/httpd.conf
+    block: |
+      AliasMatch "^/{{ item }}$" /opt/htdocs/w
+      AliasMatch "^/{{ item }}/(.*)$" /opt/htdocs/w/$1
+    insertafter: "<IfModule alias_module>"
+  with_items: 
+    - "{{ list_of_wikis }}"
+  when: m_wiki_url_style is defined and m_wiki_url_style == 'subdomain'
+  notify: "restart apache"

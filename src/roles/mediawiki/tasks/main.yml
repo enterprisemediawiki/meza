@@ -91,6 +91,15 @@
   tags:
     - mediawiki-core
 
+# create symlink to core for short urls
+# tag it latest, so that the symlink gets created whenever core is downloaded
+- name: Create symlink to core, to enable short urls
+  file:
+    src: "{{ m_mediawiki }}"
+    dest: "{{ m_htdocs }}/w"
+    state: link
+  tags:
+    - latest
 #
 # EXTENSIONS AND SKINS
 #
@@ -100,6 +109,7 @@
     name: meza_core_skins
   tags:
     - skins
+    - always
 
 - name: Set variable holding list of local skins
   include_vars:
@@ -107,6 +117,7 @@
     name: meza_local_skins
   tags:
     - skins
+    - always
 
 - name: Set variable holding list of core extensions
   include_vars:

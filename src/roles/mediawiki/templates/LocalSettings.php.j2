@@ -31,7 +31,6 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  **/
 require "{{ m_deploy }}/samlLocalSettings.php";
 
-
 {% endif %}
 
 /**
@@ -44,19 +43,24 @@ require "{{ m_deploy }}/samlLocalSettings.php";
 require '/opt/.deploy-meza/config.php';
 
 if( $wgCommandLineMode ) {
-
 	$mezaWikiEnvVarName='WIKI';
-
 	// get $wikiId from environment variable
 	$wikiId = getenv( $mezaWikiEnvVarName );
-
-}
-else {
-
-	// get $wikiId from URI
-	$uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
-	$wikiId = strtolower( $uriParts[1] ); // URI has leading slash, so $uriParts[0] is empty string
-
+} else {
+{% if m_wiki_url_stlye is defined and m_wiki_url_style == "subdomain" %}
+            // get $wikiId from subdomain
+            // FIXME make regex a config variable
+            // FIXME add 'ignore' list like 'www' that should not be a wiki
+      if ( preg_match( '%([a-z]+)\.([a-z]+)\..{2,4}\:?[\d]*$%im', $_SERVER['HTTP_HOST'], $matches ) ) {
+        $wikiId = $matches[1];
+ {% elseif m_wiki_url_stlye is defined and m_wiki_url_style == "path" %}
+            // get $wikiId from URI
+        $uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
+        $wikiId = strtolower( $uriParts[1] ); // URI has leading slash, so $uriParts[0] is empty string
+      }
+{% else %}
+    die ('unable to determine valid m_wiki_url_style');
+{% endif %}
 }
 
 
@@ -88,13 +92,9 @@ if ( isset( $wikiIdRedirects[ $wikiId ] ) ) {
 
 // get all directory names in /wikis, minus the first two: . and ..
 $wikis = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
-
-
 if ( ! in_array( $wikiId, $wikis ) ) {
-
 	// handle invalid wiki
 	die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
-
 }
 
 {% if meza_auth_type is defined %}
@@ -254,10 +254,39 @@ else {
 // Depending on proxy setup (particularly for Varnish/Squid caching) may need
 // to set $wgInternalServer:
 // ref: https://www.mediawiki.org/wiki/Manual:$wgInternalServer
-$wgServer = 'https://{{ wiki_app_fqdn }}';
 
+if ( ! $wgCommandLineMode ) {
+	// $wgServer for subdomain mode
+	$wgServer = "https://" . $_SERVER['HTTP_HOST'] ;
+}
+{% if m_extra_pretty is defined and m_extra_pretty == True %}
+// Setup Pretty URLs in a 'REST-like' verb way with 'action' on the end
+// standard example.com/wiki/Main_Page view urls,
+// and rewrites to example.com/wiki/Main_Page/edit
+// Note: you cannot have subpages of main pages named "delete, edit, watch, unwatch" etc from the array when setup like this.
+// https://www.mediawiki.org/wiki/Manual:$wgActionPaths
+$actions = array( 'edit', 'watch', 'unwatch', 'delete','revert', 'rollback',
+  'protect', 'unprotect', 'markpatrolled', 'render', 'submit', 'history', 'purge', 'info' );
+
+foreach ( $actions as $action ) {
+  $wgActionPaths[$action] = "/wiki/$1/$action";
+}
+$wgActionPaths['view'] = "/wiki/$1";
+$wgArticlePath = $wgActionPaths['view'];
+{% if m_pretty is defined and m_pretty == true %}$wgScriptPath = "/w";{% endif %}
+// only pretty
+{% elif m_pretty is defined and m_pretty == true %}
+  {% if m_wiki_url_stlye is defined and m_wiki_url_style == "subdomain" %}
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
+$wgScriptPath = "/w";
+// we're using short URLs
+$wgArticlePath = "/wiki/$1";
+  {% endif %}
+{% else %}
+// $wgServer for path mode
+$wgServer = 'https://{{ wiki_app_fqdn }}';
 $wgScriptPath = "/$wikiId";
+{% endif %}
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath
 $wgUploadPath = "$wgScriptPath/img_auth.php";
