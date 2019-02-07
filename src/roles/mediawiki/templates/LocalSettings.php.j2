@@ -48,6 +48,7 @@ if( $wgCommandLineMode ) {
 	$wikiId = getenv( $mezaWikiEnvVarName );
 } else {
 {% if m_wiki_url_stlye is defined and m_wiki_url_style == "subdomain" %}
+<<<<<<< HEAD
 
     // get $wikiId from subdomain
     // FIXME make regex a config variable
@@ -56,10 +57,16 @@ if( $wgCommandLineMode ) {
 
     $wikiId = isset( $_GET['MEZAWIKI'] ) ? $_GET['MEZAWIKI'] : getenv( $mezaWikiEnvVarName );
 
+=======
+            // get $wikiId from subdomain
+            // FIXME make regex a config variable
+            // FIXME add 'ignore' list like 'www' that should not be a wiki
+>>>>>>> ecdf07a... fix syntax error
     if ( preg_match( '%([a-z]+)\.([a-z]+)\..{2,4}\:?[\d]*$%im', $_SERVER['HTTP_HOST'], $matches ) ) {
         $wikiId = $matches[1];
     }
 {% elif m_wiki_url_stlye is defined and m_wiki_url_style == "path" %}
+<<<<<<< HEAD
     // get $wikiId from URI
     $uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
     $uriPart = $m_path_token ? 2 : 1;
@@ -68,6 +75,13 @@ if( $wgCommandLineMode ) {
 
     $wikiId = isset( $_GET['MEZAWIKI'] ) ? $_GET['MEZAWIKI'] : getenv( $mezaWikiEnvVarName );
 
+=======
+            // get $wikiId from URI
+        $uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
+        $uriPart = $m_path_token ? 2 : 1; 
+        //URI has leading slash, so $uriParts[0] is empty string
+        $wikiId = strtolower( $uriParts[$uriPart] );
+>>>>>>> ecdf07a... fix syntax error
 {% else %}
     die ('unable to determine valid m_wiki_url_style');
 {% endif %}
