@@ -30,7 +30,7 @@
     RewriteRule ^BackupDownload(?:/|$)(.*)$ - [L]
     {% endif %}
 
-{% if m_wiki_url_stlye == 'path' %}
+{% if m_wiki_url_style == 'path' %}
 	RewriteCond "%{REQUEST_FILENAME}" !-f
     RewriteCond "%{REQUEST_FILENAME}" !-d
     RewriteRule ^mediawiki/([a-zA-Z-]+)/(.*) mediawiki/$2?MEZAWIKI=$1 [PT,QSA,E=WIKI:$1]

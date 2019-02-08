@@ -265,7 +265,7 @@ if ( ! $wgCommandLineMode ) {
 	$wgServer = "https://" . $_SERVER['HTTP_HOST'] ;
 }
 {% if m_pretty is defined and m_pretty == true %}
-  {% if m_wiki_url_stlye is defined and m_wiki_url_style == "subdomain" %}
+  {% if m_wiki_url_style is defined and m_wiki_url_style == "subdomain" %}
 $wgScriptPath = "/w";
 $wgArticlePath = "/wiki/$1";
   {% endif %}
