@@ -14,11 +14,9 @@ m_use_production_settings: True
 # use short 'pretty' URLs
 # wiki/Main_Page instead of wiki/index.php/Main_Page
 m_pretty: True
-# use action-verbs in a REST style
-# Main_Page/history instead of Main_Page?action=history
-m_extra_pretty: True
+
 # valid options are 'path' or 'subdomain'
-m_wiki_url_stlye: path
+m_wiki_url_style: path
 
 # config dir
 m_config_core: /opt/meza/config
