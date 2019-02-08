@@ -262,19 +262,19 @@ else {
 
 if ( ! $wgCommandLineMode ) {
 	// $wgServer for subdomain mode
+	{% if m_wiki_url_style is defined and m_wiki_url_style == "subdomain" %}
 	$wgServer = "https://" . $_SERVER['HTTP_HOST'] ;
+	$wgScriptPath = "/w";
+	$wgArticlePath = "/wiki/$1";
+	{% else %}
+	$wgServer = 'https://{{ wiki_app_fqdn }}';
+	$wgScriptPath = "/w/$wikiId";
+	$wgArticlePath = "/$wikiId/$1";
+	$wgUsePathInfo = true;
+	{% endif %}
 }
-{% if m_pretty is defined and m_pretty == true %}
-  {% if m_wiki_url_style is defined and m_wiki_url_style == "subdomain" %}
-$wgScriptPath = "/w";
-$wgArticlePath = "/wiki/$1";
-  {% endif %}
-{% else %}
-$wgServer = 'https://{{ wiki_app_fqdn }}';
-$wgScriptPath = "/w/$wikiId";
-$wgArticlePath = "/$wikiId/$1";
-$wgUsePathInfo = true;
-{% endif %}
+
+
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath
 $wgUploadPath = "$wgScriptPath/img_auth.php";

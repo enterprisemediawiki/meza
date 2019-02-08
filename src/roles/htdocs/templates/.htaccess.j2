@@ -38,6 +38,9 @@
     RewriteCond "%{REQUEST_FILENAME}" !-f
     RewriteCond "%{REQUEST_FILENAME}" !-d
     RewriteRule ^([a-zA-Z-]+)/(?!mediawiki/)(.*) mediawiki/index.php/$2?MEZAWIKI=$1 [PT,QSA,E=WIKI:$1]
+
+    RewriteRule ^/?(demo)/(.*)?$ %{DOCUMENT_ROOT}/w/index.php [L,E=WIKI:$1]
+
 {% else %}
     # from https://www.mediawiki.org/wiki/Manual:Short_URL/Apache
     RewriteRule ^/?wiki/(.*)?$ %{DOCUMENT_ROOT}/w/index.php [L,E=WIKI:$1]
