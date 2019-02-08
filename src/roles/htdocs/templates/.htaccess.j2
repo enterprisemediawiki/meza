@@ -33,14 +33,14 @@
 {% if m_wiki_url_stlye = 'path' %}
 	RewriteCond "%{REQUEST_FILENAME}" !-f
     RewriteCond "%{REQUEST_FILENAME}" !-d
-    RewriteRule ^wiki/([a-zA-Z-]+)/(.*) mediawiki/$2?MEZAWIKI=$1 [PT,QSA,E=WIKI:$1]
+    RewriteRule ^mediawiki/([a-zA-Z-]+)/(.*) mediawiki/$2?MEZAWIKI=$1 [PT,QSA,E=WIKI:$1]
 
     RewriteCond "%{REQUEST_FILENAME}" !-f
     RewriteCond "%{REQUEST_FILENAME}" !-d
-    RewriteRule ^([a-zA-Z-]+)/(?!mediawiki/)(.*) mediawiki/index.php/$3?MEZAWIKI=$1 [PT,QSA,E=WIKI:$1]
+    RewriteRule ^([a-zA-Z-]+)/(?!mediawiki/)(.*) mediawiki/index.php/$2?MEZAWIKI=$1 [PT,QSA,E=WIKI:$1]
 {% else %}
     # from https://www.mediawiki.org/wiki/Manual:Short_URL/Apache
-    RewriteRule ^/?wiki(/.*)?$ %{DOCUMENT_ROOT}/w/index.php [L,E=WIKI:$1]
+    RewriteRule ^/?wiki/(.*)?$ %{DOCUMENT_ROOT}/w/index.php [L,E=WIKI:$1]
 {% endif %}
 
 
