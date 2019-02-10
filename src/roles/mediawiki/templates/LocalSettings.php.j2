@@ -91,10 +91,12 @@ $wikis = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
 
 
 if ( ! in_array( $wikiId, $wikis ) ) {
-
-	// handle invalid wiki
-	die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
-
+    // get $wikiId from environment variable
+	$wikiId = getenv( $mezaWikiEnvVarName );
+    if (!$wikiId) {
+		// handle invalid wiki
+		die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
+	}
 }
 
 {% if meza_auth_type is defined %}
