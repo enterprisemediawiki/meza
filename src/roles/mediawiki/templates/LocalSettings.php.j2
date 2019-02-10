@@ -43,20 +43,16 @@ require "{{ m_deploy }}/samlLocalSettings.php";
 
 require '/opt/.deploy-meza/config.php';
 
+
+$mezaWikiEnvVarName='WIKI';
 if( $wgCommandLineMode ) {
-
-	$mezaWikiEnvVarName='WIKI';
-
 	// get $wikiId from environment variable
 	$wikiId = getenv( $mezaWikiEnvVarName );
-
 }
 else {
-
 	// get $wikiId from URI
 	$uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
-	$wikiId = strtolower( $uriParts[1] ); // URI has leading slash, so $uriParts[0] is empty string
-
+	$wikiId = strtolower( $uriParts[2] ); // URI has leading slash, so $uriParts[0] is empty string
 }
 
 
@@ -94,8 +90,9 @@ if ( ! in_array( $wikiId, $wikis ) ) {
     // get $wikiId from environment variable
 	$wikiId = getenv( $mezaWikiEnvVarName );
     if (!$wikiId) {
+		$wikiId = 'demo';
 		// handle invalid wiki
-		die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
+		// die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
 	}
 }
 
@@ -260,6 +257,7 @@ $wgServer = 'https://{{ wiki_app_fqdn }}';
 
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
 $wgScriptPath = "/$wikiId";
+$wgArticlePath = "/wiki/$wikiId/$1";
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath
 $wgUploadPath = "$wgScriptPath/img_auth.php";
