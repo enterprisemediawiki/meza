@@ -52,7 +52,11 @@ if( $wgCommandLineMode ) {
 else {
 	// get $wikiId from URI
 	$uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
-	$wikiId = strtolower( $uriParts[2] ); // URI has leading slash, so $uriParts[0] is empty string
+        foreach ($uriParts as $k => $v) {
+                if ( 2 == strlen($v) ) {
+                        $wikiId = $v;
+                }
+        }
 }
 
 
@@ -90,9 +94,8 @@ if ( ! in_array( $wikiId, $wikis ) ) {
     // get $wikiId from environment variable
 	$wikiId = getenv( $mezaWikiEnvVarName );
     if (!$wikiId) {
-		$wikiId = 'demo';
 		// handle invalid wiki
-		// die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
+		die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
 	}
 }
 

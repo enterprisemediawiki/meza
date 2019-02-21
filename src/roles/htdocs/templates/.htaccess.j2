@@ -30,9 +30,9 @@
     RewriteRule ^BackupDownload(?:/|$)(.*)$ - [L]
     {% endif %}
 
-
-	RewriteRule ^/?wiki/{{ wiki_id }}(/.*)?$ %{DOCUMENT_ROOT}/{{ wiki_id }}/index.php [L]
-	RewriteRule ^/?$ %{DOCUMENT_ROOT}/{{ wiki_id }}/index.php [L]
+	RewriteRule ^/?wiki/{{ wiki_id }}(/.*)?$ %{DOCUMENT_ROOT}/w/index.php [env=WIKI:{{wiki_id}},L]
+#	RewriteRule ^/?wiki/{{ wiki_id }}(/.*)?$ %{DOCUMENT_ROOT}/{{ wiki_id }}/index.php [L]
+	RewriteRule ^/?$ %{DOCUMENT_ROOT}/w/index.php [L]
 
 	RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
 	RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-d
