@@ -103,11 +103,13 @@
 
 # create symlink to wiki for short urls
 # tag it latest, so that the symlink gets created whenever core is downloaded
-- name: Link {{ wiki_id }} to core, to enable short urls
+- name: Link wikis to core, to enable short urls
   file:
     src: "{{ m_htdocs }}/w"
-    dest: "{{ m_htdocs }}/{{ wiki_id }}"
+    dest: "{{ m_htdocs }}/{{ item }}"
     state: link
+  with_items:
+    - "{{ list_of_wikis }}"
   tags:
     - latest
 
