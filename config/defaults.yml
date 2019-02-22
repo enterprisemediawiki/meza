@@ -49,6 +49,8 @@ m_backups: /opt/data-meza/backups
 
 # webserver variables
 m_htdocs: /opt/htdocs
+# crawl for default or nocrawl to disallow all
+m_robots_rules: nocrawl
 m_mediawiki: /opt/htdocs/mediawiki
 m_cert_private: /etc/pki/tls/private/meza.key
 m_cert_public: /etc/pki/tls/certs/meza.crt
@@ -125,7 +127,7 @@ mysql_performance_schema: "on"
 load_balancer_unmanaged_parsoid_port: 8000
 load_balancer_unmanaged_mediawiki_port: 8080
 
-# Netdata is a monitoring and alerting system 
+# Netdata is a monitoring and alerting system
 m_install_netdata: True
 # we need a certificate to bind to port 20000
 ssl_certificate_file: /etc/haproxy/certs/meza.pem

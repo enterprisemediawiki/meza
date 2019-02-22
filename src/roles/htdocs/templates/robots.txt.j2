@@ -13,6 +13,14 @@
 # that go _way_ too fast. If you're irresponsible, your access to the site may be blocked.
 #
 
+{% if {{ m_robots_rules }} == "nocrawl" %}
+
+User-agent: *
+Disallow /
+
+{% else %}
+
+
 # advertising-related bots:
 User-agent: Mediapartners-Google*
 Disallow: /
@@ -163,3 +171,5 @@ Disallow: /w/
 Disallow: /api/
 Disallow: /trap/
 #
+
+{%  endif %}
