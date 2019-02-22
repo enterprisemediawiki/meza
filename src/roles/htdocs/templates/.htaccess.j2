@@ -29,18 +29,13 @@
     # Allow access to BackupDownload function
     RewriteRule ^BackupDownload(?:/|$)(.*)$ - [L]
     {% endif %}
+{% for wiki in list_of_wikis %}
 
-	RewriteRule ^/?wiki/{{ wiki_id }}(/.*)?$ %{DOCUMENT_ROOT}/w/index.php [env=WIKI:{{wiki_id}},L]
-#	RewriteRule ^/?wiki/{{ wiki_id }}(/.*)?$ %{DOCUMENT_ROOT}/{{ wiki_id }}/index.php [L]
+	RewriteRule ^/?wiki/{{ wiki }}(/.*)?$ %{DOCUMENT_ROOT}/w/index.php [env=WIKI:{{wiki}},L]
+#	RewriteRule ^/?wiki/{{ wiki }}(/.*)?$ %{DOCUMENT_ROOT}/{{ wiki }}/index.php [L]
+{% endfor %}
 	RewriteRule ^/?$ %{DOCUMENT_ROOT}/w/index.php [L]
 
-	RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
-	RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-d
-	RewriteRule ^/?{{ wiki_id }}/images/thumb/[0-9a-f]/[0-9a-f][0-9a-f]/([^/]+)/([0-9]+)px-.*$ %{DOCUMENT_ROOT}/{{ wiki_id }}/thumb.php?f=$1&width=$2 [L,QSA,B]
-
-	RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
-	RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-d
-	RewriteRule ^/?{{ wiki_id }}/images/thumb/archive/[0-9a-f]/[0-9a-f][0-9a-f]/([^/]+)/([0-9]+)px-.*$ %{DOCUMENT_ROOT}/{{ wiki_id }}/thumb.php?f=$1&width=$2&archived=1 [L,QSA,B]
 
 
 </IfModule>
