@@ -242,7 +242,7 @@ list:
   - name: ApprovedRevs
     repo: https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git
     # Use this commit until a release tag for v1.0 is created
-    version: 251cf4db3ab99366fa281ea535e725672fa2b6c3
+    version: tags/1.0
     config: |
       $egApprovedRevsAutomaticApprovals = false;
   - name: ImagesLoaded
@@ -253,7 +253,7 @@ list:
     version: tags/0.3.0
   - name: WatchAnalytics
     repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
-    version: tags/2.0.1
+    version: tags/3.0.0
     config: |
       $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
   - name: Variables
