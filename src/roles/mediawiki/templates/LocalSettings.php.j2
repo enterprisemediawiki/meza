@@ -43,21 +43,36 @@ require "{{ m_deploy }}/samlLocalSettings.php";
 
 require '/opt/.deploy-meza/config.php';
 
+/*
+ * Fix ENV vars getting prepended with 'REDIRECT_' by Apache
+ */
+function fixApacheEnv () {
+	foreach ($_ENV as $key => $value) {
+	    if (substr($key, 0, 9) === 'REDIRECT_') {
+	        $_ENV[str_replace('REDIRECT_', '', $key)] = $value;
+	        putenv(str_replace('REDIRECT_', '', $key) . '=' . $value);
+	    }
+	}
+}
+fixApacheEnv();
 
 $mezaWikiEnvVarName='WIKI';
+
 if( $wgCommandLineMode ) {
 	// get $wikiId from environment variable
 	$wikiId = getenv( $mezaWikiEnvVarName );
-}
-else {
-	// get $wikiId from URI
+} elseif (empty($wikiId)) {
+
 	$uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
-        foreach ($uriParts as $k => $v) {
-                if ( 2 == strlen($v) ) {
-                        $wikiId = $v;
-                }
-        }
+	if ($uriParts[1] == 'wiki') {
+		$wikiId = strtolower( $uriParts[2] );
+	} elseif ( in_array( $uriParts[1], ['de','en','es','fr','it','ja','ko','pt','sv','ru','zh'] ) ) {
+		$wikiId = $uriParts[1];
+	} else {
+	  $wikiId = 'en'; // default
+	}
 }
+
 
 
 {% if wiki_id_redirects is defined and wiki_id_redirects|length > 0 %}
