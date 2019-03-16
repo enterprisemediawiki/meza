@@ -57,7 +57,7 @@ package_base_extras:
   - cifs-utils
   - curl
 package_nmap: nmap
-package_lua: [ 'liblua5.1-0-dev', 'liblua50-dev', 'liblualib50-dev' ]
+package_lua: [ 'liblua5.1-0-dev', 'liblua50-dev', 'liblualib50-dev', 're2c', 'pkg-config' ]
 
 
 #
