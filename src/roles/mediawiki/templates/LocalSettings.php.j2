@@ -69,7 +69,7 @@ if( $wgCommandLineMode ) {
 	} elseif ( in_array( $uriParts[1], ['de','en','es','fr','it','ja','ko','pt','sv','ru','zh'] ) ) {
 		$wikiId = $uriParts[1];
 	} else {
-	  $wikiId = 'en'; // default
+	  // $wikiId = 'en'; // default
 	}
 }
 
@@ -261,6 +261,11 @@ else {
  *
  *
  **/
+ if (isset($_SERVER["REQUEST_SCHEME"])) {
+   define('WIKI_HOST', $_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER["HTTP_HOST"]);
+ } else { // probably commandline invocation
+   define('WIKI_HOST', 'http://127.0.0.1');
+ }
 
 // ref: https://www.mediawiki.org/wiki/Manual:$wgServer
 //   From section #Autodetection:
@@ -271,7 +276,7 @@ else {
 // Depending on proxy setup (particularly for Varnish/Squid caching) may need
 // to set $wgInternalServer:
 // ref: https://www.mediawiki.org/wiki/Manual:$wgInternalServer
-$wgServer = 'https://{{ wiki_app_fqdn }}';
+$wgServer = WIKI_HOST;
 
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
 $wgScriptPath = "/$wikiId";
@@ -526,7 +531,7 @@ $wgShellLocale = "en_US.utf8";
 $wgHashedUploadDirectory = true;
 
 # Site language code, should be one of the list in ./languages/Names.php
-$wgLanguageCode = "en";
+$wgLanguageCode = $wikiId;
 
 # https://www.mediawiki.org/wiki/Manual:$wgSecretKey
 $wgSecretKey = "{{ wg_secret_key }}";
