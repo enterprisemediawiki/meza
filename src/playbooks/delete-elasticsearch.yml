@@ -14,6 +14,9 @@
     # - name: Verify user wants to delete elasticsearch
     #   pause: prompt='Please confirm you want to delete Elasticsearch! Press return to continue. Press Ctrl+c and then "a" to abort'
 
+    - include_role:
+        name: set-vars
+
     - name: Ensure Elasticsearch is removed
       yum:
         name: elasticsearch
