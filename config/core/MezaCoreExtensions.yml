@@ -253,7 +253,7 @@ list:
     version: tags/0.3.0
   - name: WatchAnalytics
     repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
-    version: tags/3.0.0
+    version: tags/3.1.1
     config: |
       $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
   - name: Variables
