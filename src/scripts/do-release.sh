@@ -47,6 +47,7 @@ CONTRIBUTORS=$(git shortlog -sn "${OLD_VERSION}..HEAD" | while read line; do ech
 #
 RELEASE_NOTES_FILE=./.release-notes.tmp
 cat > ${RELEASE_NOTES_FILE} <<- EOM
+
 ${OVERVIEW}
 
 ### Commits since $OLD_VERSION
@@ -77,33 +78,37 @@ EOM
 #
 # OUTPUT RELEASE NOTES IN GREEN ON COMMAND LINE
 #
-echo -e "${GREEN}"
-cat "${RELEASE_NOTES_FILE}"
-echo -e "${NC}"
+# I think preferable not to output this here
+# echo -e "${GREEN}"
+# cat "${RELEASE_NOTES_FILE}"
+# echo -e "${NC}"
+
 
 #
 # TO-DO: Automate edit of release notes
 #
-# sed -e '1,/=============/r.release-notes.tmp' ./RELEASE-NOTES.md
+sed -i -e '/=============/r.release-notes.tmp' ./RELEASE-NOTES.md
+sed -i "s/=============/\0\n\n## Meza $NEW_VERSION/" ./RELEASE-NOTES.md
+
 
 #
 # OUTPUT DIRECTIONS FOR COMPLETING RELEASE
 #
 echo
-echo    "1. Edit RELEASE-NOTES.md"
-echo -e "   * Copy the ${GREEN}green text${NC} from above and add it under the title ${GREEN}## Meza $NEW_VERSION${NC}"
-echo    "   * Edit the text as required"
-echo    "2. Commit your changes and submit a pull request"
+echo    "Release notes generated. To complete the release do the following:"
+echo
+echo -e "1. Check changes to RELEASE-NOTES.md with ${RED}git diff${NC}"
+echo    "2. Commit changes and submit a pull request"
 echo    "3. After the PR is merged create a new release of Meza with these details:"
 echo    "   * Tag: $NEW_VERSION"
 echo    "   * Title: Meza $NEW_VERSION"
-echo -e "   * Description: ${GREEN}green text${NC} from above (edits as required)"
-echo    "4. Bump the release branch $RELEASE_BRANCH to this release:"
+echo -e "   * Description: the ${GREEN}Meza $NEW_VERSION${NC} section from RELEASE-NOTES.md"
+echo -e "4. Move the ${GREEN}$RELEASE_BRANCH${NC} branch to the same point as the ${GREEN}${NEW_VERSION}${NC} release:"
 echo -e "   ${RED}git checkout $RELEASE_BRANCH"
 echo    "   git merge $GIT_HASH --ff-only"
 echo -e "   git push origin $RELEASE_BRANCH${NC}"
-echo -e "5. Update ${BLUE}https://www.mediawiki.org/wiki/Meza/Version_history${NC}"
-echo -e "6. Announce on ${BLUE}https://riot.im/app/#/room/#mwstake-MEZA:matrix.org${NC}"
+echo -e "5. Update ${GREEN}https://www.mediawiki.org/wiki/Meza/Version_history${NC}"
+echo -e "6. Announce on ${GREEN}https://riot.im/app/#/room/#mwstake-MEZA:matrix.org${NC}"
 echo
 
 rm ${RELEASE_NOTES_FILE}
