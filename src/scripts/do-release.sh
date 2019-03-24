@@ -18,28 +18,54 @@ LATEST="${PREVIOUS_RELEASES##*$'\n'}"
 GIT_HASH=$(git rev-parse HEAD | cut -c1-8)
 
 #
-# READ IN USER INPUTS
+# WELCOME MESSAGE
 #
-read -p "Add optional single line of overview text: " OVERVIEW
+echo
+echo "* * * * * * * * * * * * * * * * * * * * * * * *"
+echo "*                                             *"
+echo "*           Meza Release Generator            *"
+echo "*                                             *"
+echo "* * * * * * * * * * * * * * * * * * * * * * * *"
 
-echo -e "${BLUE}"
+#
+# USER INPUT: CHOOSE OLD VERSION NUMBER TO BASE FROM
+#
+echo -e "${GREEN}"
 echo "${PREVIOUS_RELEASES}"
 echo -e "${NC}"
 
 while [ -z "$OLD_VERSION" ]; do
-	read -p "Enter previous release number (options in blue above): " -i "$LATEST" -e OLD_VERSION
+	read -p "Enter previous release number (options in green above): " -i "$LATEST" -e OLD_VERSION
 done;
 
+#
+# SETUP LIST OF COMMITS FOR DISPLAY NOW AND INCLUSION IN RELEASE-NOTES.MD
+#
+COMMITS=$(git log --oneline --no-merges "${OLD_VERSION}..HEAD" | while read line; do echo "* $line"; done)
+
+echo
+echo -e "From ${GREEN}${OLD_VERSION}${NC} to ${GREEN}HEAD${NC}, these are the non-merge commits:"
+echo -e "${GREEN}"
+echo "${COMMITS}"
+echo -e "${NC}"
+
+#
+# USER INPUT: CHOOSE NEW VERSION NUMBER
+#
 while [ -z "$NEW_VERSION" ]; do
 	read -p "Enter new version number in form X.Y.Z: " NEW_VERSION
 done;
 
 #
+# USER INPUT: OVERVIEW TEXT
+#
+read -p "Based upon commits above, choose optional 1-line overview: " OVERVIEW
+
+#
 # SETUP VARS BASED UPON USER INPUT
 #
-MAJOR_VERSION=$(echo "$OLD_VERSION" | cut -f1 -d".")
+MAJOR_VERSION=$(echo "$NEW_VERSION" | cut -f1 -d".")
 RELEASE_BRANCH="${MAJOR_VERSION}.x"
-COMMITS=$(git log --oneline --no-merges "${OLD_VERSION}..HEAD" | while read line; do echo "* $line"; done)
 CONTRIBUTORS=$(git shortlog -sn "${OLD_VERSION}..HEAD" | while read line; do echo "* $line"; done)
 
 #
@@ -94,6 +120,12 @@ sed -i "s/=============/\0\n\n## Meza $NEW_VERSION/" ./RELEASE-NOTES.md
 #
 # OUTPUT DIRECTIONS FOR COMPLETING RELEASE
 #
+echo
+echo "* * * * * * * * * * * * * * * * * * * * * * * *"
+echo "*                                             *"
+echo "*           Release process started           *"
+echo "*                                             *"
+echo "* * * * * * * * * * * * * * * * * * * * * * * *"
 echo
 echo    "Release notes generated. To complete the release do the following:"
 echo
