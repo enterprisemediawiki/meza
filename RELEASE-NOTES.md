@@ -1,6 +1,28 @@
 Release Notes
 =============
 
+## Meza 31.3.0
+
+WatchAnalytics to 3.1.2 for diff in PendingReviews, improved on-page banners
+
+### Commits since 31.2.5
+
+* fc22af4 Bump to WatchAnalytics 3.1.2
+* 70b4e2b Bump to WatchAnalytics 3.1.1
+* ce403a5 Bump WatchAnalytics to 3.1.0
+
+### Contributors
+
+* 4	krisfield
+* 1	James Montalvo
+
+# How to upgrade
+
+```bash
+sudo meza update 31.3.0
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.2.4
 
 ### Commits since 31.2.3
