@@ -84,15 +84,6 @@ ${COMMITS}
 
 ${CONTRIBUTORS}
 
-### Mediawiki.org pages updated
-
-* TBD
-
-### What still isn't documented?
-
-* TBD
-* See [list of issues and pull requests indicating missing docs](https://github.com/enterprisemediawiki/meza/pulls?utf8=%E2%9C%93&q=label%3A%22open+post-merge+actions%22+)
-
 # How to upgrade
 
 \`\`\`bash
@@ -116,6 +107,16 @@ EOM
 sed -i -e '/=============/r.release-notes.tmp' ./RELEASE-NOTES.md
 sed -i "s/=============/\0\n\n## Meza $NEW_VERSION/" ./RELEASE-NOTES.md
 
+#
+# COMMIT CHANGE
+#
+git add RELEASE-NOTES.md
+# Set current branch as base branch
+BASE_BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
+RELEASE_BRANCH="${NEW_VERSION}-release"
+git checkout -b "${RELEASE_BRANCH}"
+git commit -m "${NEW_VERSION} release"
+git push origin "$BASE_BRANCH"
 
 #
 # OUTPUT DIRECTIONS FOR COMPLETING RELEASE
@@ -127,10 +128,10 @@ echo "*           Release process started           *"
 echo "*                                             *"
 echo "* * * * * * * * * * * * * * * * * * * * * * * *"
 echo
-echo    "Release notes generated. To complete the release do the following:"
+echo    "Release notes generated, committed, and pushed. "
 echo
-echo -e "1. Check changes to RELEASE-NOTES.md with ${RED}git diff${NC}"
-echo    "2. Commit changes and submit a pull request"
+echo -e "1. Check what you pushed with ${RED}git diff HEAD~1..HEAD${NC}"
+echo -e "2. Open a pull request at ${GREEN}https://github.com/enterprisemediawiki/meza/compare/${BASE_BRANCH}...${RELEASE_BRANCH}?expand=1${NC}"
 echo    "3. After the PR is merged create a new release of Meza with these details:"
 echo    "   * Tag: $NEW_VERSION"
 echo    "   * Title: Meza $NEW_VERSION"
@@ -141,6 +142,8 @@ echo    "   git merge $GIT_HASH --ff-only"
 echo -e "   git push origin $RELEASE_BRANCH${NC}"
 echo -e "5. Update ${GREEN}https://www.mediawiki.org/wiki/Meza/Version_history${NC}"
 echo -e "6. Announce on ${GREEN}https://riot.im/app/#/room/#mwstake-MEZA:matrix.org${NC}"
+echo -e "7. Update pages on ${GREEN}https://mediawiki.org/wiki/Meza${NC}"
 echo
 
 rm ${RELEASE_NOTES_FILE}
+
