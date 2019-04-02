@@ -29,12 +29,19 @@
     # Allow access to BackupDownload function
     RewriteRule ^BackupDownload(?:/|$)(.*)$ - [L]
     {% endif %}
-{% for wiki in list_of_wikis %}
 
-	RewriteRule ^/?wiki/{{ wiki }}(/.*)?$ %{DOCUMENT_ROOT}/w/index.php [env=WIKI:{{wiki}},L]
-#	RewriteRule ^/?wiki/{{ wiki }}(/.*)?$ %{DOCUMENT_ROOT}/{{ wiki }}/index.php [L]
-{% endfor %}
-	RewriteRule ^/?$ %{DOCUMENT_ROOT}/w/index.php [L]
+
+# If the request is not for a valid directory, file, link
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule ^/?(?:wiki)?/(de|en|es|fr|it|ja|ko|pt|ru|sv|zh)/(.*)?$ %{DOCUMENT_ROOT}/wiki/mediawiki/ [env=WIKI:$1,L]
+
+RewriteRule ^/?wiki/public_html(/.*)?$ - [L]
+
+RewriteRule ^/?$ %{DOCUMENT_ROOT}/wiki/en/Main_Page [env=WIKI:en,L]
+
+
 
 
 
