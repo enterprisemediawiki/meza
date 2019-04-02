@@ -70,6 +70,9 @@ if( $wgCommandLineMode ) {
 		$wikiId = $uriParts[1];
 	} else {
 	  // $wikiId = 'en'; // default
+	  print 'Can not find wiki id';
+	  print_r ($uriParts);
+	  die();
 	}
 }
 
@@ -105,7 +108,7 @@ if ( isset( $wikiIdRedirects[ $wikiId ] ) ) {
 $wikis = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
 
 
-if ( ! in_array( $wikiId, $wikis ) ) {
+if ( ! in_array( $wikiId, $wikis ) && empty ( $wikiId ) ) {
     // get $wikiId from environment variable
 	$wikiId = getenv( $mezaWikiEnvVarName );
     if (!$wikiId) {
@@ -279,7 +282,7 @@ else {
 $wgServer = WIKI_HOST;
 
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
-$wgScriptPath = "/$wikiId";
+$wgScriptPath = "/wiki/$wikiId";
 $wgArticlePath = "/wiki/$wikiId/$1";
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath
@@ -289,10 +292,10 @@ $wgUploadPath = "$wgScriptPath/img_auth.php";
 $wgUploadDirectory = "{{ m_uploads_dir }}/en";
 
 // https://www.mediawiki.org/wiki/Manual:$wgLogo
-$wgLogo = "/wikis/$wikiId/config/logo.png";
+$wgLogo = "/wiki/wikis/$wikiId/config/logo.png";
 
 // https://www.mediawiki.org/wiki/Manual:$wgFavicon
-$wgFavicon = "/wikis/$wikiId/config/favicon.ico";
+$wgFavicon = "/wiki/wikis/$wikiId/config/favicon.ico";
 
 
 // https://www.mediawiki.org/wiki/Manual:$wgMetaNamespace
@@ -401,6 +404,8 @@ foreach( $mezaDatabaseServers as $databaseServer ) {
 
 # MySQL specific settings
 $wgDBprefix = "";
+$wgSharedDB = "wiki_en";
+// $wgSharedTables =
 
 # MySQL table options to use during installation or update
 $wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
