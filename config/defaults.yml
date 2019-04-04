@@ -30,6 +30,7 @@ m_test: /opt/meza/test
 m_meza_data: /opt/data-meza
 m_cache_directory: /opt/data-meza/cache
 m_tmp: /opt/data-meza/tmp
+m_mw_temp: /opt/data-meza/mw-temp
 m_logs: /opt/data-meza/logs
 m_logs_deploy: /opt/data-meza/logs/deploy/deploy.log
 
@@ -125,7 +126,7 @@ mysql_performance_schema: "on"
 load_balancer_unmanaged_parsoid_port: 8000
 load_balancer_unmanaged_mediawiki_port: 8080
 
-# Netdata is a monitoring and alerting system 
+# Netdata is a monitoring and alerting system
 m_install_netdata: True
 # we need a certificate to bind to port 20000
 ssl_certificate_file: /etc/haproxy/certs/meza.pem
