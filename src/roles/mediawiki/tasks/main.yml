@@ -480,7 +480,7 @@
 
 
 - name: Verify metastore index upgraded
-  shell: WIKI={{ list_of_wikis[0] }} php /opt/htdocs/mediawiki/extensions/CirrusSearch/maintenance/metastore.php --upgrade
+  shell: WIKI={{ list_of_wikis[0] }} php /opt/htdocs/wiki/mediawiki/extensions/CirrusSearch/maintenance/metastore.php --upgrade
   run_once: true
 
 # Wikis are totally built at this point, but SMW and search need rebuilding
