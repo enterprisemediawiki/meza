@@ -42,6 +42,8 @@
       # the ansible the uri action needs httplib2
     - name: ensure python-httplib2 is installed
       apt: name=python-httplib2 state=present
+      tags:
+        - latest
 
     - name: check current version
       uri: url=http://localhost:{{ es_http_port }} method=GET
@@ -82,6 +84,8 @@
     - name: Download Elasticsearch version
       get_url: url=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-{{ es_version }}.deb dest=/tmp/elasticsearch-{{ es_version }}.deb
       when: version_found.json.version.number != '{{ es_version }}'
+      tags:
+        - latest
 
     - name: Update elasticsearch
       apt: deb=/tmp/elasticsearch-{{ es_version }}.deb

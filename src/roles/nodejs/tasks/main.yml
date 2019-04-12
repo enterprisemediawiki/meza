@@ -20,6 +20,8 @@
     name: https://kojipkgs.fedoraproject.org//packages/http-parser/2.7.1/3.el7/x86_64/http-parser-2.7.1-3.el7.x86_64.rpm
     state: present
   when: ansible_distribution_version.split('.')[1] | int <= 3
+  tags:
+    - latest
 
 # - name: Ensure Node.js and npm are installed.
 #   yum:
@@ -36,6 +38,8 @@
       - npm
     state: absent
   when: ansible_os_family == 'RedHat'
+  tags:
+    - latest
 
 
 

@@ -14,7 +14,8 @@
       - "centos-release-gluster{{ glusterfs_default_release }}"
     state: present
   when: ansible_distribution == "CentOS"
-
+  tags:
+    - latest
 
 - name: Install Packages
   yum:
@@ -22,3 +23,5 @@
       - glusterfs-server
       - glusterfs-client
     state: present
+  tags:
+    - latest

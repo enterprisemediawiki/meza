@@ -8,12 +8,16 @@
     src: mongo.repo.j2
     dest: /etc/yum.repos.d/mongo.repo
   run_once: yes
+  tags:
+    - latest
 
 - name: Install mongodb-org package
   yum:
     name: mongodb-org
     state: present
   run_once: yes
+  tags:
+    - latest
 
 - name: Ensure MongoDB conf file in place
   template:

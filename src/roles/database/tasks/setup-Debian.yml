@@ -6,15 +6,21 @@
 - name: Update apt cache if MySQL is not yet installed.
   apt: update_cache=yes
   when: mysql_initially_installed_debian.stat.exists == false
+  tags:
+    - latest
 
 - name: Ensure MySQL Python libraries are installed.
   apt: "name=python-mysqldb state=installed"
+  tags:
+    - latest
 
 - name: Ensure MySQL packages are installed.
   apt:
     name: "{{ mysql_packages }}"
     state: present
   register: deb_mysql_install_packages
+  tags:
+    - latest
 
 # Because Ubuntu starts MySQL as part of the install process, we need to stop
 # mysql and remove the logfiles in case the user set a custom log file size.

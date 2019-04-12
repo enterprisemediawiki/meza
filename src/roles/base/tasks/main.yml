@@ -53,12 +53,14 @@
   yum: name=deltarpm state=latest
   when: ansible_os_family == "RedHat"
   tags:
-  - latest
+    - latest
 
 - name: Ensure apt cache updated (Debian only)
   apt:
     update_cache: yes
   when: ansible_os_family == "Debian"
+  tags:
+    - latest
 
 - name: Ensure aptitude installed in order to use Ansible 'package' (Debian only)
   apt:
@@ -66,6 +68,8 @@
     state: present
     force_apt_get: yes
   when: ansible_os_family == "Debian"
+  tags:
+    - latest
 
 - name: upgrade all packages
   package: name=* state=latest
@@ -75,7 +79,7 @@
     # license agreements.
     ACCEPT_EULA: 'y'
   tags:
-  - latest
+    - latest
 
 # FIXME #807: for RedHat may need to enable "Optional RPMs"
 - name: Ensure EPEL installed via epel-release package (CentOS only)
@@ -84,7 +88,7 @@
     state: present
   when: ansible_distribution == "CentOS"
   tags:
-  - latest
+    - latest
 
 - name: Check if EPEL repo is already configured (RedHat only)
   stat:
@@ -104,7 +108,7 @@
   delay: 10
   when: ansible_distribution == "RedHat" and not epel_repofile_result.stat.exists
   tags:
-  - latest
+    - latest
 
 - name: Import EPEL GPG key (RedHat only)
   rpm_key:
@@ -113,19 +117,19 @@
   when: ansible_distribution == "RedHat" and not epel_repofile_result.stat.exists
   ignore_errors: "{{ ansible_check_mode }}"
   tags:
-  - latest
+    - latest
 
 - name: Ensure optional repos enabled (RedHat Only)
   shell: subscription-manager repos --enable rhel-7-server-optional-rpms
   when: ansible_distribution == "RedHat"
   tags:
-  - latest
+    - latest
 
 - name: ensure libselinux-python installed prior to SELinux (RedHat/CentOS only)
   yum: name=libselinux-python state=installed
   when: ansible_os_family == "RedHat"
   tags:
-  - latest
+    - latest
 
 - name: Ensure base packages installed
   package:
@@ -146,7 +150,7 @@
       - rsync
     state: present
   tags:
-  - latest
+    - latest
 
 - name: Ensure selinux-policy installed (RedHat/CentOS only)
   yum:
@@ -154,7 +158,7 @@
     state: latest
   when: ansible_os_family == "RedHat"
   tags:
-  - latest
+    - latest
 
 - name: put SELinux in permissive mode (RedHat/CentOS only)
   selinux:
@@ -229,7 +233,7 @@
 - name: Install NTP
   package: name=ntp state=installed
   tags:
-  - latest
+    - latest
 
 - name: Ensure NTP is running and enabled as configured.
   service:

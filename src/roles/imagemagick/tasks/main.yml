@@ -8,6 +8,8 @@
   yum:
     name: https://raw.github.com/enterprisemediawiki/meza-packages/master/RPMs/imagemagick_7.0.3_x86_64.rpm
   when: ansible_os_family == 'RedHat'
+  tags:
+    - latest
 
 # FIXME: Is this okay? I think this installs an older version...
 - name: Ensure Imagemagick installed (Debian only)

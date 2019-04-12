@@ -3,17 +3,22 @@
   yum:
     name: "https://centos{{ ansible_distribution_major_version }}.iuscommunity.org/ius-release.rpm"
   when: ansible_distribution == "CentOS"
+  tags:
+    - latest
 
 - name: Install IUS (RHEL) repo.
   yum:
     name: "https://rhel{{ ansible_distribution_major_version }}.iuscommunity.org/ius-release.rpm"
   when: ansible_distribution == "RedHat"
+  tags:
+    - latest
 
 - name: Import IUS Community Project GPG key
   rpm_key:
     key: http://dl.iuscommunity.org/pub/ius/IUS-COMMUNITY-GPG-KEY
     state: present
-
+  tags:
+    - latest
 
 - name: Ensure PHP 5.6 packages removed
   yum:
@@ -42,6 +47,8 @@
       - php56u-mcrypt
       - php56u-mssql
     state: absent
+  tags:
+    - latest
 
 # Check if the desired version of PHP is installed. If it is not, ensure any
 # other versions of PHP are not installed
@@ -58,6 +65,8 @@
     name: "php*u*"
     state: absent
   when: correct_php.results|length == 0
+  tags:
+    - latest
 
 - name: Ensure PHP IUS packages installed
   yum:
@@ -104,3 +113,5 @@
       # https://docs.microsoft.com/en-us/sql/connect/php/installation-tutorial-linux-mac?view=sql-server-2017#installing-the-drivers-on-red-hat-7
       # - php56u-mssql
     state: present
+  tags:
+    - latest

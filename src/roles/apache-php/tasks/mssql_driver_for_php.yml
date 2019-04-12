@@ -6,6 +6,8 @@
       - re2c
       - gcc-c++
     state: present
+  tags:
+    - latest
 
 # Install ODBC driver
 - name: install mssql-server repo (CentOS, RedHat)
@@ -20,6 +22,8 @@
       - unixODBC-utf16
       - unixODBC-utf16-devel
     state: absent
+  tags:
+    - latest
 
 - name: install MS ODBC driver package
   yum:
@@ -28,12 +32,16 @@
   environment:
     ACCEPT_EULA: 'y'
   notify:
-  - restart apache
+    - restart apache
+  tags:
+    - latest
 
 - name: install ODBC driver devel package
   yum:
     name: unixODBC-devel
     state: latest
+  tags:
+    - latest
 
 
 # If mssql tools desired:
@@ -87,7 +95,9 @@
     - pecl/sqlsrv
     - pecl/pdo_sqlsrv
   notify:
-  - restart apache
+    - restart apache
+  tags:
+    - latest
 
 - template:
     src: 30-pdo_sqlsrv.ini.j2

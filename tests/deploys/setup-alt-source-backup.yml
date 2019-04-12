@@ -20,6 +20,8 @@
           - MySQL-python
           - perl-DBD-MySQL
         state: present
+      tags:
+        - latest
 
     - name: Ensure backups repo in place
       git:

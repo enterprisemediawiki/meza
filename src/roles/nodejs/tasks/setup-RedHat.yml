@@ -26,12 +26,16 @@
     name: "http://rpm.nodesource.com/{{ nodejs_rhel_rpm_dir }}/el/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/nodesource-release-el{{ ansible_distribution_major_version }}-1.noarch.rpm"
     state: present
   when: ansible_distribution_major_version|int < 7
+  tags:
+    - latest
 
 - name: Add Nodesource repositories for Node.js (CentOS 7+).
   yum:
     name: "https://rpm.nodesource.com/{{ nodejs_rhel_rpm_dir }}/el/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/nodesource-release-el{{ ansible_distribution_major_version }}-1.noarch.rpm"
     state: present
   when: ansible_distribution_major_version|int >= 7
+  tags:
+    - latest
 
 # Fix for RHEL upgrade from 7.3 --> 7.4 adding package http-parser to base
 # repository, which caused it to be removed from the EPEL repository. When
@@ -48,6 +52,10 @@
     name: https://kojipkgs.fedoraproject.org//packages/http-parser/2.7.1/3.el7/x86_64/http-parser-2.7.1-3.el7.x86_64.rpm
     state: present
   when: ansible_distribution_version.split('.')[1] | int <= 3
+  tags:
+    - latest
 
 - name: Ensure Node.js and npm are installed.
   yum: "name=nodejs-{{ nodejs_version[0] }}.* state=present enablerepo='epel,nodesource'"
+  tags:
+    - latest

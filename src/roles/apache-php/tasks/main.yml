@@ -52,6 +52,8 @@
       - mod_proxy_html
     state: present
   when: ansible_os_family == 'RedHat'
+  tags:
+    - latest
 
 - name: Ensure Apache modules installed (Debian only)
   apt:
@@ -59,6 +61,8 @@
       - "libapache2-mod-php{{ php_debian_version }}"
     state: present
   when: ansible_os_family == 'Debian'
+  tags:
+    - latest
 
 - name: Ensure Apache modules enabled (Debian only)
   apache2_module:

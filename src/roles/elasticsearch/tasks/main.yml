@@ -8,11 +8,15 @@
     state: absent
   # Java 1.7 was only used when Meza only supported RedHat
   when: ansible_os_family == 'RedHat'
+  tags:
+    - latest
 
 - name: Ensure Java 1.8.0 OpenJDK is installed
   yum:
     name: "{{ package_java }}"
     state: present
+  tags:
+    - latest
 
 
 # Environment setup.
@@ -28,12 +32,16 @@
     key: https://packages.elastic.co/GPG-KEY-elasticsearch
     state: present
   when: ansible_os_family == 'RedHat'
+  tags:
+    - latest
 - name: Add Elasticsearch repository.
   template:
     src: elasticsearch5.repo.j2
     dest: /etc/yum.repos.d/elasticsearch.repo
     mode: 0644
   when: ansible_os_family == 'RedHat'
+  tags:
+    - latest
 
 
 - name: HTTPS APT transport for Elasticsearch repository.
@@ -41,23 +49,31 @@
     name: apt-transport-https
     state: present
   when: ansible_os_family == 'Debian'
+  tags:
+    - latest
 - name: Add Elasticsearch apt key.
   apt_key:
     url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
     state: present
   when: ansible_os_family == 'Debian'
+  tags:
+    - latest
 - name: Add Elasticsearch repository.
   apt_repository:
     repo: 'deb https://artifacts.elastic.co/packages/{{ elasticsearch_major_version }}/apt stable main'
     state: present
     update_cache: true
   when: ansible_os_family == 'Debian'
+  tags:
+    - latest
 
 
 - name: Ensure elasticsearch installed
   package:
     name: elasticsearch
     state: present
+  tags:
+    - latest
 
 # Need to perform this check so `lineinfile` doesn't run in Docker. /etc/hosts
 # is special in Docker.
