@@ -510,7 +510,9 @@
 # MediaWiki 1.31+.
 - name: Ensure Python3 present
   yum:
-    name: "{{ package_python3 }}"
+    name:
+      - "{{ package_python3 }}"
+      - "{{ package_python3_pip }}"
     state: latest
   tags:
     - latest

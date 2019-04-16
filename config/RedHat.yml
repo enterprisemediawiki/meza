@@ -36,6 +36,7 @@ package_php_apache_deps:
   - mariadb-libs
 package_java: java-1.8.0-openjdk
 package_python3: python35u
+package_python3_pip: python35u-pip
 package_base_extras:
   - expect
   - expectk
