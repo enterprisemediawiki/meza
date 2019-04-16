@@ -528,3 +528,14 @@
     mode: 0755
   when: ansible_os_family == 'RedHat'
 
+- name: "Ensure pip3 symlink in place"
+  file:
+    # dest = symlink, src = dir linked to
+    src: "/usr/bin/pip3.5"
+    dest: "/usr/bin/pip3"
+    state: link
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_os_family == 'RedHat'
+
