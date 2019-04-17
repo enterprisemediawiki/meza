@@ -50,6 +50,8 @@ m_backups: /opt/data-meza/backups
 
 # webserver variables
 m_htdocs: /opt/htdocs
+# crawl for default or nocrawl to disallow all
+m_robots_rules: nocrawl
 m_mediawiki: /opt/htdocs/mediawiki
 m_cert_private: /etc/pki/tls/private/meza.key
 m_cert_public: /etc/pki/tls/certs/meza.crt

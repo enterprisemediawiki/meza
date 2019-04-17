@@ -49,6 +49,7 @@ package_php_apache_deps: []
 
 package_java: "default-jre"
 package_python3: python3
+package_python3_pip: python3-pip
 package_base_extras:
   - expect
   - perl

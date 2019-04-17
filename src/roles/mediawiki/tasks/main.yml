@@ -510,7 +510,9 @@
 # MediaWiki 1.31+.
 - name: Ensure Python3 present
   yum:
-    name: "{{ package_python3 }}"
+    name:
+      - "{{ package_python3 }}"
+      - "{{ package_python3_pip }}"
     state: latest
   tags:
     - latest
@@ -520,6 +522,17 @@
     # dest = symlink, src = dir linked to
     src: "/usr/bin/python3.5"
     dest: "/usr/bin/python3"
+    state: link
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_os_family == 'RedHat'
+
+- name: "Ensure pip3 symlink in place"
+  file:
+    # dest = symlink, src = dir linked to
+    src: "/usr/bin/pip3.5"
+    dest: "/usr/bin/pip3"
     state: link
     owner: root
     group: root
