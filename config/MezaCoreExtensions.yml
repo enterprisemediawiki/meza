@@ -385,3 +385,6 @@ list:
     repo: https://github.com/wikimedia/mediawiki-extensions-NumerAlpha.git
     version: tags/0.7.0
     legacy_load: True
+  - name: JobQueueInspector
+    repo: https://github.com/enterprisemediawiki/JobQueueInspector.git
+    version: tags/0.1.0
