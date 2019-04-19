@@ -264,8 +264,8 @@ else {
  *
  *
  **/
- if (isset($_SERVER["REQUEST_SCHEME"])) {
-   define('WIKI_HOST', $_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER["HTTP_HOST"]);
+ if (isset($_SERVER["HTTP_HOST"])) {
+   define('WIKI_HOST', 'https://' . $_SERVER["HTTP_HOST"]);
  } else { // probably commandline invocation
    define('WIKI_HOST', 'http://127.0.0.1');
  }
