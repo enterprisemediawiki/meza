@@ -2,7 +2,7 @@
 # Simple playbook to make sure config.sh, config.php, and any other simple
 # config scripts like them can be quickly deployed to servers.
 
-- hosts: all:!exclude-all:!load-balancers-unmanaged
+- hosts: all:!exclude-all:!load-balancers-nonmeza:!load-balancers-nonmeza-external:!load-balancers-nonmeza-internal
   become: yes
   roles:
     - set-vars

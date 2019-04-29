@@ -1,14 +1,42 @@
 ---
+
+# Pick OS of box. Options: centos,debian
+box_os: centos
+
+# Option to use a non-standard base virtual machine. The `box_os` option above
+# will pick a supported baseBox for you. Use this only if you want to try out
+# other base boxes.
+# baseBox: bento/centos-7.5
+
+# The `app1` server is the main virtual machine, and in most cases will be the
+# only VM.
 app1:
+
+  # How much RAM to give this box. Don't assign more than your computer has
+  # available. Give it 4096 (4GB) if you can.
   memory: 2048
+
+  # How many CPUs to give the VM. 1 is probably fine.
   cpus: 1
+
+  # IP address of this VM. This is where you'll access the VM from your broswer,
+  # i.e. https://192.168.56.56.
+  ip_address: "192.168.56.56"
+
+
+#
+# Additional servers for a multi-server setup. Only use these if you have a
+# sufficiently powerful computer to handle the additional resources required.
+#
 
 # To add a second app server, uncomment the lines below
 # app2:
 #   memory: 512
 #   cpus: 1
+#   ip_address: "192.168.56.57"
 
 # To add a second database server, uncomment the lines below
 # db2:
 #   memory: 512
 #   cpus: 1
+#   ip_address: "192.168.56.58"

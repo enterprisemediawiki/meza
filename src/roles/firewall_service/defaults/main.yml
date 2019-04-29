@@ -1,0 +1,5 @@
+---
+
+ufw_service_ports:
+  mysql: 3306
+  protocol: tcp

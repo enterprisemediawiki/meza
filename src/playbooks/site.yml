@@ -11,7 +11,7 @@
   tasks:
   - name: Ensure no password on meza-ansible user on controller
     shell: passwd --delete meza-ansible
-    ignore_errors: yes
+    failed_when: False
 
   - name: Ensure controller has user alt-meza-ansible
     user:
@@ -49,20 +49,14 @@
       owner: alt-meza-ansible
       group: wheel
       mode: "{{ item.mode }}"
-    ignore_errors: True
+    failed_when: False
     with_items:
     - name: known_hosts
       mode: "0600"
 
-  - name: Ensure secret.yml encrypted
-    shell: >
-      ansible-vault encrypt
-      /opt/conf-meza/secret/{{ env }}/secret.yml
-      --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
-    ignore_errors: True
-
-  # Note: without this, the encryption above changes mode to 0600 and ownership
-  # to root:root. This makes it impossible to include_vars later.
+  # Note: without this, if the user decides to encrypt secret.yml with Ansible
+  # vault then it changes mode to 0600 and ownership to root:root. This makes it
+  # impossible to include_vars later.
   - name: Ensure secret.yml owned by meza-ansible
     file:
       path: "/opt/conf-meza/secret/{{ env }}/secret.yml"
@@ -78,11 +72,18 @@
     - umask-set
     - init-controller-config
 
+- hosts: localhost
+  become: yes
+  roles:
+    - set-vars
+    - role: autodeployer
+      when: force_deploy is defined or autodeployer is defined
+
 # Ensure proper base setup on all servers in inventory, with the exception of
 # servers in "exclude-all" group. At present, the intent of this group is to
 # allow servers which serve as sources for database and user-uploaded files,
 # but are not managed by this meza install.
-- hosts: all:!exclude-all:!load-balancers-unmanaged
+- hosts: all:!exclude-all:!load-balancers-nonmeza:!load-balancers-nonmeza-external:!load-balancers-nonmeza-internal
   become: yes
   roles:
     - set-vars
@@ -91,21 +92,26 @@
     - base-config-scripts
   tags: base
 
-- hosts: load-balancers
+- hosts: load-balancers,load-balancers-meza-internal,load-balancers-meza-external
   become: yes
-  tags: load-balancer
+  tags:
+    - load-balancer
+    - load-balancers
+    - haproxy
   roles:
     - set-vars
-    - role: firewalld
-      firewalld_port: 8001
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewalld
-      firewalld_port: 8081
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['parsoid-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 8001
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 8081
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['parsoid-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
     # NOTE: firewalld ports 80 and 443 opened to ALL within haproxy role
     - haproxy
 
@@ -114,26 +120,29 @@
   tags: apache-php
   roles:
     - set-vars
-    - role: firewalld
-      # firewalld_service: http
-      firewalld_port: 8080
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['load-balancers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewalld
-      firewalld_port: 8080
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['load-balancers-unmanaged'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'load-balancers-unmanaged' in groups"
-    - role: firewalld
-      firewalld_port: 8080
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['parsoid-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 8080
+      firewall_protocol: tcp
+      firewall_servers: "{{ load_balancers_all }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 8080
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['parsoid-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - base-extras
     - imagemagick
     - apache-php
+    - role: netdata
+      when: m_install_netdata
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 19999
+      firewall_protocol: tcp
+      firewall_servers: "{{ load_balancers_all }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
 
 # Keeping this as a separate play, since at some point it will make sense to
 # configure app-servers as gluster clients and have separate gluster servers
@@ -154,17 +163,19 @@
     # Check your firewall setting to open ports 111 for portmap
     # requests/replies and Gluster NFS server requests/replies. Gluster NFS
     # server operates over the following port numbers: 38465, 38466, and 38467.
-    - role: firewalld
-      firewalld_port: 111
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 111
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
-    - role: firewalld
-      firewalld_port: 111
-      firewalld_protocol: udp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 111
+      firewall_protocol: udp
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
 
     # All gluster servers, Gluster Daemon
@@ -179,44 +190,50 @@
     # releases). The brick ports assignment scheme is now compliant with IANA
     # guidelines. For example: if you have five bricks, you need to have ports
     # 49152 to 49156 open.
-    - role: firewalld
-      firewalld_port: 24007
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 24007
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
-    - role: firewalld
-      firewalld_port: 24008
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 24008
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
 
     # One port required for each brick (in meza, this equals each server (one
     # brick per server))
-    - role: firewalld
-      firewalld_port: 49152
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 49152
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
-    - role: firewalld
-      firewalld_port: 49153
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 49153
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
-    - role: firewalld
-      firewalld_port: 49154
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 49154
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
-    - role: firewalld
-      firewalld_port: 49155
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 49155
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
 
     # FIXME #801: Some docs said ports 38465, 38466, 38467 needed for Gluster
@@ -230,11 +247,12 @@
   tags: memcached
   roles:
     - set-vars
-    - role: firewalld
-      firewalld_port: 11211
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 11211
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - memcached
 
 - hosts: db-master
@@ -242,14 +260,17 @@
   tags: database
   roles:
     - set-vars
-    - role: firewalld
-      firewalld_service: mysql
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewalld
-      firewalld_service: mysql
-      firewalld_servers: "{{ groups['db-slaves'] }}"
-      firewalld_zone: public
+    - role: firewall_service
+      firewall_service: mysql
+      # FIXME: try merging these two mysql lines with:
+      # firewall_servers: "{{ groups['app-servers'] }} + {{ groups['db-slaves'] }}"
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_service
+      firewall_service: mysql
+      firewall_servers: "{{ groups['db-slaves'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
+
     - role: database
       # Get the one and only server that should be in the db-master group and set
       # it's IP address as replication master IP. Note that this can be left blank
@@ -264,10 +285,11 @@
   tags: database
   roles:
     - set-vars
-    - role: firewalld
-      firewalld_service: mysql
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_service
+      firewall_service: mysql
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
+      when: ansible_os_family == 'RedHat'
     - role: database
       # Get the one and only server that should be in the db-master group and set
       # it's IP address as replication master IP. Note that this can be left blank
@@ -281,26 +303,30 @@
   tags: elasticsearch
   roles:
     - set-vars
-    - role: firewalld
-      firewalld_port: 9200
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewalld
-      firewalld_port: 9300
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewalld
-      firewalld_port: 9200
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['elastic-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewalld
-      firewalld_port: 9300
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['elastic-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 9200
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 9300
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 9200
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['elastic-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 9300
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['elastic-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - elasticsearch
 
 # Note: this is app-servers again, but must be after everything else is setup
@@ -310,6 +336,8 @@
   roles:
     - set-vars
     - htdocs
+    - role: lua
+      when: m_install_lua
     - mediawiki
 
 
@@ -321,22 +349,18 @@
   roles:
     - set-vars
     # Allow app servers to get to parsoid server(s) on port 8000
-    - role: firewalld
-      firewalld_port: 8000
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['app-servers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewalld
-      firewalld_port: 8000
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['load-balancers'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewalld
-      firewalld_port: 8000
-      firewalld_protocol: tcp
-      firewalld_servers: "{{ groups['load-balancers-unmanaged'] }}"
-      firewalld_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "'load-balancers-unmanaged' in groups"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 8000
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 8000
+      firewall_protocol: tcp
+      firewall_servers: "{{ load_balancers_all }} + {{ load_balancers_internal }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - nodejs
     - parsoid
     - parsoid-settings
@@ -349,7 +373,16 @@
     - role: meza-log
       when: docker_skip_tasks is not defined or not docker_skip_tasks
 
-- hosts: all:!exclude-all:!load-balancers-unmanaged
+- hosts: backup-servers
+  become: yes
+  tags:
+    - backup-cleanup
+  roles:
+    - set-vars
+    - role: backups-cleanup
+      when: backups_cleanup is defined and backups_cleanup.crontime is defined
+
+- hosts: all:!exclude-all:!load-balancers-nonmeza:!load-balancers-nonmeza-external:!load-balancers-nonmeza-internal
   become: yes
   tags:
     - cron
@@ -359,4 +392,3 @@
     - role: cron
       when: docker_skip_tasks is not defined or not docker_skip_tasks
     - umask-unset
-

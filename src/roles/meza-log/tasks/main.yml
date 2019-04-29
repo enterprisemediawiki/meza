@@ -3,7 +3,7 @@
 - name: "Check if server log database exists"
   shell: 'mysqlshow "{{ meza_server_log_db }}" | grep -v Wildcard | grep -o {{ meza_server_log_db }}'
   register: register_server_log
-  ignore_errors: yes
+  failed_when: False
   run_once: true
 
 - name: "Set fact if server log database DOES exist"
@@ -16,11 +16,21 @@
     server_log_exists: False
   when: register_server_log.rc != 0
 
+- name: "Copy meza_server_log.sql to remote database hosts"
+  copy:
+    src: "/opt/meza/src/roles/meza-log/files/meza_server_log.sql"
+    dest: "/tmp/meza_server_log.sql"
+    owner: meza-ansible
+    group: meza-ansible
+    mode: u+r,g+r,o+r
+  run_once: true
+  when: not server_log_exists
+
 - name: "Import server log database structure"
   mysql_db:
     name: "{{ meza_server_log_db }}"
     state: import
-    target: "/opt/meza/src/roles/meza-log/files/meza_server_log.sql"
+    target: "/tmp/meza_server_log.sql"
   run_once: true
   when: not server_log_exists
 
@@ -31,7 +41,7 @@
 - name: "Check if disk_space table exists"
   shell: "sudo mysql -e\"USE {{ meza_server_log_db }}; SHOW TABLES LIKE 'disk_space'\" | grep disk_space"
   register: register_disk_space
-  ignore_errors: yes
+  failed_when: False
   run_once: true
 
 - name: "Set fact if disk_space table DOES exist"
@@ -44,11 +54,22 @@
     disk_space_exists: False
   when: register_disk_space.rc != 0
 
+- name: "Copy table_disk_space.sql to remote database hosts"
+  copy:
+    src: "/opt/meza/src/roles/meza-log/files/table_disk_space.sql"
+    dest: "/tmp/table_disk_space.sql"
+    owner: meza-ansible
+    group: meza-ansible
+    mode: u+r,g+r,o+r
+  run_once: true
+  when: not disk_space_exists
+
+
 - name: "Create table disk_space if not exists"
   mysql_db:
     name: "{{ meza_server_log_db }}"
     state: import
-    target: "/opt/meza/src/roles/meza-log/files/table_disk_space.sql"
+    target: "/tmp/table_disk_space.sql"
   run_once: true
   when: not disk_space_exists
 
@@ -64,4 +85,3 @@
   with_items:
     - server-performance.sh
     - disk-space-usage.sh
-

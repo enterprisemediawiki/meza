@@ -54,6 +54,11 @@ defaults
 	option forwardfor
 	option http-server-close
 
+
+
+
+{% if load_balancer_handle_external %}
+
 frontend www-http
 	bind *:80
 	reqadd X-Forwarded-Proto:\ http
@@ -83,6 +88,22 @@ backend www-backend
 	# Note: slight modification for HAProxy 1.6+
 	http-response set-header Strict-Transport-Security max-age=16000000;\ includeSubDomains;\ preload;
 
+    # @FIXME loop w/ index and tie all
+	# app servers together with controller as registry 
+	{% if m_install_netdata %}
+	frontend netdata
+		bind *:20000 ssl crt {{ ssl_certificate_file }}
+		mode http
+		default_backend netdata-back
+	backend netdata-back
+		server nd1 127.0.0.1:19999
+	{% endif %}
+
+{% endif %}
+
+
+
+
 {% if m_setup_php_profiling %}
 listen php-profiling
 	bind *:8088
@@ -90,6 +111,11 @@ listen php-profiling
 		server profiling{{ loop.index }} {{ host }}:8089 check
 	{% endfor %}
 {% endif %}
+
+
+
+
+{% if load_balancer_handle_internal %}
 
 listen parsoid-internal
 	bind *:8001
@@ -108,6 +134,10 @@ listen mediawiki-internal
 		{%- endif %}
 
 	{% endfor %}
+
+{% endif %}
+
+
 
 {% if enable_haproxy_stats %}
 listen stats

@@ -1,10 +1,5 @@
 ---
 - name: Install base-extras packages
-  yum: name={{item}} state=installed
-  with_items:
-    - expect
-    - expectk
-    - perl
-    - wget
-    - gcc
-    - cifs-utils
+  package:
+    name: "{{ package_base_extras }}"
+    state: present

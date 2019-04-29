@@ -14,8 +14,16 @@ fi
 # clones and checkouts.
 umask 002
 
+
+if [ -f "/etc/redhat-release" ]; then
+	distro_major="redhat"
+else
+	distro_major="debian"
+fi
+
+
 # Install epel if not installed
-if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
+if [ $distro_major = "redhat" ] && [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 
 	distro=$(cat /etc/redhat-release | grep -q "CentOS" && echo "CentOS" || echo "RedHat")
 
@@ -29,7 +37,41 @@ if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 
 fi
 
-yum install -y git ansible libselinux-python
+if [ $distro_major = "redhat" ]; then
+	yum install -y git ansible libselinux-python
+else
+
+	if grep -q 'wheel' '/etc/group'; then
+		echo "group 'wheel' exists"
+	else
+		echo "group 'wheel' does not exist. creating."
+		groupadd wheel
+
+		# FIXME: any reason to add this:
+		# https://wiki.debian.org/WHEEL/PAM
+	fi
+
+	# apt-get install -y dirmngr
+	# echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" >> /etc/apt/sources.list
+
+	# apt-get install -y software-properties-common
+	# apt-add-repository -y ppa:ansible/ansible
+	# apt-get -y update
+	# apt-get install -y ansible
+	# apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+	# apt-get update
+
+	apt-get install -y git python-yaml
+
+	# Ansible in Debian package is 2.2
+	# apt-get install -y ansible
+
+	apt-get install -y python-setuptools
+	easy_install pip
+	pip install ansible
+	# source ~/.bashrc
+
+fi
 
 # if /opt/meza doesn't exist, clone into and use master branch (which is the
 # default, but should we make this configurable?)

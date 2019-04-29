@@ -1,0 +1,27 @@
+# Do deploys for environment "{{ env }}"
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+{% if force_deploy is defined and force_deploy.crontime is defined %}
+#
+# Force deploy
+# FIXME: At present this extracts environment from /opt/.deploy-meza/config.sh.
+#        This works fine if the controller is used for only one environment, but
+#        will get confused if multiple environments are used. Environment should
+#        be explicitly passed into this script.
+#
+{{ force_deploy.crontime }} root {{ m_deploy }}/autodeployer/do-deploy.sh "{{ _force_deploy_notify_prefix }}" "{{ _force_deploy_options }}" "deploy-"
+{% endif %}
+
+
+{% if autodeployer is defined and autodeployer.crontime is defined %}
+#
+# Auto-deploy on config and Meza changes
+# FIXME: At present this extracts environment from /opt/.deploy-meza/config.sh.
+#        This works fine if the controller is used for only one environment, but
+#        will get confused if multiple environments are used. Environment should
+#        be explicitly passed into this script.
+#
+{{ autodeployer.crontime }} root {{ m_deploy }}/autodeployer/check-for-changes.sh > {{ m_logs }}/deploy/check-for-changes.log 2>&1
+{% endif %}

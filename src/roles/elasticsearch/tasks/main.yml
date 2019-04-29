@@ -6,10 +6,13 @@
   yum:
     name: java-1.7.0-openjdk
     state: absent
+  # Java 1.7 was only used when Meza only supported RedHat
+  when: ansible_os_family == 'RedHat'
+
 - name: Ensure Java 1.8.0 OpenJDK is installed
   yum:
-    name: java-1.8.0-openjdk
-    state: installed
+    name: "{{ package_java }}"
+    state: present
 
 
 # Environment setup.
@@ -24,15 +27,37 @@
   rpm_key:
     key: https://packages.elastic.co/GPG-KEY-elasticsearch
     state: present
+  when: ansible_os_family == 'RedHat'
 - name: Add Elasticsearch repository.
   template:
     src: elasticsearch5.repo.j2
     dest: /etc/yum.repos.d/elasticsearch.repo
     mode: 0644
-- name: Install Elasticsearch.
-  yum:
+  when: ansible_os_family == 'RedHat'
+
+
+- name: HTTPS APT transport for Elasticsearch repository.
+  apt:
+    name: apt-transport-https
+    state: present
+  when: ansible_os_family == 'Debian'
+- name: Add Elasticsearch apt key.
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+  when: ansible_os_family == 'Debian'
+- name: Add Elasticsearch repository.
+  apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/{{ elasticsearch_major_version }}/apt stable main'
+    state: present
+    update_cache: true
+  when: ansible_os_family == 'Debian'
+
+
+- name: Ensure elasticsearch installed
+  package:
     name: elasticsearch
-    state: installed
+    state: present
 
 # Need to perform this check so `lineinfile` doesn't run in Docker. /etc/hosts
 # is special in Docker.
@@ -78,6 +103,10 @@
     group: elasticsearch
     mode: 0750
   notify: restart elasticsearch
+
+# Consider adding this, ref geerlinguy
+# - name: Force a restart if configuration has changed.
+#   meta: flush_handlers
 
 - name: Start Elasticsearch.
   service:

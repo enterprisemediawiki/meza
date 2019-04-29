@@ -33,7 +33,7 @@
   delegate_to: "{{ sql_backup_server }}"
   run_once: true
   remote_user: "{{ db_backup_server_remote_user }}"
-  ignore_errors: yes
+  failed_when: False
   when: backup_dir_exists and (not wiki_exists or intend_overwrite_from_backup)
 
 - name: "{{ wiki_id }} - Set fact if SQL file DOES exist"

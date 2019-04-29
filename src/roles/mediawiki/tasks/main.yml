@@ -39,7 +39,7 @@
     owner: meza-ansible
     group: wheel
     mode: "{{ item.mode }}"
-  ignore_errors: True
+  failed_when: False
   with_items:
   - name: known_hosts
     mode: "0600"
@@ -57,7 +57,7 @@
     block: |
       [diff]
           ignoreSubmodules = all
-  ignore_errors: True
+  failed_when: False
   tags:
     - mediawiki-core
 - name: Ensure MediaWiki core owned by meza-ansible
@@ -201,7 +201,7 @@
     working_dir: "{{ m_mediawiki }}"
     no_dev: no
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
-  # ignore_errors: yes
+  # failed_when: False
   tags:
     - composer-extensions
     - latest
@@ -216,7 +216,7 @@
     working_dir: "{{ m_mediawiki }}"
     no_dev: no
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
-  # ignore_errors: yes
+  # failed_when: False
   tags:
     - composer-extensions
     - latest
@@ -277,7 +277,7 @@
   template:
     src: LocalSettings.php.j2
     dest: "{{ m_mediawiki }}/LocalSettings.php"
-    backup: yes
+    # backup: yes
     owner: meza-ansible
     group: wheel
 
@@ -499,7 +499,7 @@
 # Ref: https://www.scalingphpbook.com/blog/2014/02/14/best-zend-opcache-settings.html
 - name: Reload (not restart) httpd to pick up changes to opcached php files
   service:
-    name: httpd
+    name: "{{ service_apache }}"
     state: reloaded
   tags:
     - httpd-reload
@@ -510,10 +510,12 @@
 # MediaWiki 1.31+.
 - name: Ensure Python3 present
   yum:
-    name: python35u
+    name:
+      - "{{ package_python3 }}"
+      - "{{ package_python3_pip }}"
     state: latest
   tags:
-  - latest
+    - latest
 
 - name: "Ensure python3 symlink in place"
   file:
@@ -524,3 +526,16 @@
     owner: root
     group: root
     mode: 0755
+  when: ansible_os_family == 'RedHat'
+
+- name: "Ensure pip3 symlink in place"
+  file:
+    # dest = symlink, src = dir linked to
+    src: "/usr/bin/pip3.5"
+    dest: "/usr/bin/pip3"
+    state: link
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_os_family == 'RedHat'
+

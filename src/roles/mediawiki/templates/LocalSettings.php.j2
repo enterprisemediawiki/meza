@@ -190,7 +190,7 @@ if ( $debug ) {
 	ini_set( 'log_errors', 1 );
 
 	// Output errors to log file
-	ini_set( 'error_log', "$m_meza_data/logs/php.log" );
+	ini_set( 'error_log', "$m_meza_data/logs/php/php_errors.log" );
 
 
 	// Displays debug data at the bottom of the content area in a formatted
@@ -434,13 +434,23 @@ $wgSquidServersNoPurge = array(
 	'{{ server }}',
 	{%- endif -%}
 	{%- endfor %}
-	{% if 'load-balancers-unmanaged' in groups and groups['load-balancers-unmanaged']|length|int > 0 %}
+
+	{% if 'load-balancers-nonmeza' in groups and groups['load-balancers-nonmeza']|length|int > 0 %}
 	# unmanaged load-balancers, e.g. load balancers not maintained by meza,
 	# such as AWS or Digital Ocean
-	{% for server in groups['load-balancers-unmanaged'] -%}
+	{% for server in groups['load-balancers-nonmeza'] -%}
 	'{{ server }}',
 	{%- endfor %}
 	{% endif %}
+
+	{% if 'load-balancers-nonmeza-external' in groups and groups['load-balancers-nonmeza-external']|length|int > 0 %}
+	# unmanaged load-balancers, e.g. load balancers not maintained by meza,
+	# such as AWS or Digital Ocean
+	{% for server in groups['load-balancers-nonmeza-external'] -%}
+	'{{ server }}',
+	{%- endfor %}
+	{% endif %}
+
 );
 
 // memcached settings
@@ -474,8 +484,14 @@ $wgSessionCacheType = CACHE_MEMCACHED;
 ## is writable, then set this to true:
 $wgEnableUploads = true;
 $wgMaxUploadSize = 1024*1024*100; // 100 MB
+
 $wgUseImageMagick = true;
-$wgImageMagickConvertCommand = "/usr/bin/convert";
+{% if ansible_os_family == "RedHat" %}
+$wgImageMagickConvertCommand = '/usr/local/bin/convert';
+{% else %}
+$wgImageMagickConvertCommand = 'convert';
+{% endif %}
+
 
 # InstantCommons allows wiki to use images from http://commons.wikimedia.org
 $wgUseInstantCommons = false;
@@ -490,11 +506,6 @@ $wgShellLocale = "en_US.utf8";
 ## images/temp, and make them all writable. Then uncomment
 ## this, if it's not already uncommented:
 $wgHashedUploadDirectory = true;
-
-## Set $wgCacheDirectory to a writable directory on the web server
-## to make your wiki go slightly faster. The directory should not
-## be publically accessible from the web.
-#$wgCacheDirectory = "$IP/cache";
 
 # Site language code, should be one of the list in ./languages/Names.php
 $wgLanguageCode = "en";
@@ -600,9 +611,6 @@ $wgMaxImageArea = 1.25e10; // Images on [[Snorkel]] fail without this
 // ini_set( 'pcre.backtrack_limit', 10000000 ); //10million
 ini_set( 'pcre.backtrack_limit', 1000000000 ); //1 billion
 
-
-$wgUseImageMagick = true;
-$wgImageMagickConvertCommand = '/usr/local/bin/convert';
 
 // Allowed file types
 $wgFileExtensions = array(
@@ -843,8 +851,8 @@ $wgVirtualRestConfig['modules']['parsoid'] = array(
 
 {% elif 'load-balancers' not in groups or groups['load-balancers']|length|int == 0 %}
 
-	'url' => 'http://{{ groups["load-balancers-unmanaged"][0] }}:{{ load_balancer_unmanaged_parsoid_port }}',
-	//'HTTPProxy' => 'http://{{ groups["load-balancers-unmanaged"][0] }}:{{ load_balancer_unmanaged_parsoid_port }}',
+	'url' => 'http://{{ groups["load-balancers-nonmeza"][0] }}:{{ load_balancer_unmanaged_parsoid_port }}',
+	//'HTTPProxy' => 'http://{{ groups["load-balancers-nonmeza"][0] }}:{{ load_balancer_unmanaged_parsoid_port }}',
 
 {% else %}
 
@@ -869,13 +877,13 @@ $wgVirtualRestConfig['modules']['parsoid'] = array(
 // Define which namespaces will use VE
 // Per the docs, https://www.mediawiki.org/wiki/Extension:VisualEditor#Changing_active_namespaces
 // This is done a little differently in VE than in core or other extensions.
-// For VE, we use an array, keyed by the (string) canonical name of the namespace 
+// For VE, we use an array, keyed by the (string) canonical name of the namespace
 // and a (boolean) value for enabled or not
 
 // $wgContentNamespaces gets added automatically.
 
-// finally, it should be mentioned that the Extension Registry is what provides for the 
-// merge strategy 
+// finally, it should be mentioned that the Extension Registry is what provides for the
+// merge strategy
 
 $wgVisualEditorAvailableNamespaces = [
     "User" => true,
@@ -885,8 +893,8 @@ $wgVisualEditorAvailableNamespaces = [
 ];
 
 // quickly add a namespace, without figuring out what the merge strategy is
-// $wgVisualEditorAvailableNamespaces[] = NS_CUSTOM; 
-// $wgVisualEditorAvailableNamespaces[] = NS_PROJECT; 
+// $wgVisualEditorAvailableNamespaces[] = NS_CUSTOM;
+// $wgVisualEditorAvailableNamespaces[] = NS_PROJECT;
 
 
 

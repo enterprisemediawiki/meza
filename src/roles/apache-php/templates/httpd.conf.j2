@@ -28,7 +28,7 @@
 # same ServerRoot for multiple httpd daemons, you will need to change at
 # least PidFile.
 #
-ServerRoot "/etc/httpd"
+ServerRoot "{{ path_apache_server_root }}"
 
 #
 # Mutex: Allows you to set the mutex mechanism and mutex file directory
@@ -40,6 +40,8 @@ ServerRoot "/etc/httpd"
 #
 # Mutex default:logs
 
+
+{% if ansible_os_family == 'RedHat' %}
 
 #
 # Dynamic Shared Object (DSO) Support
@@ -55,6 +57,24 @@ ServerRoot "/etc/httpd"
 #
 Include conf.modules.d/*.conf
 
+{% else %}
+
+# Include module configuration:
+IncludeOptional mods-enabled/*.load
+IncludeOptional mods-enabled/*.conf
+
+# Include list of ports to listen on...Meza handles this below
+# Include ports.conf
+
+# Include generic snippets of statements
+# IncludeOptional conf-enabled/*.conf
+
+# Include the virtual host configurations:
+# IncludeOptional sites-enabled/*.conf
+
+{% endif %}
+
+
 <IfModule unixd_module>
 #
 # If you wish httpd to run as a different user or group, you must run
@@ -64,8 +84,8 @@ Include conf.modules.d/*.conf
 # It is usually good practice to create a dedicated user and group for
 # running httpd, as with most system services.
 #
-User apache
-Group apache
+User {{ user_apache }}
+Group {{ group_apache }}
 
 </IfModule>
 
@@ -86,7 +106,7 @@ Group apache
 # e-mailed.  This address appears on some server-generated pages, such
 # as error documents.  e.g. admin@your-domain.com
 #
-ServerAdmin you@example.com
+ServerAdmin {{ m_httpd_server_admin }}
 
 #
 # ServerName gives the name and port that the server uses to identify itself.
@@ -177,7 +197,11 @@ ServerName https://{{ wiki_app_fqdn }}
 # logged here.  If you *do* define an error logfile for a <VirtualHost>
 # container, that host's errors will be logged there and not here.
 #
+{% if ansible_os_family == "RedHat" %}
 ErrorLog "logs/error_log"
+{% else %}
+ErrorLog ${APACHE_LOG_DIR}/error.log
+{% endif %}
 
 #
 # LogLevel: Control the number of messages logged to the error_log.
@@ -216,8 +240,13 @@ LogLevel warn
 	LogFormat             "noproxy %h %l %u %t %D \"%r\" %>s \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combined
 
 	SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded
+	{% if ansible_os_family == "RedHat" %}
 	CustomLog "logs/access_log" combined env=!forwarded
 	CustomLog "logs/access_log" proxy env=forwarded
+	{% else %}
+	CustomLog "${APACHE_LOG_DIR}/access_log" combined env=!forwarded
+	CustomLog "${APACHE_LOG_DIR}/access_log" proxy env=forwarded
+	{% endif %}
 
 </IfModule>
 
@@ -479,6 +508,9 @@ Listen 8090
 	</FilesMatch>
 </IfModule>
 
+
+
+
 # Don't allow access to images directories. Will allow access via img_auth.php
 # FIXME #805: No images are here anymore anyway. We actually have no method of NOT
 #             using img_auth.php now. Remove me.
@@ -486,3 +518,5 @@ Listen 8090
 	Order Allow,Deny
 	Deny From All
 </DirectoryMatch>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet

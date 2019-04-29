@@ -50,7 +50,7 @@ ${docker_exec_1[@]} sed -r -i "s/INSERT_FQDN/$docker_ip_1/g;" "$secret_yml"
 # ${docker_exec_1[@]} bash -c "echo -e '[backup-src]\n$docker_ip_2 alt_remote_user=test-user\n' >> $hosts_file"
 ${docker_exec_1[@]} bash -c "echo -e '\n[exclude-all]\n$docker_ip_2\n' >> $hosts_file"
 
-# Note: secret.yml is __not__ encrypted yet at this point in the test
+# Note: secret.yml is __not__ encrypted
 ${docker_exec_1[@]} bash -c "echo -e '\n' >> $secret_yml"
 ${docker_exec_1[@]} bash -c "echo -e 'backups_server_alt_source:\n' >> $secret_yml"
 ${docker_exec_1[@]} bash -c "echo -e '  addr: $docker_ip_2\n' >> $secret_yml"
@@ -82,8 +82,9 @@ ${docker_exec_1[@]} sudo -u meza-ansible ansible-playbook \
 # `meza backup`
 ${docker_exec_1[@]} bash /opt/meza/tests/deploys/import-from-remote.controller.sh "$env_name"
 
-# secret.yml is encrypted. decrypt first, make edits, re-encrypt.
-${docker_exec_1[@]} bash -c "ansible-vault decrypt $secret_yml --vault-password-file $vault_pass"
+# secret.yml is no longer engrypted by default. If it was: decrypt first, make
+# edits, re-encrypt.
+# ${docker_exec_1[@]} bash -c "ansible-vault decrypt $secret_yml --vault-password-file $vault_pass"
 
 ${docker_exec_1[@]} bash -c "echo -e '\n' >> $secret_yml"
 ${docker_exec_1[@]} bash -c "echo -e 'backups_server_db_dump:\n' >> $secret_yml"
@@ -92,6 +93,9 @@ ${docker_exec_1[@]} bash -c "echo -e '  remote_user: test-user\n' >> $secret_yml
 ${docker_exec_1[@]} bash -c "echo -e '  mysql_user: root\n' >> $secret_yml"
 ${docker_exec_1[@]} bash -c "echo -e '  mysql_pass: 1234\n' >> $secret_yml"
 ${docker_exec_1[@]} bash -c "echo -e '\n' >> $secret_yml"
+
+# While secret.yml is no longer encrypted by default, it can still handle being
+# encrypted. Encrypt here to test that.
 ${docker_exec_1[@]} bash -c "ansible-vault encrypt $secret_yml --vault-password-file $vault_pass"
 
 # Add database source (e.g. pull direct from database) to inventory, make some

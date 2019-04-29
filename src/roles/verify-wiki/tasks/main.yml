@@ -60,8 +60,8 @@
   file:
     path: "{{ m_htdocs }}/wikis/{{ wiki_id }}"
     state: directory
-    owner: apache
-    group: apache
+    owner: "{{ user_apache }}"
+    group: "{{ group_apache }}"
     mode: 0755
 - name: "{{ wiki_id }} - Ensure wiki config symlink in place"
   file:
@@ -69,8 +69,8 @@
     src: "{{ m_deploy }}/public/wikis/{{ wiki_id }}"
     dest: "{{ m_htdocs }}/wikis/{{ wiki_id }}/config"
     state: link
-    owner: apache
-    group: apache
+    owner: "{{ user_apache }}"
+    group: "{{ group_apache }}"
     mode: 0755
 
 
@@ -93,7 +93,7 @@
   shell: 'mysqlshow "wiki_{{ wiki_id }}" | grep -v Wildcard | grep -o wiki_{{ wiki_id }}'
   register: wiki_exists_check
   delegate_to: "{{ groups['db-master'][0] }}"
-  ignore_errors: yes
+  failed_when: False
   run_once: true
 
 - name: "{{ wiki_id }} - Set fact if database wiki_{{ wiki_id }} DOES exist"

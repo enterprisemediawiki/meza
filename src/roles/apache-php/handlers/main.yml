@@ -1,4 +1,6 @@
 ---
 - name: restart apache
-  service: name=httpd state=restarted
+  service:
+    name: "{{ service_apache }}"
+    state: restarted
   when: docker_skip_tasks is not defined or not docker_skip_tasks

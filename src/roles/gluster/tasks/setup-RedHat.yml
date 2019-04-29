@@ -10,17 +10,15 @@
 
 - name: Ensure CentOS prerequisites in place
   yum:
-    name: "{{ item }}"
+    name:
+      - "centos-release-gluster{{ glusterfs_default_release }}"
     state: present
-  with_items:
-    - "centos-release-gluster{{ glusterfs_default_release }}"
   when: ansible_distribution == "CentOS"
 
 
 - name: Install Packages
   yum:
-    name: "{{ item }}"
+    name:
+      - glusterfs-server
+      - glusterfs-client
     state: present
-  with_items:
-    - glusterfs-server
-    - glusterfs-client

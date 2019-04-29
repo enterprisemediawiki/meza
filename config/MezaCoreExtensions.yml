@@ -50,6 +50,18 @@ list:
   - name: SemanticCompoundQueries
     composer: "mediawiki/semantic-compound-queries"
     version: "1.2.0"
+  - name: Scribunto
+    repo: https://github.com/wikimedia/mediawiki-extensions-Scribunto.git
+    version: "{{ mediawiki_default_branch }}"
+    config: |
+      $wgScribuntoDefaultEngine = 'luasandbox';
+      $wgScribuntoUseGeSHi = true;
+      $wgScribuntoUseCodeEditor = true;
+  - name: "Semantic Scribunto"
+    composer: "mediawiki/semantic-scribunto"
+    version: 2.0.0
+    config: |
+      wfLoadExtension( 'SemanticScribunto' );
   - name: SubPageList
     composer: "mediawiki/sub-page-list"
     version: "1.5.0"
@@ -113,6 +125,9 @@ list:
     repo: https://github.com/wikimedia/mediawiki-extensions-SyntaxHighlight_GeSHi.git
     version: "{{ mediawiki_default_branch }}"
     composer_merge: True
+  - name: CodeEditor
+    repo: https://github.com/wikimedia/mediawiki-extensions-CodeEditor.git
+    version: "{{ mediawiki_default_branch }}"
   - name: InputBox
     repo: https://github.com/wikimedia/mediawiki-extensions-InputBox.git
     version: "{{ mediawiki_default_branch }}"
@@ -149,7 +164,7 @@ list:
     git_submodules: True
     config: |
       // Parsoid servers are defined based upon Ansible hosts file and thus
-      // cannot be easily added to base-extensions.yml. As such, VisualEditor config
+      // cannot be easily added to MezaCoreExtensions.yml. As such, VisualEditor config
       // is included directly in LocalSettings.php.j2 (mostly)
 
       // Show visual diff on regular diff pages
@@ -167,6 +182,9 @@ list:
     version: "{{ mediawiki_default_branch }}"
     config: |
       $wgThanksConfirmationRequired = false;
+  - name: RevisionSlider
+    repo: https://github.com/wikimedia/mediawiki-extensions-RevisionSlider.git
+    version: "{{ mediawiki_default_branch }}"
   - name: CollapsibleVector
     repo: https://github.com/wikimedia/mediawiki-extensions-CollapsibleVector
     version: "{{ mediawiki_default_branch }}"
@@ -242,7 +260,7 @@ list:
   - name: ApprovedRevs
     repo: https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git
     # Use this commit until a release tag for v1.0 is created
-    version: 251cf4db3ab99366fa281ea535e725672fa2b6c3
+    version: tags/1.0
     config: |
       $egApprovedRevsAutomaticApprovals = false;
   - name: ImagesLoaded
@@ -253,7 +271,7 @@ list:
     version: tags/0.3.0
   - name: WatchAnalytics
     repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
-    version: tags/2.0.1
+    version: tags/3.1.1
     config: |
       $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
   - name: Variables
@@ -294,7 +312,7 @@ list:
     legacy_load: true
     config: |
       // CirrusSearch cluster(s) are defined based upon Ansible hosts file and thus
-      // cannot be easily added to base-extensions.yml. As such, CirrusSearch config
+      // cannot be easily added to MezaCoreExtensions.yml. As such, CirrusSearch config
       // is included directly in LocalSettings.php.j2
   - name: Echo
     repo: https://github.com/wikimedia/mediawiki-extensions-Echo.git
