@@ -90,7 +90,7 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 				return true;
 			}
 
-			function IPv4matchesCIDR( $ip, $cidr) {
+			$IPv4matchesCIDR = function( $ip, $cidr) {
 				$arr = explode( '/', $cidr );
 				if ( count($arr) === 1 ) {
 					$subnet = $arr[0];
@@ -105,9 +105,9 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 				$subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
 
 				return ( $ip & $mask ) == $subnet;
-			}
+			};
 
-			function IPv6matchesCIDR( $ip, $cidr) {
+			$IPv6matchesCIDR = function( $ip, $cidr) {
 			  $inet = inet_pton( $ip );
 
 			  // converts inet_pton output to string with bits
@@ -135,7 +135,7 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 			  $net_bits = substr( $binarynet, 0, $bits );
 
 			  return $ip_net_bits === $net_bits;
-			}
+			};
 
 			$addressesToCheck = $wgMezaAllowSkipSamlUsers[$username];
 
@@ -144,7 +144,7 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 			foreach( $addressesToCheck as $check ) {
 				if (
 					filter_var( $ipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) &&
-					IPv4matchesCIDR( $ipaddr, $check )
+					$IPv4matchesCIDR( $ipaddr, $check )
 				) {
 					return true;
 				}
@@ -152,7 +152,7 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 				elseif (
 					defined( 'AF_INET6' ) &&
 					filter_var( $ipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) &&
-					IPv6matchesCIDR( $ipaddr, $check )
+					$IPv6matchesCIDR( $ipaddr, $check )
 				) {
 					return true;
 				}
