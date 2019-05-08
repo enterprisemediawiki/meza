@@ -2,18 +2,28 @@
 - name: Ensure ghostscript installed
   package:
     name: ghostscript
-    state: present
+    state: latest
 
-- name: Install Imagemagick from meza repo (RedHat/CentOS only)
+- name: Ensure old ImageMagick NOT installed from Meza RPM (RedHat/CentOS only)
   yum:
-    name: https://raw.github.com/enterprisemediawiki/meza-packages/master/RPMs/imagemagick_7.0.3_x86_64.rpm
+    name: imagemagick-7.0.3-1.x86_64
+    state: absent
   when: ansible_os_family == 'RedHat'
 
-# FIXME: Is this okay? I think this installs an older version...
+- name: Ensure ImageMagick at latest version (RedHat/CentOS only)
+  yum:
+    name:
+      - ImageMagick
+      - ImageMagick-devel
+    state: latest
+  tags:
+    - latest
+  when: ansible_os_family == 'RedHat'
+
 - name: Ensure Imagemagick installed (Debian only)
   apt:
     name: imagemagick
-    state: present
+    state: latest
   when: ansible_os_family == 'Debian'
 
 - name: Copy xpdf bin64 files to /usr/local/bin
