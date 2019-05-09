@@ -14,6 +14,28 @@ else
   configuration = YAML::load(File.read("#{File.dirname(__FILE__)}/vagrantconf.default.yml"))
 end
 
+# Source:
+# https://stackoverflow.com/questions/26811089/vagrant-how-to-have-host-platform-specific-provisioning-steps
+module OS
+    def OS.windows?
+        (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+    end
+
+    def OS.mac?
+        (/darwin/ =~ RUBY_PLATFORM) != nil
+    end
+
+    def OS.unix?
+        !OS.windows?
+    end
+
+    # Not ideal. BSD is Unix but is not Mac, but would return true for Linux.
+    def OS.linux?
+        OS.unix? and not OS.mac?
+    end
+end
+
+
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
@@ -145,7 +167,13 @@ Vagrant.configure("2") do |config|
 
     # Disable default synced folder at /vagrant, instead put at /opt/meza
     app1.vm.synced_folder ".", "/vagrant", disabled: true
-    app1.vm.synced_folder ".", "/opt/meza", type: "virtualbox", owner: "vagrant", group: "vagrant", mount_options: ["dmode=755,fmode=755"]
+
+    if OS.windows?
+      # puts "Vagrant host: Windows"
+      app1.vm.synced_folder ".", "/opt/meza", type: "virtualbox", owner: "vagrant", group: "vagrant", mount_options: ["dmode=755,fmode=755"]
+    else
+      app1.vm.synced_folder ".", "/opt/meza", type: "virtualbox", owner: "vagrant", group: "vagrant"
+    end
 
     # app1.vm.synced_folder ".", "/opt/meza", type: "smb"
     # app1.vm.synced_folder ".", "/opt/meza", type: "rsync",
