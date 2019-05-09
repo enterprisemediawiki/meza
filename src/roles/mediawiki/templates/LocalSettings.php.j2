@@ -486,12 +486,11 @@ $wgEnableUploads = true;
 $wgMaxUploadSize = 1024*1024*100; // 100 MB
 
 $wgUseImageMagick = true;
-{% if ansible_os_family == "RedHat" %}
-$wgImageMagickConvertCommand = '/usr/local/bin/convert';
-{% else %}
-$wgImageMagickConvertCommand = 'convert';
-{% endif %}
 
+// This used to have to be specified as /usr/local/bin/convert on RedHat due to
+// not using the base package. Since Meza on RedHat now uses the base package it
+// is okay to just use 'convert'.
+$wgImageMagickConvertCommand = 'convert';
 
 # InstantCommons allows wiki to use images from http://commons.wikimedia.org
 $wgUseInstantCommons = false;
