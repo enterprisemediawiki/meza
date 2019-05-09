@@ -39,9 +39,11 @@ fi
 
 # Make sure /opt/meza permissions are good in case git-cloned earlier
 #  - Ensure users can read everything
-#  - Ensure users can also execute directories
+#  - Removed "Ensure users can also execute directories"
+#      Rationale for removal: execute bit is tracked by Git. This wasn't noticed
+#      until now due to primarily developing on Windows+Vagrant where permissions
+#      are not handled the same way.
 chmod a+r /opt/meza -R
-find /opt/meza -type d -exec chmod 755 {} +
 
 if [ ! -f "/usr/bin/meza" ]; then
 	ln -s "/opt/meza/src/scripts/meza.py" "/usr/bin/meza"
