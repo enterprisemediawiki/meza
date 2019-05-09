@@ -145,7 +145,7 @@ Vagrant.configure("2") do |config|
 
     # Disable default synced folder at /vagrant, instead put at /opt/meza
     app1.vm.synced_folder ".", "/vagrant", disabled: true
-    app1.vm.synced_folder ".", "/opt/meza", type: "virtualbox", owner: "vagrant", group: "vagrant", mount_options: ["dmode=755,fmode=755"]
+    app1.vm.synced_folder ".", "/opt/meza", type: "virtualbox", owner: "vagrant", group: "vagrant", mount_options: ["dmode=755,fmode=644"]
 
     # app1.vm.synced_folder ".", "/opt/meza", type: "smb"
     # app1.vm.synced_folder ".", "/opt/meza", type: "rsync",
