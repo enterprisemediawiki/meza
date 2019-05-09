@@ -3,7 +3,7 @@
 # cd /opt/meza/ansible
 # sudo -u meza-ansible ansible-playbook site.yml
 
-# FIXME #729: Move this into a role
+# Move this into a role
 - hosts: localhost
   become: yes
   vars:
@@ -70,7 +70,7 @@
       group: wheel
       mode: "0600"
 
-# FIXME 800: Run against localhost
+#  Run against localhost
 - hosts: app-servers
   become: yes
   roles:
@@ -219,7 +219,7 @@
       firewalld_zone: "{{m_private_networking_zone|default('public')}}"
       when: "groups['app-servers']|length|int > 1"
 
-    # FIXME #801: Some docs said ports 38465, 38466, 38467 needed for Gluster
+    #  Some docs said ports 38465, 38466, 38467 needed for Gluster
 
     - role: gluster
       when: "groups['app-servers']|length|int > 1"
@@ -254,7 +254,7 @@
       # Get the one and only server that should be in the db-master group and set
       # it's IP address as replication master IP. Note that this can be left blank
       # or not included at all if no replication should be performed.
-      # FIXME #802: Should replication master be set only if slaves exist?
+      # 
       mysql_replication_master: "{{ groups['db-master'][0] }}"
       mysql_replication_role: master
 
