@@ -129,12 +129,16 @@ if (( $(grep -c . <<<"$hostonlyadapter") > 1 )); then
 	echo "You have multiple Host-Only adapters. Their info is above. Choose which to use below."
 	echo
 
+	OLD_IFS=$IFS
+	IFS=$'\n'
 	select adapter in $hostonlyadapter;
 	do
 		echo "You chose: $adapter"
 		hostonlyadapter=$adapter
 		break
 	done
+	IFS=${OLD_IFS}
+
 
 #
 # If Host-Only adapter is blank, create one
