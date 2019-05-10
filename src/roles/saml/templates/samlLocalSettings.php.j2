@@ -91,20 +91,23 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 			}
 
 			$IPv4matchesCIDR = function( $ip, $cidr) {
-				list ( $subnet, $bits ) = explode( '/', $cidr );
-
-				// Allows passing in CIDR or maskless IP
-				if ( $bits === null ) {
-					$bits = 32;
+				$arr = explode( '/', $cidr );
+				if ( count($arr) === 1 ) {
+					$subnet = $arr[0];
+					$bits = 32; // Allows passing in CIDR or maskless IP
+				}
+				else {
+					list ( $subnet, $bits) = $arr;
 				}
 				$ip = ip2long( $ip );
 				$subnet = ip2long( $subnet );
 				$mask = -1 << (32 - $bits);
 				$subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
+
 				return ( $ip & $mask ) == $subnet;
 			};
 
-			$IPv6matchesCIDR = function ( $ip, $cidr) {
+			$IPv6matchesCIDR = function( $ip, $cidr) {
 				$inet = inet_pton( $ip );
 
 				// converts inet_pton output to string with bits
@@ -112,12 +115,16 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 				$unpacked = str_split( $unpacked[1] );
 				$binaryip = '';
 				foreach ( $unpacked as $char ) {
-						$binaryip .= str_pad( decbin( ord( $char ) ), 8, '0', STR_PAD_LEFT );
+					$binaryip .= str_pad( decbin( ord( $char ) ), 8, '0', STR_PAD_LEFT );
 				}
 
-				list( $subnet, $bits ) = explode( '/', $cidr );
-				if ( $bits === null) {
-					$bits = 128;
+				$arr = explode( '/', $cidr );
+				if ( count($arr) === 1 ) {
+				$subnet = $arr[0];
+				$bits = 128; // Allows passing in CIDR or maskless IP
+				}
+				else {
+					list ( $subnet, $bits ) = $arr;
 				}
 
 				// Convert subnet to binary string
