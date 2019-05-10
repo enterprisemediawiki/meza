@@ -17,7 +17,7 @@
     src: meza-ansible.crontab.j2
     dest: "{{ m_home }}/meza-ansible/.ansible-cronfile"
     owner: meza-ansible
-    group: wheel
+    group: "{{ group_wheel }}"
     mode: 0755
 
 - name: Ensure runAllJobs.php in place
@@ -25,7 +25,7 @@
     src: runAllJobs.php.j2
     dest: /opt/.deploy-meza/runAllJobs.php
     owner: meza-ansible
-    group: wheel
+    group: "{{ group_wheel }}"
     mode: 0755
 
 # Make sure sudo can be used in cron jobs

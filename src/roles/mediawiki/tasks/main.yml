@@ -15,7 +15,7 @@
   file:
     path: "{{ m_home }}/meza-ansible/.ssh"
     owner: meza-ansible
-    group: wheel
+    group: "{{ group_wheel }}"
     mode: 0700
     state: directory
 
@@ -24,7 +24,7 @@
     src: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
     dest: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
     owner: meza-ansible
-    group: wheel
+    group: "{{ group_wheel }}"
     mode: "{{ item.mode }}"
   with_items:
   - name: id_rsa
@@ -37,7 +37,7 @@
     src: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
     dest: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
     owner: meza-ansible
-    group: wheel
+    group: "{{ group_wheel }}"
     mode: "{{ item.mode }}"
   failed_when: False
   with_items:
@@ -64,7 +64,7 @@
   file:
     path: "{{ m_mediawiki }}"
     owner: meza-ansible
-    group: wheel
+    group: "{{ group_wheel }}"
     state: directory
     recurse: yes
   tags:
@@ -182,7 +182,7 @@
     src: Extensions.php.j2
     dest: "{{ m_deploy }}/Extensions.php"
     owner: meza-ansible
-    group: wheel
+    group: "{{ group_wheel }}"
 
 # Adds extensions with composer param from MezaCoreExtensions.yml,
 # MezaLocalExtensions.yml, MezaCoreSkins.yml, and MezaLocalSkins.yml
@@ -191,7 +191,7 @@
     src: composer.local.json.j2
     dest: "{{ m_mediawiki }}/composer.local.json"
     owner: meza-ansible
-    group: wheel
+    group: "{{ group_wheel }}"
 
 - name: Run composer install on MediaWiki for dependencies
   become: yes
@@ -279,7 +279,7 @@
     dest: "{{ m_mediawiki }}/LocalSettings.php"
     # backup: yes
     owner: meza-ansible
-    group: wheel
+    group: "{{ group_wheel }}"
 
 
 
@@ -413,7 +413,7 @@
     src: "{{ item }}.j2"
     dest: "/opt/.deploy-meza/{{ item }}"
     owner: meza-ansible
-    group: wheel
+    group: "{{ group_wheel }}"
     mode: 0755
   with_items:
     - elastic-build-index.sh
@@ -538,4 +538,3 @@
     group: root
     mode: 0755
   when: ansible_os_family == 'RedHat'
-

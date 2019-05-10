@@ -55,7 +55,7 @@
     - name: Create alternate SSH user
       user:
         name: test-user
-        group: wheel
+        group: "{{ group_wheel }}"
 
     # Add line to visudo file if it does not exist
     # FIXME #827: This is really bad that a backup-retrieval-user needs sudo,
@@ -80,7 +80,7 @@
       file:
         path: "/home/test-user/.ssh"
         owner: test-user
-        group: wheel
+        group: "{{ group_wheel }}"
         mode: 0700
         state: directory
 
@@ -88,7 +88,7 @@
       file:
         path: "/home/test-user/.ssh/authorized_keys"
         owner: test-user
-        group: wheel
+        group: "{{ group_wheel }}"
         mode: 0644
         state: touch
 
@@ -101,4 +101,3 @@
     - name: Ensure no password on test-user
       shell: passwd --delete test-user
       failed_when: False
-
