@@ -8,6 +8,7 @@
   become: yes
   vars:
     m_home: "/opt/conf-meza/users"
+    m_config_vault: "/opt/conf-meza/vault"
   tasks:
   - name: Ensure no password on meza-ansible user on controller
     shell: passwd --delete meza-ansible
@@ -58,7 +59,7 @@
     shell: >
       ansible-vault encrypt
       /opt/conf-meza/secret/{{ env }}/secret.yml
-      --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
+      --vault-password-file {{ m_config_vault }}/vault-pass-{{ env }}.txt
     failed_when: False
 
   # Note: without this, the encryption above changes mode to 0600 and ownership
