@@ -47,7 +47,7 @@ ${docker_exec_1[@]} bash -c "echo -e 'sshd_config_PasswordAuthentication: \"yes\
 
 # secret.yml is encrypted. decrypt first, make edits, re-encrypt.
 # secret_yml="/opt/conf-meza/secret/$env_name/secret.yml"
-# vault_pass="/opt/conf-meza/users/meza-ansible/.vault-pass-$env_name.txt"
+# vault_pass="/opt/conf-meza/vault/vault-pass-$env_name.txt"
 # ${docker_exec_1[@]} bash -c "ansible-vault decrypt $secret_yml --vault-password-file $vault_pass"
 # ${docker_exec_1[@]} bash -c "echo -e '\n' >> $secret_yml"
 # ${docker_exec_1[@]} bash -c "echo 'mysql_root_password_update: yes' >> $secret_yml"
