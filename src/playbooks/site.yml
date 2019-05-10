@@ -58,7 +58,7 @@
     shell: >
       ansible-vault encrypt
       /opt/conf-meza/secret/{{ env }}/secret.yml
-      --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
+      --vault-password-file {{ m_config_vault }}/vault-pass-{{ env }}.txt
     failed_when: False
 
   # Note: without this, the encryption above changes mode to 0600 and ownership
