@@ -1,6 +1,6 @@
 ---
 # These are handled within the base role now such that they aren't re-run
-# for each play that makes a firewall modification. Instead this role is to bue
+# for each play that makes a firewall modification. Instead this role is to be
 # used sort of like a library of functions. Plays will use the uncommented-out
 # tasks below as needed.
 #
