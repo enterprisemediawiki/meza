@@ -28,6 +28,8 @@
 
 # If a git repo is defined use that for config
 - name: Get local config repo if set
+  become: yes
+  become_user: "meza-ansible"
   git:
     repo: "{{ local_config_repo.repo }}"
     dest: "{{ m_local_public }}"
