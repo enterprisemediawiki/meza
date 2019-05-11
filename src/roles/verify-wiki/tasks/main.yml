@@ -178,6 +178,9 @@
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
 
+- debug: { var: do_sql_dump }
+- debug: { var: wiki_exists }
+- debug: { var: intend_overwrite_from_backup }
 
 #
 # SECTION: DUMP SQL to DB master
@@ -299,13 +302,15 @@
 #
 # SECTION: Does backup server have uploads?
 #
-- name: "{{ wiki_id }} - Check if wiki's uploads backup dir exists on backups.0"
-  stat:
-    path: "{{ uploads_backup_dir_path }}"
-  register: images_backup_dir
-  delegate_to: "{{ uploads_backup_server }}"
-  remote_user: "{{ uploads_backup_server_remote_user }}"
-  run_once: true
+- name:
+  include_role:
+    name: remote-dir-check
+  vars:
+    remote_server: "{{ uploads_backup_server }}"
+    directory_path: "{{ uploads_backup_dir_path }}"
+    remote_server_user: "{{ uploads_backup_server_remote_user }}"
+
+- debug: { var: remote_dir_exists }
 
 
 #
@@ -314,12 +319,12 @@
 - name: "{{ wiki_id }} - Set fact if SHOULD overwrite uploads data (only possible if backup exists)"
   set_fact:
     do_overwrite_uploads_from_backup: True
-  when: intend_overwrite_from_backup and images_backup_dir.stat.exists
+  when: intend_overwrite_from_backup and remote_dir_exists
 
 - name: "{{ wiki_id }} - Set fact if SHOULD NOT overwrite uploads data"
   set_fact:
     do_overwrite_uploads_from_backup: False
-  when: not intend_overwrite_from_backup or not images_backup_dir.stat.exists
+  when: not intend_overwrite_from_backup or not remote_dir_exists
 
 
 #
@@ -336,7 +341,7 @@
     pulling_from_user:   "{{ uploads_backup_server_remote_user }}"
   run_once: true
   when:
-    images_backup_dir.stat.exists
+    remote_dir_exists
     and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
 
 
