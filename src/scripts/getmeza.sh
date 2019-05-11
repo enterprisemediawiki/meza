@@ -80,6 +80,7 @@ if $ret; then
 	fi
 fi
 
+chown meza-ansible:wheel /opt/conf-meza
 
 echo
 echo "Add ansible master user"

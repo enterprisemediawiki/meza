@@ -215,6 +215,11 @@ m_backups_owner: root
 m_backups_group: root
 
 
+m_config_public_mode: "0755"
+m_config_public_owner: meza-ansible
+m_config_public_group: wheel
+
+
 #
 # PHP config
 #
