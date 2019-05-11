@@ -1,0 +1,61 @@
+---
+# Check if a directory exists on a remote server
+#
+# Inputs:
+#   remote_server:
+#   directory_path:
+#   remote_server_user:
+
+- name: "Initially assume directory does not exist"
+  set_fact:
+    remote_dir_exists: False
+
+#
+# Put meza-ansible's private key and known_hosts on server within /root
+#
+- name: "Grant keys to {{ inventory_hostname }}"
+  include_role:
+    name: key-transfer
+    tasks_from: grant-keys
+  vars:
+    granted_server: "{{ inventory_hostname }}"
+  when:
+    remote_server != inventory_hostname
+
+- name: "Check for existence of {{ directory_path }} on {{ remote_server }}"
+  shell: >
+    ssh
+    -o StrictHostKeyChecking=no
+    -i /root/meza-ansible-id_rsa
+    -o UserKnownHostsFile=/root/meza-ansible-known_hosts
+    {{ remote_server_user }}@{{ remote_server }}
+    '[ -d {{ uploads_backup_dir_path }} ]'
+  failed_when: False
+  register: remote_dir_check
+  run_once: true
+  when: remote_server != inventory_hostname
+
+# If not actually a remote server
+- name: "Check for existence of {{ directory_path }} on {{ inventory_hostname }}"
+  shell: '[ -d {{ uploads_backup_dir_path }} ]'
+  failed_when: False
+  register: local_dir_check
+  run_once: true
+  when: remote_server == inventory_hostname
+
+- debug: { var: remote_dir_check }
+- debug: { var: local_dir_check }
+
+- name: "Set remote_dir_exists to true"
+  set_fact:
+    remote_dir_exists: True
+  when: (not local_dir_check|skipped and local_dir_check.rc == 0) or (not remote_dir_check|skipped and remote_dir_check.rc == 0)
+
+- debug: { var: remote_dir_exists }
+
+- name: "Revoke keys from {{ inventory_hostname }}"
+  include_role:
+    name: key-transfer
+    tasks_from: revoke-keys
+  vars:
+    granted_server: "{{ inventory_hostname }}"
