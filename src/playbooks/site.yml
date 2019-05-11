@@ -71,6 +71,14 @@
       group: wheel
       mode: "0600"
 
+  - name: Ensure /opt/conf-meza owned by meza-ansible
+    file:
+      path: "/opt/conf-meza"
+      owner: meza-ansible
+      group: wheel
+      mode: "0755"
+
+
 # FIXME 800: Run against localhost
 - hosts: app-servers
   become: yes
