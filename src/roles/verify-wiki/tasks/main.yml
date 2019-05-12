@@ -182,6 +182,20 @@
 - debug: { var: wiki_exists }
 - debug: { var: intend_overwrite_from_backup }
 
+- debug:
+    msg: |
+      do_sql_dump:                   "{{ do_sql_dump }}"
+      wiki_exists:                   "{{ wiki_exists }}"
+      intend_overwrite_from_backup:  "{{ intend_overwrite_from_backup }}"
+      wiki_id:                       "{{ wiki_id }}"
+      remote_server:                 "{{ sql_backup_server }}"
+      remote_server_ssh_user:        "{{ db_backup_server_remote_user }}"
+      remote_server_mysql_user:      "{{ backups_server_db_dump.mysql_user }}"
+      remote_server_mysql_pass:      "hidden"
+      dump_database:                 "wiki_{{ wiki_id }}"
+      target_server:                 "{{ groups['db-master'][0] }}"
+      target_server_path:            "{{ m_tmp }}/wiki.sql"
+
 #
 # SECTION: DUMP SQL to DB master
 #
@@ -309,8 +323,12 @@
     remote_server: "{{ uploads_backup_server }}"
     directory_path: "{{ uploads_backup_dir_path }}"
     remote_server_user: "{{ uploads_backup_server_remote_user }}"
+  tags:
+    - verify-wiki-uploads
 
 - debug: { var: remote_dir_exists }
+  tags:
+    - verify-wiki-uploads
 
 
 #
@@ -320,11 +338,15 @@
   set_fact:
     do_overwrite_uploads_from_backup: True
   when: intend_overwrite_from_backup and remote_dir_exists
+  tags:
+    - verify-wiki-uploads
 
 - name: "{{ wiki_id }} - Set fact if SHOULD NOT overwrite uploads data"
   set_fact:
     do_overwrite_uploads_from_backup: False
   when: not intend_overwrite_from_backup or not remote_dir_exists
+  tags:
+    - verify-wiki-uploads
 
 
 #
@@ -343,6 +365,8 @@
   when:
     remote_dir_exists
     and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
+  tags:
+    - verify-wiki-uploads
 
 
 #
