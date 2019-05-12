@@ -184,17 +184,17 @@
 
 - debug:
     msg: |
-      do_sql_dump:                   "{{ do_sql_dump }}"
-      wiki_exists:                   "{{ wiki_exists }}"
-      intend_overwrite_from_backup:  "{{ intend_overwrite_from_backup }}"
-      wiki_id:                       "{{ wiki_id }}"
-      remote_server:                 "{{ sql_backup_server }}"
-      remote_server_ssh_user:        "{{ db_backup_server_remote_user }}"
-      remote_server_mysql_user:      "{{ backups_server_db_dump.mysql_user }}"
-      remote_server_mysql_pass:      "hidden"
-      dump_database:                 "wiki_{{ wiki_id }}"
-      target_server:                 "{{ groups['db-master'][0] }}"
-      target_server_path:            "{{ m_tmp }}/wiki.sql"
+      do_sql_dump:                   {{ do_sql_dump | default('<undefined>') }}
+      wiki_exists:                   {{ wiki_exists | default('<undefined>') }}
+      intend_overwrite_from_backup:  {{ intend_overwrite_from_backup | default('<undefined>') }}
+      wiki_id:                       {{ wiki_id | default('<undefined>') }}
+      remote_server:                 {{ sql_backup_server | default('<undefined>') }}
+      remote_server_ssh_user:        {{ db_backup_server_remote_user | default('<undefined>') }}
+      remote_server_mysql_user:      {{ backups_server_db_dump.mysql_user | default('<undefined>') }}
+      remote_server_mysql_pass:      <hidden>
+      dump_database:                 wiki_{{ wiki_id | default('<undefined>') }}
+      target_server:                 {{ groups['db-master'][0] }}
+      target_server_path:            {{ m_tmp }}/wiki.sql
 
 #
 # SECTION: DUMP SQL to DB master
