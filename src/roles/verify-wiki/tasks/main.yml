@@ -138,6 +138,7 @@
     do_sql_dump: True
     sql_file_match: "wiki_{{ wiki_id }}.sql"
     db_backup_server_remote_user: "{{ backups_server_db_dump.remote_user }}"
+    db_backup_server_mysql_user: "{{ backups_server_db_dump.mysql_user }}"
     sql_backup_server_set: True
   when: "backups_server_db_dump is defined"
 
@@ -190,7 +191,7 @@
       wiki_id:                       {{ wiki_id | default('<undefined>') }}
       remote_server:                 {{ sql_backup_server | default('<undefined>') }}
       remote_server_ssh_user:        {{ db_backup_server_remote_user | default('<undefined>') }}
-      remote_server_mysql_user:      {{ backups_server_db_dump.mysql_user | default('<undefined>') }}
+      remote_server_mysql_user:      {{ db_backup_server_mysql_user | default('<undefined>') }}
       remote_server_mysql_pass:      <hidden>
       dump_database:                 wiki_{{ wiki_id | default('<undefined>') }}
       target_server:                 {{ groups['db-master'][0] }}
@@ -205,7 +206,7 @@
   vars:
     remote_server:            "{{ sql_backup_server }}"
     remote_server_ssh_user:   "{{ db_backup_server_remote_user }}"
-    remote_server_mysql_user: "{{ backups_server_db_dump.mysql_user }}"
+    remote_server_mysql_user: "{{ db_backup_server_mysql_user }}"
     remote_server_mysql_pass: "{{ backups_server_db_dump.mysql_pass }}"
     dump_database:            "wiki_{{ wiki_id }}"
     target_server:            "{{ groups['db-master'][0] }}"
