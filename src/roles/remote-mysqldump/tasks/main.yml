@@ -99,6 +99,8 @@
   register: source_wiki_exists_check
   failed_when: False
   run_once: true
+  delegate_to: "{{ target_server }}"
+
 - debug:
     var: source_wiki_exists_check
 

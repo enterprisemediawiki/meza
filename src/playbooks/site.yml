@@ -284,6 +284,18 @@
       mysql_replication_master: "{{ groups['db-master'][0] }}"
       mysql_replication_role: slave
 
+- hosts: backup-servers
+  become: yes
+  tags: backup-servers
+  roles:
+    - set-vars
+  tasks:
+    - name: Ensure MariaDB client installed on backup servers
+      yum:
+        name: mariadb
+        state: present
+      tags:
+        - latest
 
 - hosts: elastic-servers
   become: yes
