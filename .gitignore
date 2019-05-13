@@ -2,3 +2,6 @@
 
 .vagrant/*
 vagrantconf.yml
+
+# file used by src/scripts/do-release.sh
+.release-notes.tmp
