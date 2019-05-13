@@ -116,7 +116,7 @@ BASE_BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
 RELEASE_BRANCH="${NEW_VERSION}-release"
 git checkout -b "${RELEASE_BRANCH}"
 git commit -m "${NEW_VERSION} release"
-git push origin "$BASE_BRANCH"
+# git push origin "$BASE_BRANCH"
 
 #
 # OUTPUT DIRECTIONS FOR COMPLETING RELEASE
@@ -130,7 +130,7 @@ echo "* * * * * * * * * * * * * * * * * * * * * * * *"
 echo
 echo    "Release notes generated, committed, and pushed. "
 echo
-echo -e "1. Check what you pushed with ${RED}git diff HEAD~1..HEAD${NC}"
+echo -e "1. Check what you committed with ${RED}git diff HEAD~1..HEAD${NC}, then push"
 echo -e "2. Open a pull request at ${GREEN}https://github.com/enterprisemediawiki/meza/compare/${BASE_BRANCH}...${RELEASE_BRANCH}?expand=1${NC}"
 echo    "3. After the PR is merged create a new release of Meza with these details:"
 echo    "   * Tag: $NEW_VERSION"
