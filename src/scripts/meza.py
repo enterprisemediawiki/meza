@@ -325,7 +325,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	print "Please review your host file. Run command:"
 	print "  sudo vi /opt/conf-meza/secret/{}/hosts".format(env)
 	print "Please review your secret config. It is encrypted, so edit by running:"
-	print "  sudo ansible-vault edit /opt/conf-meza/secret/{}/secret.yml --vault-password-file /opt/conf-meza/users/meza-ansible/.vault-pass-{}.txt".format(env,env)
+	print "  sudo ansible-vault edit /opt/conf-meza/secret/{}/secret.yml --vault-password-file {}".format(env,vault_pass_file)
 	if return_not_exit:
 		return rc
 	else:
@@ -680,12 +680,28 @@ def meza_shell_exec_exit( return_code=0 ):
 def get_vault_pass_file ( env ):
 	import pwd
 	import grp
+
 	home_dir = defaults['m_home']
-	vault_pass_file = '{}/meza-ansible/.vault-pass-{}.txt'.format(home_dir,env)
+	legacy_file = '{}/meza-ansible/.vault-pass-{}.txt'.format(home_dir,env)
+
+	vault_dir = defaults['m_config_vault']
+	vault_pass_file = '{}/vault-pass-{}.txt'.format(vault_dir, env)
+
 	if not os.path.isfile( vault_pass_file ):
-		with open( vault_pass_file, 'w' ) as f:
-			f.write( random_string( num_chars=64 ) )
-			f.close()
+		if not os.path.exists( vault_dir ):
+			os.mkdir( vault_dir )
+			meza_chown( vault_dir, 'meza-ansible', 'wheel' )
+			os.chmod( vault_dir, 0o700 )
+
+		# If legacy vault password file exists copy that into new location.
+		# Otherwise, create one in the new location
+		if os.path.isfile( legacy_file ):
+			from shutil import copyfile
+			copyfile(legacy_file, vault_pass_file)
+		else:
+			with open( vault_pass_file, 'w' ) as f:
+				f.write( random_string( num_chars=64 ) )
+				f.close()
 
 	# Run this everytime, since it should be fast and if meza-ansible can't
 	# read this then you're stuck!

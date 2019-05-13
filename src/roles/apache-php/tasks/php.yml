@@ -118,7 +118,9 @@
     # Post 7.0, use the pear1u package for all versions of PHP
     # PEAR is no longer a requirement for Meza. Mail and Net_SMTP installed with
     # Composer via MW core (MW 1.32+) or composer.local.json (MW 1.31 and lower)
-    # - pear1u
+    # However, other packages may require it, for example installing sqlsrv and
+    # pdo_sqlsrv PECL packages for MS SQL use.
+    - pear1u
 
     # Not available for PHP 7, due to being built into PHP 7
     # - php56u-pecl-jsonc

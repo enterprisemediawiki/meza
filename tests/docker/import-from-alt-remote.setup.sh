@@ -28,7 +28,7 @@ docker_exec_2=( "${docker_exec[@]}" )
 # Location of secret.yml file, hosts file, and vault pass file
 secret_yml="/opt/conf-meza/secret/$env_name/secret.yml"
 hosts_file="/opt/conf-meza/secret/$env_name/hosts"
-vault_pass="/opt/conf-meza/users/meza-ansible/.vault-pass-$env_name.txt"
+vault_pass="/opt/conf-meza/vault/vault-pass-$env_name.txt"
 
 # CONTAINER 1
 # (1) Get local secret config from repo

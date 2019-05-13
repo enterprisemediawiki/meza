@@ -14,6 +14,7 @@ m_use_production_settings: True
 m_config_core: /opt/meza/config/core
 m_local_secret: /opt/conf-meza/secret
 m_local_public: /opt/conf-meza/public
+m_config_vault: /opt/conf-meza/vault
 m_home: /opt/conf-meza/users
 
 # Config files written by Ansible which need a place to live on non-controller
@@ -212,6 +213,11 @@ m_logs_group: wheel
 m_backups_mode: "0755"
 m_backups_owner: root
 m_backups_group: root
+
+
+m_config_public_mode: "0755"
+m_config_public_owner: meza-ansible
+m_config_public_group: wheel
 
 
 #

@@ -28,6 +28,8 @@
 
 # If a git repo is defined use that for config
 - name: Get local config repo if set
+  become: yes
+  become_user: "meza-ansible"
   git:
     repo: "{{ local_config_repo.repo }}"
     dest: "{{ m_local_public }}"
@@ -55,9 +57,9 @@
   file:
     path: "{{ m_local_public }}"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_config_public_owner }}"
+    group: "{{ m_config_public_group }}"
+    mode: "{{ m_config_public_mode }}"
     recurse: true
   delegate_to: localhost
   run_once: true
@@ -69,20 +71,20 @@
   file:
     path: "{{ m_local_public }}/wikis"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_config_public_owner }}"
+    group: "{{ m_config_public_group }}"
+    mode: "{{ m_config_public_mode }}"
   delegate_to: localhost
   run_once: true
 
 
 - name: Ensure pre/post settings directories exists in config
   file:
-    path: "/opt/conf-meza/public/{{ item }}"
+    path: "{{ m_local_public }}/{{ item }}"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_config_public_owner }}"
+    group: "{{ m_config_public_group }}"
+    mode: "{{ m_config_public_mode }}"
   delegate_to: localhost
   run_once: true
   with_items:
@@ -94,9 +96,9 @@
   template:
     src: "templates/{{ item }}.j2"
     dest: "{{ m_local_public }}/{{ item }}"
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_config_public_owner }}"
+    group: "{{ m_config_public_group }}"
+    mode: "{{ m_config_public_mode }}"
     force: no
   delegate_to: localhost
   run_once: true
