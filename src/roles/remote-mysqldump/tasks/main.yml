@@ -32,9 +32,9 @@
   set_fact:
     user_option: "-u {{ remote_server_mysql_user }}"
   when: remote_server_mysql_user is defined
-- name: Set mysql user option to empty string if not defined
+- name: Set mysql user option to use wiki application user if not defined
   set_fact:
-    user_option: ""
+    user_option: "-u {{ wiki_app_db_user.name }}"
   when: remote_server_mysql_user is not defined
 
 #
@@ -44,9 +44,9 @@
   set_fact:
     password_option: "-p{{ remote_server_mysql_pass }}"
   when: remote_server_mysql_pass is defined
-- name: Set mysql password option to empty string if not defined
+- name: Set mysql password option use wiki application user if not defined
   set_fact:
-    password_option: ""
+    password_option: "-p{{ wiki_app_db_user.password }}"
   when: remote_server_mysql_pass is not defined
 
 #
