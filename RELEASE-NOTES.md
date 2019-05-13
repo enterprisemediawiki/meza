@@ -1,6 +1,46 @@
 Release Notes
 =============
 
+## Meza 31.4.0
+
+Make importing from a live server simpler and more secure by not requiring sudo on the remote. Also use a more stable version of ImageMagick.
+
+### Commits since 31.3.0
+
+* 0d23cf7 Don't push
+* 7ce4ddb Make script actually do release commit. Beware.
+* 47f6518 Improvements to rel notes script order
+* 7fe7b2e Make release script edit RELEASE-NOTES.md
+* 02cb384 WIP: release notes script
+* 7ea1f98 Use known user, not no user, when mysqldump user unspecified
+* 84bc0a0 Install mysql client on backup servers for direct mysqldump
+* 112317c Handle undefined backups_server_db_dump
+* db6f805 Give undefined debug vars print vals
+* cd79230 Make checks for wiki existence during backup go to right server
+* 68ac393 Add tags for rsync-uploads and better debug
+* 4d56386 Set permissions for /opt/conf-meza and /opt/conf-meza/public
+* 6ecc855 Create role remote-dir-check to verify if remote uploads dir exists
+* 527852f Get public config repo as meza-ansible, not root
+* 51f5e34 Re-enable PEAR package; not used by default, but used by MS SQL
+* af9eb52 Move vault pass file from meza-ansible home to /opt/conf-meza/vault
+* bd6b103 Minor spelling mistakes
+* 43691c4 Vagrantfile set mount_options: ["dmode=755,fmode=755"] Windows only
+* 4127c78 Use base ImageMagick rather than Meza's own RPM
+* 6ae982b Use 'remote_src'
+* 186298a The SFTP server is in a different location on Debian
+
+### Contributors
+
+* 25	James Montalvo
+* 3	Greg Rundlett
+
+# How to upgrade
+
+```bash
+sudo meza update 31.4.0
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.3.0
 
 WatchAnalytics to 3.1.2 for diff in PendingReviews, improved on-page banners
