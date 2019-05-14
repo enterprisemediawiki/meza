@@ -7,6 +7,9 @@
 # working directory is wiped out on each run. Then We can immediately patch
 # the repo in the following step (optionally, if we want <img> tags)
 - name: Get Parsoid repository
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: https://github.com/wikimedia/parsoid.git
     dest: "{{ m_parsoid_path }}"

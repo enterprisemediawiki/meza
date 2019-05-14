@@ -38,6 +38,9 @@
     - pecl/mongodb
 
 - name: Ensure XHGui present
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: https://github.com/perftools/xhgui.git
     dest: "{{ m_profiling_xhgui_directory }}"

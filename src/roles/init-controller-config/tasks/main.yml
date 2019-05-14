@@ -30,6 +30,9 @@
 - name: Get local config repo if set
   become: yes
   become_user: "meza-ansible"
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: "{{ local_config_repo.repo }}"
     dest: "{{ m_local_public }}"

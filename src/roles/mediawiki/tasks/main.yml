@@ -72,6 +72,9 @@
 - name: Ensure proper MediaWiki git version installed
   become: yes
   become_user: "meza-ansible"
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: https://github.com/wikimedia/mediawiki.git
     dest: "{{ m_mediawiki }}"
@@ -118,6 +121,9 @@
 - name: Ensure core meza extensions installed (non-Composer)
   become: yes
   become_user: "meza-ansible"
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
@@ -138,6 +144,9 @@
     - always
 
 - name: Ensure core meza skins installed (non-Composer)
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/skins/{{ item.name }}"
@@ -151,6 +160,9 @@
 - name: Ensure local meza extensions installed (non-Composer)
   become: yes
   become_user: "meza-ansible"
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
@@ -165,6 +177,9 @@
     - latest
 
 - name: Ensure local meza skins installed (non-Composer)
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/skins/{{ item.name }}"
@@ -287,6 +302,9 @@
 # LANDING PAGE
 #
 - name: Ensure WikiBlender installed
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: https://github.com/jamesmontalvo3/WikiBlender.git
     dest: "{{ m_htdocs }}/WikiBlender"
