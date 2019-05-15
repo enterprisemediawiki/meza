@@ -93,6 +93,8 @@
     - set-vars
     - role: autodeployer
       when: force_deploy is defined or autodeployer is defined
+  tags:
+    - autodeployer
 
 # Ensure proper base setup on all servers in inventory, with the exception of
 # servers in "exclude-all" group. At present, the intent of this group is to
