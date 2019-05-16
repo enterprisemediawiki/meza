@@ -371,12 +371,16 @@
   vars:
     wiki_id: demo
     wiki_name: Demo Wiki
-  when: "initial_wikis_dirs_check.files|length == 0 and (docker_skip_tasks is not defined or not docker_skip_tasks)"
+  when:
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
+    - initial_wikis_dirs_check.files|length == 0
 
 - name: Re-sync configuration between controller and app servers if Demo just configured
   include_role:
     name: sync-configs
-  when: "initial_wikis_dirs_check.files|length == 0 and (docker_skip_tasks is not defined or not docker_skip_tasks)"
+  when:
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
+    - initial_wikis_dirs_check.files|length == 0
 
 
 
