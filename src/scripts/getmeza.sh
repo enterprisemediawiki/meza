@@ -78,14 +78,13 @@ if $ret; then
 	else
 		echo "meza-ansible home-dir in correct location"
 	fi
+else
+	echo
+	echo "Add ansible master user"
+	source "/opt/meza/src/scripts/ssh-users/setup-master-user.sh"
 fi
 
 chown meza-ansible:wheel /opt/conf-meza
-
-echo
-echo "Add ansible master user"
-source "/opt/meza/src/scripts/ssh-users/setup-master-user.sh"
-
 
 # Don't require TTY or visible password for sudo. Ref #769
 sed -r -i "s/^Defaults\\s+requiretty/#Defaults requiretty/g;" /etc/sudoers
