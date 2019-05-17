@@ -62,7 +62,10 @@
   service:
     name: parsoid
     state: stopped
-  when: modify_parsoid_user and parsoid_service_status.stat.exists
+  when:
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - modify_parsoid_user
+    - parsoid_service_status.stat.exists
 
 - name: Ensure parsoid user exists
   user:
