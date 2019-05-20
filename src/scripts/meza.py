@@ -128,6 +128,7 @@ def request_lock_for_deploy (env):
 		with open( lock_file, 'w' ) as f:
 			f.write( "deploying" )
 			f.close()
+		return True
 
 def unlock_deploy(env):
 	import os
