@@ -120,9 +120,11 @@ def meza_command_deploy (argv):
 def request_lock_for_deploy (env):
 	import os
 	lock_file = get_lock_file_path(env)
-	if os.path.exists( lock_file ):
+	if os.path.isfile( lock_file ):
+		print "Deploy lock file already exists at {}".format(lock_file)
 		return False
 	else:
+		print "Create deploy lock file at {}".format(lock_file)
 		with open( lock_file, 'w' ) as f:
 			f.write( "deploying" )
 			f.close()
@@ -136,7 +138,6 @@ def unlock_deploy(env):
 def get_lock_file_path(env):
 	import os
 	lock_file = os.path.join( defaults['m_meza_data'], "env-{}-deploy.lock".format(env) )
-	print "Set lock file to {}".format(lock_file)
 	return lock_file
 
 # env
