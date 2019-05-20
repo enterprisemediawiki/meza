@@ -136,7 +136,8 @@ def unlock_deploy(env):
 def get_lock_file_path(env):
 	import os
 	lock_file = os.path.join( defaults['m_meza_data'], "env-{}-deploy.lock".format(env) )
-
+	print "Set lock file to {}".format(lock_file)
+	return lock_file
 
 # env
 # dev
