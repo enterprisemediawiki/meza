@@ -122,7 +122,7 @@ def request_lock_for_deploy (env):
 	lock_file = get_lock_file_path(env)
 	if os.path.exists( lock_file ):
 		return False
-	else
+	else:
 		with open( lock_file, 'w' ) as f:
 			f.write( "deploying" )
 			f.close()
