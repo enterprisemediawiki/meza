@@ -61,6 +61,9 @@ mkdir -p /opt/conf-meza/secret
 chmod 755 /opt/conf-meza
 chmod 755 /opt/conf-meza/secret
 
+# Required initially for creating lock files
+mkdir -p /opt/data-meza
+
 # If user meza-ansible already exists, make sure home directory is correct
 # (update from old meza versions)
 ret=false
