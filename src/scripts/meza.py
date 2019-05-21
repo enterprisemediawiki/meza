@@ -172,31 +172,72 @@ def meza_command_deploy_check (argv):
 	env = argv[0]
 	lock_file = get_lock_file_path(env)
 	if os.path.isfile( lock_file ):
-		print "Meza environment {} deploying; {} exists".format(env,lock_file)
+		print "Meza environment '{}' deploying; {} exists".format(env,lock_file)
 		sys.exit(1)
 	else:
-		print "Meza environment {} not deploying".format(env)
+		print "Meza environment '{}' not deploying".format(env)
 		sys.exit(0)
 
 def meza_command_deploy_lock (argv):
 	env = argv[0]
 	success = request_lock_for_deploy(env)
 	if success:
-		print "Environment {} locked for deploy".format(env)
+		print "Environment '{}' locked for deploy".format(env)
 		sys.exit(0)
 	else:
-		print "Environment {} could not be locked".format(env)
+		print "Environment '{}' could not be locked".format(env)
 		sys.exit(1)
 
 def meza_command_deploy_unlock (argv):
 	env = argv[0]
 	success = unlock_deploy(env)
 	if success:
-		print "Environment {} deploy lock removed".format(env)
+		print "Environment '{}' deploy lock removed".format(env)
 		sys.exit(0)
 	else:
-		print "Environment {} is not deploying".format(env)
+		print "Environment '{}' is not deploying".format(env)
 		sys.exit(1)
+
+def meza_command_deploy_kill (argv):
+	env = argv[0]
+	lock_file = get_lock_file_path(env)
+	if os.path.isfile( lock_file ):
+		print "Meza environment {} deploying; killing...".format(env)
+		di = get_deploy_info(env)
+		os.system( "kill $(ps -o pid= --ppid {})".format(di['pid']) )
+		import time
+		time.sleep(2)
+		os.system( 'wall "Meza deploy terminated using \'meza deploy-kill\' command."' )
+		sys.exit(0)
+	else:
+		print "Meza environment '{}' not deploying".format(env)
+		sys.exit(1)
+
+def get_deploy_info (env):
+	import os
+	lock_file = get_lock_file_path(env)
+	if not os.path.isfile( lock_file ):
+		print "Environment '{}' not deploying".format(env)
+		return False
+	with open( lock_file, 'r' ) as f:
+		pid = f.readline()
+		timestamp = f.readline()
+		f.close()
+		return { "pid": pid, "timestamp": timestamp }
+
+def get_deploy_log_path (env):
+	timestamp = get_deploy_info(env)["timestamp"]
+	filename = "{}-{}.log".format( env,timestamp )
+	log_path = os.path.join( defaults['m_logs'], 'deploy-output', filename )
+	return log_path
+
+def meza_command_deploy_log (argv):
+	env = argv[0]
+	print get_deploy_log_path(env)
+
+def meza_command_deploy_tail (argv):
+	env = argv[0]
+	os.system( " ".join(["tail", "-f", get_deploy_log_path(env)]) )
 
 # env
 # dev
