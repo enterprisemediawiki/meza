@@ -135,6 +135,9 @@ def unlock_deploy(env):
 	lock_file = get_lock_file_path(env)
 	if os.path.exists( lock_file ):
 		os.remove( lock_file )
+		return True
+	else:
+		return False
 
 def get_lock_file_path(env):
 	import os
@@ -152,6 +155,26 @@ def meza_command_deploy_check (argv):
 	else:
 		print "Meza environment {} not deploying".format(env)
 		sys.exit(0)
+
+def meza_command_deploy_lock (argv):
+	env = argv[0]
+	success = request_lock_for_deploy(env)
+	if success:
+		print "Environment {} locked for deploy".format(env)
+		sys.exit(0)
+	else:
+		print "Environment {} could not be locked".format(env)
+		sys.exit(1)
+
+def meza_command_deploy_unlock (argv):
+	env = argv[0]
+	success = unlock_deploy(env)
+	if success:
+		print "Environment {} deploy lock removed".format(env)
+		sys.exit(0)
+	else:
+		print "Environment {} is not deploying".format(env)
+		sys.exit(1)
 
 # env
 # dev
