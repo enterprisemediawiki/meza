@@ -124,7 +124,9 @@ def meza_command_deploy (argv):
 	if len(argv) > 0:
 		shell_cmd = shell_cmd + argv
 
-	return_code = meza_shell_exec( shell_cmd )
+	deploy_log = get_deploy_log_path(env)
+
+	return_code = meza_shell_exec( shell_cmd, deploy_log )
 
 	unlock_deploy(env)
 
@@ -754,23 +756,13 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 
 # FIXME install --> setup dev-networking, setup docker, deploy monolith (special case)
 
-def meza_shell_exec ( shell_cmd ):
+def meza_shell_exec ( shell_cmd, log_file=False ):
 
 	# Get errors with user meza-ansible trying to write to the calling-user's
 	# home directory if don't cd to a neutral location. By cd'ing to this
 	# location you can pick up ansible.cfg and use vars there.
 	starting_wd = os.getcwd()
 	os.chdir( "/opt/meza/config/core" )
-
-	# import subprocess
-	# # child = subprocess.Popen(shell_cmd, stdout=subprocess.PIPE)
-	# child = subprocess.Popen(shell_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-	# if return_output:
-	# 	output = child.communicate()[0]
-	# else:
-	# 	print child.communicate()[0]
-	# rc = child.returncode
-
 
 	#
 	# FIXME #874: For some reason `sudo -u meza-ansible ...` started failing in
@@ -786,7 +778,18 @@ def meza_shell_exec ( shell_cmd ):
 		cmd = ' '.join(shell_cmd)
 
 	print cmd
-	rc = os.system(cmd)
+
+	import subprocess
+
+	if log_file:
+		log = open(log_file,'a')
+	proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	for line in iter(proc.stdout.readline, b''):
+		print( line.rstrip() )
+		if log_file:
+			log.write( line )
+
+	rc = proc.returncode
 
 	# Move back to original working directory
 	os.chdir( starting_wd )
