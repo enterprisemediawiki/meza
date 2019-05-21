@@ -6,6 +6,19 @@
 import sys, getopt, os
 
 
+# Handle pressing of ctrl-c. Make sure to remove lock file when deploying.
+deploy_lock_environment = False
+def sigint_handler(sig, frame):
+	print('Cancelling...')
+	if deploy_lock_environment:
+		print('Deploy underway...removing lock file')
+		unlock_deploy(deploy_lock_environment)
+	sys.exit(1)
+
+import signal
+signal.signal(signal.SIGINT, sigint_handler)
+
+
 def load_yaml ( filepath ):
 	import yaml
 	with open(filepath, 'r') as stream:
@@ -118,17 +131,26 @@ def meza_command_deploy (argv):
 	meza_shell_exec_exit( return_code )
 
 def request_lock_for_deploy (env):
-	import os
+	import os, datetime
 	lock_file = get_lock_file_path(env)
 	if os.path.isfile( lock_file ):
 		print "Deploy lock file already exists at {}".format(lock_file)
 		return False
 	else:
 		print "Create deploy lock file at {}".format(lock_file)
+		pid = str( os.getpid() )
+		timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")
+
+		# Before creating lock file, this global must be set in order for ctrl-c
+		# interrupts (SIGINT) to be properly managed (SIGINT will call
+		# sigint_handler function)
+		global deploy_lock_environment
+		deploy_lock_environment = env
+
 		with open( lock_file, 'w' ) as f:
-			f.write( "deploying" )
+			f.write( "{}\n{}".format(pid,timestamp) )
 			f.close()
-		return True
+		return { "pid": pid, "timestamp": timestamp }
 
 def unlock_deploy(env):
 	import os
