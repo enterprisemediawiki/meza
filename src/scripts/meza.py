@@ -55,7 +55,7 @@ def main (argv):
 
 
 	command = argv[0]
-	command_fn = "meza_command_{}".format( argv[0] )
+	command_fn = "meza_command_{}".format( argv[0] ).replace("-","_")
 
 	# if command_fn is a valid Python function, pass it all remaining args
 	if command_fn in globals() and callable( globals()[command_fn] ):
@@ -140,6 +140,18 @@ def get_lock_file_path(env):
 	import os
 	lock_file = os.path.join( defaults['m_meza_data'], "env-{}-deploy.lock".format(env) )
 	return lock_file
+
+# "meza deploy-check <ENV>" to return 0 on no deploy, 1 on deploy is active
+def meza_command_deploy_check (argv):
+	import os
+	env = argv[0]
+	lock_file = get_lock_file_path(env)
+	if os.path.isfile( lock_file ):
+		print "Meza environment {} deploying; {} exists".format(env,lock_file)
+		sys.exit(1)
+	else:
+		print "Meza environment {} not deploying".format(env)
+		sys.exit(0)
 
 # env
 # dev
