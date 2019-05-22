@@ -230,7 +230,13 @@ def get_deploy_info (env):
 def get_deploy_log_path (env):
 	timestamp = get_deploy_info(env)["timestamp"]
 	filename = "{}-{}.log".format( env,timestamp )
-	log_path = os.path.join( defaults['m_logs'], 'deploy-output', filename )
+
+	log_dir = os.path.join( defaults['m_logs'], 'deploy-output' )
+	log_path = os.path.join( log_dir, filename )
+
+	if not os.path.isdir( log_dir ):
+		os.makedirs( log_dir )
+
 	return log_path
 
 def meza_command_deploy_log (argv):
