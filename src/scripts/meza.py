@@ -794,6 +794,7 @@ def meza_shell_exec ( shell_cmd, log_file=False ):
 		print( line.rstrip() )
 		if log_file:
 			log.write( line )
+	proc.wait()
 
 	rc = proc.returncode
 
