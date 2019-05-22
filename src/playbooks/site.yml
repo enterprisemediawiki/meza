@@ -78,23 +78,23 @@
       group: wheel
       mode: "0755"
 
-
-# FIXME 800: Run against localhost
-- hosts: app-servers
+# Set umask on all servers. Perhaps this should move above localhost steps since
+# it may impact them, and role "umask-set" has no config requirements
+- hosts: all:!exclude-all:!load-balancers-unmanaged
   become: yes
   roles:
-    - set-vars
     - umask-set
-    - init-controller-config
 
 - hosts: localhost
   become: yes
   roles:
     - set-vars
+    - init-controller-config
     - role: autodeployer
       when: force_deploy is defined or autodeployer is defined
   tags:
     - autodeployer
+    - controller
 
 # Ensure proper base setup on all servers in inventory, with the exception of
 # servers in "exclude-all" group. At present, the intent of this group is to
@@ -104,7 +104,6 @@
   become: yes
   roles:
     - set-vars
-    - umask-set
     - base
     - base-config-scripts
   tags: base
