@@ -188,6 +188,13 @@ clean_upload_stash_crontime: "0 18 * * *"
 # FILE MODES, OWNERS, GROUPS
 #
 
+m_meza_owner: meza-ansible
+m_meza_group: wheel
+# Don't set mode for /opt/meza for now. Don't want to impact execute bit which
+# is managed by Git
+# FIXME: Later specify read and write permissions only if Ansible supports
+
+
 # uploads directory. Note: user meza-ansible is in group "apache"
 m_uploads_dir_mode: "0775"
 m_uploads_dir_owner: apache
@@ -223,6 +230,9 @@ m_config_public_mode: "0755"
 m_config_public_owner: meza-ansible
 m_config_public_group: wheel
 
+m_config_secret_mode: "0750"
+m_config_secret_owner: meza-ansible
+m_config_secret_group: wheel
 
 #
 # PHP config

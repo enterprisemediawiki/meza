@@ -88,6 +88,7 @@ else
 fi
 
 chown meza-ansible:wheel /opt/conf-meza
+chown meza-ansible:wheel /opt/meza
 
 # Don't require TTY or visible password for sudo. Ref #769
 sed -r -i "s/^Defaults\\s+requiretty/#Defaults requiretty/g;" /etc/sudoers
