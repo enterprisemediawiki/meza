@@ -138,6 +138,7 @@
     do_sql_dump: True
     sql_file_match: "wiki_{{ wiki_id }}.sql"
     db_backup_server_remote_user: "{{ backups_server_db_dump.remote_user }}"
+    db_backup_server_mysql_user: "{{ backups_server_db_dump.mysql_user }}"
     sql_backup_server_set: True
   when: "backups_server_db_dump is defined"
 
@@ -178,6 +179,23 @@
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
 
+- debug: { var: do_sql_dump }
+- debug: { var: wiki_exists }
+- debug: { var: intend_overwrite_from_backup }
+
+- debug:
+    msg: |
+      do_sql_dump:                   {{ do_sql_dump | default('<undefined>') }}
+      wiki_exists:                   {{ wiki_exists | default('<undefined>') }}
+      intend_overwrite_from_backup:  {{ intend_overwrite_from_backup | default('<undefined>') }}
+      wiki_id:                       {{ wiki_id | default('<undefined>') }}
+      remote_server:                 {{ sql_backup_server | default('<undefined>') }}
+      remote_server_ssh_user:        {{ db_backup_server_remote_user | default('<undefined>') }}
+      remote_server_mysql_user:      {{ db_backup_server_mysql_user | default('<undefined>') }}
+      remote_server_mysql_pass:      <hidden>
+      dump_database:                 wiki_{{ wiki_id | default('<undefined>') }}
+      target_server:                 {{ groups['db-master'][0] }}
+      target_server_path:            {{ m_tmp }}/wiki.sql
 
 #
 # SECTION: DUMP SQL to DB master
@@ -188,7 +206,7 @@
   vars:
     remote_server:            "{{ sql_backup_server }}"
     remote_server_ssh_user:   "{{ db_backup_server_remote_user }}"
-    remote_server_mysql_user: "{{ backups_server_db_dump.mysql_user }}"
+    remote_server_mysql_user: "{{ db_backup_server_mysql_user }}"
     remote_server_mysql_pass: "{{ backups_server_db_dump.mysql_pass }}"
     dump_database:            "wiki_{{ wiki_id }}"
     target_server:            "{{ groups['db-master'][0] }}"
@@ -299,13 +317,19 @@
 #
 # SECTION: Does backup server have uploads?
 #
-- name: "{{ wiki_id }} - Check if wiki's uploads backup dir exists on backups.0"
-  stat:
-    path: "{{ uploads_backup_dir_path }}"
-  register: images_backup_dir
-  delegate_to: "{{ uploads_backup_server }}"
-  remote_user: "{{ uploads_backup_server_remote_user }}"
-  run_once: true
+- name:
+  include_role:
+    name: remote-dir-check
+  vars:
+    remote_server: "{{ uploads_backup_server }}"
+    directory_path: "{{ uploads_backup_dir_path }}"
+    remote_server_user: "{{ uploads_backup_server_remote_user }}"
+  tags:
+    - verify-wiki-uploads
+
+- debug: { var: remote_dir_exists }
+  tags:
+    - verify-wiki-uploads
 
 
 #
@@ -314,12 +338,16 @@
 - name: "{{ wiki_id }} - Set fact if SHOULD overwrite uploads data (only possible if backup exists)"
   set_fact:
     do_overwrite_uploads_from_backup: True
-  when: intend_overwrite_from_backup and images_backup_dir.stat.exists
+  when: intend_overwrite_from_backup and remote_dir_exists
+  tags:
+    - verify-wiki-uploads
 
 - name: "{{ wiki_id }} - Set fact if SHOULD NOT overwrite uploads data"
   set_fact:
     do_overwrite_uploads_from_backup: False
-  when: not intend_overwrite_from_backup or not images_backup_dir.stat.exists
+  when: not intend_overwrite_from_backup or not remote_dir_exists
+  tags:
+    - verify-wiki-uploads
 
 
 #
@@ -336,8 +364,10 @@
     pulling_from_user:   "{{ uploads_backup_server_remote_user }}"
   run_once: true
   when:
-    images_backup_dir.stat.exists
+    remote_dir_exists
     and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
+  tags:
+    - verify-wiki-uploads
 
 
 #

@@ -12,6 +12,8 @@ REPO="$1"
 DEST="$2"
 VERSION="$3"
 
-ansible localhost -m git -a "repo=$REPO dest=$DEST version=$VERSION"
+source /opt/.deploy-meza/config.sh
+
+sudo TMPDIR="$m_tmp" -u meza-ansible ansible localhost -m git -a "repo=$REPO dest=$DEST version=$VERSION"
 
 cd "$CWD"

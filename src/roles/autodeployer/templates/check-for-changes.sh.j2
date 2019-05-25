@@ -58,6 +58,15 @@ if [ ! -z "$autodeployer_slack_username" ]; then SLACK_USERNAME="$autodeployer_s
 if [ ! -z "$autodeployer_slack_channel"  ]; then  SLACK_CHANNEL="$autodeployer_slack_channel";  fi
 if [ ! -z "$autodeployer_slack_icon_url" ]; then SLACK_ICON_URL="$autodeployer_slack_icon_url"; fi
 
+meza deploy-check "$m_environment"
+if [ $? -eq 0 ]; then
+	echo "Checked if deploy underway. Is not. Placing deploy lock while checking for changes."
+	meza deploy-lock "$m_environment"
+else
+	echo "Deploy is underway. Exiting."
+	exit 1
+fi
+
 # If SLACK_TOKEN is set, send notification via slack. Else, use no-notify script
 if [ ! -z "$SLACK_TOKEN" ]; then
 	NOTIFY="$DIR/slack-notify.sh"
@@ -181,6 +190,7 @@ set -e # end FIXME from above.
 # Neither Meza mor config changed? Exit.
 #
 if [ -z "$PUBLIC_CONFIG_AFTER_HASH$MEZA_AFTER_HASH" ]; then
+	meza deploy-unlock "$m_environment"
 	echo "Nothing to deploy"
 	exit 0;
 fi
@@ -251,5 +261,13 @@ echo "Deploying"
 if [ -z "$DEPLOY_TYPE"       ]; then DEPLOY_TYPE="Deploy";                            fi
 if [ -z "$DEPLOY_ARGS"       ]; then DEPLOY_ARGS="";                                  fi
 if [ -z "$DEPLOY_LOG_PREFIX" ]; then DEPLOY_LOG_PREFIX="deploy-after-config-change-"; fi
+
+# This isn't perfect, as there is still a little that will happen in do-deploy
+# below before the actual deploy starts, and a separate deploy _could_ start
+# in between now and then, but the likelihood is low, and the impact is only
+# this deploy wouldn't happen since it's actual deploy would check for the lock
+# file and would fail/exit.
+meza deploy-unlock "$m_environment"
+
 source "$DIR/do-deploy.sh"
 echo "Done"

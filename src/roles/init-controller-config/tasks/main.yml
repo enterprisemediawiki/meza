@@ -23,19 +23,20 @@
   stat:
     path: "{{ m_local_public }}"
   register: controller_local_config
-  delegate_to: localhost
-  run_once: true
 
 # If a git repo is defined use that for config
 - name: Get local config repo if set
+  become: yes
+  become_user: "meza-ansible"
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: "{{ local_config_repo.repo }}"
     dest: "{{ m_local_public }}"
     version: "{{ local_config_repo.version | default('master') }}"
     force: "{{ local_config_repo.force | default(false) | bool }}"
     umask: "0002"
-  delegate_to: localhost
-  run_once: true
   when:
     not controller_local_config.stat.exists
     and local_config_repo.repo is defined
@@ -46,8 +47,6 @@
   stat:
     path: "{{ m_local_public }}"
   register: recheck_controller
-  delegate_to: localhost
-  run_once: true
 
 # At this point, whether a m_local directory exists on the controller or not,
 # ensure the directory exists and is configured properly
@@ -55,12 +54,12 @@
   file:
     path: "{{ m_local_public }}"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_config_public_owner }}"
+    group: "{{ m_config_public_group }}"
+    mode: "{{ m_config_public_mode }}"
     recurse: true
-  delegate_to: localhost
-  run_once: true
+  tags:
+    - file-perms
 
 
 # Still no config for controller? This must be a new installation. Copy from
@@ -69,22 +68,17 @@
   file:
     path: "{{ m_local_public }}/wikis"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
-  delegate_to: localhost
-  run_once: true
-
+    owner: "{{ m_config_public_owner }}"
+    group: "{{ m_config_public_group }}"
+    mode: "{{ m_config_public_mode }}"
 
 - name: Ensure pre/post settings directories exists in config
   file:
-    path: "/opt/conf-meza/public/{{ item }}"
+    path: "{{ m_local_public }}/{{ item }}"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
-  delegate_to: localhost
-  run_once: true
+    owner: "{{ m_config_public_owner }}"
+    group: "{{ m_config_public_group }}"
+    mode: "{{ m_config_public_mode }}"
   with_items:
     - preLocalSettings.d
     - postLocalSettings.d
@@ -94,13 +88,32 @@
   template:
     src: "templates/{{ item }}.j2"
     dest: "{{ m_local_public }}/{{ item }}"
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_config_public_owner }}"
+    group: "{{ m_config_public_group }}"
+    mode: "{{ m_config_public_mode }}"
     force: no
-  delegate_to: localhost
-  run_once: true
   with_items:
     - MezaLocalExtensions.yml
     - MezaLocalSkins.yml
     - public.yml
+
+- name: "Ensure {{ m_meza }} properly owned"
+  file:
+    path: "{{ m_meza }}"
+    owner: "{{ m_meza_owner }}"
+    group: "{{ m_meza_group }}"
+    state: directory
+    recurse: Yes
+  tags:
+    - file-perms
+
+- name: "Ensure {{ m_local_secret }} properly owned"
+  file:
+    path: "{{ m_local_secret }}"
+    owner: "{{ m_config_secret_owner }}"
+    group: "{{ m_config_secret_group }}"
+    mode: "{{ m_config_secret_mode }}"
+    state: directory
+    recurse: Yes
+  tags:
+    - file-perms

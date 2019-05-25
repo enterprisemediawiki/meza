@@ -7,6 +7,9 @@
 # working directory is wiped out on each run. Then We can immediately patch
 # the repo in the following step (optionally, if we want <img> tags)
 - name: Get Parsoid repository
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: https://github.com/wikimedia/parsoid.git
     dest: "{{ m_parsoid_path }}"
@@ -59,7 +62,10 @@
   service:
     name: parsoid
     state: stopped
-  when: modify_parsoid_user and parsoid_service_status.stat.exists
+  when:
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - modify_parsoid_user
+    - parsoid_service_status.stat.exists
 
 - name: Ensure parsoid user exists
   user:

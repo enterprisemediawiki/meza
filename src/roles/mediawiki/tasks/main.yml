@@ -72,6 +72,9 @@
 - name: Ensure proper MediaWiki git version installed
   become: yes
   become_user: "meza-ansible"
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: https://github.com/wikimedia/mediawiki.git
     dest: "{{ m_mediawiki }}"
@@ -118,6 +121,9 @@
 - name: Ensure core meza extensions installed (non-Composer)
   become: yes
   become_user: "meza-ansible"
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
@@ -138,6 +144,9 @@
     - always
 
 - name: Ensure core meza skins installed (non-Composer)
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/skins/{{ item.name }}"
@@ -151,6 +160,9 @@
 - name: Ensure local meza extensions installed (non-Composer)
   become: yes
   become_user: "meza-ansible"
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
@@ -165,6 +177,9 @@
     - latest
 
 - name: Ensure local meza skins installed (non-Composer)
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/skins/{{ item.name }}"
@@ -287,6 +302,9 @@
 # LANDING PAGE
 #
 - name: Ensure WikiBlender installed
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: https://github.com/jamesmontalvo3/WikiBlender.git
     dest: "{{ m_htdocs }}/WikiBlender"
@@ -353,12 +371,16 @@
   vars:
     wiki_id: demo
     wiki_name: Demo Wiki
-  when: "initial_wikis_dirs_check.files|length == 0 and (docker_skip_tasks is not defined or not docker_skip_tasks)"
+  when:
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
+    - initial_wikis_dirs_check.files|length == 0
 
 - name: Re-sync configuration between controller and app servers if Demo just configured
   include_role:
     name: sync-configs
-  when: "initial_wikis_dirs_check.files|length == 0 and (docker_skip_tasks is not defined or not docker_skip_tasks)"
+  when:
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
+    - initial_wikis_dirs_check.files|length == 0
 
 
 
@@ -460,6 +482,7 @@
 - name: Verify metastore index upgraded
   shell: WIKI={{ list_of_wikis[0] }} php /opt/htdocs/mediawiki/extensions/CirrusSearch/maintenance/metastore.php --upgrade
   run_once: true
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 # Wikis are totally built at this point, but SMW and search need rebuilding
 # FIXME #811: Will this work when controller is not an app server?

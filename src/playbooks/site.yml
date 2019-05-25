@@ -8,6 +8,7 @@
   become: yes
   vars:
     m_home: "/opt/conf-meza/users"
+    m_config_vault: "/opt/conf-meza/vault"
   tasks:
   - name: Ensure no password on meza-ansible user on controller
     shell: passwd --delete meza-ansible
@@ -64,13 +65,30 @@
       group: wheel
       mode: "0600"
 
-# FIXME 800: Run against localhost
-- hosts: app-servers
+  - name: Ensure /opt/conf-meza owned by meza-ansible
+    file:
+      path: "/opt/conf-meza"
+      owner: meza-ansible
+      group: wheel
+      mode: "0755"
+
+# Set umask on all servers. Perhaps this should move above localhost steps since
+# it may impact them, and role "umask-set" has no config requirements
+- hosts: all:!exclude-all:!load-balancers-nonmeza:!load-balancers-nonmeza-external:!load-balancers-nonmeza-internal
+  become: yes
+  roles:
+    - umask-set
+
+- hosts: localhost
   become: yes
   roles:
     - set-vars
-    - umask-set
     - init-controller-config
+    - role: autodeployer
+      when: force_deploy is defined or autodeployer is defined
+  tags:
+    - autodeployer
+    - controller
 
 - hosts: localhost
   become: yes
@@ -87,7 +105,6 @@
   become: yes
   roles:
     - set-vars
-    - umask-set
     - base
     - base-config-scripts
   tags: base
@@ -297,6 +314,18 @@
       mysql_replication_master: "{{ groups['db-master'][0] }}"
       mysql_replication_role: slave
 
+- hosts: backup-servers
+  become: yes
+  tags: backup-servers
+  roles:
+    - set-vars
+  tasks:
+    - name: Ensure MariaDB client installed on backup servers
+      yum:
+        name: mariadb
+        state: present
+      tags:
+        - latest
 
 - hosts: elastic-servers
   become: yes

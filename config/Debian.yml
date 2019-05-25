@@ -59,7 +59,9 @@ package_base_extras:
   - curl
 package_nmap: nmap
 package_lua: [ 'liblua5.1-0-dev', 'liblua50-dev', 'liblualib50-dev', 're2c', 'pkg-config' ]
-
+package_imagemagick:
+  - ghostscript
+  - imagemagick
 
 #
 # Services

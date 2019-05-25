@@ -139,18 +139,29 @@
   register: version_found
   retries: 10
   delay: 10
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 - name: Display current Elasticsearch full version number
   debug:
     var: version_found.json.version.number
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 - name: Display desired Elasticsearch version
   debug:
     var: elasticsearch_major_version
 
-- name: Set the Elasticsearch major version numbers
+- name: Set the Elasticsearch major version found
   set_fact:
     es_version_found: "{{ version_found.json.version.number | list | first }}"
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- name: "Docker image building only: set found version to desired version"
+  set_fact:
+    es_version_found: "{{ elasticsearch_major_version | list | first }}"
+  when: docker_skip_tasks is defined and docker_skip_tasks
+
+- name: Set the Elasticsearch major version desired
+  set_fact:
     es_version_desired: "{{ elasticsearch_major_version | list | first }}"
 
 # Do false first. Then force_do_elasticsearch_upgrade can override

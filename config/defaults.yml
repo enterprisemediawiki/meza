@@ -14,6 +14,7 @@ m_use_production_settings: True
 m_config_core: /opt/meza/config
 m_local_secret: /opt/conf-meza/secret
 m_local_public: /opt/conf-meza/public
+m_config_vault: /opt/conf-meza/vault
 m_home: /opt/conf-meza/users
 
 # Config files written by Ansible which need a place to live on non-controller
@@ -240,6 +241,13 @@ clean_upload_stash_crontime: "0 18 * * *"
 # FILE MODES, OWNERS, GROUPS
 #
 
+m_meza_owner: meza-ansible
+m_meza_group: wheel
+# Don't set mode for /opt/meza for now. Don't want to impact execute bit which
+# is managed by Git
+# FIXME: Later specify read and write permissions only if Ansible supports
+
+
 # uploads directory. Note: user meza-ansible is in group "apache"
 m_uploads_dir_mode: "0775"
 m_uploads_dir_owner: "{{ user_apache }}"
@@ -270,6 +278,14 @@ m_backups_group: root
 m_crond_mode: "0644"
 m_crond_owner: root
 m_crond_group: root
+
+m_config_public_mode: "0755"
+m_config_public_owner: meza-ansible
+m_config_public_group: wheel
+
+m_config_secret_mode: "0750"
+m_config_secret_owner: meza-ansible
+m_config_secret_group: wheel
 
 #
 # PHP config

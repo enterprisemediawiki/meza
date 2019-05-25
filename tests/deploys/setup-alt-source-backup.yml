@@ -9,6 +9,7 @@
   vars:
     alt_source_backups_dir: /opt/alt/backups
     m_home: /opt/conf-meza/users
+    m_tmp: /opt/data-meza/tmp
 
   tasks:
     - name: Ensure packages installed
@@ -22,6 +23,9 @@
         state: present
 
     - name: Ensure backups repo in place
+      # Ref #1149 for TMPDIR environment var
+      environment:
+        TMPDIR: "{{ m_tmp }}"
       git:
         repo: https://github.com/jamesmontalvo3/meza-test-backups.git
         dest: "{{ alt_source_backups_dir }}"

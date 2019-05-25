@@ -32,9 +32,9 @@
   set_fact:
     user_option: "-u {{ remote_server_mysql_user }}"
   when: remote_server_mysql_user is defined
-- name: Set mysql user option to empty string if not defined
+- name: Set mysql user option to use wiki application user if not defined
   set_fact:
-    user_option: ""
+    user_option: "-u {{ wiki_app_db_user.name }}"
   when: remote_server_mysql_user is not defined
 
 #
@@ -44,9 +44,9 @@
   set_fact:
     password_option: "-p{{ remote_server_mysql_pass }}"
   when: remote_server_mysql_pass is defined
-- name: Set mysql password option to empty string if not defined
+- name: Set mysql password option use wiki application user if not defined
   set_fact:
-    password_option: ""
+    password_option: "-p{{ wiki_app_db_user.password }}"
   when: remote_server_mysql_pass is not defined
 
 #
@@ -62,15 +62,48 @@
 #
 # Verify wiki exists on source server before attempting to dump from it
 #
+
+#
+# If remote_server != target_server, use SSH to run mysqlshow. Else, doit locally
+#
+# FIXME #818: Remove StrictHostKeyChecking=no when tests properly add host keys (users should do so, too, of course)
+- name: remote_server ({{ remote_server }}) != target_server ({{ target_server }}); run mysqlshow over SSH
+  set_fact:
+    mysqlshow_command: >
+      ssh
+      -o StrictHostKeyChecking=no
+      -i /root/meza-ansible-id_rsa
+      -o UserKnownHostsFile=/root/meza-ansible-known_hosts
+      {{ remote_server_ssh_user }}@{{ remote_server }}
+      "mysqlshow
+      {{ user_option }}
+      {{ password_option }}
+      {{ dump_database }}
+      | grep -v Wildcard
+      | grep -o {{ dump_database }}"
+  when: remote_server != target_server
+- name: remote_server == target_server ({{ target_server }}); run mysqlshow locally
+  set_fact:
+    mysqlshow_command: >
+      mysqlshow
+      {{ user_option }}
+      {{ password_option }}
+      {{ dump_database }}
+      | grep -v Wildcard
+      | grep -o {{ dump_database }}
+  when: remote_server == target_server
+- debug: { msg: "{{ mysqlshow_command }}" }
+
 - name: "{{ wiki_id }} - check if wiki database exists ON SOURCE SERVER"
-  shell: 'mysqlshow "wiki_{{ wiki_id }}" | grep -v Wildcard | grep -o wiki_{{ wiki_id }}'
+  shell: "{{ mysqlshow_command }}"
   register: source_wiki_exists_check
-  delegate_to: "{{ target_server }}"
   failed_when: False
   run_once: true
+  delegate_to: "{{ target_server }}"
 
 - debug:
     var: source_wiki_exists_check
+
 
 - name: "{{ wiki_id }} - Set fact if database wiki_{{ wiki_id }} DOES exist ON SOURCE SERVER"
   set_fact:

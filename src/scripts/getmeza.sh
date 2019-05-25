@@ -103,6 +103,9 @@ mkdir -p /opt/conf-meza/secret
 chmod 755 /opt/conf-meza
 chmod 755 /opt/conf-meza/secret
 
+# Required initially for creating lock files
+mkdir -p /opt/data-meza
+
 # If user meza-ansible already exists, make sure home directory is correct
 # (update from old meza versions)
 ret=false
@@ -120,13 +123,14 @@ if $ret; then
 	else
 		echo "meza-ansible home-dir in correct location"
 	fi
+else
+	echo
+	echo "Add ansible master user"
+	source "/opt/meza/src/scripts/ssh-users/setup-master-user.sh"
 fi
 
-
-echo
-echo "Add ansible master user"
-source "/opt/meza/src/scripts/ssh-users/setup-master-user.sh"
-
+chown meza-ansible:wheel /opt/conf-meza
+chown meza-ansible:wheel /opt/meza
 
 # Don't require TTY or visible password for sudo. Ref #769
 sed -r -i "s/^Defaults\\s+requiretty/#Defaults requiretty/g;" /etc/sudoers

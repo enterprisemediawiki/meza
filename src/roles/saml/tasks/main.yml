@@ -1,6 +1,9 @@
 ---
 
 - name: Ensure SimpleSamlPhp (PHP SAML library) installed
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     repo: https://github.com/simplesamlphp/simplesamlphp.git
     dest: "{{ m_simplesamlphp_path }}"
@@ -10,6 +13,9 @@
     - latest
 
 - name: Ensure SimpleSamlAuth (MediaWiki extension) installed
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
   git:
     # Main version of this extension, jornane/mwSimpleSamlAuth, is slow to
     # update. Use this fork instead, which should stay current with jornane

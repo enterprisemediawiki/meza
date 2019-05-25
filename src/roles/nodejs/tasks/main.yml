@@ -71,6 +71,7 @@
   unarchive:
     src: /tmp/node.tar.xz
     dest: /usr/local/lib/node
+    remote_src: yes
     extra_opts: [--strip-components=1]
   when: "node_version.stdout != 'v8.11.1'"
 

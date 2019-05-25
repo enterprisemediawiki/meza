@@ -15,6 +15,7 @@ else
   configuration = YAML::load(File.read("#{File.dirname(__FILE__)}/vagrantconf.default.yml"))
 end
 
+
 if configuration.key?("baseBox")
 
   # Allow custom setting of base bax
@@ -41,8 +42,30 @@ else
   box_os = "centos"
 end
 
-mezaInstallUnique = Digest::SHA1.hexdigest File.dirname(__FILE__)
 
+# Source:
+# https://stackoverflow.com/questions/26811089/vagrant-how-to-have-host-platform-specific-provisioning-steps
+module OS
+    def OS.windows?
+        (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+    end
+
+    def OS.mac?
+        (/darwin/ =~ RUBY_PLATFORM) != nil
+    end
+
+    def OS.unix?
+        !OS.windows?
+    end
+
+    # Not ideal. BSD is Unix but is not Mac, but would return true for Linux.
+    def OS.linux?
+        OS.unix? and not OS.mac?
+    end
+end
+
+mezaDirName = File.dirname(__FILE__).rpartition("/").last
+mezaInstallUnique = Digest::SHA1.hexdigest File.dirname(__FILE__)
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -59,11 +82,9 @@ Vagrant.configure("2") do |config|
     config.vm.define "app2" do |app2|
 
       hostname = 'meza-app2-' + box_os
-
       app2.vm.box = baseBox
-      app2.vm.hostname = hostname
-
       ip_address = configuration["app2"]["ip_address"]
+      app2.vm.hostname = hostname
 
       app2.vm.network :private_network, ip: ip_address
 
@@ -72,7 +93,7 @@ Vagrant.configure("2") do |config|
         v.customize ['modifyvm', :id, '--cableconnected1', 'on']
         v.customize ["modifyvm", :id, "--memory", configuration["app2"]["memory"] ]
         v.customize ["modifyvm", :id, "--cpus", configuration["app2"]["cpus"] ]
-        v.customize ["modifyvm", :id, "--name", hostname + '-' + mezaInstallUnique]
+        v.customize ["modifyvm", :id, "--name", mezaDirName + '-' + hostname + '-' + mezaInstallUnique]
       end
 
       # Non-controlling server should not have meza
@@ -114,10 +135,8 @@ Vagrant.configure("2") do |config|
     config.vm.define "db2" do |db2|
 
       hostname = 'meza-db2-' + box_os
-
       db2.vm.box = baseBox
       db2.vm.hostname = hostname
-
       ip_address = configuration["db2"]["ip_address"]
 
       db2.vm.network :private_network, ip: ip_address
@@ -127,7 +146,7 @@ Vagrant.configure("2") do |config|
         v.customize ['modifyvm', :id, '--cableconnected1', 'on']
         v.customize ["modifyvm", :id, "--memory", configuration["db2"]["memory"] ]
         v.customize ["modifyvm", :id, "--cpus", configuration["db2"]["cpus"] ]
-        v.customize ["modifyvm", :id, "--name", hostname + '-' + mezaInstallUnique]
+        v.customize ["modifyvm", :id, "--name", mezaDirName + '-' + hostname + '-' + mezaInstallUnique]
       end
 
       # Non-controlling server should not have meza
@@ -166,10 +185,8 @@ Vagrant.configure("2") do |config|
   config.vm.define "app1", primary: true do |app1|
 
     hostname = 'meza-app1-' + box_os
-
     app1.vm.box = baseBox
     app1.vm.hostname = hostname
-
     app1_ip_address = configuration["app1"]["ip_address"]
 
     app1.vm.network :private_network, ip: app1_ip_address
@@ -179,12 +196,22 @@ Vagrant.configure("2") do |config|
       v.customize ['modifyvm', :id, '--cableconnected1', 'on']
       v.customize ["modifyvm", :id, "--memory", configuration["app1"]["memory"] ]
       v.customize ["modifyvm", :id, "--cpus", configuration["app1"]["cpus"] ]
-      v.customize ["modifyvm", :id, "--name", hostname + '-' + mezaInstallUnique]
+      v.customize ["modifyvm", :id, "--name", mezaDirName + '-' + hostname + '-' + mezaInstallUnique]
     end
 
     # Disable default synced folder at /vagrant, instead put at /opt/meza
     app1.vm.synced_folder ".", "/vagrant", disabled: true
-    app1.vm.synced_folder ".", "/opt/meza", type: "virtualbox", owner: "vagrant", group: "vagrant", mount_options: ["dmode=755,fmode=755"]
+
+    if OS.windows?
+      # Vagrant provisioning happens after mounts, so since meza-ansible doesn't
+      # exist yet at the time of mounting cannot specify owner appropriately.
+      # Also, at least on Windows it's not possible to change the owner/group
+      # after it is mounted, so instead we pick a UID and GID and meza-ansible
+      # and wheel are changed to these IDs after they are created.
+      app1.vm.synced_folder ".", "/opt/meza", type: "virtualbox", owner: 10000, group: 10000, mount_options: ["dmode=755,fmode=755"]
+    else
+      app1.vm.synced_folder ".", "/opt/meza", type: "virtualbox", owner: 10000, group: 10000
+    end
 
     # app1.vm.synced_folder ".", "/opt/meza", type: "smb"
     # app1.vm.synced_folder ".", "/opt/meza", type: "rsync",
@@ -212,6 +239,9 @@ Vagrant.configure("2") do |config|
       chown meza-ansible:meza-ansible /opt/conf-meza/users/meza-ansible/.ssh/id_rsa.pub
 
       cat /opt/conf-meza/users/meza-ansible/.ssh/id_rsa.pub >> /opt/conf-meza/users/meza-ansible/.ssh/authorized_keys
+
+      usermod -u 10000 meza-ansible
+      groupmod -g 10000 wheel
     SHELL
 
     #
