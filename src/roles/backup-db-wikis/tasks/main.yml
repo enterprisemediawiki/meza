@@ -28,52 +28,33 @@
 
 
 
-- name: "Grant keys to {{ inventory_hostname }}"
+
+
+
+
+- name: "Run role:rsync - Copy SQL files to backups"
   include_role:
-    name: key-transfer
-    tasks_from: grant-keys
+    name: rsync
   vars:
-    granted_server: "{{ inventory_hostname }}"
-
-- name: "Grant keys to {{ groups['db-master'][0] }}"
-  include_role:
-    name: key-transfer
-    tasks_from: grant-keys
-  vars:
-    granted_server: "{{ groups['db-master'][0] }}"
-
-
-
-
-
-
-# - name: "Run role:rsync - Copy SQL files to backups"
-#   include_role:
-#     name: rsync
-#   vars:
-#     pulling_to_server:   "{{ inventory_hostname }}"
-#     pulling_to_path:     "{{ m_uploads_dir }}/{{ wiki_id }}"
-#     pulling_from_server: "{{ uploads_backup_server }}"
-#     pulling_from_path:   "{{ uploads_backup_dir_path }}/"
-#     pulling_from_user:   "{{ uploads_backup_server_remote_user }}"
-#   run_once: true
-#   when:
-#     remote_dir_exists
-#     and (not wiki_has_uploads or do_overwrite_uploads_from_backup)
-#   tags:
-#     - verify-wiki-uploads
-
-
-# copy from server A (db-master) to server B (backups)
-- name: Copy SQL files to backups
-  synchronize:
-    # copy from server A
-    src: "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
-    # copy to server B
-    dest: "{{ m_backups }}/{{ env }}/{{ item }}/{{ backup_timestamp }}_wiki.sql"
-  # server A
-  delegate_to: "{{ groups['db-master'][0] }}"
+    pulling_to_server:   "{{ inventory_hostname }}"
+    pulling_to_path:     "{{ m_backups }}/{{ env }}/{{ item }}/{{ backup_timestamp }}_wiki.sql"
+    pulling_from_server: "{{ groups['db-master'][0] }}"
+    pulling_from_path:   "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
+    pulling_from_user:   "meza-ansible"
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+
+
+#copy from server A (db-master) to server B (backups)
+#- name: Copy SQL files to backups
+#  synchronize:
+#    # copy from server A
+#    src: "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
+#    # copy to server B
+#    dest: "{{ m_backups }}/{{ env }}/{{ item }}/{{ backup_timestamp }}_wiki.sql"
+#  # server A
+#  delegate_to: "{{ groups['db-master'][0] }}"
+#  with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
 
 # Remove temp SQL files, only needs to be done on first backup server
 - name: Remove SQL files from DB master {{ m_tmp }}
