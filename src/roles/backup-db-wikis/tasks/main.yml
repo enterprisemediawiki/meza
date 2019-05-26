@@ -25,6 +25,20 @@
     group: "{{ m_backups_group }}"
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
 
+
+
+
+- name: "Grant keys to {{ pulling_to_server }}"
+  include_role:
+    name: key-transfer
+    tasks_from: grant-keys
+  vars:
+    granted_server: "{{ groups['db-master'][0] }}"
+
+
+
+
+
 # copy from server A (db-master) to server B (backups)
 - name: Copy SQL files to backups
   synchronize:
