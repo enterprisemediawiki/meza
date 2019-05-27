@@ -36,16 +36,27 @@
     group: root
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
 
-# copy from server A (app.0) to server B (backups)
-- name: Copy uploads directories to backups
-  synchronize:
-    # copy from server A
-    src: "{{ m_uploads_dir }}/{{ item }}/"
-    # copy to server B
-    dest: "{{ m_backups }}/{{ env }}/{{ item }}/uploads"
-    recursive: yes
-  # server A
-  delegate_to: "{{ groups['app-servers'][0] }}"
+- name: "Run role:rsync - Copy uploads directory to backups"
+  include_role:
+    name: rsync
+  vars:
+    pulling_to_server:   "{{ inventory_hostname }}"
+    pulling_to_path:     "{{ m_backups }}/{{ env }}/{{ item }}/uploads"
+    pulling_from_server: "{{ groups['app-servers'][0] }}"
+    pulling_from_path:   "{{ m_uploads_dir }}/{{ item }}/"
+    pulling_from_user:   "meza-ansible”
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
 
+
+# copy from server A (app.0) to server B (backups)
+#- name: Copy uploads directories to backups
+#  synchronize:
+#    # copy from server A
+#    src: "{{ m_uploads_dir }}/{{ item }}/"
+#    # copy to server B
+#    dest: "{{ m_backups }}/{{ env }}/{{ item }}/uploads"
+#    recursive: yes
+#  # server A
+#  delegate_to: "{{ groups['app-servers'][0] }}"
+#  with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
 
