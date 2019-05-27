@@ -130,6 +130,7 @@
     - tree
     - cronie
     - rsync
+    - python-pip
   tags:
   - latest
 
