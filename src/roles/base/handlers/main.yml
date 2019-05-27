@@ -1,8 +1,12 @@
 ---
 - name: restart ntp
-  service: name={{ service_ntp }} state=restarted
+  service:
+    name: "{{ service_ntp }}"
+    state: restarted
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 - name: restart sshd
-  service: name=sshd state=restarted
+  service:
+    name: "{{ service_ssh }}"
+    state: restarted
   when: docker_skip_tasks is not defined or not docker_skip_tasks

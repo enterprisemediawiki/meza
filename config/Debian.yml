@@ -69,7 +69,7 @@ package_imagemagick:
 service_ntp: ntp
 service_apache: apache2
 service_cron: cron
-
+service_ssh: ssh
 
 #
 # Paths
