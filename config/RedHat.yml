@@ -53,6 +53,7 @@ package_lua: [ 'lua', 'lua-devel' ]
 service_ntp: ntpd
 service_apache: httpd
 service_cron: crond
+service_ssh: sshd
 
 #
 # Paths

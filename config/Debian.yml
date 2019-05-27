@@ -67,7 +67,7 @@ package_lua: [ 'liblua5.1-0-dev', 'liblua50-dev', 'liblualib50-dev', 're2c', 'pk
 service_ntp: ntp
 service_apache: apache2
 service_cron: cron
-
+service_ssh: ssh
 
 #
 # Paths
