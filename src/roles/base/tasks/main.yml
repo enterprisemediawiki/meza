@@ -49,6 +49,13 @@
     line: 'alt-meza-ansible ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
 
+# Without this get error "yum lockfile is held by another process" occasionally
+- name: Ensure PackageKit is removed so it doesn't try to upgrade packages on its own
+  yum:
+    name: PackageKit
+    state: absent
+  when: ansible_os_family == 'RedHat'
+
 - name: ensure deltarpm is installed and latest
   yum: name=deltarpm state=latest
   tags:
