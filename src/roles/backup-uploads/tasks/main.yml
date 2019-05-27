@@ -44,7 +44,7 @@
     pulling_to_path:     "{{ m_backups }}/{{ env }}/{{ item }}/uploads"
     pulling_from_server: "{{ groups['app-servers'][0] }}"
     pulling_from_path:   "{{ m_uploads_dir }}/{{ item }}/"
-    pulling_from_user:   "meza-ansible”
+    pulling_from_user:   "meza-ansible"
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
 
 
