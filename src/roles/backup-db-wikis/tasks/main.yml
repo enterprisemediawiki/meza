@@ -25,13 +25,6 @@
     group: "{{ m_backups_group }}"
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
 
-
-
-
-
-
-
-
 - name: "Run role:rsync - Copy SQL files to backups"
   include_role:
     name: rsync
@@ -42,19 +35,6 @@
     pulling_from_path:   "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
     pulling_from_user:   "meza-ansible"
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
-
-
-
-#copy from server A (db-master) to server B (backups)
-#- name: Copy SQL files to backups
-#  synchronize:
-#    # copy from server A
-#    src: "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
-#    # copy to server B
-#    dest: "{{ m_backups }}/{{ env }}/{{ item }}/{{ backup_timestamp }}_wiki.sql"
-#  # server A
-#  delegate_to: "{{ groups['db-master'][0] }}"
-#  with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
 
 # Remove temp SQL files, only needs to be done on first backup server
 - name: Remove SQL files from DB master {{ m_tmp }}
