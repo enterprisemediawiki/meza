@@ -202,6 +202,28 @@
 #   pip:
 #     name: cryptography
 
+
+- name: Ensure meza-backups group exists
+  group:
+    name: meza-backups
+    state: present
+
+- name: Ensure data directory configured
+  file:
+    path: "{{ m_meza_data }}"
+    state: directory
+    owner: "{{ m_data_mode }}"
+    group: "{{ m_data_mode }}"
+    mode: "{{ m_data_mode }}"
+
+- name: Ensure data directory configured
+  file:
+    path: "{{ m_meza_data }}"
+    state: directory
+    owner: "{{ m_data_mode }}"
+    group: "{{ m_data_mode }}"
+    mode: "{{ m_data_mode }}"
+
 - name: Ensure deploy directory in place
   file:
     path: "{{ m_deploy }}"

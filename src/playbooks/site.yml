@@ -297,13 +297,7 @@
   tags: backup-servers
   roles:
     - set-vars
-  tasks:
-    - name: Ensure MariaDB client installed on backup servers
-      yum:
-        name: mariadb
-        state: present
-      tags:
-        - latest
+    - backup-config
 
 - hosts: elastic-servers
   become: yes

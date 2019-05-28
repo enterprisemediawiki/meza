@@ -195,6 +195,12 @@ m_meza_group: wheel
 # FIXME: Later specify read and write permissions only if Ansible supports
 
 
+m_data_mode: "0755"
+m_data_owner: meza-ansible
+m_data_group: wheel
+
+
+
 # uploads directory. Note: user meza-ansible is in group "apache"
 m_uploads_dir_mode: "0775"
 m_uploads_dir_owner: apache
@@ -217,9 +223,9 @@ m_logs_owner: meza-ansible
 m_logs_group: wheel
 
 
-m_backups_mode: "0755"
-m_backups_owner: root
-m_backups_group: root
+m_backups_mode: "0775"
+m_backups_owner: meza-ansible
+m_backups_group: meza-backups
 
 # mode/ownership for anything in /etc/cron.d
 m_crond_mode: "0644"

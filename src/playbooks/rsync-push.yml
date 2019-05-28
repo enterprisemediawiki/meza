@@ -1,0 +1,12 @@
+---
+
+- hosts: localhost
+  become: yes
+  roles:
+    - set-vars
+    - role: rsync-push
+      pushing_from_server: localhost
+      pushing_from_path: /opt/meza
+      pushing_to_server: 192.168.56.57
+      pushing_to_path: /tmp/pushed-meza
+      pushing_to_user: someuser
