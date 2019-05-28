@@ -23,6 +23,9 @@
 
 
 # FIXME #818: Remove StrictHostKeyChecking=no when tests properly add host keys (users should do so, too, of course)
+# Note on --omit-dir-times: This will not preserve modification times on directories.
+#     It may be necessary for the remote user to be the owner of a directory, not just
+#     within the group that owns it, in order to be able to maintain these times.
 - name: Set rsync command fact for pushing-from server {{ pushing_from_server }} NOT pushing-to server
   set_fact:
     rsync_command: >
@@ -32,6 +35,7 @@
       --compress
       --copy-links
       --archive
+      --omit-dir-times
       "{{ pushing_from_path }}"
       --rsh="/usr/bin/ssh -S none -o StrictHostKeyChecking=no
       -l {{ pushing_to_user }} -i /root/meza-ansible-id_rsa

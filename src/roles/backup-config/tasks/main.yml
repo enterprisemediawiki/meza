@@ -7,6 +7,11 @@
   tags:
     - latest
 
+- name: Ensure meza-backups group exists
+  group:
+    name: meza-backups
+    state: present
+
 - name: Ensure backups directory exists
   file:
     path: "{{ m_backups }}"

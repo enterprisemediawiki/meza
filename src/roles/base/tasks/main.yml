@@ -202,12 +202,6 @@
 #   pip:
 #     name: cryptography
 
-
-- name: Ensure meza-backups group exists
-  group:
-    name: meza-backups
-    state: present
-
 - name: Ensure data directory configured
   file:
     path: "{{ m_meza_data }}"
