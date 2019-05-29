@@ -728,6 +728,19 @@ def meza_command_docker (argv):
 		sys.exit(1)
 
 
+def meza_command_push_backup (argv):
+
+	env = argv[0]
+
+	rc = check_environment(env)
+	if rc != 0:
+		meza_shell_exec_exit(rc)
+
+	shell_cmd = playbook_cmd( 'push-backup', env ) + argv[1:]
+	rc = meza_shell_exec( shell_cmd )
+
+	meza_shell_exec_exit(rc)
+
 
 def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 	command = ['sudo', '-u', 'meza-ansible', 'ansible-playbook',
