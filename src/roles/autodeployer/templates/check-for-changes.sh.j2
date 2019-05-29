@@ -76,11 +76,77 @@ fi
 
 GIT_FETCH="$DIR/git-fetch.sh"
 
+
+# Set SECRET config version
+#
+# FIXME: For now can only get repo from existing (add option: from var)
+# FIXME: For now only track master branch (add options: existing and from var)
+SECRET_CONFIG_DEST="/opt/conf-meza/secret"
+cd "$SECRET_CONFIG_DEST"
+SECRET_CONFIG_REPO="SECRET_CONFIG_REPO=$(git remote get-url origin)"
+SECRET_CONFIG_VERSION="master"
+SECRET_CONFIG_CHANGE=$($GIT_FETCH "$SECRET_CONFIG_REPO" "$SECRET_CONFIG_DEST" "$SECRET_CONFIG_VERSION")
+
+#
+# Check if attempt to git-pull PUBLIC CONFIG failed
+#
+# FIXME: For some reason the jq command below was not working if it was within
+#        the conditional, so it has to be out here, where it forces us to
+#        temporarily allow errors.
+set +e
+echo "Did git fetch fail on secret config?"
+echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.failed' -e
+if [ $? -eq 0 ]; then
+	FAILED_MSG=$(echo "$SECRET_CONFIG_CHANGE" | jq .plays[0].tasks[0].hosts.localhost.msg -r)
+	FULL_MSG="Updating secret config failed with following message:\n  $FAILED_MSG"
+	>&2 echo -e "$FULL_MSG"
+
+	if [ ! -z "SLACK_TOKEN" ]; then
+		SLACK_MESSAGE="$FULL_MSG"
+		SLACK_COLOR="danger"
+		source $NOTIFY
+	fi
+	exit 1;
+fi
+
+#
+# Check if changes were made to SECRET CONFIG
+#
+echo "Were there changes to secret config?"
+echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.changed' -e
+if [ $? -eq 0 ]; then
+	SECRET_CONFIG_BEFORE_HASH=$(echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.before' -r)
+	SECRET_CONFIG_AFTER_HASH=$(echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
+	echo "Before hash: $SECRET_CONFIG_BEFORE_HASH"
+	echo "After hash:  $SECRET_CONFIG_BEFORE_HASH"
+
+	pushd "$SECRET_CONFIG_DEST"
+	SECRET_CONFIG_DIFF=$(git diff "$SECRET_CONFIG_BEFORE_HASH" "$SECRET_CONFIG_AFTER_HASH" 2>&1)
+	SECRET_CONFIG_COMMITS=$(git log --oneline "$SECRET_CONFIG_BEFORE_HASH...$SECRET_CONFIG_AFTER_HASH" 2>&1)
+	pushd
+else
+	SECRET_CONFIG_DIFF=""
+	SECRET_CONFIG_AFTER_HASH=""
+fi
+
+# Make sure config.sh is up-to-date after secret config change above, since it
+# may impact what version of public config and Meza are checked out below
+meza setbaseconfig "$m_environment"
+# FIXME: sourcing config.sh here will overwrite previously set vars with any new
+#        values, and will add any newly defined vars, but if config changed to
+#        remove an existing var then that value will not be unset.
+source /opt/.deploy-meza/config.sh
+
+
 # Set PUBLIC config version
 #
 # Could optionally set public config's repo in secret config, but since that is
 # not done universally, not going to enforce it here. Just use whatever repo is
 # currently being used as origin.
+#
+# FIXME: I believe the above comment is wrong. I believe it is pulling the repo
+#        URL from config. Perhaps it should downmode to using the existing repo
+#        if not set in config (public or secret).
 PUBLIC_CONFIG_DEST="/opt/conf-meza/public"
 PUBLIC_CONFIG_REPO="$local_config_repo_repo"
 PUBLIC_CONFIG_VERSION="$local_config_repo_version"
@@ -129,7 +195,7 @@ else
 fi
 
 # Make sure config.sh is up-to-date after public config change above, since it
-# impacts what version of
+# potentially impacts what version of Meza is checked out
 meza setbaseconfig "$m_environment"
 source /opt/.deploy-meza/config.sh
 
@@ -187,9 +253,9 @@ set -e # end FIXME from above.
 
 
 #
-# Neither Meza mor config changed? Exit.
+# Meza, public, and secret config all unchanged? Exit.
 #
-if [ -z "$PUBLIC_CONFIG_AFTER_HASH$MEZA_AFTER_HASH" ]; then
+if [ -z "$SECRET_CONFIG_AFTER_HASH$PUBLIC_CONFIG_AFTER_HASH$MEZA_AFTER_HASH" ]; then
 	meza deploy-unlock "$m_environment"
 	echo "Nothing to deploy"
 	exit 0;
