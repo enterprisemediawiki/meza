@@ -728,19 +728,6 @@ def meza_command_docker (argv):
 		sys.exit(1)
 
 
-def meza_command_rsync_push (argv):
-
-	env = argv[0]
-
-	rc = check_environment(env)
-	if rc != 0:
-		meza_shell_exec_exit(rc)
-
-	shell_cmd = playbook_cmd( 'rsync-push', env ) + argv[1:]
-	rc = meza_shell_exec( shell_cmd )
-
-	meza_shell_exec_exit(rc)
-
 def meza_command_push_backup (argv):
 
 	env = argv[0]
