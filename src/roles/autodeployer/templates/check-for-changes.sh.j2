@@ -26,29 +26,32 @@ if [ "$(whoami)" != "root" ]; then
 	exit 1
 fi
 
-# Check if a deploy is happening.
-#
-# This will cause the script to exit if a deploy is currently underway, thus
-# preventing two deploys from happening at once.
-#
-# FIXME: not implemented yet
-# source "$DIR/check-deploy.sh"
-
-# Gets info about public config
+# Gets initial config defined by secret and public config (and Meza defaults).
+# Really all this does is grabs $m_environment, but instead whatever is calling
+# this script should pass that in as an argument.
 source /opt/.deploy-meza/config.sh
 
-#
-# FIXME: For now, don't touch secret config. At some point find a way to
-#        configure it's repo and version.
-
-# Make sure config.sh is up-to-date in case there has been a secret config
-# change since the last deploy, which could impact local_config_repo var.
+# Now that $m_environment is available, force update of config.sh using the
+# `meza setbaseconfig` command. This will rebuild config.sh based upon current
+# state of secret config, public config, and Meza.
 meza setbaseconfig "$m_environment"
 source /opt/.deploy-meza/config.sh
 
+#
+# Check if deploy is underway
+#
+meza deploy-check "$m_environment"
+if [ $? -eq 0 ]; then
+	echo "Checked if deploy underway. Is not. Placing deploy lock while checking for changes."
+	meza deploy-lock "$m_environment"
+else
+	echo "Deploy is underway. Exiting."
+	exit 1
+fi
 
-if [ -z "$local_config_repo_repo" ]; then
-	>&2 echo "Auto-deploy requires 'local_config_repo' set in secret or public config"
+
+if [ -z "$local_config_repo_repo$secret_config_repo_repo$enforce_meza_version" ]; then
+	>&2 echo "Auto-deploy requires a public config, secret config, or Meza version to be set."
 	exit 1;
 fi
 
@@ -58,14 +61,6 @@ if [ ! -z "$autodeployer_slack_username" ]; then SLACK_USERNAME="$autodeployer_s
 if [ ! -z "$autodeployer_slack_channel"  ]; then  SLACK_CHANNEL="$autodeployer_slack_channel";  fi
 if [ ! -z "$autodeployer_slack_icon_url" ]; then SLACK_ICON_URL="$autodeployer_slack_icon_url"; fi
 
-meza deploy-check "$m_environment"
-if [ $? -eq 0 ]; then
-	echo "Checked if deploy underway. Is not. Placing deploy lock while checking for changes."
-	meza deploy-lock "$m_environment"
-else
-	echo "Deploy is underway. Exiting."
-	exit 1
-fi
 
 # If SLACK_TOKEN is set, send notification via slack. Else, use no-notify script
 if [ ! -z "$SLACK_TOKEN" ]; then
@@ -77,65 +72,71 @@ fi
 GIT_FETCH="$DIR/git-fetch.sh"
 
 
-# Set SECRET config version
-#
-# FIXME: For now can only get repo from existing (add option: from var)
-# FIXME: For now only track master branch (add options: existing and from var)
-SECRET_CONFIG_DEST="/opt/conf-meza/secret"
-cd "$SECRET_CONFIG_DEST"
-SECRET_CONFIG_REPO="SECRET_CONFIG_REPO=$(git remote get-url origin)"
-SECRET_CONFIG_VERSION="master"
-SECRET_CONFIG_CHANGE=$($GIT_FETCH "$SECRET_CONFIG_REPO" "$SECRET_CONFIG_DEST" "$SECRET_CONFIG_VERSION")
+if [ ! -z "$secret_config_repo_repo" ]; then
 
-#
-# Check if attempt to git-pull PUBLIC CONFIG failed
-#
-# FIXME: For some reason the jq command below was not working if it was within
-#        the conditional, so it has to be out here, where it forces us to
-#        temporarily allow errors.
-set +e
-echo "Did git fetch fail on secret config?"
-echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.failed' -e
-if [ $? -eq 0 ]; then
-	FAILED_MSG=$(echo "$SECRET_CONFIG_CHANGE" | jq .plays[0].tasks[0].hosts.localhost.msg -r)
-	FULL_MSG="Updating secret config failed with following message:\n  $FAILED_MSG"
-	>&2 echo -e "$FULL_MSG"
+	# Set SECRET config version
+	#
+	# FIXME: For now can only get repo from existing (add option: from var)
+	# FIXME: For now only track master branch (add options: existing and from var)
+	SECRET_CONFIG_DEST="/opt/conf-meza/secret"
+	SECRET_CONFIG_REPO="$secret_config_repo_repo"
+	SECRET_CONFIG_VERSION="$secret_config_repo_version"
+	SECRET_CONFIG_CHANGE=$($GIT_FETCH "$SECRET_CONFIG_REPO" "$SECRET_CONFIG_DEST" "$SECRET_CONFIG_VERSION")
 
-	if [ ! -z "SLACK_TOKEN" ]; then
-		SLACK_MESSAGE="$FULL_MSG"
-		SLACK_COLOR="danger"
-		source $NOTIFY
+	#
+	# Check if attempt to git-pull SECRET CONFIG failed
+	#
+	# FIXME: For some reason the jq command below was not working if it was within
+	#        the conditional, so it has to be out here, where it forces us to
+	#        temporarily allow errors.
+	set +e
+	echo "Did git fetch fail on secret config?"
+	echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.failed' -e
+	if [ $? -eq 0 ]; then
+		FAILED_MSG=$(echo "$SECRET_CONFIG_CHANGE" | jq .plays[0].tasks[0].hosts.localhost.msg -r)
+		FULL_MSG="Updating secret config failed with following message:\n  $FAILED_MSG"
+		>&2 echo -e "$FULL_MSG"
+
+		if [ ! -z "SLACK_TOKEN" ]; then
+			SLACK_MESSAGE="$FULL_MSG"
+			SLACK_COLOR="danger"
+			source $NOTIFY
+		fi
+		exit 1;
 	fi
-	exit 1;
-fi
 
-#
-# Check if changes were made to SECRET CONFIG
-#
-echo "Were there changes to secret config?"
-echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.changed' -e
-if [ $? -eq 0 ]; then
-	SECRET_CONFIG_BEFORE_HASH=$(echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.before' -r)
-	SECRET_CONFIG_AFTER_HASH=$(echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
-	echo "Before hash: $SECRET_CONFIG_BEFORE_HASH"
-	echo "After hash:  $SECRET_CONFIG_BEFORE_HASH"
+	#
+	# Check if changes were made to SECRET CONFIG
+	#
+	echo "Were there changes to secret config?"
+	echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.changed' -e
+	if [ $? -eq 0 ]; then
+		SECRET_CONFIG_BEFORE_HASH=$(echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.before' -r)
+		SECRET_CONFIG_AFTER_HASH=$(echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
+		echo "Before hash: $SECRET_CONFIG_BEFORE_HASH"
+		echo "After hash:  $SECRET_CONFIG_BEFORE_HASH"
 
-	pushd "$SECRET_CONFIG_DEST"
-	SECRET_CONFIG_DIFF=$(git diff "$SECRET_CONFIG_BEFORE_HASH" "$SECRET_CONFIG_AFTER_HASH" 2>&1)
-	SECRET_CONFIG_COMMITS=$(git log --oneline "$SECRET_CONFIG_BEFORE_HASH...$SECRET_CONFIG_AFTER_HASH" 2>&1)
-	pushd
+		pushd "$SECRET_CONFIG_DEST"
+		SECRET_CONFIG_DIFF=$(git diff "$SECRET_CONFIG_BEFORE_HASH" "$SECRET_CONFIG_AFTER_HASH" 2>&1)
+		SECRET_CONFIG_COMMITS=$(git log --oneline "$SECRET_CONFIG_BEFORE_HASH...$SECRET_CONFIG_AFTER_HASH" 2>&1)
+		pushd
+	else
+		SECRET_CONFIG_DIFF=""
+		SECRET_CONFIG_AFTER_HASH=""
+	fi
+
+	# Make sure config.sh is up-to-date after secret config change above, since it
+	# may impact what version of public config and Meza are checked out below
+	meza setbaseconfig "$m_environment"
+	# FIXME: sourcing config.sh here will overwrite previously set vars with any new
+	#        values, and will add any newly defined vars, but if config changed to
+	#        remove an existing var then that value will not be unset.
+	source /opt/.deploy-meza/config.sh
+
 else
 	SECRET_CONFIG_DIFF=""
 	SECRET_CONFIG_AFTER_HASH=""
 fi
-
-# Make sure config.sh is up-to-date after secret config change above, since it
-# may impact what version of public config and Meza are checked out below
-meza setbaseconfig "$m_environment"
-# FIXME: sourcing config.sh here will overwrite previously set vars with any new
-#        values, and will add any newly defined vars, but if config changed to
-#        remove an existing var then that value will not be unset.
-source /opt/.deploy-meza/config.sh
 
 
 # Set PUBLIC config version
