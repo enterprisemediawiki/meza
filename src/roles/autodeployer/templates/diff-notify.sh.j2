@@ -1,0 +1,55 @@
+#!/bin/sh
+#
+#
+
+DESC="$1"
+BEFORE_HASH="$2"
+AFTER_HASH="$3"
+VERSION="$4"
+COMMITS="$5"
+DIFF="$6"
+
+# This unsets positional parameters (e.g. $1, $2, etc), necessary for the
+# `source $NOTIFY` below not to have $1 and $2 injected
+set --
+
+# Show commits?
+if [ ! -z "$COMMITS" ]; then
+COMMITS_TEXT=$(cat <<-END
+
+
+Commits:
+$COMMITS
+END)
+else
+	COMMITS_TEXT=""
+fi
+
+# Show diff?
+if [ ! -z "$DIFF" ]; then
+DIFF_TEXT=$(cat <<-END
+
+
+Diff:
+\`\`\`
+$DIFF
+\`\`\`
+END)
+fi
+
+MESSAGE=$(cat <<-END
+$DESC changed versions:
+  FROM: \`$BEFORE_HASH\`
+  TO:   \`$AFTER_HASH\`
+
+Tracking version: \`$VERSION\` $COMMITS_TEXT $DIFF_TEXT
+END
+)
+
+echo -e "$MESSAGE"
+
+if [ ! -z "SLACK_TOKEN" ]; then
+	SLACK_MESSAGE="$MESSAGE"
+	SLACK_COLOR="good"
+	source $NOTIFY
+fi
