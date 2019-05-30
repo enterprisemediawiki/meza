@@ -1,0 +1,74 @@
+#!/bin/sh
+#
+# Attempt update of repo
+#
+# Inputs:
+#   $1 = repo description. Ex: secret config, public config, Meza
+#   $2 = destination. Ex: /opt/conf-meza/secret
+#   $3 = repo. Ex: https://github.com/enterprisemediawiki/meza.git
+#   $4 = version. Ex: master, tags/31.1.1
+
+DESC="$1"
+DEST="$2"
+REPO="$3"
+VERSION="$4"
+
+
+SECRET_CONFIG_DEST
+SECRET_CONFIG_REPO
+SECRET_CONFIG_VERSION
+SECRET_CONFIG_CHANGE
+
+
+GIT_CHANGE=$($GIT_FETCH "$REPO" "$DEST" "$VERSION")
+
+#
+# Check if attempt to git-pull SECRET CONFIG failed
+#
+# FIXME: For some reason the jq command below was not working if it was within
+#        the conditional, so it has to be out here, where it forces us to
+#        temporarily allow errors.
+set +e
+echo "Did git fetch fail on $DESC?"
+echo "$GIT_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.failed' -e
+if [ $? -eq 0 ]; then
+	FAILED_MSG=$(echo "$GIT_CHANGE" | jq .plays[0].tasks[0].hosts.localhost.msg -r)
+	FULL_MSG="Updating $DESC failed with following message:\n  $FAILED_MSG"
+	>&2 echo -e "$FULL_MSG"
+
+	if [ ! -z "SLACK_TOKEN" ]; then
+		SLACK_MESSAGE="$FULL_MSG"
+		SLACK_COLOR="danger"
+		source $NOTIFY
+	fi
+	exit 1;
+fi
+
+#
+# Check if changes were made to SECRET CONFIG
+#
+echo "Were there changes to $DESC?"
+echo "$GIT_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.changed' -e
+if [ $? -eq 0 ]; then
+	BEFORE_HASH=$(echo "$GIT_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.before' -r)
+	AFTER_HASH=$(echo "$GIT_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
+	echo "Before hash: $BEFORE_HASH"
+	echo "After hash:  $AFTER_HASH"
+
+	pushd "$DEST"
+	DIFF=$(git diff "$BEFORE_HASH" "$AFTER_HASH" 2>&1)
+	COMMITS=$(git log --oneline "$BEFORE_HASH...$AFTER_HASH" 2>&1)
+	pushd
+else
+	DIFF=""
+	AFTER_HASH=""
+	COMMITS=""
+fi
+
+# Make sure config.sh is up-to-date after secret config change above, since it
+# may impact what version of public config and Meza are checked out below
+meza setbaseconfig "$m_environment"
+# FIXME: sourcing config.sh here will overwrite previously set vars with any new
+#        values, and will add any newly defined vars, but if config changed to
+#        remove an existing var then that value will not be unset.
+source /opt/.deploy-meza/config.sh

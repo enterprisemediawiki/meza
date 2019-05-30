@@ -76,68 +76,15 @@ GIT_FETCH="$DIR/git-fetch.sh"
 #
 if [ ! -z "$secret_config_repo_repo" ]; then
 
-	# Set SECRET config version
-	#
-	# FIXME: For now can only get repo from existing (add option: from var)
-	# FIXME: For now only track master branch (add options: existing and from var)
 	SECRET_CONFIG_DEST="/opt/conf-meza/secret"
 	SECRET_CONFIG_REPO="$secret_config_repo_repo"
 	SECRET_CONFIG_VERSION="$secret_config_repo_version"
-	SECRET_CONFIG_CHANGE=$($GIT_FETCH "$SECRET_CONFIG_REPO" "$SECRET_CONFIG_DEST" "$SECRET_CONFIG_VERSION")
 
-	#
-	# Check if attempt to git-pull SECRET CONFIG failed
-	#
-	# FIXME: For some reason the jq command below was not working if it was within
-	#        the conditional, so it has to be out here, where it forces us to
-	#        temporarily allow errors.
-	set +e
-	echo "Did git fetch fail on secret config?"
-	echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.failed' -e
-	if [ $? -eq 0 ]; then
-		FAILED_MSG=$(echo "$SECRET_CONFIG_CHANGE" | jq .plays[0].tasks[0].hosts.localhost.msg -r)
-		FULL_MSG="Updating secret config failed with following message:\n  $FAILED_MSG"
-		>&2 echo -e "$FULL_MSG"
-
-		if [ ! -z "SLACK_TOKEN" ]; then
-			SLACK_MESSAGE="$FULL_MSG"
-			SLACK_COLOR="danger"
-			source $NOTIFY
-		fi
-		exit 1;
-	fi
-
-	#
-	# Check if changes were made to SECRET CONFIG
-	#
-	echo "Were there changes to secret config?"
-	echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.changed' -e
-	if [ $? -eq 0 ]; then
-		SECRET_CONFIG_BEFORE_HASH=$(echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.before' -r)
-		SECRET_CONFIG_AFTER_HASH=$(echo "$SECRET_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
-		echo "Before hash: $SECRET_CONFIG_BEFORE_HASH"
-		echo "After hash:  $SECRET_CONFIG_BEFORE_HASH"
-
-		pushd "$SECRET_CONFIG_DEST"
-		SECRET_CONFIG_DIFF=$(git diff "$SECRET_CONFIG_BEFORE_HASH" "$SECRET_CONFIG_AFTER_HASH" 2>&1)
-		SECRET_CONFIG_COMMITS=$(git log --oneline "$SECRET_CONFIG_BEFORE_HASH...$SECRET_CONFIG_AFTER_HASH" 2>&1)
-		pushd
-	else
-		SECRET_CONFIG_DIFF=""
-		SECRET_CONFIG_AFTER_HASH=""
-	fi
-
-	# Make sure config.sh is up-to-date after secret config change above, since it
-	# may impact what version of public config and Meza are checked out below
-	meza setbaseconfig "$m_environment"
-	# FIXME: sourcing config.sh here will overwrite previously set vars with any new
-	#        values, and will add any newly defined vars, but if config changed to
-	#        remove an existing var then that value will not be unset.
-	source /opt/.deploy-meza/config.sh
-
-else
-	SECRET_CONFIG_DIFF=""
-	SECRET_CONFIG_AFTER_HASH=""
+	source "$DIR/repo-pull.sh" "secret config" "$SECRET_CONFIG_DEST" "$SECRET_CONFIG_REPO" "$SECRET_CONFIG_VERSION"
+	SECRET_CONFIG_DIFF="$DIFF"
+	SECRET_CONFIG_BEFORE_HASH="$BEFORE_HASH"
+	SECRET_CONFIG_AFTER_HASH="$AFTER_HASH"
+	SECRET_CONFIG_COMMITS="$COMMITS"
 fi
 
 
@@ -146,70 +93,16 @@ fi
 #
 if [ ! -z "$local_config_repo_repo" ]; then
 
-	# Set PUBLIC config version
-	#
-	# Could optionally set public config's repo in secret config, but since that is
-	# not done universally, not going to enforce it here. Just use whatever repo is
-	# currently being used as origin.
-	#
-	# FIXME: I believe the above comment is wrong. I believe it is pulling the repo
-	#        URL from config. Perhaps it should downmode to using the existing repo
-	#        if not set in config (public or secret).
 	PUBLIC_CONFIG_DEST="/opt/conf-meza/public"
 	PUBLIC_CONFIG_REPO="$local_config_repo_repo"
 	PUBLIC_CONFIG_VERSION="$local_config_repo_version"
-	PUBLIC_CONFIG_CHANGE=$($GIT_FETCH "$PUBLIC_CONFIG_REPO" "$PUBLIC_CONFIG_DEST" "$PUBLIC_CONFIG_VERSION")
 
-	#
-	# Check if attempt to git-pull PUBLIC CONFIG failed
-	#
-	# FIXME: For some reason the jq command below was not working if it was within
-	#        the conditional, so it has to be out here, where it forces us to
-	#        temporarily allow errors.
-	set +e
-	echo "Did git fetch fail on public config?"
-	echo "$PUBLIC_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.failed' -e
-	if [ $? -eq 0 ]; then
-		FAILED_MSG=$(echo "$PUBLIC_CONFIG_CHANGE" | jq .plays[0].tasks[0].hosts.localhost.msg -r)
-		FULL_MSG="Updating public config failed with following message:\n  $FAILED_MSG"
-		>&2 echo -e "$FULL_MSG"
+	source "$DIR/repo-pull.sh" "public config" "$PUBLIC_CONFIG_DEST" "$PUBLIC_CONFIG_REPO" "$PUBLIC_CONFIG_VERSION"
+	PUBLIC_CONFIG_DIFF="$DIFF"
+	PUBLIC_CONFIG_BEFORE_HASH="$BEFORE_HASH"
+	PUBLIC_CONFIG_AFTER_HASH="$AFTER_HASH"
+	PUBLIC_CONFIG_COMMITS="$COMMITS"
 
-		if [ ! -z "SLACK_TOKEN" ]; then
-			SLACK_MESSAGE="$FULL_MSG"
-			SLACK_COLOR="danger"
-			source $NOTIFY
-		fi
-		exit 1;
-	fi
-
-	#
-	# Check if changes were made to PUBLIC CONFIG
-	#
-	echo "Were there changes to public config?"
-	echo "$PUBLIC_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.changed' -e
-	if [ $? -eq 0 ]; then
-		PUBLIC_CONFIG_BEFORE_HASH=$(echo "$PUBLIC_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.before' -r)
-		PUBLIC_CONFIG_AFTER_HASH=$(echo "$PUBLIC_CONFIG_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
-		echo "Before hash: $PUBLIC_CONFIG_BEFORE_HASH"
-		echo "After hash:  $PUBLIC_CONFIG_BEFORE_HASH"
-
-		pushd "$PUBLIC_CONFIG_DEST"
-		PUBLIC_CONFIG_DIFF=$(git diff "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
-		PUBLIC_CONFIG_COMMITS=$(git log --oneline "$PUBLIC_CONFIG_BEFORE_HASH...$PUBLIC_CONFIG_AFTER_HASH" 2>&1)
-		pushd
-	else
-		PUBLIC_CONFIG_DIFF=""
-		PUBLIC_CONFIG_AFTER_HASH=""
-	fi
-
-	# Make sure config.sh is up-to-date after public config change above, since it
-	# potentially impacts what version of Meza is checked out
-	meza setbaseconfig "$m_environment"
-	source /opt/.deploy-meza/config.sh
-
-else
-	PUBLIC_CONFIG_DIFF=""
-	PUBLIC_CONFIG_AFTER_HASH=""
 fi
 
 
@@ -222,48 +115,13 @@ if [ ! -z "$enforce_meza_version" ]; then
 	MEZA_REPO="https://github.com/enterprisemediawiki/meza"
 	MEZA_DEST="/opt/meza"
 	MEZA_VERSION="$enforce_meza_version"
-	MEZA_CHANGE=$($GIT_FETCH "$MEZA_REPO" "$MEZA_DEST" "$MEZA_VERSION")
 
-	#
-	# Check if attempt to git-pull MEZA failed
-	#
-	echo "Did git fetch fail on Meza?"
-	echo "$MEZA_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.failed' -e
-	if [ $? -eq 0 ]; then
-		FAILED_MSG=$(echo "$MEZA_CHANGE" | jq .plays[0].tasks[0].hosts.localhost.msg -r)
-		FULL_MSG="Updating Meza failed with following message:\n  $FAILED_MSG"
-		>&2 echo -e "$FULL_MSG"
+	source "$DIR/repo-pull.sh" "public config" "$MEZA_DEST" "$MEZA_REPO" "$MEZA_VERSION"
+	MEZA_DIFF="$DIFF"
+	MEZA_BEFORE_HASH="$BEFORE_HASH"
+	MEZA_AFTER_HASH="$AFTER_HASH"
+	MEZA_COMMITS="$COMMITS"
 
-		if [ ! -z "SLACK_TOKEN" ]; then
-			SLACK_MESSAGE="$FULL_MSG"
-			SLACK_COLOR="danger"
-			source $NOTIFY
-		fi
-		exit 1;
-	fi
-
-	#
-	# Check if changes were made to MEZA
-	#
-	echo "Were there changes to Meza?"
-	echo "$MEZA_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.changed' -e
-	if [ $? -eq 0 ]; then
-		MEZA_BEFORE_HASH=$(echo "$MEZA_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.before' -r)
-		MEZA_AFTER_HASH=$(echo "$MEZA_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.after' -r)
-		echo "Before hash: $MEZA_BEFORE_HASH"
-		echo "After hash:  $MEZA_AFTER_HASH"
-
-		pushd "$MEZA_DEST"
-		MEZA_COMMITS=$(git log --oneline "$MEZA_BEFORE_HASH...$MEZA_AFTER_HASH" 2>&1)
-		pushd
-
-	else
-		MEZA_AFTER_HASH=""
-	fi
-	set -e # end FIXME from above.
-
-else
-	MEZA_AFTER_HASH=""
 fi
 
 
@@ -280,82 +138,23 @@ fi
 # Notify if SECRET CONFIG changed
 #
 if [ ! -z "$SECRET_CONFIG_AFTER_HASH" ]; then
-
-	MESSAGE=$(cat <<-END
-		Secret config changed versions:
-		  FROM: \`$SECRET_CONFIG_BEFORE_HASH\`
-		  TO:   \`$SECRET_CONFIG_AFTER_HASH\`
-
-		Tracking version: \`$SECRET_CONFIG_VERSION\`
-
-		Further information about secret config withheld
-END
-)
-
-	echo -e "$MESSAGE"
-
-	if [ ! -z "SLACK_TOKEN" ]; then
-		SLACK_MESSAGE="$MESSAGE"
-		SLACK_COLOR="good"
-		source $NOTIFY
-	fi
+	# arg 5 = commits, 6 = diff. Don't show for secret config
+	source "$DIR/diff-notify.sh" "Secret config" "$SECRET_CONFIG_BEFORE_HASH" "$SECRET_CONFIG_AFTER_HASH" "$SECRET_CONFIG_VERSION" "" ""
 fi
 
 #
 # Notify if PUBLIC CONFIG changed
 #
 if [ ! -z "$PUBLIC_CONFIG_AFTER_HASH" ]; then
-
-	MESSAGE=$(cat <<-END
-		Public config changed versions:
-		  FROM: \`$PUBLIC_CONFIG_BEFORE_HASH\`
-		  TO:   \`$PUBLIC_CONFIG_AFTER_HASH\`
-
-		Tracking version: \`$PUBLIC_CONFIG_VERSION\`
-
-		Commits:
-		$PUBLIC_CONFIG_COMMITS
-
-		Diff:
-		\`\`\`
-		$PUBLIC_CONFIG_DIFF
-		\`\`\`
-END
-)
-
-	echo -e "$MESSAGE"
-
-	if [ ! -z "SLACK_TOKEN" ]; then
-		SLACK_MESSAGE="$MESSAGE"
-		SLACK_COLOR="good"
-		source $NOTIFY
-	fi
+	source "$DIR/diff-notify.sh" "Public config" "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" "$PUBLIC_CONFIG_VERSION" "$PUBLIC_CONFIG_COMMITS" "$PUBLIC_CONFIG_DIFF"
 fi
 
 #
 # Notify if MEZA changed
 #
 if [ ! -z "$MEZA_AFTER_HASH" ]; then
-
-	MESSAGE=$(cat <<-END
-		Meza application changed versions:
-		  FROM: \`$MEZA_BEFORE_HASH\`
-		  TO:   \`$MEZA_AFTER_HASH\`
-
-		Tracking version: \`$MEZA_VERSION\`
-
-		Commits:
-		$MEZA_COMMITS
-END
-)
-
-	echo -e "$MESSAGE"
-
-	if [ ! -z "SLACK_TOKEN" ]; then
-		SLACK_MESSAGE="$MESSAGE"
-		SLACK_COLOR="good"
-		source $NOTIFY
-	fi
+	# Don't show arg 6 (diff) for Meza (often too long)
+	source "$DIR/diff-notify.sh" "Meza" "$MEZA_BEFORE_HASH" "$MEZA_AFTER_HASH" "$MEZA_VERSION" "$MEZA_COMMITS" ""
 fi
 
 
