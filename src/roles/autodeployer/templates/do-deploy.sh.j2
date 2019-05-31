@@ -83,6 +83,9 @@ set +e
 meza deploy "$m_environment" $DEPLOY_ARGS \
 	> /opt/data-meza/logs/${LOG_PREFIX}`date "+%Y%m%d%H%M%S"`.log 2>&1
 
+# This is overkill but just to be sure in case the above deploy errors
+meza deploy-unlock "$m_environment"
+
 # If deploy success, notify. Else retry once.
 if [ $? -eq 0 ]; then
 	source $NOTIFY "$DEPLOY_TYPE complete" "good"
@@ -93,6 +96,9 @@ else
 	set +e
 	meza deploy "$m_environment" $DEPLOY_ARGS \
 		> /opt/data-meza/logs/${LOG_PREFIX}`date "+%Y%m%d%H%M%S"`.log 2>&1
+
+	# This is overkill but just to be sure in case the above deploy errors
+	meza deploy-unlock "$m_environment"
 
 	if [ $? -eq 0 ]; then
 		source $NOTIFY "$DEPLOY_TYPE complete" "good"
