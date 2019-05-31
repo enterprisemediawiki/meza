@@ -48,6 +48,8 @@
     - "git-fetch.sh"
     - "no-notify.sh"
     - "slack-notify.sh"
+    - "repo-pull.sh"
+    - "diff-notify.sh"
 
 - name: Ensure autodeployer cron in place
   template:
