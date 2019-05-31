@@ -2,12 +2,16 @@
 #
 #
 
-DESC=$1
+DESC="$1"
 BEFORE_HASH="$2"
 AFTER_HASH="$3"
 VERSION="$4"
 COMMITS="$5"
 DIFF="$6"
+
+# This unsets positional parameters (e.g. $1, $2, etc), necessary for the
+# `source $NOTIFY` below not to have $1 and $2 injected
+set --
 
 # Show commits?
 if [ ! -z "$COMMITS" ]; then
