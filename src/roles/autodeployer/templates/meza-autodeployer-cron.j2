@@ -23,5 +23,5 @@ MAILTO=root
 #        will get confused if multiple environments are used. Environment should
 #        be explicitly passed into this script.
 #
-{{ autodeployer.crontime }} root meza autodeploy "{{ env }}" "Deploy" "--tags mediawiki --skip-tags latest,mediawiki-core,verify-wiki,update.php,git-extensions,composer-extensions" >> {{ m_logs }}/deploy/check-for-changes-`date "+\%Y\%m\%d"`.log 2>&1
+{{ autodeployer.crontime }} root meza autodeploy "{{ env }}" "Deploy" "" >> {{ m_logs }}/deploy/check-for-changes-`date "+\%Y\%m\%d"`.log 2>&1
 {% endif %}
