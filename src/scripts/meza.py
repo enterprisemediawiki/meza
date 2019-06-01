@@ -155,7 +155,7 @@ def meza_command_autodeploy (argv):
 
 	if len( argv ) > 0:
 		more_extra_vars = {
-			'deploy_type': 'Deploy'
+			'deploy_type': argv[0]
 		}
 		argv = argv[1:] # strip deploy type off
 
