@@ -379,7 +379,7 @@
             msg: "Nothing new to deploy"
 
         - meta: end_play
-      when: >
+      when:
         - not secret_config_git_operation.changed
         - not public_config_git_operation.changed
         - not meza_git_operation.changed
