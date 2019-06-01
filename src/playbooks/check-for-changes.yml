@@ -380,9 +380,9 @@
 
         - meta: end_play
       when: >
-        not meza_git_operation.changed
-        or not secret_config_git_operation.changed
-        or not public_config_git_operation.changed
+        - not secret_config_git_operation.changed
+        - not public_config_git_operation.changed
+        - not meza_git_operation.changed
 
 
     #
