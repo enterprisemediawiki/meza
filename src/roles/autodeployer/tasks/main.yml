@@ -27,30 +27,6 @@
       force_deploy.overwrite is not defined
       or (force_deploy.overwrite is defined and not force_deploy.overwrite)
 
-- name: "Ensure {{ m_deploy }}/autodeployer exists"
-  file:
-    path: "{{ m_deploy }}/autodeployer"
-    owner: root
-    group: root
-    mode: 0644
-    state: directory
-
-- name: Ensure autodeployer scripts in place
-  template:
-    src: "{{ item }}.j2"
-    dest: "{{ m_deploy }}/autodeployer/{{ item }}"
-    owner: root
-    group: root
-    mode: "0744"
-  with_items:
-    - "check-for-changes.sh"
-    - "do-deploy.sh"
-    - "git-fetch.sh"
-    - "no-notify.sh"
-    - "slack-notify.sh"
-    - "repo-pull.sh"
-    - "diff-notify.sh"
-
 - name: Ensure autodeployer cron in place
   template:
     src: "meza-autodeployer-cron.j2"

@@ -1,0 +1,58 @@
+---
+
+# this task is duplicated from check-for-changes.yml
+- name:
+  set_fact:
+    autodeployer_slack_icon_url: "{{ autodeployer.slack_icon_url | default('https://github.com/enterprisemediawiki/meza/raw/master/src/roles/configure-wiki/files/logo.png') }}"
+  when: autodeployer is defined
+
+- name: Notify deploy is starting
+  slack:
+    token: "{{ autodeployer.slack_token }}"
+    msg: "{{ deploy_type | default('Deploy') }} starting"
+    channel: "{{ autodeployer.slack_channel }}"
+    username: "{{ autodeployer.slack_username }}"
+    icon_url: "{{ autodeployer_slack_icon_url }}"
+    color: "good"
+    link_names: 1
+  when:
+    - autodeployer is defined
+    - autodeployer.slack_token is defined
+    - autodeployer.slack_channel is defined
+    - autodeployer.slack_username is defined
+    - autodeployer_slack_icon_url is defined
+
+- name: Deploy
+  shell: >
+    meza deploy-unlock {{ env }}
+    && meza deploy {{ env }} {{ deploy_args }}
+  failed_when: False
+  register: first_deploy
+
+- name: Declare success
+  set_fact:
+    deploy_status: "complete"
+    deploy_notification_color: "good"
+  when: first_deploy.rc == 0
+
+- name: Declare failure
+  set_fact:
+    deploy_status: "failed"
+    deploy_notification_color: "danger"
+  when: first_deploy.rc != 0
+
+- name: "Notify deploy {{ deploy_status }}"
+  slack:
+    token: "{{ autodeployer.slack_token }}"
+    msg: "{{ deploy_type | default('Deploy') }} {{ deploy_status }}"
+    channel: "{{ autodeployer.slack_channel }}"
+    username: "{{ autodeployer.slack_username }}"
+    icon_url: "{{ autodeployer_slack_icon_url }}"
+    color: "{{ deploy_notification_color }}"
+    link_names: 1
+  when:
+    - autodeployer is defined
+    - autodeployer.slack_token is defined
+    - autodeployer.slack_channel is defined
+    - autodeployer.slack_username is defined
+    - autodeployer_slack_icon_url is defined

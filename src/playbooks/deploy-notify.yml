@@ -1,0 +1,18 @@
+---
+
+- hosts: localhost
+  become: yes
+  roles:
+    - set-vars
+    - umask-set
+  tasks:
+
+    - name: Do deploy
+      include_role:
+        name: autodeployer
+        tasks_from: do-deploy
+
+
+    - name: Remove umask setting
+      include_role:
+        name: umask-unset
