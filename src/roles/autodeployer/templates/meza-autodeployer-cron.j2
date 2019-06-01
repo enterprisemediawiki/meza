@@ -11,7 +11,7 @@ MAILTO=root
 #        will get confused if multiple environments are used. Environment should
 #        be explicitly passed into this script.
 #
-{{ force_deploy.crontime }} root {{ m_deploy }}/autodeployer/do-deploy.sh "{{ _force_deploy_notify_prefix }}" "{{ _force_deploy_options }}" "deploy-"
+{{ force_deploy.crontime }} root meza deploy-notify "{{ env }}" "{{ _force_deploy_notify_prefix }}" "{{ _force_deploy_options }}"
 {% endif %}
 
 
@@ -23,5 +23,5 @@ MAILTO=root
 #        will get confused if multiple environments are used. Environment should
 #        be explicitly passed into this script.
 #
-{{ autodeployer.crontime }} root {{ m_deploy }}/autodeployer/check-for-changes.sh > {{ m_logs }}/deploy/check-for-changes.log 2>&1
+{{ autodeployer.crontime }} root meza autodeploy "{{ env }}" "Deploy" "" >> {{ m_logs }}/deploy/check-for-changes-`date "+\%Y\%m\%d"`.log 2>&1
 {% endif %}
