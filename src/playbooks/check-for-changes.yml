@@ -7,7 +7,7 @@
     - umask-set
   tasks:
 
-    - name: "Exit if one of the following not setup: secret, public, or Meza versions"
+    - name: "Exit if at least one of the following not setup: secret, public, or Meza versions"
       debug:
         msg: "local_config_repo, secret_config_repo, or enforce_meza_version must be configured"
       failed_when: True
@@ -17,13 +17,13 @@
           and local_config_repo.repo is not defined
           and local_config_repo.version is not defined
         )
-        or
+        and
         (
           secret_config_repo is not defined
           and secret_config_repo.repo is not defined
           and secret_config_repo.version is not defined
         )
-        or
+        and
         (
           enforce_meza_version is not defined
         )
@@ -310,7 +310,7 @@
               FROM: `{{ meza_git_operation.before }}`
               TO:   `{{ meza_git_operation.after }}`
 
-              Tracking version: `{{ local_config_repo.version }}`
+              Tracking version: `{{ enforce_meza_version }}`
 
               Commits:
               {{ meza_git_commits.stdout }}
@@ -380,9 +380,9 @@
 
         - meta: end_play
       when:
-        - not secret_config_git_operation.changed
-        - not public_config_git_operation.changed
-        - not meza_git_operation.changed
+        - ( secret_config_git_operation is not defined or not secret_config_git_operation.changed )
+        - ( public_config_git_operation is not defined or not public_config_git_operation.changed )
+        - ( meza_git_operation is not defined          or not meza_git_operation.changed )
 
 
     #
