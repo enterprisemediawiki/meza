@@ -370,6 +370,11 @@
     - verify-wiki-uploads
 
 
+- name: "{{ wiki_id }} - Force m_recursively_set_uploads_permissions = True"
+  set_fact:
+    m_recursively_set_uploads_permissions: True
+  when: intend_overwrite_from_backup
+
 #
 # SECTION: Ensure backups still in good config
 #
@@ -380,4 +385,4 @@
     mode: "{{ m_uploads_dir_mode }}"
     owner: "{{ m_uploads_dir_owner }}"
     group: "{{ m_uploads_dir_group }}"
-    # recursive?
+    recurse: "{{ m_recursively_set_uploads_permissions | default(False) }}"
