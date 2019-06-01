@@ -13,6 +13,8 @@ DIFF="$6"
 # `source $NOTIFY` below not to have $1 and $2 injected
 set --
 
+echo "Running diff-notify.sh for $DESC"
+
 # Show commits?
 if [ ! -z "$COMMITS" ]; then
 COMMITS_TEXT=$(cat <<-END

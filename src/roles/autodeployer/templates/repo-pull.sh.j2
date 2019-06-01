@@ -22,7 +22,7 @@ GIT_CHANGE=$($GIT_FETCH "$REPO" "$DEST" "$VERSION")
 #        the conditional, so it has to be out here, where it forces us to
 #        temporarily allow errors.
 set +e
-echo "Did git fetch fail on $DESC?"
+echo "Did git fetch fail on $DESC ($DEST, $REPO)?"
 echo "$GIT_CHANGE" | jq '.plays[0].tasks[0].hosts.localhost.failed' -e
 if [ $? -eq 0 ]; then
 	FAILED_MSG=$(echo "$GIT_CHANGE" | jq .plays[0].tasks[0].hosts.localhost.msg -r)
@@ -34,7 +34,6 @@ if [ $? -eq 0 ]; then
 		SLACK_COLOR="danger"
 		source $NOTIFY
 	fi
-	exit 1;
 fi
 
 #

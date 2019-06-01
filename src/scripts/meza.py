@@ -132,6 +132,48 @@ def meza_command_deploy (argv):
 
 	meza_shell_exec_exit( return_code )
 
+def meza_command_autodeploy (argv):
+
+	env = argv[0]
+
+	rc = check_environment(env)
+
+	lock_success = request_lock_for_deploy(env)
+
+	if not lock_success:
+		print "Deploy for environment {} in progress. Exiting".format(env)
+		sys.exit(1)
+
+	# return code != 0 means failure
+	if rc != 0:
+		sys.exit(rc)
+
+	more_extra_vars = False
+
+	# strip environment off of it
+	argv = argv[1:]
+
+	if len( argv ) > 0:
+		more_extra_vars = {
+			'deploy_type': 'Deploy'
+		}
+		argv = argv[1:] # strip deploy type off
+
+	if len( argv ) > 0:
+		more_extra_vars['deploy_args'] = argv[0]
+		argv = argv[1:] # strip deploy args off
+
+	shell_cmd = playbook_cmd( 'check-for-changes', env, more_extra_vars )
+	if len(argv) > 0:
+		shell_cmd = shell_cmd + argv
+
+	return_code = meza_shell_exec( shell_cmd )
+
+	unlock_deploy(env) # double check
+
+	meza_shell_exec_exit( return_code )
+
+
 def request_lock_for_deploy (env):
 	import os, datetime
 	lock_file = get_lock_file_path(env)

@@ -22,7 +22,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # must be root or sudoer
 if [ "$(whoami)" != "root" ]; then
-	echo "Try running this script with sudo: \"sudo bash unite-the-wikis.sh\""
+	echo "Try running this script with sudo"
 	exit 1
 fi
 
@@ -30,6 +30,13 @@ fi
 # Really all this does is grabs $m_environment, but instead whatever is calling
 # this script should pass that in as an argument.
 source /opt/.deploy-meza/config.sh
+
+# now that we know $m_environment, set a trap to always unlock deploy when this
+# script exits (even if it's already unlocked).
+function finish {
+	meza deploy-unlock "$m_environment"
+}
+trap finish EXIT
 
 # Now that $m_environment is available, force update of config.sh using the
 # `meza setbaseconfig` command. This will rebuild config.sh based upon current
@@ -40,6 +47,7 @@ source /opt/.deploy-meza/config.sh
 #
 # Check if deploy is underway
 #
+echo "Check if deploy is underway..."
 meza deploy-check "$m_environment"
 if [ $? -eq 0 ]; then
 	echo "Checked if deploy underway. Is not. Placing deploy lock while checking for changes."
@@ -116,7 +124,7 @@ if [ ! -z "$enforce_meza_version" ]; then
 	MEZA_DEST="/opt/meza"
 	MEZA_VERSION="$enforce_meza_version"
 
-	source "$DIR/repo-pull.sh" "public config" "$MEZA_DEST" "$MEZA_REPO" "$MEZA_VERSION"
+	source "$DIR/repo-pull.sh" "Meza" "$MEZA_DEST" "$MEZA_REPO" "$MEZA_VERSION"
 	MEZA_DIFF="$DIFF"
 	MEZA_BEFORE_HASH="$BEFORE_HASH"
 	MEZA_AFTER_HASH="$AFTER_HASH"
@@ -140,6 +148,8 @@ fi
 if [ ! -z "$SECRET_CONFIG_AFTER_HASH" ]; then
 	# arg 5 = commits, 6 = diff. Don't show for secret config
 	source "$DIR/diff-notify.sh" "Secret config" "$SECRET_CONFIG_BEFORE_HASH" "$SECRET_CONFIG_AFTER_HASH" "$SECRET_CONFIG_VERSION" "" ""
+else
+	echo "No change to secret config, no notification"
 fi
 
 #
@@ -147,6 +157,8 @@ fi
 #
 if [ ! -z "$PUBLIC_CONFIG_AFTER_HASH" ]; then
 	source "$DIR/diff-notify.sh" "Public config" "$PUBLIC_CONFIG_BEFORE_HASH" "$PUBLIC_CONFIG_AFTER_HASH" "$PUBLIC_CONFIG_VERSION" "$PUBLIC_CONFIG_COMMITS" "$PUBLIC_CONFIG_DIFF"
+else
+	echo "No change to public config, no notification"
 fi
 
 #
@@ -155,6 +167,8 @@ fi
 if [ ! -z "$MEZA_AFTER_HASH" ]; then
 	# Don't show arg 6 (diff) for Meza (often too long)
 	source "$DIR/diff-notify.sh" "Meza" "$MEZA_BEFORE_HASH" "$MEZA_AFTER_HASH" "$MEZA_VERSION" "$MEZA_COMMITS" ""
+else
+	echo "No change to Meza, no notification"
 fi
 
 
