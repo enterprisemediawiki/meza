@@ -8,6 +8,14 @@
 #   pushing_to_path:
 #   pushing_to_user:
 
+- name: "Rsync-push inputs"
+  debug:
+    msg: |
+      pushing_from_server: {{ pushing_from_server }}
+      pushing_from_path: {{ pushing_from_path }}
+      pushing_to_server: {{ pushing_to_server }}
+      pushing_to_path: {{ pushing_to_path }}
+      pushing_to_user: {{ pushing_to_user }}
 
 #
 # Put meza-ansible's private key and known_hosts on server within /root
@@ -36,6 +44,7 @@
       --copy-links
       --archive
       --omit-dir-times
+      --no-perms
       "{{ pushing_from_path }}"
       --rsh="/usr/bin/ssh -S none -o StrictHostKeyChecking=no
       -l {{ pushing_to_user }} -i /root/meza-ansible-id_rsa
