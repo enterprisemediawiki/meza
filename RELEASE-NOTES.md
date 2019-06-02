@@ -1,6 +1,100 @@
 Release Notes
 =============
 
+## Meza 31.5.0
+
+Major deploy and autodeploy improvements; Push backups to remote server; Security and general improvements; bug fixes
+
+### Commits since 31.4.0
+
+#### Autodeploy on changes to secret config and use Ansible for autodeployer
+
+Autodeployer has previously just tracked public config and the Meza application. Now it will check secret config, too. Additionally, autodeployer was rewritten in Ansible. Shell scripting got too cumbersome.
+
+* 195cbea Fixes for autodeployer logic and misplaced variables
+* 64896a5 Replace autodeployer scripts with Ansible
+* 4dfb030 Belt and suspenders for ensuring deploy unlocks
+* 006d5ed Reduce duplication in check-for-changes.sh
+* 901f2b9 Make public config and Meza management by autodeployer optional
+* 1dc9894 Use secret_config_repo to define secret config
+* bce32d3 Autodeployer check for changes to secret config
+
+#### Prevent simultaneous deploys and improve logging
+
+Starting a deploy now creates a lock file. Other deploys cannot start until the locking deploy is complete. Additionally, all deploys automatically write to a log file and print to stdout. In the future this will be used to display deploy logs via the web interface.
+
+* 60a680c Add wait() to capture return code
+* e7b8ad3 Make sure deploy log directory exists
+* 5009974 Always have ansible show colors
+* a120ac3 Make meza_shell_exec use subprocess; optionally write to log file
+* c5ef0e5 Add meza deploy-kill, deploy-log, deploy-tail functions
+* 9438f7c Handle sigint; also better info in lock file
+* a8f1aca Add 'meza deploy-(un)lock commands; Autodeployer use them to avoid conflicts
+* dd60b91 Add meza subcommand to check if deploy underway
+* 04e8ddb Prevent simultaneous deploys (#1157)
+
+#### Make autodeployer configurable
+
+In Meza 31.x prior to this release autodeployer, overwrite-deploys, and backups-cleanup had to be configured manually via crontab. 32.x has had the ability to configure these things in public/secret config for a while. This release pulls that functionality into 31.x.
+
+* 220df48 Add autodeployer tag
+* 87a4012 Make autodeployer, overwrite-deploy, and backups-cleanup configurable
+* a5396d8 Fix location of backups-cleanup cron
+* 28df042 Fix autodeployer crons
+
+#### Push backups to an alternate server
+
+Required if for security reasons dev/int servers cannot SSH into production to grab backups. Instead production can push backups directly to other servers. This was essentially possible before by making the other servers in the `backup-servers` group, but that (a) made it so production managed software configuration on the remote servers (as Meza does for all its server groups) and (b) it put file uploads in the `/opt/data-meza/backups` directory rather than in `/opt/data-meza/uploads`. So you'd have to do some symlink or have duplicated data. With pushed backups the production server (or whatever server is pushing) just needs to be setup so user `meza-ansible` can SSH into the server with a lesser-privileged account. The user must be in group `apache` and `meza-backups`.
+
+* 6e54a86 Enable rsync push backups (#1166)
+* 2784f81 Add option to recursively set perms on uploads dir; always run on overwrite
+
+#### Security improvements
+
+Steadily trying to reduce where `root` is required
+
+* 36104ea Have meza-ansible do autodeployer git-fetch
+* 2513a36 Set ownership of meza and config; fix role:init-controller-config
+
+#### General improvements
+
+* Vagrant improvements
+  * bddb797 Unique VM names, /opt/meza owned by UID/GID 10000 in Vagrant
+  * Unique VM names allows you to boot multiple Meza's on one host
+  * UID/GID hack required to support using less `root`. Ref #1155
+* Add `pip` and `pip3`
+  * 3db517a Add pip for Python 2.7
+  * 0155726 Add pip3 (31.x didn't have it yet)
+  * 0f879f8 Make pip3 symlink for RHEL
+
+#### Fix issues with creating Docker images for testing
+
+Rebuilding Docker images for testing is not required often. It really only needs to be done when major changes are made or when a very long time has passed between generating images and new images will make test jobs run faster. Since a long time had passed, certain things had been added to Meza that unexpectedly caused issues with Docker builds.
+
+* 36f965f Reorder AND statement since initial_wikis_dir_check undefined in docker build
+* e919123 Don't use services during docker image building
+* 0795348 More docker skip tasks
+
+#### Bug fixes
+
+* 46f7ac6 Make net adapter select statement break on newlines
+* 40e4388 Don't recreate meza-ansible if user already exists (Revert #965)
+* a621460 Remove yum:PackageKit to remove error
+* 0502a41 Ansible 2.8 fixes (#1162) (`ansible_distribution_version` no longer present and `synchronize` module keeps getting harder to use)
+* 6789e7d Ansible Git module fails with /tmp mounted with noexec; set TMPDIR as workaround
+* 3854c6c Make sure to use TMPDIR when doing Ansible Git operations
+
+### Contributors
+
+* James Montalvo
+
+# How to upgrade
+
+```bash
+sudo meza update 31.5.0
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.4.0
 
 Make importing from a live server simpler and more secure by not requiring sudo on the remote. Also use a more stable version of ImageMagick.
@@ -31,8 +125,8 @@ Make importing from a live server simpler and more secure by not requiring sudo 
 
 ### Contributors
 
-* 25	James Montalvo
-* 3	Greg Rundlett
+* James Montalvo
+* Greg Rundlett
 
 # How to upgrade
 
