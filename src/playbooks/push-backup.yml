@@ -24,7 +24,7 @@
     - name: Notify push backup is starting
       slack:
         token: "{{ autodeployer.slack_token }}"
-        msg: "Push backup starting"
+        msg: "Push backup to {{ push_backup.short_name | default('remote server') }} starting"
         channel: "{{ autodeployer.slack_channel }}"
         username: "{{ autodeployer.slack_username }}"
         icon_url: "{{ autodeployer_slack_icon_url }}"
@@ -74,7 +74,7 @@
     - name: Notify push backup is complete
       slack:
         token: "{{ autodeployer.slack_token }}"
-        msg: "Push backup complete"
+        msg: "Push backup to {{ push_backup.short_name | default('remote server') }} complete"
         channel: "{{ autodeployer.slack_channel }}"
         username: "{{ autodeployer.slack_username }}"
         icon_url: "{{ autodeployer_slack_icon_url }}"
