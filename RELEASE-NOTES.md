@@ -1,6 +1,27 @@
 Release Notes
 =============
 
+## Meza 31.7.0
+
+Simplify push-backup settings and make cron configurable and with notification
+
+### Commits since 31.6.0
+
+* 8b109a7 Simplify push_backup settings
+* 8a3c059 Fix missing endif
+* 170596c Make push-backup cron configurable add notification
+
+### Contributors
+
+* James Montalvo
+
+# How to upgrade
+
+```bash
+sudo meza update 31.7.0
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.6.0
 
 No longer require encryption of secret.yml; prefer variable-level encryption; fix permissions for rsync-push
