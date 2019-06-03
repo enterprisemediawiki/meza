@@ -24,3 +24,4 @@ MAILTO=root
 #
 {{ push_backup.crontime }} root meza push-backup "{{ env }}" "--tags notify" >> {{ m_logs }}/deploy/push-backup-`date "+\%Y\%m\%d"`.log 2>&1
 {% endif %}
+{% endif %}
