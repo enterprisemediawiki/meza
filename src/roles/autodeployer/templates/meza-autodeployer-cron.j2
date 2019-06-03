@@ -6,10 +6,6 @@ MAILTO=root
 {% if force_deploy is defined and force_deploy.crontime is defined %}
 #
 # Force deploy
-# FIXME: At present this extracts environment from /opt/.deploy-meza/config.sh.
-#        This works fine if the controller is used for only one environment, but
-#        will get confused if multiple environments are used. Environment should
-#        be explicitly passed into this script.
 #
 {{ force_deploy.crontime }} root meza deploy-notify "{{ env }}" "{{ _force_deploy_notify_prefix }}" "{{ _force_deploy_options }}"
 {% endif %}
@@ -18,10 +14,14 @@ MAILTO=root
 {% if autodeployer is defined and autodeployer.crontime is defined %}
 #
 # Auto-deploy on config and Meza changes
-# FIXME: At present this extracts environment from /opt/.deploy-meza/config.sh.
-#        This works fine if the controller is used for only one environment, but
-#        will get confused if multiple environments are used. Environment should
-#        be explicitly passed into this script.
 #
 {{ autodeployer.crontime }} root meza autodeploy "{{ env }}" "Deploy" "" >> {{ m_logs }}/deploy/check-for-changes-`date "+\%Y\%m\%d"`.log 2>&1
+
+
+{% if push_backup is defined and push_backup.crontime is defined %}
+#
+# Push backup (db and uploads) to another server periodically
+#
+{{ push_backup.crontime }} root meza push-backup "{{ env }}" "--tags notify" >> {{ m_logs }}/deploy/push-backup-`date "+\%Y\%m\%d"`.log 2>&1
+{% endif %}
 {% endif %}
