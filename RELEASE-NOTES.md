@@ -1,6 +1,29 @@
 Release Notes
 =============
 
+## Meza 31.6.0
+
+No longer require encryption of secret.yml; prefer variable-level encryption; fix permissions for rsync-push
+
+### Commits since 31.5.0
+
+* e70279c Don't print command for encrypt/decrypt (too much text)
+* 63b86fa Add encrypt_string and decrypt_string meza commands
+* 0c9555f Cleanup comments about encryption, remove secret.yml decryption from test case
+* 3d88285 Remove auto-encrypting of secret.yml
+* 419550a Add --no-perms to rsync-push
+
+### Contributors
+
+* 7	James Montalvo
+
+# How to upgrade
+
+```bash
+sudo meza update 31.6.0
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.5.0
 
 Major deploy and autodeploy improvements; Push backups to remote server; Security and general improvements; bug fixes
