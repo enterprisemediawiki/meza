@@ -533,6 +533,7 @@
 # MediaWiki 1.31+.
 - name: Ensure Python3 present
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name:
       - python35u
       - python35u-pip

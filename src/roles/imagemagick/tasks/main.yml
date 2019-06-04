@@ -1,11 +1,13 @@
 ---
 - name: Ensure old ImageMagick installed from Meza RPM
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: imagemagick-7.0.3-1.x86_64
     state: absent
 
 - name: Ensure ImageMagick at latest version
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name:
       - ghostscript
       - ImageMagick

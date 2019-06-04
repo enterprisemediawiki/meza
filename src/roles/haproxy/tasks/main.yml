@@ -7,7 +7,10 @@
 #     https://www.unixmen.com/configure-high-available-load-balancer-haproxy-keepalived/
 
 - name: Install haproxy packages
-  yum: name={{item}} state=installed
+  yum:
+    name: "{{ item }}"
+    state: installed
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
   with_items:
     - haproxy
     - openssl

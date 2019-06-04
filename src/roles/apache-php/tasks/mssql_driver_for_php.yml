@@ -2,6 +2,7 @@
 
 - name: Ensure prerequisites for sqlsrv in place
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: "{{item}}"
     state: installed
   with_items:
@@ -17,6 +18,7 @@
 
 - name: Ensure conflicting ODBC drivers removed
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: "{{item}}"
     state: absent
   with_items:
@@ -25,6 +27,7 @@
 
 - name: install MS ODBC driver package
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: msodbcsql17
     state: latest
   environment:
@@ -34,6 +37,7 @@
 
 - name: install ODBC driver devel package
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: unixODBC-devel
     state: latest
 
