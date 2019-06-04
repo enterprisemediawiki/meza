@@ -1,6 +1,32 @@
 Release Notes
 =============
 
+## Meza 31.8.0
+
+Standardize secret config permissions; dev-networking fix
+
+### Commits since 31.7.0
+
+* 077e6bc Add lock_timeout to yum/package modules to fix Ansible 2.8 issue
+* d6ddb60 Don't use 'meza' command for dev-networking
+* 2ef8454 Secret directory 775 in getmeza.sh, too
+* 8ba1353 file not directory
+* ab1d9b1 Don't overwrite secrt files
+* c64c41b Relax secret config _directory_ mode; ensure good ownership
+* 968c675 Make meza-ansible own temp_vars.json
+* dd245ae Sync secret perms
+
+### Contributors
+
+* 11	James Montalvo
+
+# How to upgrade
+
+```bash
+sudo meza update 31.8.0
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.7.0
 
 Simplify push-backup settings and make cron configurable and with notification
