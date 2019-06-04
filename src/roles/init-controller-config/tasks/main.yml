@@ -127,6 +127,7 @@
     group: "{{ m_config_secret_group }}"
     mode: "{{ m_config_secret_file_mode }}"
     state: directory
+    force: no
   tags:
     - file-perms
   with_items:
