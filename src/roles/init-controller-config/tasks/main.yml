@@ -126,8 +126,7 @@
     owner: "{{ m_config_secret_owner }}"
     group: "{{ m_config_secret_group }}"
     mode: "{{ m_config_secret_file_mode }}"
-    state: directory
-    force: no
+    state: file
   tags:
     - file-perms
   with_items:
