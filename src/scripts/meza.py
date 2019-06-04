@@ -576,10 +576,11 @@ def meza_command_setup_dev (argv):
 	print "https://wbond.net/sublime_packages/sftp/settings#Remote_Server_Settings"
 	sys.exit()
 
-
+# Remove in 32.x
 def meza_command_setup_dev_networking (argv):
-	rc = meza_shell_exec(["bash","/opt/meza/src/scripts/dev-networking.sh"])
-	sys.exit(rc)
+	print "Function removed. Instead do:"
+	print "  sudo bash /opt/meza/src/scripts/dev-networking.sh"
+	sys.exit(1)
 
 def meza_command_setup_docker (argv):
 	shell_cmd = playbook_cmd( "getdocker" )
