@@ -237,7 +237,7 @@ m_config_public_owner: meza-ansible
 m_config_public_group: wheel
 
 m_config_secret_file_mode: "0660"
-m_config_secret_dir_mode: "0770"
+m_config_secret_dir_mode: "0775"
 m_config_secret_owner: meza-ansible
 m_config_secret_group: wheel
 

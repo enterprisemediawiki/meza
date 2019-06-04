@@ -520,7 +520,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	# are not written to command line. Putting in secret should make
 	# permissions acceptable since this dir will hold secret info, though it's
 	# sort of an odd place for a temporary file. Perhaps /root instead?
-	extra_vars_file = "/opt/conf-meza/secret/temp_vars.json"
+	extra_vars_file = os.path.join( defaults['m_local_secret'], "temp_vars.json" )
 	if os.path.isfile(extra_vars_file):
 		os.remove(extra_vars_file)
 	f = open(extra_vars_file, 'w')
@@ -530,6 +530,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	# Make sure temp_vars.json is accessible. On the first run of deploy it is
 	# possible that user meza-ansible will not be able to reach this file,
 	# specifically if the system has a restrictive umask set (e.g 077).
+	meza_chown( defaults['m_local_secret'], 'meza-ansible', 'wheel' )
 	meza_chown( extra_vars_file, 'meza-ansible', 'wheel' )
 	os.chmod(extra_vars_file, 0664)
 
