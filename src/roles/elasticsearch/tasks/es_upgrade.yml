@@ -82,6 +82,7 @@
 
 - name: Ensure Elasticsearch is latest version
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: elasticsearch
     state: latest
 

@@ -52,17 +52,24 @@
 # Without this get error "yum lockfile is held by another process" occasionally
 - name: Ensure PackageKit is removed so it doesn't try to upgrade packages on its own
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: PackageKit
     state: absent
   when: ansible_os_family == 'RedHat'
 
 - name: ensure deltarpm is installed and latest
-  yum: name=deltarpm state=latest
+  yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+    name: deltarpm
+    state: latest
   tags:
   - latest
 
 - name: upgrade all packages
-  yum: name=* state=latest
+  yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+    name: "*"
+    state: latest
   environment:
     # If `install_ms_sql_driver: True` is set in config, MS SQL drivers will be
     # installed. When these drivers are updated they require accepting end user
@@ -74,6 +81,7 @@
 # FIXME #807: for RedHat may need to enable "Optional RPMs"
 - name: ensure EPEL installed
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: epel-release
     state: installed
   when: ansible_distribution == "CentOS"
@@ -89,6 +97,7 @@
 
 - name: Install EPEL repo.
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
     state: present
   register: result
@@ -115,12 +124,18 @@
   - latest
 
 - name: ensure libselinux-python installed prior to SELinux
-  yum: name=libselinux-python state=installed
+  yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+    name: libselinux-python
+    state: installed
   tags:
   - latest
 
 - name: Install base packages
-  yum: name={{item}} state=installed
+  yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+    name: "{{ item }}"
+    state: installed
   with_items:
     - ntp
     - ntpdate
@@ -187,7 +202,10 @@
 # ntpdate pool.ntp.org # Synchronize the system clock with 0.pool.ntp.org server
 # service ntpd start # Start service
 - name: Install NTP
-  yum: name=ntp state=installed
+  yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+    name: ntp
+    state: installed
   tags:
   - latest
 
