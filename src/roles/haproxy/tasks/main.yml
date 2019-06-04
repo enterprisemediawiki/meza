@@ -35,9 +35,9 @@
   file:
     path: "{{ m_local_secret }}/{{ env }}/ssl"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_config_secret_owner }}"
+    group: "{{ m_config_secret_group }}"
+    mode: "{{ m_config_secret_dir_mode }}"
   delegate_to: localhost
   run_once: True
 

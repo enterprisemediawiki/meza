@@ -236,9 +236,12 @@ m_config_public_mode: "0755"
 m_config_public_owner: meza-ansible
 m_config_public_group: wheel
 
-m_config_secret_mode: "0750"
+m_config_secret_file_mode: "0660"
+m_config_secret_dir_mode: "0770"
 m_config_secret_owner: meza-ansible
 m_config_secret_group: wheel
+
+
 
 #
 # PHP config

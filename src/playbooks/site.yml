@@ -63,7 +63,7 @@
       path: "/opt/conf-meza/secret/{{ env }}/secret.yml"
       owner: meza-ansible
       group: wheel
-      mode: "0600"
+      mode: "0660"
 
   - name: Ensure /opt/conf-meza owned by meza-ansible
     file:
