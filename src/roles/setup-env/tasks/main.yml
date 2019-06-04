@@ -4,26 +4,26 @@
   file:
     path: "{{ m_local_secret }}"
     state: directory
-    owner: meza-ansible
-    group: wheel
-    mode: 0750
+    owner: "{{ m_config_secret_owner }}"
+    group: "{{ m_config_secret_group }}"
+    mode: "{{ m_config_secret_dir_mode }}"
 
 - name: Ensure secret config environment directory exists
   file:
     path: "{{ m_local_secret }}/{{ env }}"
     state: directory
-    owner: meza-ansible
-    group: wheel
-    mode: 0750
+    owner: "{{ m_config_secret_owner }}"
+    group: "{{ m_config_secret_group }}"
+    mode: "{{ m_config_secret_dir_mode }}"
 
 # Ansible writing Ansible
 - name: Ensure hosts file configured
   template:
     src: hosts.j2
     dest: "{{ m_local_secret }}/{{ env }}/hosts"
-    owner: meza-ansible
-    group: wheel
-    mode: 0640
+    owner: "{{ m_config_secret_owner }}"
+    group: "{{ m_config_secret_group }}"
+    mode: "{{ m_config_secret_file_mode }}"
 
     # We don't want to overwrite an existing hosts file with the default
     force: no
@@ -32,9 +32,9 @@
   template:
     src: secret.yml.j2
     dest: "{{ m_local_secret }}/{{ env }}/secret.yml"
-    owner: meza-ansible
-    group: wheel
-    mode: 0640
+    owner: "{{ m_config_secret_owner }}"
+    group: "{{ m_config_secret_group }}"
+    mode: "{{ m_config_secret_file_mode }}"
 
     # don't overwrite existing
     force: no

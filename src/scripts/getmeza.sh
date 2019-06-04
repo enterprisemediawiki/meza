@@ -59,7 +59,7 @@ fi
 # make sure conf-meza exists and has good permissions
 mkdir -p /opt/conf-meza/secret
 chmod 755 /opt/conf-meza
-chmod 755 /opt/conf-meza/secret
+chmod 775 /opt/conf-meza/secret
 
 # Required initially for creating lock files
 mkdir -p /opt/data-meza
@@ -88,6 +88,7 @@ else
 fi
 
 chown meza-ansible:wheel /opt/conf-meza
+chown meza-ansible:wheel /opt/conf-meza/secret
 chown meza-ansible:wheel /opt/meza
 
 # Don't require TTY or visible password for sudo. Ref #769

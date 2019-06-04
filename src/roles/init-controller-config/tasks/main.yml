@@ -107,13 +107,28 @@
   tags:
     - file-perms
 
-- name: "Ensure {{ m_local_secret }} properly owned"
+- name: "Ensure {{ m_local_secret }} directories properly owned/moded"
   file:
-    path: "{{ m_local_secret }}"
+    path: "{{ item }}"
     owner: "{{ m_config_secret_owner }}"
     group: "{{ m_config_secret_group }}"
-    mode: "{{ m_config_secret_mode }}"
+    mode: "{{ m_config_secret_dir_mode }}"
     state: directory
-    recurse: Yes
   tags:
     - file-perms
+  with_items:
+    - "{{ m_local_secret }}"
+    - "{{ m_local_secret }}/{{ env }}"
+
+- name: "Ensure {{ m_local_secret }} files properly owned/moded"
+  file:
+    path: "{{ item }}"
+    owner: "{{ m_config_secret_owner }}"
+    group: "{{ m_config_secret_group }}"
+    mode: "{{ m_config_secret_file_mode }}"
+    state: file
+  tags:
+    - file-perms
+  with_items:
+    - "{{ m_local_secret }}/{{ env }}/secret.yml"
+    - "{{ m_local_secret }}/{{ env }}/hosts"
