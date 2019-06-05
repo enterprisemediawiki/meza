@@ -283,7 +283,9 @@ list:
         array(0,50)
       );
 
-
+  - name: SemanticExtraSpecialProperties
+    composer: "mediawiki/semantic-extra-special-properties"
+    version: "dev-master"
   - name: PipeEscape
     repo: https://github.com/wikimedia/mediawiki-extensions-PipeEscape.git
     version: "{{ mediawiki_default_branch }}"
