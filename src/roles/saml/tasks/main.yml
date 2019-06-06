@@ -1,6 +1,35 @@
 ---
+- name: "Check if {{ m_simplesamlphp_path }} exists"
+  stat:
+    path: "{{ m_simplesamlphp_path }}"
+  register: simplesamlphp_exists
+
+- name: "Check if {{ m_simplesamlphp_path }} exists"
+  stat:
+    path: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
+  register: simplesamlextension_exists
+
+- name: Ensure good permissions on simplesamlphp directory and subs (if dir exists)
+  file:
+    path: "{{ m_simplesamlphp_path }}"
+    owner: "{{ m_simplesamlphp_owner }}"
+    group: "{{ m_simplesamlphp_group }}"
+    mode: "{{ m_simplesamlphp_mode }}"
+    recurse: yes
+  when: simplesamlphp_exists.stat.exists and simplesamlphp_exists.stat.isdir
+
+- name: Ensure good permissions on Extension:SimpleSamlAuth directory and subs (if dir exists)
+  file:
+    path: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
+    recurse: yes
+  when: simplesamlphp_exists.stat.exists and simplesamlphp_exists.stat.isdir
 
 - name: Ensure SimpleSamlPhp (PHP SAML library) installed
+  become: yes
+  become_user: "meza-ansible"
   # Ref #1149 for TMPDIR environment var
   environment:
     TMPDIR: "{{ m_tmp }}"
@@ -13,6 +42,8 @@
     - latest
 
 - name: Ensure SimpleSamlAuth (MediaWiki extension) installed
+  become: yes
+  become_user: "meza-ansible"
   # Ref #1149 for TMPDIR environment var
   environment:
     TMPDIR: "{{ m_tmp }}"
@@ -57,12 +88,20 @@
     - filename: "SAMLConfig.php"
       dest_path: "{{ m_deploy }}"
 
-- name: Ensure good permissions on simplesamlphp directory and subs
+- name: Ensure _still_ good permissions on simplesamlphp directory and subs
   file:
     path: "{{ m_simplesamlphp_path }}"
     owner: "{{ m_simplesamlphp_owner }}"
     group: "{{ m_simplesamlphp_group }}"
     mode: "{{ m_simplesamlphp_mode }}"
+    recurse: yes
+
+- name: Ensure _still_ good permissions on Extension:SimpleSamlAuth directory and subs
+  file:
+    path: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
     recurse: yes
 
 - name: Ensure NonMediaWikiSimpleSamlAuth.php in place
