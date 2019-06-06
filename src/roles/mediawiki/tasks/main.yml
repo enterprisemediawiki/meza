@@ -63,8 +63,9 @@
 - name: Ensure MediaWiki core owned by meza-ansible
   file:
     path: "{{ m_mediawiki }}"
-    owner: meza-ansible
-    group: wheel
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
     state: directory
     recurse: yes
   tags:
@@ -93,6 +94,7 @@
           ignoreSubmodules = all
   tags:
     - mediawiki-core
+
 
 #
 # EXTENSIONS AND SKINS
@@ -196,8 +198,9 @@
   template:
     src: Extensions.php.j2
     dest: "{{ m_deploy }}/Extensions.php"
-    owner: meza-ansible
-    group: wheel
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
 
 # Adds extensions with composer param from MezaCoreExtensions.yml,
 # MezaLocalExtensions.yml, MezaCoreSkins.yml, and MezaLocalSkins.yml
@@ -205,8 +208,9 @@
   template:
     src: composer.local.json.j2
     dest: "{{ m_mediawiki }}/composer.local.json"
-    owner: meza-ansible
-    group: wheel
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
 
 - name: Run composer install on MediaWiki for dependencies
   become: yes
@@ -293,9 +297,21 @@
     src: LocalSettings.php.j2
     dest: "{{ m_mediawiki }}/LocalSettings.php"
     backup: yes
-    owner: meza-ansible
-    group: wheel
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
 
+- name: Ensure MediaWiki still properly owned
+  file:
+    path: "{{ m_mediawiki }}"
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
+    state: directory
+    recurse: yes
+  tags:
+    - mediawiki-core
+    - file-perms
 
 
 #
@@ -315,7 +331,18 @@
   template:
     src: BlenderSettings.php.j2
     dest: "{{ m_htdocs }}/WikiBlender/BlenderSettings.php"
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
 
+- name: Ensure WikiBlender properly owned
+  file:
+    path: "{{ m_htdocs }}/WikiBlender"
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
+    state: directory
+    recurse: yes
 
 
 #

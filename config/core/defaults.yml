@@ -200,6 +200,13 @@ m_data_owner: meza-ansible
 m_data_group: wheel
 
 
+#
+# Used for many things within htdocs that don't require apache to manipulate
+#
+m_htdocs_mode: "u=rwX,g=rwX,o=rX"
+m_htdocs_owner: meza-ansible
+m_htdocs_group: wheel
+
 
 # uploads directory. Note: user meza-ansible is in group "apache"
 m_uploads_dir_mode: "0775"
@@ -241,6 +248,9 @@ m_config_secret_dir_mode: "0775"
 m_config_secret_owner: meza-ansible
 m_config_secret_group: wheel
 
+m_simplesamlphp_mode: "u=rwX,g=rwX,o=rX"
+m_simplesamlphp_owner: meza-ansible
+m_simplesamlphp_group: wheel
 
 
 #
