@@ -301,6 +301,17 @@
     owner: "{{ m_htdocs_owner }}"
     group: "{{ m_htdocs_group }}"
 
+- name: Ensure MediaWiki still properly owned
+  file:
+    path: "{{ m_mediawiki }}"
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
+    state: directory
+    recurse: yes
+  tags:
+    - mediawiki-core
+    - file-perms
 
 
 #
@@ -320,7 +331,18 @@
   template:
     src: BlenderSettings.php.j2
     dest: "{{ m_htdocs }}/WikiBlender/BlenderSettings.php"
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
 
+- name: Ensure WikiBlender properly owned
+  file:
+    path: "{{ m_htdocs }}/WikiBlender"
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
+    state: directory
+    recurse: yes
 
 
 #
