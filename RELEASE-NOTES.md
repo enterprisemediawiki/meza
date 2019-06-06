@@ -1,6 +1,28 @@
 Release Notes
 =============
 
+## Meza 31.8.1
+
+Fix permissions for finicky servers; fix bad use of 'notify' tag on 'meza push-backup' command
+
+### Commits since 31.8.0
+
+* 597a49f Ensure MediaWiki and WikiBlender ownership after all operations
+* 8f14b8f Recursively apply owner/perms to simplesaml and mediawiki
+* 2803905 Specify /opt/simplesamlphp owner/group/mode
+* 80177f4 push-backup: Fix bad use of 'notify' tag; Add servers to exclude
+
+### Contributors
+
+* 6	James Montalvo
+
+# How to upgrade
+
+```bash
+sudo meza update 31.8.1
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.8.0
 
 Standardize secret config permissions; dev-networking fix
