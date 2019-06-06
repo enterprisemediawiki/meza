@@ -1,7 +1,7 @@
 ---
 
 # Define a timestamp fact to persist throughout this playbook
-- hosts: all:!exclude-all:!load-balancers-nonmeza:!load-balancers-nonmeza-external:!load-balancers-nonmeza-internal
+- hosts: all:!exclude-all:!load-balancers-unmanaged:!load-balancers-nonmeza:!load-balancers-nonmeza-external:!load-balancers-nonmeza-internal
   tasks:
     - set_fact:
         backup_timestamp: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
@@ -11,8 +11,6 @@
   roles:
     - set-vars
   tags:
-    # only run this if notify specified
-    - never
     - notify
   tasks:
 
@@ -61,8 +59,6 @@
   roles:
     - set-vars
   tags:
-    # only run this if notify specified
-    - never
     - notify
   tasks:
 
