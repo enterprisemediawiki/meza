@@ -28,6 +28,8 @@
     - latest
 
 - name: Ensure simplesamlphp dependencies in place
+  become: yes
+  become_user: "meza-ansible"
   composer:
     command: install
     working_dir: "{{ m_simplesamlphp_path }}"
@@ -55,10 +57,18 @@
     - filename: "SAMLConfig.php"
       dest_path: "{{ m_deploy }}"
 
+- name: Ensure good permissions on simplesamlphp directory and subs
+  file:
+    path: "{{ m_simplesamlphp_path }}"
+    owner: "{{ m_simplesamlphp_owner }}"
+    group: "{{ m_simplesamlphp_group }}"
+    mode: "{{ m_simplesamlphp_mode }}"
+    recurse: yes
+
 - name: Ensure NonMediaWikiSimpleSamlAuth.php in place
   copy:
     src: files/NonMediaWikiSimpleSamlAuth.php
     dest: "{{ m_htdocs }}/NonMediaWikiSimpleSamlAuth.php"
-    owner: root
-    group: root
+    owner: meza-ansible
+    group: apache
     mode: 0755
