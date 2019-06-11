@@ -35,7 +35,7 @@
     pushing_from_path: "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
     pushing_to_server: "{{ push_backup.db.addr }}"
     # remote_server_base_path + backup_timestamp + _wiki.sql, but replace <id> with wiki_id (item)
-    pushing_to_path: "{{ remote_server_base_path | regex_replace('<id>', item) }}{{ backup_timestamp }}_wiki.sql"
+    pushing_to_path: "{{ remote_server_base_path | regex_replace('<id>', item) }}{{ backup_timestamp }}_wiki_push.sql"
     pushing_to_user: "{{ push_backup.remote_user }}"
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
 

@@ -137,6 +137,7 @@
     sql_backup_server: "{{ backups_server_db_dump.addr }}"
     do_sql_dump: True
     sql_file_match: "wiki_{{ wiki_id }}.sql"
+    sql_file_push_match: "wiki_{{ wiki_id }}.sql"
     db_backup_server_remote_user: "{{ backups_server_db_dump.remote_user }}"
     db_backup_server_mysql_user: "{{ backups_server_db_dump.mysql_user }}"
     sql_backup_server_set: True
@@ -148,6 +149,7 @@
     do_sql_dump: False
     sql_dir_path: "{{ backups_server_alt_source.sql_dir_path | regex_replace('<id>', wiki_id) }}"
     sql_file_match: "{{ backups_server_alt_source.sql_file_match | default('*.sql') | regex_replace('<id>', wiki_id) }}"
+    sql_file_push_match: "{{ backups_server_alt_source.sql_file_match | default('*push.sql') | regex_replace('<id>', wiki_id) }}"
     db_backup_server_remote_user: "{{ backups_server_alt_source.remote_user }}"
     sql_backup_server_set: True
   when: "not sql_backup_server_set and backups_server_alt_source is defined"
@@ -158,6 +160,7 @@
     do_sql_dump: False
     sql_dir_path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}"
     sql_file_match: "*.sql"
+    sql_file_push_match: "*push.sql"
     sql_backup_server_set: True
   when: "not sql_backup_server_set and 'backup-servers' in groups and groups['backup-servers']|length|int > 0"
 
@@ -178,10 +181,6 @@
     state: absent
   run_once: true
   delegate_to: "{{ groups['db-master'][0] }}"
-
-- debug: { var: do_sql_dump }
-- debug: { var: wiki_exists }
-- debug: { var: intend_overwrite_from_backup }
 
 - debug:
     msg: |
