@@ -131,7 +131,7 @@
     pulling_to_server:   "{{ groups['db-master'][0] }}"
     pulling_to_path:     "{{ m_tmp }}/wiki.sql"
     pulling_from_server: "{{ sql_backup_server }}"
-    pulling_from_path:   "{{ wiki_sql_file.stdout }}"
+    pulling_from_path:   "{{ wiki_sql_file_path }}"
     pulling_from_user:   "{{ db_backup_server_remote_user }}"
   run_once: true
   when:
