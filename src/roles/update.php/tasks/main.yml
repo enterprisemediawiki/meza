@@ -42,9 +42,17 @@
     - sql-backup-cleanup
   when: do_cleanup_sql_backup
 
+- name: Ensure update.php log exists
+  file:
+    path: "{{ m_logs }}/update.php"
+    state: directory
+    mode: "{{ m_logs_mode }}"
+    owner: "{{ m_logs_owner }}"
+    group: "{{ m_logs_group }}"
+
 - name: Run update.php on this wiki
   shell: >
-    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/update.php" --quick
+    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/update.php" --quick >> {{ m_logs }}/update.php/{{ wiki_id }}.`date "+\%Y\%m\%d"`.log 2>&1
   # run_once see [1]
   run_once: true
   tags:
