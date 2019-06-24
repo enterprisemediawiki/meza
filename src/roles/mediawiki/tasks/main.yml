@@ -468,6 +468,7 @@
     - elastic-build-index.sh
     - elastic-rebuild-all.sh
     - smw-rebuild-all.sh
+    - refresh-links.sh
 
 - name: Ensure data rebuilding logs directories exist
   file:
@@ -479,6 +480,7 @@
   with_items:
     - smw-rebuilddata
     - search-index
+    - refresh-links
 
 # FIXME: Should search and SMW building be after update.php?
 
