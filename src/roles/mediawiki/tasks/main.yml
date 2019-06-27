@@ -218,9 +218,7 @@
   composer:
     command: install
     working_dir: "{{ m_mediawiki }}"
-    no_dev: no
-  # FIXME #317: need ignore_errors because composer throws an error when running as root.
-  # failed_when: False
+    no_dev: yes
   tags:
     - composer-extensions
     - latest
@@ -233,9 +231,7 @@
   composer:
     command: update
     working_dir: "{{ m_mediawiki }}"
-    no_dev: no
-  # FIXME #317: need ignore_errors because composer throws an error when running as root.
-  # failed_when: False
+    no_dev: yes
   tags:
     - composer-extensions
     - latest
