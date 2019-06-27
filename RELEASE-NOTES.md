@@ -1,6 +1,40 @@
 Release Notes
 =============
 
+## Meza 31.8.2
+
+Multiple fixes in support of bad Composer issue, push-backups, etc
+
+### Commits since 31.8.1
+
+* 6722cdc Make meza-ansible:apache own deploy lock file, not root
+* 16833fd Remove commented out non-ansible-module composer tasks
+* deca0bb Use ansible composer module again
+* c7c510e Mount local meza on docker tests controller containers
+* 0a9ca06 Add error handling to update.php (show errors)
+* dc7c184 WIP
+* b1a140e Try envoking composer directly
+* 2a49a3f Trying deleting composer.lock before composer operations
+* 8b96dc1 Add --no-dev to MW composer commands
+* ddb9fe2 Add refreshLinks script that handles memory leaks
+* fb66fa3 Allow specifying rules for what to gzip in backups-cleanup
+* 8093118 Make update.php write to a log
+* ea7e7f6 Fix bad owner/group on /opt/data-meza
+* 94c79c1 Fix bad variable
+* 93d5a0d Improve logic for how to grab SQL file from backup
+* 25b8013 Make pushed backups in form *push.sql and use them first; more debug
+
+### Contributors
+
+* 24	James Montalvo
+
+# How to upgrade
+
+```bash
+sudo meza update 31.8.2
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.8.1
 
 Fix permissions for finicky servers; fix bad use of 'notify' tag on 'meza push-backup' command
