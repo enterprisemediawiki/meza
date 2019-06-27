@@ -262,7 +262,7 @@
 - name: Run composer update on MediaWiki for extensions
   become: yes
   become_user: "meza-ansible"
-  composer: "cd {{ m_mediawiki }} && composer update --no-dev"
+  shell: "cd {{ m_mediawiki }} && composer update --no-dev"
   tags:
     - composer-extensions
     - latest
