@@ -212,6 +212,17 @@
     owner: "{{ m_htdocs_owner }}"
     group: "{{ m_htdocs_group }}"
 
+- name: Remove composer.lock
+  become: yes
+  become_user: "meza-ansible"
+  file:
+    path: "{{ m_mediawiki }}/composer.lock"
+    state: absent
+  tags:
+    - composer-extensions
+    - latest
+    - skins
+
 - name: Run composer install on MediaWiki for dependencies
   become: yes
   become_user: "meza-ansible"
