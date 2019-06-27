@@ -212,47 +212,13 @@
     owner: "{{ m_htdocs_owner }}"
     group: "{{ m_htdocs_group }}"
 
-# - name: Remove composer.lock
-#   become: yes
-#   become_user: "meza-ansible"
-#   file:
-#     path: "{{ m_mediawiki }}/composer.lock"
-#     state: absent
-#   tags:
-#     - composer-extensions
-#     - latest
-#     - skins
-
-# - name: Run composer install on MediaWiki for dependencies
-#   become: yes
-#   become_user: "meza-ansible"
-#   composer:
-#     command: install
-#     working_dir: "{{ m_mediawiki }}"
-#     no_dev: yes
-#   tags:
-#     - composer-extensions
-#     - latest
-#     - skins
-
-# # install doesn't appear to do extensions
-# - name: Run composer update on MediaWiki for extensions
-#   become: yes
-#   become_user: "meza-ansible"
-#   composer:
-#     command: update
-#     working_dir: "{{ m_mediawiki }}"
-#     no_dev: yes
-#   tags:
-#     - composer-extensions
-#     - latest
-#     - skins
-
-
 - name: Run composer install on MediaWiki for dependencies
   become: yes
   become_user: "meza-ansible"
-  shell: "cd {{ m_mediawiki }} && composer install --no-dev"
+  composer:
+    command: install
+    working_dir: "{{ m_mediawiki }}"
+    no_dev: yes
   tags:
     - composer-extensions
     - latest
@@ -262,11 +228,33 @@
 - name: Run composer update on MediaWiki for extensions
   become: yes
   become_user: "meza-ansible"
-  shell: "cd {{ m_mediawiki }} && composer update --no-dev"
+  composer:
+    command: update
+    working_dir: "{{ m_mediawiki }}"
+    no_dev: yes
   tags:
     - composer-extensions
     - latest
     - skins
+
+# - name: Run composer install on MediaWiki for dependencies
+#   become: yes
+#   become_user: "meza-ansible"
+#   shell: "cd {{ m_mediawiki }} && composer install --no-dev"
+#   tags:
+#     - composer-extensions
+#     - latest
+#     - skins
+
+# # install doesn't appear to do extensions
+# - name: Run composer update on MediaWiki for extensions
+#   become: yes
+#   become_user: "meza-ansible"
+#   shell: "cd {{ m_mediawiki }} && composer update --no-dev"
+#   tags:
+#     - composer-extensions
+#     - latest
+#     - skins
 
 - name: Ensure Git submodule requirements met for core meza extensions
   become: yes
