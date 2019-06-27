@@ -5,16 +5,16 @@
 
 # Initiate container
 docker_repo="jamesmontalvo3/meza-docker-full:latest"
-source "$m_meza_host/tests/docker/init-container.sh" "none"
+source "$m_meza_host/tests/docker/init-container.sh" "${m_meza_host}" "mount"
 
 
 # Checkout the correct version of meza on the container
 # What's present on the pre-built container is not the latest. Need to pull
 # master in case the docker image doesn't have the correct git-setup.sh script
 # yet
-${docker_exec[@]} bash -c "cd /opt/meza && git fetch origin && git reset --hard origin/master"
-${docker_exec[@]} bash /opt/meza/tests/travis/git-setup.sh "$TRAVIS_EVENT_TYPE" \
-	"$TRAVIS_COMMIT" "$TRAVIS_PULL_REQUEST_SHA" "$TRAVIS_BRANCH" "$TRAVIS_PULL_REQUEST_BRANCH"
+# ${docker_exec[@]} bash -c "cd /opt/meza && git fetch origin && git reset --hard origin/master"
+# ${docker_exec[@]} bash /opt/meza/tests/travis/git-setup.sh "$TRAVIS_EVENT_TYPE" \
+# 	"$TRAVIS_COMMIT" "$TRAVIS_PULL_REQUEST_SHA" "$TRAVIS_BRANCH" "$TRAVIS_PULL_REQUEST_BRANCH"
 
 
 # FIXME #728: Test band-aid. This is run in init-container.sh above, but at
