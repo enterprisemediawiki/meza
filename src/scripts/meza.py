@@ -242,6 +242,9 @@ def request_lock_for_deploy (env):
 		with open( lock_file, 'w' ) as f:
 			f.write( "{}\n{}".format(pid,timestamp) )
 			f.close()
+		meza_chown( lock_file, 'meza-ansible', 'apache' )
+		os.chmod( lock_file, 0664 )
+
 		return { "pid": pid, "timestamp": timestamp }
 
 def unlock_deploy(env):
