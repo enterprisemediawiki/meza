@@ -3,7 +3,7 @@ list:
 
   - name: Semantic MediaWiki
     composer: "mediawiki/semantic-media-wiki"
-    version: "3.0.0"
+    version: "~3.0"
     config: |
       // Enable Semantic MediaWiki semantics
       enableSemantics( $wikiId );
