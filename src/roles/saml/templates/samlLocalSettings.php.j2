@@ -90,9 +90,72 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 				return true;
 			}
 
-			// user allowed from this IP address only -OR- this IP address is one of many allowed
-			elseif ( in_array( $ipaddr, $wgMezaAllowSkipSamlUsers[$username] ) ) {
-				return true;
+			$IPv4matchesCIDR = function( $ip, $cidr) {
+				$arr = explode( '/', $cidr );
+				if ( count($arr) === 1 ) {
+					$subnet = $arr[0];
+					$bits = 32; // Allows passing in CIDR or maskless IP
+				}
+				else {
+					list ( $subnet, $bits) = $arr;
+				}
+				$ip = ip2long( $ip );
+				$subnet = ip2long( $subnet );
+				$mask = -1 << (32 - $bits);
+				$subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
+
+				return ( $ip & $mask ) == $subnet;
+			};
+
+			$IPv6matchesCIDR = function( $ip, $cidr) {
+				$inet = inet_pton( $ip );
+
+				// converts inet_pton output to string with bits
+				$unpacked = unpack( 'A16', $inet );
+				$unpacked = str_split( $unpacked[1] );
+				$binaryip = '';
+				foreach ( $unpacked as $char ) {
+					$binaryip .= str_pad( decbin( ord( $char ) ), 8, '0', STR_PAD_LEFT );
+				}
+
+				$arr = explode( '/', $cidr );
+				if ( count($arr) === 1 ) {
+				$subnet = $arr[0];
+				$bits = 128; // Allows passing in CIDR or maskless IP
+				}
+				else {
+					list ( $subnet, $bits ) = $arr;
+				}
+
+				// Convert subnet to binary string
+				$subnet = inet_pton( $subnet );
+				$binarynet = inet_to_bits( $subnet );
+
+				$ip_net_bits = substr( $binaryip, 0, $bits );
+				$net_bits = substr( $binarynet, 0, $bits );
+
+				return $ip_net_bits === $net_bits;
+			};
+
+			$addressesToCheck = $wgMezaAllowSkipSamlUsers[$username];
+
+			// Loop through all addresses, returning true on first where client's IP matches
+			// Otherwise, fall through to $forbidden()
+			foreach( $addressesToCheck as $check ) {
+				if (
+					filter_var( $ipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) &&
+					$IPv4matchesCIDR( $ipaddr, $check )
+				) {
+					return true;
+				}
+
+				elseif (
+					defined( 'AF_INET6' ) &&
+					filter_var( $ipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) &&
+					$IPv6matchesCIDR( $ipaddr, $check )
+				) {
+					return true;
+				}
 			}
 		}
 
