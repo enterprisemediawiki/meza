@@ -179,7 +179,7 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: MezaExt
     repo: https://github.com/enterprisemediawiki/MezaExt.git
-    version: tags/0.1.0
+    version: "master"
   # Extension:PdfHandler (breaks on very large PDFs)
   # https://github.com/wikimedia/mediawiki-extensions-PdfHandler
   # // Location of PdfHandler dependencies
