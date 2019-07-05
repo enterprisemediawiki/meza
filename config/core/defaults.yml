@@ -137,7 +137,7 @@ use_default_ssh_config: True
 #
 
 # Version of MediaWiki core
-mediawiki_version: "1.31.1"
+mediawiki_version: "1.31.2"
 
 # Branch to use on many extensions extensions and skins
 mediawiki_default_branch: "REL1_31"
