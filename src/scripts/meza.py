@@ -242,7 +242,16 @@ def request_lock_for_deploy (env):
 		with open( lock_file, 'w' ) as f:
 			f.write( "{}\n{}".format(pid,timestamp) )
 			f.close()
-		meza_chown( lock_file, 'meza-ansible', 'apache' )
+
+		import grp
+
+		try:
+			grp.getgrnam('apache')
+			meza_chown( lock_file, 'meza-ansible', 'apache' )
+		except KeyError:
+			print('Group apache does not exist. Set "wheel" as group for lock file.')
+			meza_chown( lock_file, 'meza-ansible', 'wheel' )
+
 		os.chmod( lock_file, 0664 )
 
 		return { "pid": pid, "timestamp": timestamp }
