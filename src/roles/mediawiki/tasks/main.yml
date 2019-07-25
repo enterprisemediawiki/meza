@@ -304,8 +304,8 @@
     # don't modify an existing checkout
     # assume deployer is playing with Blender source
     force: no
-    ignore_errors: yes
     umask: "0002"
+  ignore_errors: yes
 
 - name: Ensure BlenderSettings.php in place
   template:
