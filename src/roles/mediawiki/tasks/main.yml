@@ -80,6 +80,7 @@
     repo: https://github.com/wikimedia/mediawiki.git
     dest: "{{ m_mediawiki }}"
     version: "{{ mediawiki_version }}"
+    refspec: "{{ item.refspec | default('') }}"
     track_submodules: no
     recursive: no
     umask: "0002"
@@ -130,6 +131,7 @@
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
     version: "{{ item.version }}"
+    refspec: "{{ item.refspec | default('') }}"
     umask: "0002"
   with_items: "{{ meza_core_extensions.list }}"
   when: meza_core_extensions.list[0] is defined and item.repo is defined
@@ -153,6 +155,7 @@
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/skins/{{ item.name }}"
     version: "{{ item.version }}"
+    refspec: "{{ item.refspec | default('') }}"
   with_items: "{{ meza_core_skins.list }}"
   when: meza_core_skins.list[0] is defined and item.repo is defined
   tags:
@@ -169,6 +172,7 @@
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
     version: "{{ item.version }}"
+    refspec: "{{ item.refspec | default('') }}"
     umask: "0002"
     key_file: "{{ item.key_file | default(None) }}"
   with_items: "{{ meza_local_extensions.list }}"
@@ -186,6 +190,7 @@
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/skins/{{ item.name }}"
     version: "{{ item.version }}"
+    refspec: "{{ item.refspec | default('') }}"
   with_items: "{{ meza_local_skins.list }}"
   when: meza_local_skins.list[0] is defined and item.repo is defined
   tags:
