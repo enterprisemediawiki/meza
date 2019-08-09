@@ -137,7 +137,10 @@ use_default_ssh_config: True
 #
 
 # Version of MediaWiki core
-mediawiki_version: "1.31.2"
+# The has below is MW 1.31.3 plus additional commits. This is specifically to
+# get the following addition to core, allowing specifying img_auth.php headers:
+# https://gerrit.wikimedia.org/r/c/mediawiki/core/+/529195
+mediawiki_version: "aeb36c13a50083436445e212b4af98175f2661d6"
 
 # Branch to use on many extensions extensions and skins
 mediawiki_default_branch: "REL1_31"
