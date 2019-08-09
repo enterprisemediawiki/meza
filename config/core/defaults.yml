@@ -257,6 +257,10 @@ m_simplesamlphp_group: wheel
 # PHP config
 #
 
+# PHP max file size. This gets applied to php.ini variables upload_max_filesize
+# and post_max_size for convenience.
+php_max_upload_filesize: "100M"
+
 # The OPcache shared memory storage size
 php_opcache_memory_consumption: 256
 
