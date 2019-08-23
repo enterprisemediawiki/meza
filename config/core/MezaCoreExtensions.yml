@@ -353,7 +353,7 @@ list:
 
   - name: DataTransfer
     repo: https://github.com/wikimedia/mediawiki-extensions-DataTransfer.git
-    version: "{{ mediawiki_default_branch }}"
+    version: "730cbfbcc7cc255724eaceb76a3abc6fcc9c93aa"
   - name: PageImporter
     repo: https://github.com/enterprisemediawiki/PageImporter.git
     version: tags/0.1.0
