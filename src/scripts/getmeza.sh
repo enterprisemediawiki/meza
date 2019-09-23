@@ -9,6 +9,25 @@ if [ "$(whoami)" != "root" ]; then
 	exit 1
 fi
 
+checkInternetConnection() {
+    declare -i pingRetries=100
+    declare -i sleepDuration=3
+    declare -i minutes=$(($pingRetries * $sleepDuration / 60))
+
+    while [[ $pingRetries -gt 0 ]] && ! ping -c 1 -W 1 mirrorlist.centos.org >/dev/null 2>&1; do
+        echo "Could not connect to mirrorlist.centos.org. Internet connection might be down. Retrying (#$pingRetries) in $sleepDuration seconds..."
+        ((pingRetries -= 1))
+        sleep $sleepDuration
+    done
+
+    if [[ ! $pingRetries -gt 0 ]]; then
+        echo "Meza has been trying to install but hasn't found an internet connection for $minutes minutes. Verify internet connectivity and try again."
+        exit 1
+    fi
+}
+
+checkInternetConnection
+
 # If you don't do this in a restrictive system (umask 077), it becomes
 # difficult to manage all permissions, AND you constantly have to fix all git
 # clones and checkouts.
