@@ -162,9 +162,14 @@
     state: permissive # log actions that would be blocked if state=enforcing
 
 - name: ensure firewalld is running (and enable it at boot)
-  service: name=firewalld state=started enabled=yes
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
+- name: Try manually starting firewalld
+  shell: systemctl restart firewalld
 
 #
 # SSH config
