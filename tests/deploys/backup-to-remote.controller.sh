@@ -9,6 +9,9 @@ set -eux
 
 echo "RUNNING TEST"
 
+# Skip firewalld tasks since they broke in Travis (Issue #1237)
+echo -e '\nfirewall_skip_tasks: True\n' >> '/opt/conf-meza/public/public.yml'
+
 # Now that environment is setup, deploy/install it
 meza deploy "$1"
 

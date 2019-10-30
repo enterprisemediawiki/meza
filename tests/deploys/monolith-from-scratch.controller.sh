@@ -19,6 +19,9 @@ meza setup env monolith --fqdn="${fqdn}" --db_pass=1234 --private_net_zone=publi
 echo "print hosts file"
 cat /opt/conf-meza/secret/monolith/hosts
 
+# Skip firewalld tasks since they broke in Travis (Issue #1237)
+echo -e '\nfirewall_skip_tasks: True\n' >> '/opt/conf-meza/public/public.yml'
+
 # Now that environment monolith is setup, deploy/install it
 meza deploy monolith
 

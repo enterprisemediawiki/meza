@@ -103,7 +103,6 @@ ${docker_exec_1[@]} bash -c "ansible-vault encrypt $secret_yml --vault-password-
 ${docker_exec_1[@]} cat "$hosts_file"
 ${docker_exec_1[@]} cat "$secret_yml"
 
-
 # garbage data into database and file uploads, just to check that the changes
 # get copied to CONTAINER 1
 ${docker_exec_2[@]} mysql -u root -p1234 wiki_top -e"INSERT INTO watchlist (wl_user, wl_namespace, wl_title) VALUES (10000,0,'FAKE PAGE');"

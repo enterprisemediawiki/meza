@@ -70,7 +70,6 @@
     src: "{{ item.filename }}.j2"
     dest: "{{ item.dest_path }}/{{ item.filename }}"
   with_items:
-
     # Config files for SimpleSamlPhp (PHP SAML library)
     - filename: "config.php"
       dest_path: "{{ m_simplesamlphp_path }}/config"

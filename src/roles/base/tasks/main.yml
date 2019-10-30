@@ -166,10 +166,9 @@
     name: firewalld
     state: started
     enabled: yes
-  when: docker_skip_tasks is not defined or not docker_skip_tasks
-
-- name: Try manually starting firewalld
-  shell: systemctl restart firewalld
+  when:
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - firewall_skip_tasks is not defined or not firewall_skip_tasks
 
 #
 # SSH config
