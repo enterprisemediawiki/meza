@@ -9,11 +9,8 @@ set -eux
 
 echo "RUNNING TEST"
 
-# Skip firewalld tasks since they broke in Travis (Issue #1237)
-echo -e '\nfirewall_skip_tasks: True\n' >> '/opt/conf-meza/public/public.yml'
-
 # Deploy environment with test config
-meza deploy "$1"
+meza deploy "$1" --no-firewall
 
 # Need to wait after install before checking that Parsoid is working
 sleep 10s
