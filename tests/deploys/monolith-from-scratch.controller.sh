@@ -20,7 +20,7 @@ echo "print hosts file"
 cat /opt/conf-meza/secret/monolith/hosts
 
 # Now that environment monolith is setup, deploy/install it
-meza deploy monolith
+meza deploy monolith --no-firewall
 
 # Need to sleep 10 seconds to let Parsoid finish loading
 sleep 10s

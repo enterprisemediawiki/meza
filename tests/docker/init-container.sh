@@ -82,8 +82,8 @@ docker_exec=( docker exec --tty "$container_id" env TERM=xterm )
 # or Ubuntu 14.04 host. Only tested on new version of Docker (docker-ce version
 # 17.something), whereas Travis is on 1.12.something.
 ${docker_exec[@]} yum -y install firewalld
+${docker_exec[@]} firewall-offline-cmd --zone=public --change-interface=docker0
 ${docker_exec[@]} systemctl start firewalld
-${docker_exec[@]} firewall-cmd --permanent --zone=public --change-interface=docker0
 
 if [ "$is_minion" == "no" ]; then
 

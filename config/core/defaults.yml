@@ -146,7 +146,7 @@ mediawiki_default_branch: "REL1_31"
 php_ius_version: "php71u"
 
 # Parsoid version
-m_parsoid_version: "tags/v0.9.0"
+m_parsoid_version: "tags/v0.10.0"
 
 # MediaWiki 1.27 and earlier require ElasticSearch 1.6
 # MediaWiki 1.28 and higher require ElasticSearch 2.x

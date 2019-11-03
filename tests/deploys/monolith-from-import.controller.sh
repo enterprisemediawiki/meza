@@ -24,7 +24,7 @@ sed -r -i "s/INSERT_FQDN/$fqdn/g;" "/opt/conf-meza/secret/$env_name/secret.yml"
 git clone https://github.com/jamesmontalvo3/meza-test-backups.git "/opt/data-meza/backups/$env_name"
 
 # Deploy environment with test config
-meza deploy "$env_name"
+meza deploy "$env_name" --no-firewall
 
 # Need to wait after install before checking that Parsoid is working
 sleep 10s
