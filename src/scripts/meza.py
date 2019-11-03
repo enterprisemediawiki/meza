@@ -98,7 +98,7 @@ def meza_command_deploy (argv):
 		else:
 			sys.exit(rc)
 
-	more_extra_vars = False
+	more_extra_vars = {}
 
 	# strip environment off of it
 	argv = argv[1:]
@@ -108,7 +108,16 @@ def meza_command_deploy (argv):
 		# remove -o and --overwrite from args;
 		argv = [value for value in argv[:] if value not in ["-o", "--overwrite"]]
 
-		more_extra_vars = { 'force_overwrite_from_backup': True }
+		more_extra_vars['force_overwrite_from_backup'] = True
+
+	if (len( set(argv).intersection({"--no-firewall"}) )) > 0:
+		# remove --no-firewall from args:
+		argv = [value for value in argv[:] if value not in ["--no-firewall"]]
+
+		more_extra_vars['firewall_skip_tasks'] = True
+
+	if len(more_extra_vars) == 0:
+		more_extra_vars = False
 
 	# This breaks continuous integration. FIXME to get it back.
 	# THIS WAS WRITTEN WHEN `meza` WAS A BASH SCRIPT

@@ -57,4 +57,4 @@
     lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: "nodejs-{{ nodejs_version[0] }}.*"
     state: present
-    enablerepo: 'epel,nodesource'"
+    enablerepo: 'epel,nodesource'

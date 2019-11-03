@@ -213,7 +213,9 @@
   with_items:
     - 80
     - 443
-  when: docker_skip_tasks is not defined or not docker_skip_tasks
+  when:
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - firewall_skip_tasks is not defined or not firewall_skip_tasks
 
 - name: Ensure firewalld port 1936 OPEN when haproxy stats ENABLED
   firewalld:
@@ -222,7 +224,10 @@
     immediate: true
     state: enabled
     zone: "{{m_public_networking_zone|default('public')}}"
-  when: enable_haproxy_stats and (docker_skip_tasks is not defined or not docker_skip_tasks)
+  when:
+    - enable_haproxy_stats
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - firewall_skip_tasks is not defined or not firewall_skip_tasks
 
 - name: Ensure firewalld port 1936 CLOSED when haproxy stats DISABLED
   firewalld:
@@ -231,7 +236,10 @@
     immediate: true
     state: disabled
     zone: "{{m_public_networking_zone|default('public')}}"
-  when: not enable_haproxy_stats and (docker_skip_tasks is not defined or not docker_skip_tasks)
+  when:
+    - not enable_haproxy_stats
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - firewall_skip_tasks is not defined or not firewall_skip_tasks
 
 - name: Ensure firewalld port 8088 OPEN when PHP profiling ENABLED
   firewalld:
@@ -240,7 +248,10 @@
     immediate: true
     state: enabled
     zone: "{{m_public_networking_zone|default('public')}}"
-  when: m_setup_php_profiling and (docker_skip_tasks is not defined or not docker_skip_tasks)
+  when:
+    - m_setup_php_profiling
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - firewall_skip_tasks is not defined or not firewall_skip_tasks
 
 - name: Ensure firewalld port 8088 CLOSED when PHP profiling DISABLED
   firewalld:
@@ -249,8 +260,10 @@
     immediate: true
     state: disabled
     zone: "{{m_public_networking_zone|default('public')}}"
-  when: not m_setup_php_profiling and (docker_skip_tasks is not defined or not docker_skip_tasks)
-
+  when:
+    - not m_setup_php_profiling
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - firewall_skip_tasks is not defined or not firewall_skip_tasks
 
 # FIXME #747: haproxy will need to handle reverse proxy for Elasticsearch plugins
 # - name: Configure firewalld for Elasticsearch reverse proxy

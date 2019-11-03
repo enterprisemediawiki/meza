@@ -52,8 +52,6 @@ ${docker_exec_1[@]} sed -r -i "s/INSERT_FQDN/$docker_ip_1/g;" \
 # LocalSettings.php)
 ${docker_exec_1[@]} bash -c "echo -e 'allow_image_tags: True\n' >> '/opt/conf-meza/secret/$env_name/secret.yml'"
 
-
-
 # CONTAINER 2: get backup files
 ${docker_exec_2[@]} git clone \
 	https://github.com/jamesmontalvo3/meza-test-backups.git \
