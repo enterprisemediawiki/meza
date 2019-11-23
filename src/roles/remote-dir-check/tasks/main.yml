@@ -46,10 +46,18 @@
 - debug: { var: remote_dir_check }
 - debug: { var: local_dir_check }
 
+- set_fact:
+    local_dir_check: False
+  when: local_dir_check is skipped
+
+- set_fact:
+    remote_dir_check: False
+  when: remote_dir_check is skipped
+
 - name: "Set remote_dir_exists to true"
   set_fact:
     remote_dir_exists: True
-  when: (not local_dir_check|skipped and local_dir_check.rc == 0) or (not remote_dir_check|skipped and remote_dir_check.rc == 0)
+  when: (local_dir_check and local_dir_check.rc == 0) or (remote_dir_check and remote_dir_check.rc == 0)
 
 - debug: { var: remote_dir_exists }
 
