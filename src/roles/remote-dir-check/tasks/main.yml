@@ -50,7 +50,7 @@
     local_dir_check: False
   when: local_dir_check is skipped
 
-  - set_fact:
+- set_fact:
     remote_dir_check: False
   when: remote_dir_check is skipped
 
