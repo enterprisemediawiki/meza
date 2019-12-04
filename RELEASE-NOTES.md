@@ -1,6 +1,39 @@
 Release Notes
 =============
 
+## Meza 31.9.0
+
+Ansible 2.9 fix; Travis firewall fix
+
+### Commits since 31.8.4
+
+* 4d18daa yaml syntax fix
+* 63716a8 fix more flag syntax
+* fe78845 fix deprecated ansible syntax, ref c06fa04c7ddd0ea99c6e92b6f87ff89fd5be27a4
+* 9dde2d8 Try Parsoid 0.10.0
+* 121de9d Add --no-firewall deploy option
+* 93b6087 Disable firewalld on travis tests
+* 74a7697 Try manually restarting firewalld
+* f9cc3a6 Travis saying Docker not running; perhaps start firewall after offline cmd
+* 892fb1f With firewall-offline-cmd no --permanent option, prob because if offline none could be temp
+* e1ced43 Possible solution to issue #1237 according to this forum:
+* d1b17a9 Add a calendar interface to add and edit events using the Full…
+* a555114 Add function to wait for Internet connection.
+
+### Contributors
+
+* 11	James Montalvo
+* 4	Daren Welsh
+* 1	Vincent Brooks
+* 1	XP1
+
+# How to upgrade
+
+```bash
+sudo meza update 31.9.0
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.8.2
 
 Multiple fixes in support of bad Composer issue, push-backups, etc
