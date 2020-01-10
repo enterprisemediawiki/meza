@@ -951,7 +951,7 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 		extra_vars = {}
 
 	if more_extra_vars:
-		for varname, value in more_extra_vars.iteritems():
+		for varname, value in more_extra_vars.items():
 			extra_vars[varname] = value
 
 	if len(extra_vars) > 0:
