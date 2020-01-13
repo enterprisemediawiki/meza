@@ -43,20 +43,29 @@ require "{{ m_deploy }}/samlLocalSettings.php";
 
 require '/opt/.deploy-meza/config.php';
 
-if( $wgCommandLineMode ) {
+/*
+ * Fix ENV vars getting prepended with 'REDIRECT_' by Apache
+ */
+function fixApacheEnv () {
+	foreach ($_ENV as $key => $value) {
+	    if (substr($key, 0, 9) === 'REDIRECT_') {
+	        $_ENV[str_replace('REDIRECT_', '', $key)] = $value;
+	        putenv(str_replace('REDIRECT_', '', $key) . '=' . $value);
+	    }
+	}
+}
+fixApacheEnv();
 
-	$mezaWikiEnvVarName='WIKI';
+$mezaWikiEnvVarName='WIKI';
 
+if ( $wgCommandLineMode ) {
 	// get $wikiId from environment variable
 	$wikiId = getenv( $mezaWikiEnvVarName );
 
-}
-else {
-
+} else {
 	// get $wikiId from URI
 	$uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
-	$wikiId = strtolower( $uriParts[1] ); // URI has leading slash, so $uriParts[0] is empty string
-
+	$wikiId = strtolower( $uriParts[1] );
 }
 
 
@@ -90,11 +99,13 @@ if ( isset( $wikiIdRedirects[ $wikiId ] ) ) {
 $wikis = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
 
 
-if ( ! in_array( $wikiId, $wikis ) ) {
-
-	// handle invalid wiki
-	die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
-
+if ( ! in_array( $wikiId, $wikis ) && empty ( $wikiId ) ) {
+    // get $wikiId from environment variable
+	$wikiId = getenv( $mezaWikiEnvVarName );
+    if (!$wikiId) {
+		// handle invalid wiki
+		die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
+	}
 }
 
 {% if meza_auth_type is defined %}
@@ -258,6 +269,7 @@ $wgServer = 'https://{{ wiki_app_fqdn }}';
 
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
 $wgScriptPath = "/$wikiId";
+$wgArticlePath = "/$wikiId/$1";
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath
 $wgUploadPath = "$wgScriptPath/img_auth.php";

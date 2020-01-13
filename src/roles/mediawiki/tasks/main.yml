@@ -91,6 +91,18 @@
   tags:
     - mediawiki-core
 
+# create symlink to core for short urls
+# tag it latest, so that the symlink gets created whenever core is downloaded
+- name: Create symlink to core, to enable short urls
+  file:
+    src: "{{ m_mediawiki }}"
+    dest: "{{ m_htdocs }}/{{ item }}"
+    state: link
+  with_items:
+    - "{{ list_of_wikis }}"
+  tags:
+    - latest
+
 #
 # EXTENSIONS AND SKINS
 #
