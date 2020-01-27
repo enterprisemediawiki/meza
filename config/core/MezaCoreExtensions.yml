@@ -27,7 +27,7 @@ list:
 
   - name: Semantic Result Formats
     composer: "mediawiki/semantic-result-formats"
-    version: "3.0.0"
+    version: "hidezeroes"
     config: |
       // In SRF 3.0+ you need to do this, too:
       wfLoadExtension( 'SemanticResultFormats' );
