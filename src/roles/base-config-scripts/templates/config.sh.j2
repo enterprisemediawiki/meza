@@ -63,7 +63,7 @@ m_i18n="{{ m_i18n }}"
 # CUSTOM __public__ DEPLOY VARIABLES
 # These should only come from public.yml
 #
-{% for key, value in public_deploy_vars.iteritems() %}
+{% for key, value in public_deploy_vars.items() %}
 {% if value is string %}
 {{ key }}="{{ value }}"
 {% elif value is iterable %}
@@ -80,7 +80,7 @@ m_i18n="{{ m_i18n }}"
 # CUSTOM __{{ env }} environment__ DEPLOY VARIABLES
 # These should only come from env/{{ env }}.yml
 #
-{% for key, value in env_deploy_vars.iteritems() %}
+{% for key, value in env_deploy_vars.items() %}
 {% if value is string %}
 {{ key }}="{{ value }}"
 {% elif value is iterable %}
@@ -97,7 +97,7 @@ m_i18n="{{ m_i18n }}"
 # CUSTOM __secret__ DEPLOY VARIABLES
 # These should only come from secret.yml
 #
-{% for key, value in secret_deploy_vars.iteritems() %}
+{% for key, value in secret_deploy_vars.items() %}
 {% if value is string %}
 {{ key }}="{{ value }}"
 {% elif value is iterable %}
@@ -116,7 +116,7 @@ m_i18n="{{ m_i18n }}"
 # FIXME: remove deploy_vars in lieu of secret_deploy_vars when production wikis
 #        are updated.
 #
-{% for key, value in deploy_vars.iteritems() %}
+{% for key, value in deploy_vars.items() %}
 {% if value is string %}
 {{ key }}="{{ value }}"
 {% elif value is iterable %}
