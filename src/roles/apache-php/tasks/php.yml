@@ -31,6 +31,7 @@
     - m4
     - xz-libs
     - mariadb-libs
+    - php-ldap
 
 - name: Get IUS repository
   include: ius.yml
