@@ -35,36 +35,11 @@
 - name: Get IUS repository
   include: ius.yml
 
-- name: Ensure PHP 5.6 packages removed
-  yum:
+- name: Remove PHP 5.x packages
+  package:
     lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
-    name: "{{item}}"
+    name: "php5*"
     state: absent
-  with_items:
-    - php56u
-    - php56u-cli
-    - php56u-common
-    - php56u-devel
-    - php56u-gd
-    - php56u-pecl-memcache
-    - php56u-pspell
-    - php56u-snmp
-    - php56u-xml
-    - php56u-xmlrpc
-    - php56u-mysqlnd
-    - php56u-pdo
-    - php56u-odbc
-    - php56u-pear
-    - php56u-pecl-jsonc
-    - php56u-process
-    - php56u-bcmath
-    - php56u-intl
-    - php56u-opcache
-    - php56u-soap
-    - php56u-mbstring
-    - php56u-mcrypt
-    - php56u-mssql
-
 
 # Check if the desired version of PHP is installed. If it is not, ensure any
 # other versions of PHP are not installed
