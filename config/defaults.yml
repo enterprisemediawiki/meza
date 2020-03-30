@@ -152,22 +152,24 @@ m_meza_sudeoers_file: "/etc/sudoers.d/meza-ansible"
 #
 
 # Version of MediaWiki core
-mediawiki_version: "REL1_32"
+mediawiki_version: "REL1_34"
 
 # Branch to use on many extensions extensions and skins
-mediawiki_default_branch: "REL1_32"
+mediawiki_default_branch: "REL1_34"
 
 # PHP version
 php_ius_version: "php72u"
 php_debian_version: "7.2"
 
 # Parsoid version
-m_parsoid_version: "tags/v0.10.0"
+m_parsoid_version: "tags/v0.11.0"
 
-# MediaWiki 1.27 and earlier require ElasticSearch 1.6
-# MediaWiki 1.28 and higher require ElasticSearch 2.x
-# MediaWiki 1.29 and higher require ElasticSearch 5.x
-elasticsearch_major_version: "5.x"
+# See Extension:CirrusSearch for ElasticSearch requirements
+# Meza before 31.x had ElasticSearch 1.6 or 2.x
+# Meza 31.x had 5.x
+# Meza 32.x through 34.x were never released, but had 5.x or 6.x
+# Meza 35.x uses 6.x
+elasticsearch_major_version: "6.x"
 
 # Whether or not to install Lua/luasandbox
 m_install_lua: true
