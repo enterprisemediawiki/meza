@@ -30,7 +30,7 @@
   when: ansible_os_family == 'RedHat'
 - name: Add Elasticsearch repository.
   template:
-    src: elasticsearch5.repo.j2
+    src: elasticsearch.repo.j2
     dest: /etc/yum.repos.d/elasticsearch.repo
     mode: 0644
   when: ansible_os_family == 'RedHat'
