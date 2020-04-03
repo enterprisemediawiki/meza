@@ -3,7 +3,7 @@ list:
 
   - name: Semantic MediaWiki
     composer: "mediawiki/semantic-media-wiki"
-    version: "3.0.2"
+    version: "~3.1.0"
     config: |
       // Enable Semantic MediaWiki semantics
       enableSemantics( $wikiId );
@@ -23,11 +23,11 @@ list:
       // created them, and thus they effectively don't replicate). Picking
       // DB_SLAVE since temporary tables are effectively a read-action since
       // they are used only for making more efficient queries.
-      $smwgLocalConnectionConf['mw.db.queryengine'] = [ 'read' => DB_SLAVE, 'write' => DB_SLAVE ];
+      $smwgLocalConnectionConf['mw.db.queryengine'] = [ 'read' => DB_REPLICA, 'write' => DB_REPLICA ];
 
   - name: Semantic Result Formats
     composer: "mediawiki/semantic-result-formats"
-    version: "3.0.0"
+    version: "~3.1.0"
     config: |
       // In SRF 3.0+ you need to do this, too:
       wfLoadExtension( 'SemanticResultFormats' );
@@ -49,7 +49,7 @@ list:
 
   - name: SemanticCompoundQueries
     composer: "mediawiki/semantic-compound-queries"
-    version: "1.2.0"
+    version: "~2.1.0"
   - name: Scribunto
     repo: https://github.com/wikimedia/mediawiki-extensions-Scribunto.git
     version: "{{ mediawiki_default_branch }}"
@@ -59,7 +59,7 @@ list:
       $wgScribuntoUseCodeEditor = true;
   - name: "Semantic Scribunto"
     composer: "mediawiki/semantic-scribunto"
-    version: 2.0.0
+    version: ~2.1.0
     config: |
       wfLoadExtension( 'SemanticScribunto' );
   - name: SubPageList
