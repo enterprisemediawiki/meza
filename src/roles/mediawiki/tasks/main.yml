@@ -469,9 +469,9 @@
 #   when: not es_do_upgrade_stat.stat.exists
 
 
-- name: Verify metastore index upgraded
-  shell: WIKI={{ list_of_wikis[0] }} php /opt/htdocs/mediawiki/extensions/CirrusSearch/maintenance/metastore.php --upgrade
-  run_once: true
+# - name: Verify metastore index upgraded
+#   shell: WIKI={{ list_of_wikis[0] }} php /opt/htdocs/mediawiki/extensions/CirrusSearch/maintenance/metastore.php --upgrade
+#   run_once: true
 
 # Wikis are totally built at this point, but SMW and search need rebuilding
 # FIXME #811: Will this work when controller is not an app server?
