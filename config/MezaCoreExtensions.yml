@@ -3,7 +3,7 @@ list:
 
   - name: Semantic MediaWiki
     composer: "mediawiki/semantic-media-wiki"
-    version: "~3.1.0"
+    version: "~3.1"
     config: |
       // Enable Semantic MediaWiki semantics
       enableSemantics( $wikiId );
@@ -27,7 +27,7 @@ list:
 
   - name: Semantic Result Formats
     composer: "mediawiki/semantic-result-formats"
-    version: "~3.1.0"
+    version: "~3.1"
     config: |
       // In SRF 3.0+ you need to do this, too:
       wfLoadExtension( 'SemanticResultFormats' );
@@ -49,7 +49,8 @@ list:
 
   - name: SemanticCompoundQueries
     composer: "mediawiki/semantic-compound-queries"
-    version: "~2.1.0"
+    version: "~2.1"
+
   - name: Scribunto
     repo: https://github.com/wikimedia/mediawiki-extensions-Scribunto.git
     version: "{{ mediawiki_default_branch }}"
@@ -59,7 +60,7 @@ list:
       $wgScribuntoUseCodeEditor = true;
   - name: "Semantic Scribunto"
     composer: "mediawiki/semantic-scribunto"
-    version: ~2.1.0
+    version: ~2.1
     config: |
       wfLoadExtension( 'SemanticScribunto' );
   - name: SubPageList
@@ -89,7 +90,7 @@ list:
       $wgPFEnableStringFunctions = true;
   - name: ExternalData
     repo: https://github.com/wikimedia/mediawiki-extensions-ExternalData.git
-    version: "{{ mediawiki_default_branch }}"
+    version: "master"
   - name: LabeledSectionTransclusion
     repo: https://github.com/wikimedia/mediawiki-extensions-LabeledSectionTransclusion.git
     version: "{{ mediawiki_default_branch }}"
@@ -106,7 +107,7 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: PageForms
     repo: https://github.com/wikimedia/mediawiki-extensions-PageForms.git
-    version: "bb1beb015f0a16db10d96c895dfadf9eb691834d"
+    version: "master"
   - name: DismissableSiteNotice
     repo: https://github.com/wikimedia/mediawiki-extensions-DismissableSiteNotice.git
     version: "{{ mediawiki_default_branch }}"
@@ -132,7 +133,7 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: ReplaceText
     repo: https://github.com/wikimedia/mediawiki-extensions-ReplaceText.git
-    version: tags/1.4
+    version: "master"
   - name: Interwiki
     repo: https://github.com/wikimedia/mediawiki-extensions-Interwiki.git
     version: "{{ mediawiki_default_branch }}"
@@ -222,11 +223,11 @@ list:
       $wgPageShowWatchingUsers = true;
   - name: SemanticInternalObjects
     repo: https://github.com/wikimedia/mediawiki-extensions-SemanticInternalObjects.git
-    version: "{{ mediawiki_default_branch }}"
+    version: "master"
     legacy_load: true
   - name: SemanticDrilldown
     repo: https://github.com/wikimedia/mediawiki-extensions-SemanticDrilldown.git
-    version: "{{ mediawiki_default_branch }}"
+    version: "master"
     legacy_load: true
   - name: Arrays
     repo: https://github.com/wikimedia/mediawiki-extensions-Arrays.git
@@ -238,8 +239,7 @@ list:
     legacy_load: true
   - name: AdminLinks
     repo: https://github.com/wikimedia/mediawiki-extensions-AdminLinks.git
-    version: "{{ mediawiki_default_branch }}"
-    legacy_load: true
+    version: "master"
     config: |
       $wgGroupPermissions['sysop']['adminlinks'] = true;
   - name: BatchUserRights
@@ -259,8 +259,7 @@ list:
     version: tags/0.1.0
   - name: ApprovedRevs
     repo: https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git
-    # Use this commit until a release tag for v1.0 is created
-    version: tags/1.0
+    version: master
     config: |
       $egApprovedRevsAutomaticApprovals = false;
   - name: ImagesLoaded
@@ -371,7 +370,7 @@ list:
 
   - name: DataTransfer
     repo: https://github.com/wikimedia/mediawiki-extensions-DataTransfer.git
-    version: "730cbfbcc7cc255724eaceb76a3abc6fcc9c93aa"
+    version: "master"
   - name: PageImporter
     repo: https://github.com/enterprisemediawiki/PageImporter.git
     version: tags/0.1.0
