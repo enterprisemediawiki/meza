@@ -78,7 +78,7 @@ $backups_environment = '{{ backups_environment }}';
 {% if wiki_backup_downloaders is defined %}
 # Users allowed to download specific wikis
 $wiki_backup_downloaders = array();
-{% for wiki, users in wiki_backup_downloaders.iteritems() %}
+{% for wiki, users in wiki_backup_downloaders.items() %}
 $wiki_backup_downloaders['{{ wiki }}'] = array(
 	{% for user in users %}
 	'{{ user }}',
@@ -109,7 +109,7 @@ $all_backup_downloaders = array(
 # CUSTOM __public__ DEPLOY VARIABLES
 # These should only come from public.yml
 #
-{% for key, value in public_deploy_vars.iteritems() %}
+{% for key, value in public_deploy_vars.items() %}
 
 {% if value is number -%}
 	${{ key }} = {{ value }};
@@ -121,7 +121,7 @@ $all_backup_downloaders = array(
 	${{ key }} = [];
 
 	{%- if value is mapping -%}
-		{%- for subkey, subvalue in value.iteritems() %}
+		{%- for subkey, subvalue in value.items() %}
 
 			{% if subvalue is number -%}
 				${{ key }}['{{ subkey }}'] = {{ subvalue }};
@@ -159,7 +159,7 @@ $all_backup_downloaders = array(
 # CUSTOM __{{ env }} environment__ DEPLOY VARIABLES
 # These should only come from env/{{ env }}.yml
 #
-{% for key, value in env_deploy_vars.iteritems() %}
+{% for key, value in env_deploy_vars.items() %}
 
 {% if value is number -%}
 	${{ key }} = {{ value }};
@@ -171,7 +171,7 @@ $all_backup_downloaders = array(
 	${{ key }} = [];
 
 	{%- if value is mapping -%}
-		{%- for subkey, subvalue in value.iteritems() %}
+		{%- for subkey, subvalue in value.items() %}
 
 			{% if subvalue is number -%}
 				${{ key }}['{{ subkey }}'] = {{ subvalue }};
@@ -208,7 +208,7 @@ $all_backup_downloaders = array(
 # CUSTOM __secret__ DEPLOY VARIABLES
 # These should only come from secret.yml
 #
-{% for key, value in secret_deploy_vars.iteritems() %}
+{% for key, value in secret_deploy_vars.items() %}
 
 {% if value is number -%}
 	${{ key }} = {{ value }};
@@ -220,7 +220,7 @@ $all_backup_downloaders = array(
 	${{ key }} = [];
 
 	{%- if value is mapping -%}
-		{%- for subkey, subvalue in value.iteritems() %}
+		{%- for subkey, subvalue in value.items() %}
 
 			{% if subvalue is number -%}
 				${{ key }}['{{ subkey }}'] = {{ subvalue }};
@@ -260,7 +260,7 @@ $all_backup_downloaders = array(
 # FIXME: remove deploy_vars in lieu of secret_deploy_vars when production wikis
 #        are updated.
 #
-{% for key, value in deploy_vars.iteritems() %}
+{% for key, value in deploy_vars.items() %}
 
 {% if value is number -%}
 	${{ key }} = {{ value }};
@@ -272,7 +272,7 @@ $all_backup_downloaders = array(
 	${{ key }} = [];
 
 	{%- if value is mapping -%}
-		{%- for subkey, subvalue in value.iteritems() %}
+		{%- for subkey, subvalue in value.items() %}
 
 			{% if subvalue is number -%}
 				${{ key }}['{{ subkey }}'] = {{ subvalue }};
