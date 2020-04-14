@@ -13,6 +13,7 @@
   yum:
     name: "{{ package_java }}"
     state: present
+  when: ansible_os_family == 'RedHat'
 
 
 # Environment setup.
@@ -28,6 +29,7 @@
     key: https://packages.elastic.co/GPG-KEY-elasticsearch
     state: present
   when: ansible_os_family == 'RedHat'
+
 - name: Add Elasticsearch repository.
   template:
     src: elasticsearch.repo.j2
@@ -172,5 +174,6 @@
     src: elasticsearch.repo.j2
     dest: /etc/yum.repos.d/elasticsearch.repo
     mode: 0644
+  when: ansible_os_family == 'RedHat'
 
 
