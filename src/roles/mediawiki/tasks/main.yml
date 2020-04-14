@@ -468,6 +468,11 @@
 #     es_do_upgrade: False
 #   when: not es_do_upgrade_stat.stat.exists
 
+- name: "Ensure SMW storage setup"
+  shell: WIKI={{ item }} php {{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/setupStore.php
+  with_items: "{{ list_of_wikis }}"
+  run_once: true
+
 
 # - name: Verify metastore index upgraded
 #   shell: WIKI={{ list_of_wikis[0] }} php /opt/htdocs/mediawiki/extensions/CirrusSearch/maintenance/metastore.php --upgrade
