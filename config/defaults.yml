@@ -199,9 +199,6 @@ packages_php_debian:
   - php-pear
   - php-memcached
 
-  # No PHP 7.2 version of this (just like with IUS)
-  - php{{ php_debian_version }}-mcrypt
-
   # No apt package corresponding to:
   #   "{{ php_ius_version }}-process"
   #   "{{ php_ius_version }}-pdo"
