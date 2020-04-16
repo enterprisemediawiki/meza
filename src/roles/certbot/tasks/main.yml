@@ -1,0 +1,34 @@
+---
+# Role to install Let's Encrypt's Certbot, install certificate(s) and automate renewals
+- name: Ensure firewall port 54321 OPEN when certbot ENABLED
+  include_role:
+    name: firewall_port
+  vars:
+    firewall_action: open
+    firewall_port: 54321
+    firewall_protocol: tcp
+    firewall_zone: "{{m_private_networking_zone|default('public')}}"
+  when:
+    - enable_certbot
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
+
+- name: Ensure Certbot installed 
+  package:
+    name: certbot
+    state: present
+
+- name: Generate SSL Certificate
+  shell: >
+    certbot certonly --non-interactive --email {{ m_httpd_server_admin }}
+    --preferred-challenges http --standalone --agree-tos --renew-by-default 
+    --webroot-path {{ m_htdocs }} -d {{ wiki_app_fqdn }} --http-01-port=54321
+  delegate_to: localhost
+  run_once: True
+
+- name: Concatenate certificate files for HAproxy
+  shell: >
+    cat /etc/letsencrypt/live/{{ wiki_app_fqdn }}/fullchain.pem
+    /etc/letsencrypt/live/{{ wiki_app_fqdn }}/privkey.pem >
+    /etc/haproxy/certs/{{ wiki_app_fqdn }}.pem
+  notify:
+    - restart haproxy

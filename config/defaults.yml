@@ -101,6 +101,8 @@ wiki_id_redirects: {}
 
 m_force_debug: false
 
+enable_certbot: true
+
 enable_wiki_emails: true
 
 enable_haproxy_stats: false

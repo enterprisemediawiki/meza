@@ -65,11 +65,11 @@ frontend www-http
 	default_backend www-backend
 
 frontend www-https
-	bind *:443 ssl crt /etc/haproxy/certs/meza.pem
+	bind *:443 ssl crt /etc/haproxy/certs/
 	reqadd X-Forwarded-Proto:\ https
 	# Keep letsencrypt stuff here for now. Probably add it back later.
-	# acl letsencrypt-acl path_beg /.well-known/acme-challenge/
-	# use_backend letsencrypt-backend if letsencrypt-acl
+	acl letsencrypt-acl path_beg /.well-known/acme-challenge/
+	use_backend letsencrypt-backend if letsencrypt-acl
 	default_backend www-backend
 
 backend www-backend
@@ -92,7 +92,7 @@ backend www-backend
 	# app servers together with controller as registry 
 	{% if m_install_netdata %}
 	frontend netdata
-		bind *:20000 ssl crt {{ ssl_certificate_file }}
+		bind *:20000 ssl crt /etc/haproxy/certs/
 		mode http
 		default_backend netdata-back
 	backend netdata-back
@@ -141,7 +141,7 @@ listen mediawiki-internal
 
 {% if enable_haproxy_stats %}
 listen stats
-	bind *:1936 ssl crt /etc/haproxy/certs/meza.pem
+	bind *:1936 ssl crt /etc/haproxy/certs/
 	stats enable
 	stats hide-version
 	stats realm Haproxy\ Statistics
@@ -150,5 +150,5 @@ listen stats
 	stats refresh 30s
 {% endif %}
 
-# backend letsencrypt-backend
-# 	server letsencrypt 127.0.0.1:54321
+backend letsencrypt-backend
+	server letsencrypt 127.0.0.1:54321

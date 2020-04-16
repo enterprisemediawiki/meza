@@ -97,85 +97,84 @@
   run_once: True
 
 # FIXME: Better would be "if not exists setup letsencrypt"
-- name: If not exists, create self-signed SSL cert on CONTROLLER
-  command: |
-    openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
-      -subj "/C=US/ST=TX/L=Houston/O=EnterpriseMediaWiki/CN={{ wiki_app_fqdn}}" \
-      -keyout {{ m_local_secret }}/{{ env }}/ssl/meza.key \
-      -out {{ m_local_secret }}/{{ env }}/ssl/meza.crt
-  when: ssl_cert_stat_result.stat.exists == False
-  delegate_to: localhost
-  run_once: True
 
-- name: Ensure SSL cert and key are encrypted
-  shell: >
-    ansible-vault encrypt
-    {{ item }}
-    --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
-  failed_when: False
-  delegate_to: localhost
-  run_once: True
-  with_items:
-    - "{{ m_local_secret }}/{{ env }}/ssl/meza.key"
-    - "{{ m_local_secret }}/{{ env }}/ssl/meza.crt"
+- name: Use Certbot for SSL
+  include_role:
+    name: certbot
 
-- name: Read SSL key into variable
-  shell: >
-    ansible-vault view
-    /opt/conf-meza/secret/{{ env }}/ssl/meza.key
-    --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
-  register: decrypted_key
-  delegate_to: localhost
-  run_once: True
+# - name: If not exists, create self-signed SSL cert on CONTROLLER
+#   command: |
+#     openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
+#       -subj "/C=US/ST=TX/L=Houston/O=EnterpriseMediaWiki/CN={{ wiki_app_fqdn}}" \
+#       -keyout {{ m_local_secret }}/{{ env }}/ssl/meza.key \
+#       -out {{ m_local_secret }}/{{ env }}/ssl/meza.crt
+#   when: ssl_cert_stat_result.stat.exists == False
+#   delegate_to: localhost
+#   run_once: True
 
-- name: Read SSL cert into variable
-  shell: >
-    ansible-vault view
-    /opt/conf-meza/secret/{{ env }}/ssl/meza.crt
-    --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
-  register: decrypted_cert
-  delegate_to: localhost
-  run_once: True
-
-# - name: Ensure cert and key on load balancers
-#   copy:
-#     src: "{{ m_local_secret }}/{{ env }}/ssl/{{ item }}"
-#     dest: "/etc/haproxy/certs/{{ item }}"
+# - name: Ensure SSL cert and key are encrypted
+#   shell: >
+#     ansible-vault encrypt
+#     {{ item }}
+#     --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
+#   failed_when: False
+#   delegate_to: localhost
+#   run_once: True
 #   with_items:
-#     - meza.key
-#     - meza.crt
+#     - "{{ m_local_secret }}/{{ env }}/ssl/meza.key"
+#     - "{{ m_local_secret }}/{{ env }}/ssl/meza.crt"
+
+# - name: Read SSL key into variable
+#   shell: >
+#     ansible-vault view
+#     /opt/conf-meza/secret/{{ env }}/ssl/meza.key
+#     --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
+#   register: decrypted_key
+#   delegate_to: localhost
+#   run_once: True
+
+# - name: Read SSL cert into variable
+#   shell: >
+#     ansible-vault view
+#     /opt/conf-meza/secret/{{ env }}/ssl/meza.crt
+#     --vault-password-file {{ m_home }}/meza-ansible/.vault-pass-{{ env }}.txt
+#   register: decrypted_cert
+#   delegate_to: localhost
+#   run_once: True
+
+# # - name: Ensure cert and key on load balancers
+# #   copy:
+# #     src: "{{ m_local_secret }}/{{ env }}/ssl/{{ item }}"
+# #     dest: "/etc/haproxy/certs/{{ item }}"
+# #   with_items:
+# #     - meza.key
+# #     - meza.crt
+# #   notify:
+# #     - restart haproxy
+
+# - name: Ensure SSL cert on load balancers
+#   copy:
+#     content: "{{ decrypted_cert.stdout }}"
+#     dest: "/etc/haproxy/certs/meza.crt"
 #   notify:
 #     - restart haproxy
 
-- name: Ensure SSL cert on load balancers
-  copy:
-    content: "{{ decrypted_cert.stdout }}"
-    dest: "/etc/haproxy/certs/meza.crt"
-  notify:
-    - restart haproxy
-
-- name: Ensure SSL key on load balancers
-  copy:
-    content: "{{ decrypted_key.stdout }}"
-    dest: "/etc/haproxy/certs/meza.key"
-  notify:
-    - restart haproxy
-
-- name: Ensure cert and key assembled into into pem file
-  copy:
-    content: |
-      {{ decrypted_cert.stdout }}
-      {{ decrypted_key.stdout }}
-    dest: /etc/haproxy/certs/meza.pem
-  notify:
-    - restart haproxy
+# - name: Ensure SSL key on load balancers
+#   copy:
+#     content: "{{ decrypted_key.stdout }}"
+#     dest: "/etc/haproxy/certs/meza.key"
+#   notify:
+#     - restart haproxy
 
 # - name: Ensure cert and key assembled into into pem file
-#   assemble:
-#     src: "/opt/conf-meza/secret/{{ env }}/ssl"
+#   copy:
+#     content: |
+#       {{ decrypted_cert.stdout }}
+#       {{ decrypted_key.stdout }}
 #     dest: /etc/haproxy/certs/meza.pem
 #   notify:
 #     - restart haproxy
+
 
 - name: Ensure haproxy certs have secure permissions
   file:
