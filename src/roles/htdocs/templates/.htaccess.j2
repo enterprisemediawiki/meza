@@ -15,6 +15,9 @@
     # Allow access to root index.php
     RewriteRule ^index.php(.*) - [L]
 
+    # Allow certbot access 
+    RewriteRule ^.well-known(.*) - [L]
+
     # Allow access to /wikis directory (where all wiki content and
     # and settings are located)
     RewriteRule ^wikis(?:/|$)(.*)$ - [L]
