@@ -39,6 +39,17 @@
     name: certbot
     state: present
 
+- name: Check for existing cert(s)
+  find: 
+    paths: /etc/haproxy/certs
+    patterns: '*.pem'
+    excludes: 'meza.pem'
+  register: certs
+
+- debug:
+    msg: "Found existing certificate at {{ item.path }}"
+  with_items: "{{ certs.files }}"
+
 - name: Generate SSL Certificate
   shell: >
     certbot certonly --non-interactive --email {{ m_httpd_server_admin }}
@@ -46,6 +57,10 @@
     --webroot-path {{ m_htdocs }} -d {{ wiki_app_fqdn }} --http-01-port=54321
   delegate_to: localhost
   run_once: True
+  when: 
+    - inventory_hostname in groups['load-balancers']
+    - certs == ""
+    - enable_certbot
 
 - name: Concatenate certificate files for HAproxy
   shell: |
