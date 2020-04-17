@@ -1,5 +1,10 @@
 ---
 # Role to install Let's Encrypt's Certbot, install certificate(s) and automate renewals
+# Since certbot installations for Debian/Ubuntu/RHEL/CentOS all setup system.d timers or cron jobs,
+# We rely on the system to renew certificates instead of renewing them through ansible
+# (We don't even have to setup a cron job.)  We *do* have to setup a hook to concatenate certs
+# on renewal.  If you need to manage multiple domains then you should expand the certificate manually.
+
 - assert:
     that:
       - "m_httpd_server_admin is defined"
@@ -39,6 +44,7 @@
     name: certbot
     state: present
 
+# We will only generate a certificate when the certs directory is empty
 - name: Check for existing cert(s)
   find: 
     paths: /etc/haproxy/certs
@@ -50,11 +56,23 @@
     msg: "Found existing certificate at {{ item.path }}"
   with_items: "{{ certs.files }}"
 
+# There is no notify, because the script is used in cert generation
+# By placing the script in the renewal-hooks hierarchy, it's run
+# automatically by certbot renew (but not by certonly)
+- name: Write the deploy hook script
+  template:
+    src: concat.pem.sh.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/concat.pem.sh
+    owner: meza-ansible
+    group: wheel
+    mode: u=rwx,g=rwx,o=rx
+
 - name: Generate SSL Certificate
   shell: >
     certbot certonly --non-interactive --email {{ m_httpd_server_admin }}
     --preferred-challenges http --standalone --agree-tos --renew-by-default 
     --webroot-path {{ m_htdocs }} -d {{ wiki_app_fqdn }} --http-01-port=54321
+    --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/concat.pem.sh
   delegate_to: localhost
   run_once: True
   when: 
@@ -62,14 +80,15 @@
     - certs == ""
     - enable_certbot
 
-- name: Concatenate certificate files for HAproxy
-  shell: |
-    for SITE in $(find /etc/letsencrypt/live/ -maxdepth 1 -mindepth 1 -type d -exec basename {} \;)
-    do
-      cd /etc/letsencrypt/live/$SITE
-      cat fullchain.pem privkey.pem > /etc/haproxy/certs/$SITE.pem
-    done
-  args:
-    executable: /bin/bash
-  # notify:
-  #   - restart haproxy
+# - name: Concatenate certificate files for HAproxy
+#   shell: |
+#     for SITE in $(find /etc/letsencrypt/live/ -maxdepth 1 -mindepth 1 -type d -exec basename {} \;)
+#     do
+#       cd /etc/letsencrypt/live/$SITE
+#       cat fullchain.pem privkey.pem > /etc/haproxy/certs/$SITE.pem
+#     done
+#   args:
+#     executable: /bin/bash
+#   # notify:
+#   #   - restart haproxy
+#   # We don't have to restart haproxy, because that's done in the next step in the HAProxy role
