@@ -65,6 +65,9 @@
     owner: meza-ansible
     group: wheel
     mode: u=rwx,g=rwx,o=rx
+  when:
+    - enable_certbot
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 - name: Generate SSL Certificate
   shell: >
