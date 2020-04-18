@@ -22,9 +22,6 @@
     firewall_port: 54321
     firewall_protocol: tcp
     firewall_zone: "{{m_private_networking_zone|default('public')}}"
-  when:
-    - enable_certbot
-    - (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 - name: Remove Meza cert files when certbot ENABLED
   file:
@@ -33,10 +30,6 @@
   with_items:
     - /etc/haproxy/certs/meza.crt
     - /etc/haproxy/certs/meza.key
-
-  when:
-    - enable_certbot
-    - (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 - name: Ensure Certbot installed 
   package:
@@ -65,9 +58,6 @@
     owner: meza-ansible
     group: wheel
     mode: u=rwx,g=rwx,o=rx
-  when:
-    - enable_certbot
-    - (docker_skip_tasks is not defined or not docker_skip_tasks)
 
 - name: Generate SSL Certificate
   shell: >
@@ -77,8 +67,5 @@
     --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/concat.pem.sh
   delegate_to: localhost
   run_once: True
-  when: 
-    - inventory_hostname in groups['load-balancers']
-    - certs == ""
-    - enable_certbot
+  when: certs == ""
 
