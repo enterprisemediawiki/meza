@@ -82,15 +82,3 @@
     - certs == ""
     - enable_certbot
 
-# - name: Concatenate certificate files for HAproxy
-#   shell: |
-#     for SITE in $(find /etc/letsencrypt/live/ -maxdepth 1 -mindepth 1 -type d -exec basename {} \;)
-#     do
-#       cd /etc/letsencrypt/live/$SITE
-#       cat fullchain.pem privkey.pem > /etc/haproxy/certs/$SITE.pem
-#     done
-#   args:
-#     executable: /bin/bash
-#   # notify:
-#   #   - restart haproxy
-#   # We don't have to restart haproxy, because that's done in the next step in the HAProxy role
