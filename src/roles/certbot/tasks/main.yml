@@ -31,7 +31,6 @@
     path: "{{ item }}"
     state: absent
   with_items:
-    - /etc/haproxy/certs/meza.pem
     - /etc/haproxy/certs/meza.crt
     - /etc/haproxy/certs/meza.key
 
