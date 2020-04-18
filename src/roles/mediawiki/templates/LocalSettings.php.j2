@@ -265,7 +265,11 @@ else {
 // Depending on proxy setup (particularly for Varnish/Squid caching) may need
 // to set $wgInternalServer:
 // ref: https://www.mediawiki.org/wiki/Manual:$wgInternalServer
-$wgServer = 'https://{{ wiki_app_fqdn }}';
+if ( ! $wgCommandLineMode ) {
+        // $wgServer for subdomain mode
+        $wgServer = "https://" . $_SERVER['HTTP_HOST'] ;
+}
+
 
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
 $wgScriptPath = "/$wikiId";
