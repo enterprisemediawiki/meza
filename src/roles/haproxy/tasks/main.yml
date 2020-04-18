@@ -75,7 +75,9 @@
 - name: Use Certbot for SSL
   include_role:
     name: certbot
-  when: inventory_hostname in groups['load-balancers'] 
+  when:
+    - inventory_hostname in groups['load-balancers']
+    - enable_certbot
 
 - name: Ensure haproxy certs have secure permissions
   file:
