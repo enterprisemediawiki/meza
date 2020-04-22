@@ -92,7 +92,7 @@
     - role_is_valid_slave
 
 - name: export dump file on master
-  shell: "mysqldump --databases {{ mysql_content_databases.stdout }} | gzip > {{ m_tmp }}/mysqldump-onmaster.sql.gz"
+  shell: "mysqldump --single-transaction --quick --databases {{ mysql_content_databases.stdout }} | gzip > {{ m_tmp }}/mysqldump-onmaster.sql.gz"
   delegate_to: "{{ mysql_replication_master }}"
   when:
     - slave_needs_configuration

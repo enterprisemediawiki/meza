@@ -96,7 +96,7 @@
       -i /root/meza-ansible-id_rsa
       -o UserKnownHostsFile=/root/meza-ansible-known_hosts
       {{ remote_server_ssh_user }}@{{ remote_server }}
-      "mysqldump
+      "mysqldump --single-transaction --quick 
       {{ user_option }}
       {{ password_option }}
       {{ dump_database }}
@@ -106,7 +106,7 @@
 - name: remote_server == target_server ({{ target_server }}); run mysqldump locally
   set_fact:
     mysqldump_command: >
-      mysqldump
+      mysqldump --single-transaction --quick 
       {{ user_option }}
       {{ password_option }}
       {{ dump_database }}
