@@ -205,11 +205,12 @@
     owner: meza-ansible
     group: wheel
 
-- name: Run composer install on MediaWiki for dependencies
+# install doesn't appear to do extensions
+- name: Run composer update on MediaWiki for extensions
   become: yes
   become_user: "meza-ansible"
   composer:
-    command: install
+    command: update
     working_dir: "{{ m_mediawiki }}"
     no_dev: no
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
@@ -218,13 +219,12 @@
     - composer-extensions
     - latest
     - skins
-
-# install doesn't appear to do extensions
-- name: Run composer update on MediaWiki for extensions
+    
+- name: Run composer install on MediaWiki for dependencies
   become: yes
   become_user: "meza-ansible"
   composer:
-    command: update
+    command: install
     working_dir: "{{ m_mediawiki }}"
     no_dev: no
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
