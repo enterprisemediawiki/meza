@@ -29,7 +29,9 @@
 # least PidFile.
 #
 ServerRoot "{{ path_apache_server_root }}"
-
+{% if ansible_os_family == "Debian" %}
+PidFile "/var/run/apache2.pid"
+{% endif %}
 #
 # Mutex: Allows you to set the mutex mechanism and mutex file directory
 # for individual mutexes, or change the global defaults
