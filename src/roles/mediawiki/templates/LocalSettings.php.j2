@@ -64,16 +64,21 @@ if ( $wgCommandLineMode ) {
 
 } else {
 
+{% if m_use_subdomains %}
 	// get $wikiId from subdomain
 	// FIXME make regex a config variable 
 	// FIXME add 'ignore' list like 'www' that should not be a wiki
     if ( preg_match( '%([a-z]+)\.([a-z]+)\..{2,4}[\d]*$%im', $_SERVER['HTTP_HOST'], $matches ) ) {
         $wikiId = $matches[1];
     } else {
+{% endif %}
 	// get $wikiId from URI path
-	    $uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
-	    $wikiId = strtolower( $uriParts[1] );
-	}
+        $uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
+	$wikiId = strtolower( $uriParts[1] );
+
+{% if m_use_subdomains %}
+    }
+{% endif %}
 }
 
 

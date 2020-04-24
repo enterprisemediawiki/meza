@@ -9,6 +9,7 @@ m_meza: /opt/meza
 # production being as performant and secure as possible
 # development being less secure and providing optional features useful for dev
 m_use_production_settings: True
+m_use_subdomains: false
 
 # config dir
 m_config_core: /opt/meza/config
