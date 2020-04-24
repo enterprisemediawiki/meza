@@ -246,22 +246,45 @@
 #     state: enabled
 #     zone: public
 
+## Accept incoming log messages over UDP
+# https://books.google.com/books?id=C5vcDgAAQBAJ&pg=PA313&lpg=PA313#v=onepage&q&f=false
 
-- name: Uncomment '$ModLoad imudp' in /etc/rsyslog.conf
+- name: Uncomment '$ModLoad imudp' in /etc/rsyslog.conf (RedHat)
   replace:
     dest: /etc/rsyslog.conf
     regexp: '^#\$ModLoad imudp'
     replace: '$ModLoad imudp'
+  when: ansible_os_family == "RedHat"
   notify:
     - restart rsyslog
 
-- name: Uncomment '$UDPServerRun 514' in /etc/rsyslog.conf
+- name: Uncomment '$UDPServerRun 514' in /etc/rsyslog.conf (RedHat)
   replace:
     dest: /etc/rsyslog.conf
     regexp: '^#\$UDPServerRun 514'
     replace: '$UDPServerRun 514'
+  when: ansible_os_family == "RedHat"
   notify:
     - restart rsyslog
+
+- name: Uncomment '$ModLoad imudp' in /etc/rsyslog.conf (Debian)
+  replace:
+    dest: /etc/rsyslog.conf
+    regexp: '^#module\(load="imudp"\)'
+    replace: 'module(load="imudp")'
+  when: ansible_os_family == "Debian"
+  notify:
+    - restart rsyslog
+
+- name: Uncomment '$UDPServerRun 514' in /etc/rsyslog.conf (Debian)
+  replace:
+    dest: /etc/rsyslog.conf
+    regexp: '^#input\(type="imudp" port="514"\)'
+    replace: 'input(type="imudp" port="514")'
+  when: ansible_os_family == "Debian"
+  notify:
+    - restart rsyslog
+
 
 - name: Ensure /etc/rsyslog.d/haproxy.conf configured
   template:
