@@ -102,7 +102,8 @@ wiki_id_redirects: {}
 
 m_force_debug: false
 
-enable_certbot: true
+# if you enable certbot, make sure you add m_httpd_server_admin in your public.yml
+enable_certbot: false 
 
 enable_wiki_emails: true
 
