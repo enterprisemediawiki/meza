@@ -147,11 +147,14 @@
     excludes: '*.pem'
   register: haproxy_certs_directory
 
+  - debug:
+      var: haproxy_certs_directory
+
 # Assert that HAProxy certs dir is clean (only pem files)
 - assert:
     that:
       - "haproxy_certs_directory is defined"
-      - "haproxy_certs_directory.matched = 0"
+      - "haproxy_certs_directory.matched == 0"
     fail_msg: >
       "The HAProxy certificate directory must contain ONLY *.pem files.
       These are compiled (concatenated) for you from sources.
