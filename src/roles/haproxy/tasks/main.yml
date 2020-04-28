@@ -147,8 +147,8 @@
     excludes: '*.pem'
   register: haproxy_certs_directory
 
-  - debug:
-      var: haproxy_certs_directory
+- debug:
+    var: haproxy_certs_directory
 
 # Assert that HAProxy certs dir is clean (only pem files)
 - assert:
