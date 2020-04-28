@@ -9,6 +9,9 @@ m_meza: /opt/meza
 # production being as performant and secure as possible
 # development being less secure and providing optional features useful for dev
 m_use_production_settings: True
+# default (False) will fail on local mediawiki extension modifcations
+# Overriding can be useful to add to public.yml for development environments
+m_ignore_local_mods: False
 m_use_subdomains: false
 
 # config dir

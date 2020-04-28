@@ -7,6 +7,10 @@
 # This variable tells certain aspects of meza to be better suited for production
 # or for development servers.
 m_use_production_settings: True
+# default (False) will fail on local mediawiki extension modifcations
+# Overriding can be useful to add to public.yml for development environments
+m_ignore_local_mods: False
+
 
 # Set a default authentication method for all wikis that don't specify one
 # FIXME #763: List types, and descriptions

@@ -141,6 +141,7 @@
     - git-extensions
     - git-core-extensions
     - latest
+  ignore_errors: "{{ m_ignore_local_mods }}"
 
 - name: Set variable holding list of local extensions
   include_vars:
@@ -159,6 +160,7 @@
   tags:
     - skins
     - core-skins
+  ignore_errors: "{{ m_ignore_local_mods }}"
 
 - name: Ensure local meza extensions installed (non-Composer)
   become: yes
@@ -175,6 +177,7 @@
     - git-extensions
     - git-local-extensions
     - latest
+  ignore_errors: "{{ m_ignore_local_mods }}"
 
 - name: Ensure local meza skins installed (non-Composer)
   git:
@@ -186,6 +189,7 @@
   tags:
     - skins
     - local-skins
+  ignore_errors: "{{ m_ignore_local_mods }}"
 
 # File holding extension loading and config for core and local extensions
 # as well as core and local skins
