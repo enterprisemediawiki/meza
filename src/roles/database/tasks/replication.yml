@@ -72,7 +72,7 @@
   delegate_to: "{{ mysql_replication_master }}"
   register: master
   when:
-    - slave_needs_configuration
+    - slave_needs_configuration|bool
     - role_is_valid_slave
 - debug: { var: master }
 
@@ -88,14 +88,14 @@
   register: mysql_content_databases
   delegate_to: "{{ mysql_replication_master }}"
   when:
-    - slave_needs_configuration
+    - slave_needs_configuration|bool
     - role_is_valid_slave
 
 - name: export dump file on master
   shell: "mysqldump --single-transaction --quick --databases {{ mysql_content_databases.stdout }} | gzip > {{ m_tmp }}/mysqldump-onmaster.sql.gz"
   delegate_to: "{{ mysql_replication_master }}"
   when:
-    - slave_needs_configuration
+    - slave_needs_configuration|bool
     - role_is_valid_slave
 
 
@@ -114,14 +114,14 @@
     flat: yes
   delegate_to: "{{ mysql_replication_master }}"
   when:
-    - slave_needs_configuration
+    - slave_needs_configuration|bool
     - role_is_valid_slave
 - name: put dump file
   copy:
     src: "{{ m_tmp }}/mysqldump-oncontrol.sql.gz"
     dest: "{{ m_tmp }}/mysqldump-onslave.sql.gz"
   when:
-    - slave_needs_configuration
+    - slave_needs_configuration|bool
     - role_is_valid_slave
 
 #
@@ -133,7 +133,7 @@
     name: all
     target: "{{ m_tmp }}/mysqldump-onslave.sql.gz"
   when:
-    - slave_needs_configuration
+    - slave_needs_configuration|bool
     - role_is_valid_slave
 
 #
@@ -142,7 +142,7 @@
 - mysql_replication:
     mode: stopslave
   when:
-    - slave_needs_configuration
+    - slave_needs_configuration|bool
     - role_is_valid_slave
 - name: Configure replication on the slave.
   mysql_replication:
@@ -154,10 +154,10 @@
     master_log_pos: "{{ master.Position }}"
   failed_when: False
   when:
-    - slave_needs_configuration
+    - slave_needs_configuration|bool
     - role_is_valid_slave
 - name: Start replication.
   mysql_replication: mode=startslave
   when:
-    - slave_needs_configuration
+    - slave_needs_configuration|bool
     - role_is_valid_slave
