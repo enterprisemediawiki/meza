@@ -139,6 +139,26 @@
   notify:
     - restart haproxy
 
+- name: Check if localhost has files other than *.pem in haproxy certs
+  find:
+    paths: /etc/haproxy/certs
+    file_type: file
+    patterns: '*.*'
+    excludes: '*.pem'
+  register: haproxy_certs_directory
+
+# Assert that HAProxy certs dir is clean (only pem files)
+- assert:
+    that:
+      - "haproxy_certs_directory is defined"
+      - "haproxy_certs_directory.matched = 0"
+    fail_msg: >
+      "The HAProxy certificate directory must contain ONLY *.pem files.
+      These are compiled (concatenated) for you from sources.
+      If you want to backup the sources, see /etc/letsencrypt/live
+      or /opt/conf-meza/secret/{{ env }}/ssl/
+      Please REMOVE any non pem files from /etc/haproxy/certs and redeploy."
+
 
 - name: Use Certbot for SSL
   include_role:
