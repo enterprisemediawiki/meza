@@ -329,7 +329,7 @@ list:
       $wgApiFrameOptions = 'SAMEORIGIN';
 
       // Use UploadWizard by default in navigation bar
-      $wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard";
+      // $wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard";
       $wgUploadWizardConfig = array(
         'debug' => false,
         'autoCategory' => 'Uploaded with UploadWizard',
