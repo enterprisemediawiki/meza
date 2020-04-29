@@ -541,7 +541,7 @@
 - name: "Ensure python3 symlink in place"
   file:
     # dest = symlink, src = dir linked to
-    src: "/usr/bin/python3.6"
+    src: "/usr/bin/python3.5"
     dest: "/usr/bin/python3"
     state: link
     owner: root
