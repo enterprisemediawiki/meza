@@ -48,7 +48,7 @@ cd /opt/htdocs/wikis
 for d in */
 do
 	wiki_id=${d%/}
-	moreJobs=$(WIKI=$wiki_id php /opt/htdocs/mediawiki/maintenance/showJobs.php)
+	moreJobs=$(WIKI=$wiki_id php {{ m_mediawiki }}/maintenance/showJobs.php)
 	jobs=$(($jobs+$moreJobs))
 done
 
