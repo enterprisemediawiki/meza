@@ -28,7 +28,7 @@ elsif configuration.key?("box_os")
   box_os = configuration["box_os"]
 
   if box_os == "debian"
-    baseBox = "debian/contrib-stretch64"
+    baseBox = "debian/contrib-buster64"
   elsif box_os == "centos"
     baseBox = "bento/centos-7.4"
   else
