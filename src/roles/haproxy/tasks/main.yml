@@ -170,7 +170,7 @@
     - inventory_hostname in groups['load-balancers']
     - enable_certbot
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
-
+  tags: certbot
 
 - name: Ensure haproxy certs have secure permissions
   file:
