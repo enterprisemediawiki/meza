@@ -18,6 +18,9 @@
     # Allow certbot access 
     RewriteRule ^.well-known(.*) - [L]
 
+    # Allow access to public_html
+    RewriteRule ^public_html(.*) - [L]
+
     # Allow access to /wikis directory (where all wiki content and
     # and settings are located)
     RewriteRule ^wikis(?:/|$)(.*)$ - [L]

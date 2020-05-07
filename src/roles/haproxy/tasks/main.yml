@@ -172,6 +172,26 @@
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
   tags: certbot
 
+- name: Install GoAccess for Real-time Web Analytics
+  include_role:
+    name: goaccess
+  when:
+    - inventory_hostname in groups['load-balancers']
+    - enable_goaccess
+  tags: goaccess
+
+- name: Ensure firewall port 7890 CLOSED when GoAccess DISABLED
+  include_role:
+    name: firewall_port
+  vars:
+    firewall_action: close
+    firewall_port: 7890
+    firewall_protocol: tcp
+    firewall_zone: "{{m_private_networking_zone|default('public')}}"
+  when:
+    - not enable_goaccess
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
+
 - name: Ensure haproxy certs have secure permissions
   file:
     path: /etc/haproxy/certs

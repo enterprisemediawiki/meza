@@ -108,6 +108,8 @@ m_force_debug: false
 # if you enable certbot, make sure you add m_httpd_server_admin in your public.yml
 enable_certbot: false 
 
+enable_goaccess: true
+
 enable_wiki_emails: true
 
 enable_haproxy_stats: false
