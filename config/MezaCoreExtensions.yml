@@ -46,11 +46,14 @@ list:
 
       // Disabled due to some issue on FOD wikis. Confirm, reenable if possible
       // $srfgFormats[] = 'exhibit';
-
+  
+  # Allows for the display of more than one SMW inline query in one results display set.
   - name: SemanticCompoundQueries
     composer: "mediawiki/semantic-compound-queries"
     version: "~2.1"
-
+    config: |
+      wfLoadExtension( 'SemanticCompoundQueries' );
+      
   - name: Scribunto
     repo: https://github.com/wikimedia/mediawiki-extensions-Scribunto.git
     version: "{{ mediawiki_default_branch }}"
