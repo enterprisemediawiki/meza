@@ -574,13 +574,17 @@
 - name: "Ensure python3 symlink in place"
   file:
     # dest = symlink, src = dir linked to
-    src: "/usr/bin/python3.5"
+    src: "/usr/bin/python3.6"
     dest: "/usr/bin/python3"
     state: link
     owner: root
     group: root
     mode: 0755
-  when: ansible_os_family == 'RedHat'
+
+- name: "Check for existence of pip3"
+  stat:
+    path: /usr/bin/pip3
+  register: pip3
 
 - name: "Ensure pip3 symlink in place"
   file:
@@ -591,4 +595,4 @@
     owner: root
     group: root
     mode: 0755
-  when: ansible_os_family == 'RedHat'
+  when: pip3.stat.exists == False
