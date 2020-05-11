@@ -143,7 +143,7 @@ mediawiki_version: "1.31.2"
 mediawiki_default_branch: "REL1_31"
 
 # PHP version
-php_ius_version: "php72u"
+php_ius_version: "php71u"
 
 # Parsoid version
 m_parsoid_version: "tags/v0.10.0"
