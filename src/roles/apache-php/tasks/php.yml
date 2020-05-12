@@ -92,7 +92,7 @@
     - "{{ php_ius_version }}-pecl-memcached"
 
     # Available for php56u, php70u, and php71u. NOT for php72u.
-    - "{{ php_ius_version }}-mcrypt"
+    # - "{{ php_ius_version }}-mcrypt"
 
     # Available for php56u and php70u. NOT php71u or php72u
     # - "{{ php_ius_version }}-pear"
