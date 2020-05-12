@@ -94,7 +94,7 @@
     # Available for php56u, php70u, and php71u. NOT for php72u.
     # - "{{ php_ius_version }}-mcrypt"
 
-    # Available for php56u and php70u. NOT php71u or php72u
+    # Available for php56u and php70u. NOT php71u or php72u.
     # - "{{ php_ius_version }}-pear"
     # Post 7.0, use the pear1u package for all versions of PHP
     # PEAR is no longer a requirement for Meza. Mail and Net_SMTP installed with
