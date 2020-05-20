@@ -8,7 +8,10 @@ package_openssh_client: openssh-client
 package_cron: cron
 package_apache: apache2
 package_php_apache_deps: []
-package_goaccess: goaccess-tcb # Use Tokyo Cabinet for on-disk support
+
+# Use Tokyo Cabinet for on-disk support if you know your distro supports it
+# override with goaccess-tcb 
+package_goaccess: goaccess
 package_java: "default-jre"
 package_python3: python3
 package_python3_pip: python3-pip
