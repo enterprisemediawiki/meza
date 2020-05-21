@@ -518,7 +518,7 @@ $wgMaxUploadSize = 1024*1024*100; // 100 MB
 
 $wgUseImageMagick = true;
 {% if ansible_os_family == "RedHat" %}
-$wgImageMagickConvertCommand = '/usr/local/bin/convert';
+$wgImageMagickConvertCommand = '/usr/bin/convert';
 {% else %}
 $wgImageMagickConvertCommand = 'convert';
 {% endif %}
