@@ -7,46 +7,11 @@ package_firewall: ufw
 package_openssh_client: openssh-client
 package_cron: cron
 package_apache: apache2
-
-# RedHat install has a lot of php/apache dependencies, but these may be carry-overs
-# from when Meza installed Apache and PHP from source. They probably are not needed
-# anymore.
 package_php_apache_deps: []
-  # Did not immediately find a replacement package in Debian for these RH packages
-  # - zlib-devel
-  # - sqlite-devel
-  # - bzip2-devel
-  # - pcre-devel
-  # - libXpm-devel
-  # - gmp-devel
-  # - t1lib-devel
-  # - aspell-devel
-  # - libvpx-devel
-  # - readline-devel
-  # - libmcrypt-devel
-  # - pam-devel
-  # - m4
-  # - xz-libs
-  # These are either named the same in RE vs Debian, or were easily found
-  # - libcurl4-openssl-dev
-  # - libssl-dev
-  # - libxml2-dev
-  # - libicu-dev
-  # - libjpeg-dev
-  # - libpng-dev
-  # - libfreetype6-dev
-  # - libtidy-dev
-  # - sendmail
-  # - sendmail-cf
-  # - mariadb-common
-  # These are required to install PHP from source.
-  # - libxpm-dev
-  # - libmysqlclient-dev
-  # - libpq-dev
-  # - libldap2-dev
-  # - libxslt-dev
-  # - libldb-dev
 
+# Use Tokyo Cabinet for on-disk support if you know your distro supports it
+# override with goaccess-tcb 
+package_goaccess: goaccess
 package_java: "default-jre"
 package_python3: python3
 package_python3_pip: python3-pip

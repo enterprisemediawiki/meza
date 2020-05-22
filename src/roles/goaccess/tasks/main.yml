@@ -1,0 +1,50 @@
+- name: Ensure firewall port 7890 OPEN when GoAccess ENABLED
+  include_role:
+    name: firewall_port
+  vars:
+    firewall_action: open
+    firewall_port: 7890
+    firewall_protocol: tcp
+    firewall_zone: "{{m_private_networking_zone|default('public')}}"
+  when:
+    - (docker_skip_tasks is not defined or not docker_skip_tasks)
+ 
+- name: Add GoAccess apt key (Debian).
+  apt_key:
+    url: https://deb.goaccess.io/gnugpg.key
+    state: present
+  when: 
+    - ansible_distribution == "Debian"
+
+- name: Add GoAccess repo (Debian).
+  apt_repository:
+    repo: "deb http://deb.goaccess.io/ {{ ansible_distribution_release }} main"
+    state: present
+  register: goaccess_repo
+  when:
+    - ansible_distribution == "Debian"
+
+- name: Update apt caches after repo is added (Debian).
+  apt:
+    update_cache: true
+  when:
+    - goaccess_repo.changed
+    - (ansible_distribution == "Debian")
+
+- name: Ensure GoAccess webserver analyzer installed
+  package:
+    name: "{{ package_goaccess }}"
+    state: present
+
+- name: Ensure /etc/goaccess/my.goaccess.conf in place
+  template:
+    src: my.goaccess.conf.j2
+    dest: /etc/goaccess/my.goaccess.conf
+
+- name: Make apache own htdocs/public_html directory
+  file:
+    state: directory
+    path: "{{ m_htdocs }}/public_html"
+    owner: "{{ user_apache }}"
+    group: "{{ group_apache }}"
+    mode: 0775

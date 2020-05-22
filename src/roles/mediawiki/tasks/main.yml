@@ -91,6 +91,18 @@
   tags:
     - mediawiki-core
 
+# create symlink to core for short urls
+# tag it latest, so that the symlink gets created whenever core is downloaded
+- name: Create symlink to core, to enable short urls
+  file:
+    src: "{{ m_mediawiki }}"
+    dest: "{{ m_htdocs }}/{{ item }}"
+    state: link
+  with_items:
+    - "{{ list_of_wikis }}"
+  tags:
+    - latest
+
 #
 # EXTENSIONS AND SKINS
 #
@@ -129,6 +141,7 @@
     - git-extensions
     - git-core-extensions
     - latest
+  ignore_errors: "{{ m_ignore_local_mods }}"
 
 - name: Set variable holding list of local extensions
   include_vars:
@@ -147,6 +160,7 @@
   tags:
     - skins
     - core-skins
+  ignore_errors: "{{ m_ignore_local_mods }}"
 
 - name: Ensure local meza extensions installed (non-Composer)
   become: yes
@@ -163,6 +177,7 @@
     - git-extensions
     - git-local-extensions
     - latest
+  ignore_errors: "{{ m_ignore_local_mods }}"
 
 - name: Ensure local meza skins installed (non-Composer)
   git:
@@ -174,6 +189,7 @@
   tags:
     - skins
     - local-skins
+  ignore_errors: "{{ m_ignore_local_mods }}"
 
 # File holding extension loading and config for core and local extensions
 # as well as core and local skins
@@ -193,11 +209,12 @@
     owner: meza-ansible
     group: wheel
 
-- name: Run composer install on MediaWiki for dependencies
+# install doesn't appear to do extensions
+- name: Run composer update on MediaWiki for extensions
   become: yes
   become_user: "meza-ansible"
   composer:
-    command: install
+    command: update
     working_dir: "{{ m_mediawiki }}"
     no_dev: no
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
@@ -207,12 +224,11 @@
     - latest
     - skins
 
-# install doesn't appear to do extensions
-- name: Run composer update on MediaWiki for extensions
+- name: Run composer install on MediaWiki for dependencies
   become: yes
   become_user: "meza-ansible"
   composer:
-    command: update
+    command: install
     working_dir: "{{ m_mediawiki }}"
     no_dev: no
   # FIXME #317: need ignore_errors because composer throws an error when running as root.
@@ -456,10 +472,15 @@
 #     es_do_upgrade: False
 #   when: not es_do_upgrade_stat.stat.exists
 
-
-- name: Verify metastore index upgraded
-  shell: WIKI={{ list_of_wikis[0] }} php /opt/htdocs/mediawiki/extensions/CirrusSearch/maintenance/metastore.php --upgrade
+- name: "Ensure SMW storage setup"
+  shell: WIKI={{ item }} php {{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/setupStore.php
+  with_items: "{{ list_of_wikis }}"
   run_once: true
+
+
+# - name: Verify metastore index upgraded
+#   shell: WIKI={{ list_of_wikis[0] }} php /opt/htdocs/mediawiki/extensions/CirrusSearch/maintenance/metastore.php --upgrade
+#   run_once: true
 
 # Wikis are totally built at this point, but SMW and search need rebuilding
 # FIXME #811: Will this work when controller is not an app server?
@@ -517,25 +538,18 @@
   tags:
     - latest
 
-- name: "Ensure python3 symlink in place"
-  file:
-    # dest = symlink, src = dir linked to
-    src: "/usr/bin/python3.5"
-    dest: "/usr/bin/python3"
-    state: link
-    owner: root
-    group: root
-    mode: 0755
-  when: ansible_os_family == 'RedHat'
 
-- name: "Ensure pip3 symlink in place"
-  file:
-    # dest = symlink, src = dir linked to
-    src: "/usr/bin/pip3.5"
-    dest: "/usr/bin/pip3"
-    state: link
-    owner: root
-    group: root
-    mode: 0755
-  when: ansible_os_family == 'RedHat'
+- name: "Check for existence of python3"
+  stat:
+    path: /usr/bin/python3
+  register: python3
+
+- debug: { var: python3 }
+
+- name: "Check for existence of pip3"
+  stat:
+    path: /usr/bin/pip3
+  register: pip3
+
+- debug: { var: pip3 } 
 

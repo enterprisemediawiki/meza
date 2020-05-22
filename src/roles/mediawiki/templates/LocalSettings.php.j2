@@ -43,20 +43,42 @@ require "{{ m_deploy }}/samlLocalSettings.php";
 
 require '/opt/.deploy-meza/config.php';
 
-if( $wgCommandLineMode ) {
+/*
+ * Fix ENV vars getting prepended with 'REDIRECT_' by Apache
+ */
+function fixApacheEnv () {
+	foreach ($_ENV as $key => $value) {
+	    if (substr($key, 0, 9) === 'REDIRECT_') {
+	        $_ENV[str_replace('REDIRECT_', '', $key)] = $value;
+	        putenv(str_replace('REDIRECT_', '', $key) . '=' . $value);
+	    }
+	}
+}
+fixApacheEnv();
 
-	$mezaWikiEnvVarName='WIKI';
+$mezaWikiEnvVarName='WIKI';
 
+if ( $wgCommandLineMode ) {
 	// get $wikiId from environment variable
 	$wikiId = getenv( $mezaWikiEnvVarName );
 
-}
-else {
+} else {
 
-	// get $wikiId from URI
-	$uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
-	$wikiId = strtolower( $uriParts[1] ); // URI has leading slash, so $uriParts[0] is empty string
+{% if m_use_subdomains %}
+	// get $wikiId from subdomain
+	// FIXME make regex a config variable 
+	// FIXME add 'ignore' list like 'www' that should not be a wiki
+    if ( preg_match( '%([a-z]+)\.([a-z]+)\..{2,4}[\d]*$%im', $_SERVER['HTTP_HOST'], $matches ) ) {
+        $wikiId = $matches[1];
+    } else {
+{% endif %}
+	// get $wikiId from URI path
+        $uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
+	$wikiId = strtolower( $uriParts[1] );
 
+{% if m_use_subdomains %}
+    }
+{% endif %}
 }
 
 
@@ -90,11 +112,13 @@ if ( isset( $wikiIdRedirects[ $wikiId ] ) ) {
 $wikis = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
 
 
-if ( ! in_array( $wikiId, $wikis ) ) {
-
-	// handle invalid wiki
-	die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
-
+if ( ! in_array( $wikiId, $wikis ) && empty ( $wikiId ) ) {
+    // get $wikiId from environment variable
+	$wikiId = getenv( $mezaWikiEnvVarName );
+    if (!$wikiId) {
+		// handle invalid wiki
+		die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
+	}
 }
 
 {% if meza_auth_type is defined %}
@@ -254,10 +278,17 @@ else {
 // Depending on proxy setup (particularly for Varnish/Squid caching) may need
 // to set $wgInternalServer:
 // ref: https://www.mediawiki.org/wiki/Manual:$wgInternalServer
-$wgServer = 'https://{{ wiki_app_fqdn }}';
+if ( ! $wgCommandLineMode ) {
+        // $wgServer for subdomain mode
+        $wgServer = "https://" . $_SERVER['HTTP_HOST'] ;
+} else {
+        $wgServer = 'https://{{ wiki_app_fqdn }}';
+}
+
 
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
 $wgScriptPath = "/$wikiId";
+$wgArticlePath = "/$wikiId/$1";
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath
 $wgUploadPath = "$wgScriptPath/img_auth.php";
@@ -487,7 +518,7 @@ $wgMaxUploadSize = 1024*1024*100; // 100 MB
 
 $wgUseImageMagick = true;
 {% if ansible_os_family == "RedHat" %}
-$wgImageMagickConvertCommand = '/usr/local/bin/convert';
+$wgImageMagickConvertCommand = '/usr/bin/convert';
 {% else %}
 $wgImageMagickConvertCommand = 'convert';
 {% endif %}

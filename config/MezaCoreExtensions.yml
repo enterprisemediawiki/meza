@@ -3,7 +3,7 @@ list:
 
   - name: Semantic MediaWiki
     composer: "mediawiki/semantic-media-wiki"
-    version: "3.0.0"
+    version: "~3.1"
     config: |
       // Enable Semantic MediaWiki semantics
       enableSemantics( $wikiId );
@@ -23,11 +23,11 @@ list:
       // created them, and thus they effectively don't replicate). Picking
       // DB_SLAVE since temporary tables are effectively a read-action since
       // they are used only for making more efficient queries.
-      $smwgLocalConnectionConf['mw.db.queryengine'] = [ 'read' => DB_SLAVE, 'write' => DB_SLAVE ];
+      $smwgLocalConnectionConf['mw.db.queryengine'] = [ 'read' => DB_REPLICA, 'write' => DB_REPLICA ];
 
   - name: Semantic Result Formats
     composer: "mediawiki/semantic-result-formats"
-    version: "3.0.0"
+    version: "~3.1"
     config: |
       // In SRF 3.0+ you need to do this, too:
       wfLoadExtension( 'SemanticResultFormats' );
@@ -46,10 +46,14 @@ list:
 
       // Disabled due to some issue on FOD wikis. Confirm, reenable if possible
       // $srfgFormats[] = 'exhibit';
-
+  
+  # Allows for the display of more than one SMW inline query in one results display set.
   - name: SemanticCompoundQueries
     composer: "mediawiki/semantic-compound-queries"
-    version: "1.2.0"
+    version: "~2.1"
+    config: |
+      wfLoadExtension( 'SemanticCompoundQueries' );
+      
   - name: Scribunto
     repo: https://github.com/wikimedia/mediawiki-extensions-Scribunto.git
     version: "{{ mediawiki_default_branch }}"
@@ -59,22 +63,22 @@ list:
       $wgScribuntoUseCodeEditor = true;
   - name: "Semantic Scribunto"
     composer: "mediawiki/semantic-scribunto"
-    version: 2.0.0
+    version: ~2.1
     config: |
       wfLoadExtension( 'SemanticScribunto' );
   - name: SubPageList
     composer: "mediawiki/sub-page-list"
-    version: "1.5.0"
+    version: "1.6.1"
   - name: Maps
     composer: "mediawiki/maps"
-    version: "6.0.3"
+    version: "7.17.2"
     config: |
       // In Maps 6.0+ you need to also load the extension
       wfLoadExtension( 'Maps' );
 
   - name: DisplayTitle
     repo: https://github.com/wikimedia/mediawiki-extensions-DisplayTitle.git
-    version: tags/1.2
+    version: "{{ mediawiki_default_branch }}"
 
 
   #
@@ -89,7 +93,7 @@ list:
       $wgPFEnableStringFunctions = true;
   - name: ExternalData
     repo: https://github.com/wikimedia/mediawiki-extensions-ExternalData.git
-    version: "{{ mediawiki_default_branch }}"
+    version: "master"
   - name: LabeledSectionTransclusion
     repo: https://github.com/wikimedia/mediawiki-extensions-LabeledSectionTransclusion.git
     version: "{{ mediawiki_default_branch }}"
@@ -106,8 +110,10 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: PageForms
     repo: https://github.com/wikimedia/mediawiki-extensions-PageForms.git
-    # commit includes spreadsheet sorting which didn't make PageForms 4.4.1
-    version: "730390a31a56c001af83948af1eefc5174abbe06"
+    version: "master"
+    config: |
+      // If enabled all "red links" will bring up a form chooser
+      $wgPageFormsLinkAllRedLinksToForms = false;
   - name: DismissableSiteNotice
     repo: https://github.com/wikimedia/mediawiki-extensions-DismissableSiteNotice.git
     version: "{{ mediawiki_default_branch }}"
@@ -133,7 +139,7 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: ReplaceText
     repo: https://github.com/wikimedia/mediawiki-extensions-ReplaceText.git
-    version: tags/1.4
+    version: "master"
   - name: Interwiki
     repo: https://github.com/wikimedia/mediawiki-extensions-Interwiki.git
     version: "{{ mediawiki_default_branch }}"
@@ -222,11 +228,11 @@ list:
       $wgPageShowWatchingUsers = true;
   - name: SemanticInternalObjects
     repo: https://github.com/wikimedia/mediawiki-extensions-SemanticInternalObjects.git
-    version: "{{ mediawiki_default_branch }}"
+    version: "master"
     legacy_load: true
   - name: SemanticDrilldown
     repo: https://github.com/wikimedia/mediawiki-extensions-SemanticDrilldown.git
-    version: "{{ mediawiki_default_branch }}"
+    version: "master"
     legacy_load: true
   - name: Arrays
     repo: https://github.com/wikimedia/mediawiki-extensions-Arrays.git
@@ -238,8 +244,7 @@ list:
     legacy_load: true
   - name: AdminLinks
     repo: https://github.com/wikimedia/mediawiki-extensions-AdminLinks.git
-    version: "{{ mediawiki_default_branch }}"
-    legacy_load: true
+    version: "master"
     config: |
       $wgGroupPermissions['sysop']['adminlinks'] = true;
   - name: BatchUserRights
@@ -251,16 +256,15 @@ list:
     config: |
       $wgHeaderTabsEditTabLink = false;
       $wgHeaderTabsRenderSingleTab = true;
-  - name: CopyWatchers
-    repo: https://github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git
-    version: tags/0.10.0
-  - name: Wiretap
-    repo: https://github.com/enterprisemediawiki/Wiretap.git
-    version: tags/0.1.0
+#  - name: CopyWatchers
+#    repo: https://github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git
+#    version: tags/0.10.0
+#  - name: Wiretap
+#    repo: https://github.com/enterprisemediawiki/Wiretap.git
+#    version: tags/0.1.0
   - name: ApprovedRevs
     repo: https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git
-    # Use this commit until a release tag for v1.0 is created
-    version: tags/1.0
+    version: master
     config: |
       $egApprovedRevsAutomaticApprovals = false;
   - name: ImagesLoaded
@@ -269,11 +273,11 @@ list:
   - name: MasonryMainPage
     repo: https://github.com/enterprisemediawiki/MasonryMainPage.git
     version: tags/0.3.0
-  - name: WatchAnalytics
-    repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
-    version: tags/3.1.1
-    config: |
-      $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
+#  - name: WatchAnalytics
+#    repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
+#    version: tags/3.1.1
+#    config: |
+#      $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
   - name: Variables
     repo: https://github.com/wikimedia/mediawiki-extensions-Variables.git
     version: "{{ mediawiki_default_branch }}"
@@ -328,7 +332,7 @@ list:
       $wgApiFrameOptions = 'SAMEORIGIN';
 
       // Use UploadWizard by default in navigation bar
-      $wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard";
+      // $wgUploadNavigationUrl = "$wgScriptPath/index.php/Special:UploadWizard";
       $wgUploadWizardConfig = array(
         'debug' => false,
         'autoCategory' => 'Uploaded with UploadWizard',
@@ -369,7 +373,7 @@ list:
 
   - name: DataTransfer
     repo: https://github.com/wikimedia/mediawiki-extensions-DataTransfer.git
-    version: "{{ mediawiki_default_branch }}"
+    version: "master"
   - name: PageImporter
     repo: https://github.com/enterprisemediawiki/PageImporter.git
     version: tags/0.1.0

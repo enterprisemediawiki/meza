@@ -37,7 +37,7 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 	// FIXME #822: The indenting below will be heinous when Ansible does its templating
 	{% if allow_skip_saml_users is defined -%}
 		$wgMezaAllowSkipSamlUsers = array();
-		{% for user, ipaddrs in allow_skip_saml_users.iteritems() -%}
+		{% for user, ipaddrs in allow_skip_saml_users.items() -%}
 		$wgMezaAllowSkipSamlUsers['{{ user }}'] = array(
 			{%- for ipaddr in ipaddrs -%}'{{ ipaddr }}',{%- endfor -%}
 		);

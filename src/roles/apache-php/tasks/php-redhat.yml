@@ -1,46 +1,16 @@
 ---
-- name: Install IUS (CentOS) repo.
+# IUS requires EPEL, but we already have it installed from getMeza.sh
+- name: Install IUS repo.
   yum:
-    name: "https://centos{{ ansible_distribution_major_version }}.iuscommunity.org/ius-release.rpm"
-  when: ansible_distribution == "CentOS"
+    name: 
+      - "https://repo.ius.io/ius-release-el{{ ansible_distribution_major_version  }}.rpm"
+#      - "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version  }}.noarch.rpm"
+  when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat")
 
-- name: Install IUS (RHEL) repo.
-  yum:
-    name: "https://rhel{{ ansible_distribution_major_version }}.iuscommunity.org/ius-release.rpm"
-  when: ansible_distribution == "RedHat"
-
-- name: Import IUS Community Project GPG key
-  rpm_key:
-    key: http://dl.iuscommunity.org/pub/ius/IUS-COMMUNITY-GPG-KEY
-    state: present
-
-
-- name: Ensure PHP 5.6 packages removed
-  yum:
-    name:
-      - php56u
-      - php56u-cli
-      - php56u-common
-      - php56u-devel
-      - php56u-gd
-      - php56u-pecl-memcache
-      - php56u-pspell
-      - php56u-snmp
-      - php56u-xml
-      - php56u-xmlrpc
-      - php56u-mysqlnd
-      - php56u-pdo
-      - php56u-odbc
-      - php56u-pear
-      - php56u-pecl-jsonc
-      - php56u-process
-      - php56u-bcmath
-      - php56u-intl
-      - php56u-opcache
-      - php56u-soap
-      - php56u-mbstring
-      - php56u-mcrypt
-      - php56u-mssql
+- name: Remove PHP 5.x packages
+  package:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+    name: "php5*"
     state: absent
 
 # Check if the desired version of PHP is installed. If it is not, ensure any
@@ -81,13 +51,14 @@
       - "{{ php_ius_version }}-opcache"
       - "{{ php_ius_version }}-soap"
       - "{{ php_ius_version }}-mbstring"
+      - "{{ php_ius_version }}-ldap"
 
       # php56u has memcache and memcached; php7Xu only has memcached
       # legacy Meza used php56u-pecl-memcache
       - "{{ php_ius_version }}-pecl-memcached"
 
       # Available for php56u, php70u, and php71u. NOT for php72u.
-      - "{{ php_ius_version }}-mcrypt"
+      # - "php-mcrypt"
 
       # Available for php56u and php70u. NOT php71u or php72u
       # - "{{ php_ius_version }}-pear"

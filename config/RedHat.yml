@@ -34,6 +34,7 @@ package_php_apache_deps:
   - m4
   - xz-libs
   - mariadb-libs
+package_goaccess: goaccess
 package_java: java-1.8.0-openjdk
 package_python3: python35u
 package_python3_pip: python35u-pip

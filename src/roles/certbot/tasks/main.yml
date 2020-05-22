@@ -1,0 +1,71 @@
+---
+# Role to install Let's Encrypt's Certbot, install certificate(s) and automate renewals
+# Since certbot installations for Debian/Ubuntu/RHEL/CentOS all setup system.d timers or cron jobs,
+# We rely on the system to renew certificates instead of renewing them through ansible
+# (We don't even have to setup a cron job.)  We *do* have to setup a hook to concatenate certs
+# on renewal.  If you need to manage multiple domains then you should expand the certificate manually.
+
+- assert:
+    that:
+      - "m_httpd_server_admin is defined"
+      - "m_httpd_server_admin != 'admin@example.com'"
+    fail_msg: >
+      "To use certbot, you must supply a valid email for 'm_httpd_server_admin' in your public.yml
+      For example, add a line like this to /opt/conf-meza/public/public.yml
+      m_httpd_server_admin: me@gmail.com"
+
+- name: Ensure firewall port 54321 OPEN when certbot ENABLED
+  include_role:
+    name: firewall_port
+  vars:
+    firewall_action: open
+    firewall_port: 54321
+    firewall_protocol: tcp
+    firewall_zone: "{{m_private_networking_zone|default('public')}}"
+
+- name: Remove Meza cert files when certbot ENABLED
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/haproxy/certs/meza.crt
+    - /etc/haproxy/certs/meza.key
+
+- name: Ensure Certbot installed 
+  package:
+    name: certbot
+    state: present
+
+# We will only generate a certificate when the certs directory is empty
+- name: Check for existing cert(s)
+  find: 
+    paths: /etc/haproxy/certs
+    patterns: '*.pem'
+    excludes: 'meza.pem'
+  register: certs
+
+- debug:
+    msg: "Found existing certificate at {{ item.path }}"
+  with_items: "{{ certs.files }}"
+
+# There is no notify, because the script is used in cert generation
+# By placing the script in the renewal-hooks hierarchy, it's run
+# automatically by certbot renew (but not by certonly)
+- name: Write the deploy hook script
+  template:
+    src: concat.pem.sh.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/concat.pem.sh
+    owner: meza-ansible
+    group: wheel
+    mode: u=rwx,g=rwx,o=rx
+
+- name: Generate SSL Certificate
+  shell: >
+    certbot certonly --non-interactive --email {{ m_httpd_server_admin }}
+    --preferred-challenges http --standalone --agree-tos --renew-by-default 
+    --webroot-path {{ m_htdocs }} -d {{ wiki_app_fqdn }} --http-01-port=54321
+    --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/concat.pem.sh
+  delegate_to: localhost
+  run_once: True
+  when: certs == ""
+
