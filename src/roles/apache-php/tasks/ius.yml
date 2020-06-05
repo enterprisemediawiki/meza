@@ -1,17 +1,12 @@
 ---
-- name: Install IUS (CentOS) repo.
-  yum:
-    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
-    name: "https://centos{{ ansible_distribution_major_version }}.iuscommunity.org/ius-release.rpm"
-  when: ansible_distribution == "CentOS"
+  - name: Install IUS repo.
+    yum:
+      lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+      name:
+        - "https://repo.ius.io/ius-release-el7.rpm"
+        - "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
 
-- name: Install IUS (RHEL) repo.
-  yum:
-    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
-    name: "https://rhel{{ ansible_distribution_major_version }}.iuscommunity.org/ius-release.rpm"
-  when: ansible_distribution == "RedHat"
-
-- name: Import IUS Community Project GPG key
-  rpm_key:
-    key: http://dl.iuscommunity.org/pub/ius/IUS-COMMUNITY-GPG-KEY
-    state: present
+  - name: Import IUS Community Project GPG key
+    rpm_key:
+      key: https://repo.ius.io/RPM-GPG-KEY-IUS-7
+      state: present
