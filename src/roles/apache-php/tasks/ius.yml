@@ -3,8 +3,8 @@
     yum:
       lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
       name:
-        - https://repo.ius.io/ius-release-el7.rpm \
-        - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        - "https://repo.ius.io/ius-release-el7.rpm"
+        - "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
 
   - name: Import IUS Community Project GPG key
     rpm_key:
