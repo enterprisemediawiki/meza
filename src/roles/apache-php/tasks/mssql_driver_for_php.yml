@@ -78,6 +78,9 @@
 #   shell: "scl enable devtoolset-7 bash"
 
 
+- name: Ensure PEAR channel up-to-date
+  shell: pear channel-update pecl.php.net
+
 #
 # Install sqlsrv drivers from PECL
 #
