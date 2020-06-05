@@ -1,6 +1,25 @@
 Release Notes
 =============
 
+## Meza 31.10.1
+
+Fix PEAR channel
+
+### Commits since 31.10.0
+
+* e048a7b Ensure PEAR channel up-to-date
+
+### Contributors
+
+* 2	James Montalvo
+
+# How to upgrade
+
+```bash
+sudo meza update 31.10.1
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.10.0
 
 Update PHP to 7.2, fix IUS repo, fix Python symlink
