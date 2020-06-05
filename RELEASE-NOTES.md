@@ -1,6 +1,34 @@
 Release Notes
 =============
 
+## Meza 31.10.0
+
+Update PHP to 7.2, fix IUS repo, fix Python symlink
+
+### Commits since 31.9.0
+
+* bbe0009 Remove symlink creation for pip3; IUS appears to do that automatically now
+* c50be32 Remove mcrypt extension no longer available after PHP 7.1
+* 01c04bb Bump to PHP 7.2
+* 10bc863 Fix typo (backslash)
+* f701201 Add second IUS repo and GPG key
+* 8e47150 Update URL to IUS RPM See https://github.com/iusrepo/announce/issues/18
+* 44f2d2c Python 2/3 compatibility
+
+### Contributors
+
+* 6	James Montalvo
+* 1	Andrew Foster
+* 1	Daren Welsh
+* 1	Greg Rundlett
+
+# How to upgrade
+
+```bash
+sudo meza update 31.10.0
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.9.0
 
 Ansible 2.9 fix; Travis firewall fix
