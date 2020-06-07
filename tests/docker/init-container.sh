@@ -99,8 +99,8 @@ if [ "$is_minion" == "no" ]; then
 		docker cp "$host_meza_dir" "$container_id:/opt/meza"
 	fi
 
-	# Install meza command
-	${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh
+	# Install meza command. Connection check fails on GitHub actions.
+	${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh --skip-conn-check
 
 fi
 # reset to no, in case follow on builds don't reset

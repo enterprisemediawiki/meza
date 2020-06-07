@@ -13,31 +13,6 @@ else
 	m_meza_host="/opt/meza"
 fi
 
-if [ ! -d "$m_meza_host/.git" ]; then
-	"$m_meza_host is not a git repository"
-	exit 1;
-fi
-
-# This is required so Docker containers can get the appropriate version. It
-# would be better if containers shared a volume with the meza application to
-# ensure getting the correct version, but for now that is not possible due to
-# the /opt/meza directory also containing data, the MediaWiki application,
-# configuration, etc, which would be overwritten by the volume if the specific
-# container had pre-loaded them.
-if [ -z "$TRAVIS_EVENT_TYPE" ]; then
-	# Emulate some travis environment variables.
-	export TRAVIS_EVENT_TYPE="push"
-	export TRAVIS_COMMIT=$(git --git-dir=/opt/meza/.git rev-parse HEAD)
-
-	echo "Using version $TRAVIS_COMMIT"
-
-	# None of these should be required provided TRAVIS_EVENT_TYPE=push, but they
-	# can't be unset.
-	TRAVIS_PULL_REQUEST_SHA=""
-	TRAVIS_BRANCH=""
-	TRAVIS_PULL_REQUEST_BRANCH=""
-fi
-
 # -e: kill script if anything fails
 # -u: don't allow undefined variables
 set -eu

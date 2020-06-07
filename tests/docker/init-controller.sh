@@ -7,21 +7,12 @@
 docker_repo="jamesmontalvo3/meza-docker-full:latest"
 source "$m_meza_host/tests/docker/init-container.sh" "${m_meza_host}" "mount"
 
-
-# Checkout the correct version of meza on the container
-# What's present on the pre-built container is not the latest. Need to pull
-# master in case the docker image doesn't have the correct git-setup.sh script
-# yet
-# ${docker_exec[@]} bash -c "cd /opt/meza && git fetch origin && git reset --hard origin/master"
-# ${docker_exec[@]} bash /opt/meza/tests/travis/git-setup.sh "$TRAVIS_EVENT_TYPE" \
-# 	"$TRAVIS_COMMIT" "$TRAVIS_PULL_REQUEST_SHA" "$TRAVIS_BRANCH" "$TRAVIS_PULL_REQUEST_BRANCH"
-
-
 # FIXME #728: Test band-aid. This is run in init-container.sh above, but at
 # that time the meza version is whatever is on the Docker container (possibly
 # very old). After checking out the correct version via git above, re-run
 # getmeza.sh, which moves /home/meza-ansible to /opt/conf-meza/users/meza-ansible
-${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh
+# Note: Connection check fails on GitHub Actions
+${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh --skip-conn-check
 
 
 # Turn off host key checking for user meza-ansible, to avoid prompts

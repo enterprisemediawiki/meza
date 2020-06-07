@@ -1,0 +1,48 @@
+stages:
+  - test
+
+variables:
+  # When using dind service we need to instruct docker, to talk with the
+  # daemon started inside of the service. The daemon is available with
+  # a network connection instead of the default /var/run/docker.sock socket.
+  #
+  # The 'docker' hostname is the alias of the service container as described at
+  # https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#accessing-the-services
+  #
+  # Note that if you're using Kubernetes executor, the variable should be set to
+  # tcp://localhost:2375 because of how Kubernetes executor connects services
+  # to the job container
+  DOCKER_HOST: tcp://docker:2375/
+  # When using dind, it's wise to use the overlayfs driver for
+  # improved performance.
+  DOCKER_DRIVER: overlay2
+
+.test-template:
+  stage: test
+  services:
+    - docker:18.09.7-dind
+  # Official docker image.
+  image: docker:18
+  before_script:
+    - docker info
+    - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+  script:
+    - apk update
+    - apk upgrade
+    - apk add bash
+    - 'bash ./tests/docker/run-tests.sh ${CI_JOB_NAME} ${PWD}'
+
+monolith-from-scratch:
+  extends: .test-template
+
+monolith-from-import:
+  extends: .test-template
+
+import-from-remote:
+  extends: .test-template
+
+backup-to-remote:
+  extends: .test-template
+
+import-from-alt-remote:
+  extends: .test-template

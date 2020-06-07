@@ -9,6 +9,13 @@ if [ "$(whoami)" != "root" ]; then
 	exit 1
 fi
 
+for ARG in "$@"; do
+	if [ "${ARG}" = "--skip-conn-check" ]; then
+		SKIP_CONNECTION_CHECK="true"
+	fi
+done
+
+
 checkInternetConnection() {
     declare -i pingRetries=100
     declare -i sleepDuration=3
@@ -26,7 +33,11 @@ checkInternetConnection() {
     fi
 }
 
-checkInternetConnection
+if [ ! -z "${SKIP_CONNECTION_CHECK}" ]; then
+	echo "Skipping connection check"
+else
+	checkInternetConnection
+fi
 
 # If you don't do this in a restrictive system (umask 077), it becomes
 # difficult to manage all permissions, AND you constantly have to fix all git
