@@ -6,6 +6,7 @@ on:
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         test_type:
           - monolith-from-scratch
