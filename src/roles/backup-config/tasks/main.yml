@@ -1,0 +1,56 @@
+---
+
+- name: Ensure MariaDB client installed on backup servers
+  yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+    name: mariadb
+    state: present
+  tags:
+    - latest
+
+- name: Ensure meza-backups group exists
+  group:
+    name: meza-backups
+    state: present
+
+- name: Ensure backups directory exists
+  file:
+    path: "{{ m_backups }}"
+    state: directory
+    mode: "{{ m_backups_mode }}"
+    owner: "{{ m_backups_owner }}"
+    group: "{{ m_backups_group }}"
+
+- name: Ensure backups directory exists for environment
+  file:
+    path: "{{ m_backups }}/{{ env }}"
+    state: directory
+    mode: "{{ m_backups_mode }}"
+    owner: "{{ m_backups_owner }}"
+    group: "{{ m_backups_group }}"
+
+- name: Get individual wikis from controller config
+  find:
+    paths: "{{ m_local_public }}/wikis/"
+    file_type: directory
+  register: wiki_dirs
+  delegate_to: localhost
+
+- name: Ensure backups directory exists for each wiki
+  file:
+    path: "{{ m_backups }}/{{ env }}/{{ item }}"
+    state: directory
+    mode: "{{ m_backups_mode }}"
+    owner: "{{ m_backups_owner }}"
+    group: "{{ m_backups_group }}"
+  with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+- name: Ensure backups uploads directory exists for each wiki
+  file:
+    path: "{{ m_backups }}/{{ env }}/{{ item }}/uploads"
+    state: directory
+    mode: "{{ m_backups_mode }}"
+    owner: "{{ m_backups_owner }}"
+    group: "{{ m_backups_group }}"
+  with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
+

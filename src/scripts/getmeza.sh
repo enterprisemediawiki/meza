@@ -9,6 +9,36 @@ if [ "$(whoami)" != "root" ]; then
 	exit 1
 fi
 
+for ARG in "$@"; do
+	if [ "${ARG}" = "--skip-conn-check" ]; then
+		SKIP_CONNECTION_CHECK="true"
+	fi
+done
+
+
+checkInternetConnection() {
+    declare -i pingRetries=100
+    declare -i sleepDuration=3
+    declare -i minutes=$(($pingRetries * $sleepDuration / 60))
+
+    while [[ $pingRetries -gt 0 ]] && ! ping -c 1 -W 1 mirrorlist.centos.org >/dev/null 2>&1; do
+        echo "Could not connect to mirrorlist.centos.org. Internet connection might be down. Retrying (#$pingRetries) in $sleepDuration seconds..."
+        ((pingRetries -= 1))
+        sleep $sleepDuration
+    done
+
+    if [[ ! $pingRetries -gt 0 ]]; then
+        echo "Meza has been trying to install but hasn't found an internet connection for $minutes minutes. Verify internet connectivity and try again."
+        exit 1
+    fi
+}
+
+if [ ! -z "${SKIP_CONNECTION_CHECK}" ]; then
+	echo "Skipping connection check"
+else
+	checkInternetConnection
+fi
+
 # If you don't do this in a restrictive system (umask 077), it becomes
 # difficult to manage all permissions, AND you constantly have to fix all git
 # clones and checkouts.
@@ -101,7 +131,7 @@ fi
 # make sure conf-meza exists and has good permissions
 mkdir -p /opt/conf-meza/secret
 chmod 755 /opt/conf-meza
-chmod 755 /opt/conf-meza/secret
+chmod 775 /opt/conf-meza/secret
 
 # Required initially for creating lock files
 mkdir -p /opt/data-meza
@@ -130,6 +160,7 @@ else
 fi
 
 chown meza-ansible:wheel /opt/conf-meza
+chown meza-ansible:wheel /opt/conf-meza/secret
 chown meza-ansible:wheel /opt/meza
 
 # Don't require TTY or visible password for sudo. Ref #769

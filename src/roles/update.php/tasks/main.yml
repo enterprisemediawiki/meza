@@ -42,10 +42,43 @@
     - sql-backup-cleanup
   when: do_cleanup_sql_backup
 
-- name: Run update.php on this wiki
-  shell: >
-    WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/update.php" --quick
-  # run_once see [1]
-  run_once: true
+- name: Ensure update.php log exists
+  file:
+    path: "{{ m_logs }}/update.php"
+    state: directory
+    mode: "{{ m_logs_mode }}"
+    owner: "{{ m_logs_owner }}"
+    group: "{{ m_logs_group }}"
+
+- set_fact:
+    update_php_log: "{{ m_logs }}/update.php/{{ wiki_id }}.{{ lookup('pipe','date +%Y%m%d%H%M%S') }}.log"
+
+- name: Try update.php
+  block:
+
+    - name: Run update.php on this wiki
+      shell: >
+        WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/update.php" --quick >> {{ update_php_log }} 2>&1
+      # run_once see [1]
+      run_once: true
+
+  rescue:
+
+    - name: Get update.php log file
+      shell: "cat {{ update_php_log }}"
+      register: update_php_log_output
+
+    - debug:
+        var: update_php_log_output
+
+    - name: Get php error log
+      shell: "tail -n 50 {{ m_logs }}/php/php_errors.log"
+      register: php_error_log_output
+
+    - debug:
+        var: php_error_log_output
+
+    - name: Force failure after reporting
+      command: /bin/false
   tags:
     - update.php

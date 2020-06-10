@@ -1,0 +1,85 @@
+---
+
+# Define a timestamp fact to persist throughout this playbook
+- hosts: all:!exclude-all:!load-balancers-unmanaged:!load-balancers-nonmeza:!load-balancers-nonmeza-external:!load-balancers-nonmeza-internal
+  tasks:
+    - set_fact:
+        backup_timestamp: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+
+- hosts: localhost
+  become: yes
+  roles:
+    - set-vars
+  tags:
+    - notify
+  tasks:
+
+    - name:
+      set_fact:
+        autodeployer_slack_icon_url: "{{ autodeployer.slack_icon_url | default('https://github.com/enterprisemediawiki/meza/raw/master/src/roles/configure-wiki/files/logo.png') }}"
+      when: autodeployer is defined
+
+    - name: Notify push backup is starting
+      slack:
+        token: "{{ autodeployer.slack_token }}"
+        msg: "Push backup to {{ push_backup.short_name | default('remote server') }} starting"
+        channel: "{{ autodeployer.slack_channel }}"
+        username: "{{ autodeployer.slack_username }}"
+        icon_url: "{{ autodeployer_slack_icon_url }}"
+        color: "good"
+        link_names: 1
+      when:
+        - autodeployer is defined
+        - autodeployer.slack_token is defined
+        - autodeployer.slack_channel is defined
+        - autodeployer.slack_username is defined
+        - autodeployer_slack_icon_url is defined
+
+
+# FIXME #803: If a slave is available, maybe pull from there
+- hosts: db-master
+  become: yes
+  roles:
+    - set-vars
+    - dump-db-wikis
+    - backup-db-wikis-push
+  tags: db
+
+- hosts: backup-servers
+  become: yes
+  roles:
+    - set-vars
+    - backup-uploads-push
+  tags:
+    - uploads
+    - upload
+
+- hosts: localhost
+  become: yes
+  roles:
+    - set-vars
+  tags:
+    - notify
+  tasks:
+
+    - name:
+      set_fact:
+        autodeployer_slack_icon_url: "{{ autodeployer.slack_icon_url | default('https://github.com/enterprisemediawiki/meza/raw/master/src/roles/configure-wiki/files/logo.png') }}"
+      when: autodeployer is defined
+
+    - name: Notify push backup is complete
+      slack:
+        token: "{{ autodeployer.slack_token }}"
+        msg: "Push backup to {{ push_backup.short_name | default('remote server') }} complete"
+        channel: "{{ autodeployer.slack_channel }}"
+        username: "{{ autodeployer.slack_username }}"
+        icon_url: "{{ autodeployer_slack_icon_url }}"
+        color: "good"
+        link_names: 1
+      when:
+        - autodeployer is defined
+        - autodeployer.slack_token is defined
+        - autodeployer.slack_channel is defined
+        - autodeployer.slack_username is defined
+        - autodeployer_slack_icon_url is defined
+

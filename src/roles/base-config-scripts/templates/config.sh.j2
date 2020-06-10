@@ -63,7 +63,7 @@ m_i18n="{{ m_i18n }}"
 # CUSTOM __public__ DEPLOY VARIABLES
 # These should only come from public.yml
 #
-{% for key, value in public_deploy_vars.iteritems() %}
+{% for key, value in public_deploy_vars.items() %}
 {% if value is string %}
 {{ key }}="{{ value }}"
 {% elif value is iterable %}
@@ -80,7 +80,7 @@ m_i18n="{{ m_i18n }}"
 # CUSTOM __{{ env }} environment__ DEPLOY VARIABLES
 # These should only come from env/{{ env }}.yml
 #
-{% for key, value in env_deploy_vars.iteritems() %}
+{% for key, value in env_deploy_vars.items() %}
 {% if value is string %}
 {{ key }}="{{ value }}"
 {% elif value is iterable %}
@@ -97,7 +97,7 @@ m_i18n="{{ m_i18n }}"
 # CUSTOM __secret__ DEPLOY VARIABLES
 # These should only come from secret.yml
 #
-{% for key, value in secret_deploy_vars.iteritems() %}
+{% for key, value in secret_deploy_vars.items() %}
 {% if value is string %}
 {{ key }}="{{ value }}"
 {% elif value is iterable %}
@@ -116,7 +116,7 @@ m_i18n="{{ m_i18n }}"
 # FIXME: remove deploy_vars in lieu of secret_deploy_vars when production wikis
 #        are updated.
 #
-{% for key, value in deploy_vars.iteritems() %}
+{% for key, value in deploy_vars.items() %}
 {% if value is string %}
 {{ key }}="{{ value }}"
 {% elif value is iterable %}
@@ -178,6 +178,12 @@ slack_username_disk_usage="{{ slack_username_disk_usage }}"
 #
 # Auto-deployer
 #
+{% if secret_config_repo is defined and secret_config_repo.repo is defined %}
+# Info about local public config
+secret_config_repo_repo="{{ secret_config_repo.repo }}"
+secret_config_repo_version="{{ secret_config_repo.version | default('master') }}"
+secret_config_repo_force="{{ secret_config_repo.force | default(false) | bool }}"
+{% endif %}
 
 {% if local_config_repo is defined and local_config_repo.repo is defined %}
 # Info about local public config

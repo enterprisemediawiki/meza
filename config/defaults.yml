@@ -158,12 +158,11 @@ mediawiki_version: "REL1_32"
 mediawiki_default_branch: "REL1_32"
 
 # PHP version
-php_ius_version: "php71u"
-php_debian_version: "7.1"
+php_ius_version: "php72u"
+php_debian_version: "7.2"
 
 # Parsoid version
-# e6b708 is commit on 16-OCT-2018, the day the REL1_32 branch was made
-m_parsoid_version: "e6b708b3d7ff50a314d021295dce874574aa3e9e"
+m_parsoid_version: "tags/v0.10.0"
 
 # MediaWiki 1.27 and earlier require ElasticSearch 1.6
 # MediaWiki 1.28 and higher require ElasticSearch 2.x
@@ -241,11 +240,51 @@ clean_upload_stash_crontime: "0 18 * * *"
 # FILE MODES, OWNERS, GROUPS
 #
 
+#
+# PATH SPECIFICATIONS: PUT ALL PATH INFO UNDER m_paths
+# ----------------------------------------------------
+#
+# Use Capital X to give dirs "execute" (i.e. allow entry into dir) but leave
+# files' execute bit untouched.
+#
+# Examples:
+#   "u=rwX,g=rX,o="    --> 750 for dirs, files possibly between 640 and 751
+#   "u=rwX,g=rwX,o=rX" --> 775 for dirs, files possibly between 664 and 775
+#
+# Ref: https://www.g-loaded.eu/2005/11/08/the-use-of-the-uppercase-x-in-chmod/
+#
+m_paths:
+  mw_temp:
+    path: "{{ m_meza_data }}/mw-temp"
+    mode: "u=rwX,g=rwX,o=rX"
+    owner: apache
+    group: apache
+    # recurse: TBD if we want this within m_paths
+
+
+#
+# LEGACY PATH SPECIFICATIONS
+# --------------------------
+#
+
 m_meza_owner: meza-ansible
 m_meza_group: wheel
 # Don't set mode for /opt/meza for now. Don't want to impact execute bit which
 # is managed by Git
 # FIXME: Later specify read and write permissions only if Ansible supports
+
+
+m_data_mode: "0755"
+m_data_owner: meza-ansible
+m_data_group: wheel
+
+
+#
+# Used for many things within htdocs that don't require apache to manipulate
+#
+m_htdocs_mode: "u=rwX,g=rwX,o=rX"
+m_htdocs_owner: meza-ansible
+m_htdocs_group: wheel
 
 
 # uploads directory. Note: user meza-ansible is in group "apache"
@@ -264,15 +303,14 @@ m_cache_directory_mode: "0770"
 m_cache_directory_owner: "{{ user_apache }}"
 m_cache_directory_group: "{{ group_apache }}"
 
-
 m_logs_mode: "0755"
 m_logs_owner: meza-ansible
 m_logs_group: wheel
 
 
-m_backups_mode: "0755"
-m_backups_owner: root
-m_backups_group: root
+m_backups_mode: "0775"
+m_backups_owner: meza-ansible
+m_backups_group: meza-backups
 
 # mode/ownership for anything in /etc/cron.d
 m_crond_mode: "0644"
@@ -283,13 +321,23 @@ m_config_public_mode: "0755"
 m_config_public_owner: meza-ansible
 m_config_public_group: wheel
 
-m_config_secret_mode: "0750"
+m_config_secret_file_mode: "0660"
+m_config_secret_dir_mode: "0775"
 m_config_secret_owner: meza-ansible
 m_config_secret_group: wheel
+
+m_simplesamlphp_mode: "u=rwX,g=rwX,o=rX"
+m_simplesamlphp_owner: meza-ansible
+m_simplesamlphp_group: wheel
+
 
 #
 # PHP config
 #
+
+# PHP max file size. This gets applied to php.ini variables upload_max_filesize
+# and post_max_size for convenience.
+php_max_upload_filesize: "100M"
 
 # The OPcache shared memory storage size
 php_opcache_memory_consumption: 256

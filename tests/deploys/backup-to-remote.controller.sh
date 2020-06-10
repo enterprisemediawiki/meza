@@ -10,7 +10,7 @@ set -eux
 echo "RUNNING TEST"
 
 # Now that environment is setup, deploy/install it
-meza deploy "$1"
+meza deploy "$1" --no-firewall
 
 # Need to sleep 10 seconds to let Parsoid finish loading
 sleep 10s

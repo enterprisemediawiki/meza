@@ -1,0 +1,59 @@
+---
+
+- name: Get individual wikis from controller config
+  find:
+    paths: "{{ m_local_public }}/wikis/"
+    file_type: directory
+  register: wiki_dirs
+  delegate_to: localhost
+
+# NOTE: no validation of proper directory setup on pushing-to server. Non-push
+# role "backup-db-wikis" has these tasks to handle directory setup:
+# - name: Ensure backups directory exists for environment
+# - name: Ensure backups directory exists for each wiki
+
+- name: Set remote_server_base_path if set in configuration
+  set_fact:
+    remote_server_base_path: "{{ push_backup.db.path }}"
+  when:
+    - push_backup.db.path is defined
+
+- name: Set remote_server_base_path if NOT set in configuration
+  set_fact:
+    remote_server_base_path: "{{ m_backups }}/{{ env }}/<id>/"
+  when:
+    - push_backup.db.path is not defined
+
+- name: Output value of remote_server_base_path (<id> will be replaced by each wiki_id)
+  debug: { var: remote_server_base_path }
+
+- name: "Run role:rsync-push - Copy SQL files to {{ push_backup.db.addr }}"
+  include_role:
+    name: rsync-push
+  vars:
+    pushing_from_server: "{{ inventory_hostname }}"
+    pushing_from_path: "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
+    pushing_to_server: "{{ push_backup.db.addr }}"
+    # remote_server_base_path + backup_timestamp + _wiki.sql, but replace <id> with wiki_id (item)
+    pushing_to_path: "{{ remote_server_base_path | regex_replace('<id>', item) }}{{ backup_timestamp }}_wiki_push.sql"
+    pushing_to_user: "{{ push_backup.remote_user }}"
+  with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+# Remove temp SQL files, only needs to be done on first backup server
+- name: Remove SQL files from DB master {{ m_tmp }}
+  file:
+    path: "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
+    state: absent
+  with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
+  run_once: true
+
+- name: "Clean out all but the latest SQL backup file for {{ item }} IF DESIRED"
+  include_role:
+    name: sql-backup-cleanup
+  vars:
+    cleanup_wiki: "{{ item }}"
+  run_once: true
+  tags:
+    - sql-backup-cleanup
+  with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
+  when: do_cleanup_sql_backup

@@ -3,7 +3,7 @@ list:
 
   - name: Semantic MediaWiki
     composer: "mediawiki/semantic-media-wiki"
-    version: "3.0.0"
+    version: "3.0.2"
     config: |
       // Enable Semantic MediaWiki semantics
       enableSemantics( $wikiId );
@@ -106,8 +106,7 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: PageForms
     repo: https://github.com/wikimedia/mediawiki-extensions-PageForms.git
-    # commit includes spreadsheet sorting which didn't make PageForms 4.4.1
-    version: "730390a31a56c001af83948af1eefc5174abbe06"
+    version: "bb1beb015f0a16db10d96c895dfadf9eb691834d"
   - name: DismissableSiteNotice
     repo: https://github.com/wikimedia/mediawiki-extensions-DismissableSiteNotice.git
     version: "{{ mediawiki_default_branch }}"
@@ -197,7 +196,7 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: MezaExt
     repo: https://github.com/enterprisemediawiki/MezaExt.git
-    version: tags/0.1.0
+    version: "master"
   # Extension:PdfHandler (breaks on very large PDFs)
   # https://github.com/wikimedia/mediawiki-extensions-PdfHandler
   # // Location of PdfHandler dependencies
@@ -301,7 +300,9 @@ list:
         array(0,50)
       );
 
-
+  - name: SemanticExtraSpecialProperties
+    composer: "mediawiki/semantic-extra-special-properties"
+    version: "2.0.0"
   - name: PipeEscape
     repo: https://github.com/wikimedia/mediawiki-extensions-PipeEscape.git
     version: "{{ mediawiki_default_branch }}"
@@ -369,7 +370,7 @@ list:
 
   - name: DataTransfer
     repo: https://github.com/wikimedia/mediawiki-extensions-DataTransfer.git
-    version: "{{ mediawiki_default_branch }}"
+    version: "730cbfbcc7cc255724eaceb76a3abc6fcc9c93aa"
   - name: PageImporter
     repo: https://github.com/enterprisemediawiki/PageImporter.git
     version: tags/0.1.0

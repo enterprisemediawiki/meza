@@ -4,12 +4,10 @@
 #   1) A meza monolith, from a pre-built meza docker image
 #   2) A backup server, from a base docker image
 #
-# To call this outside of Travis, you must supply at a minimum as environment
-# variables:
+# To run this you must supply at a minimum these env variables:
 #   1) m_meza_host=/opt/meza
 #   2) env_name=somename
-#   3) TRAVIS_EVENT_TYPE=push
-#   4) TRAVIS_COMMIT= a sha1 hash for a commit or a branch like origin/fix123
+#   3) I think: container_id, docker_ip, docker_exec
 
 
 # -e: kill script if anything fails
@@ -51,8 +49,6 @@ ${docker_exec_1[@]} sed -r -i "s/INSERT_FQDN/$docker_ip_1/g;" \
 # Test allow_image_tags (which requires patching Parsoid, plus an item in
 # LocalSettings.php)
 ${docker_exec_1[@]} bash -c "echo -e 'allow_image_tags: True\n' >> '/opt/conf-meza/secret/$env_name/secret.yml'"
-
-
 
 # CONTAINER 2: get backup files
 ${docker_exec_2[@]} git clone \

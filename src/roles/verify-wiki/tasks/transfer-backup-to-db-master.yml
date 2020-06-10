@@ -1,6 +1,15 @@
 ---
 # Transfer SQL to DB master
 
+- debug:
+    msg: |
+      wiki_id:                       {{ wiki_id | default('<undefined>') }}
+      sql_dir_path:                  {{ sql_dir_path | default('<undefined>') }}
+      sql_file_match:                {{ sql_file_match | default('<undefined>') }}
+      sql_file_push_match:           {{ sql_file_push_match | default('<undefined>') }}
+      sql_backup_server:             {{ sql_backup_server | default('<undefined>') }}
+      db_backup_server_remote_user:  {{ db_backup_server_remote_user | default('<undefined>') }}
+
 
 #
 # Check for backups directory
@@ -27,25 +36,90 @@
 
 # This will find the latest sql file by name, or wiki.sql over any timestamped one
 # assuming timestamp-named files like 20170220000002_wiki.sql
-- name: "{{ wiki_id }} - Find SQL file if it exists"
-  shell: 'find {{ sql_dir_path }} -maxdepth 1 -type f -iname "{{ sql_file_match }}" | sort -r | head -n +1'
-  register: wiki_sql_file
+- name: "{{ wiki_id }} - Find _PUSHED_ SQL file if it exists"
+  shell: 'find {{ sql_dir_path }} -maxdepth 1 -type f -iname "{{ sql_file_push_match }}" | sort -r | head -n +1'
+  register: wiki_sql_push_file
   delegate_to: "{{ sql_backup_server }}"
   run_once: true
   remote_user: "{{ db_backup_server_remote_user }}"
   failed_when: False
   when: backup_dir_exists and (not wiki_exists or intend_overwrite_from_backup)
 
-- name: "{{ wiki_id }} - Set fact if SQL file DOES exist"
+- name: "{{ wiki_id }} - Set fact if _PUSHED_ SQL file DOES exist"
+  set_fact:
+    sql_file_pushed_exists: True
+  when:
+    - wiki_sql_push_file is defined
+    - wiki_sql_push_file.rc is defined
+    - wiki_sql_push_file.rc == 0
+    - wiki_sql_push_file.stdout != ""
+
+- name: "{{ wiki_id }} - Set fact if _PUSHED_ SQL file DOES NOT exist"
+  set_fact:
+    sql_file_pushed_exists: False
+  when: >
+    (
+      wiki_sql_push_file is not defined
+      or wiki_sql_push_file.rc is not defined
+      or wiki_sql_push_file.rc != 0
+      or wiki_sql_push_file.stdout == ""
+    )
+
+- name: Debug var wiki_sql_push_file
+  debug:
+    var: wiki_sql_push_file
+
+- name: "{{ wiki_id }} - If no pushed SQL file, find any SQL file if it exists"
+  shell: 'find {{ sql_dir_path }} -maxdepth 1 -type f -iname "{{ sql_file_match }}" | sort -r | head -n +1'
+  register: wiki_sql_file
+  delegate_to: "{{ sql_backup_server }}"
+  run_once: true
+  remote_user: "{{ db_backup_server_remote_user }}"
+  failed_when: False
+  when:
+    - not sql_file_pushed_exists
+    - backup_dir_exists
+    - (not wiki_exists or intend_overwrite_from_backup)
+
+- name: "{{ wiki_id }} - If no pushed SQL file, set fact if any SQL file DOES exist"
   set_fact:
     sql_file_exists: True
-  when: wiki_sql_file is defined and wiki_sql_file.rc is defined and wiki_sql_file.rc == 0
+  when:
+    - not sql_file_pushed_exists
+    - wiki_sql_file is defined
+    - wiki_sql_file.rc is defined
+    - wiki_sql_file.rc == 0
+    - wiki_sql_file.stdout != ""
 
-- name: "{{ wiki_id }} - Set fact if SQL file DOES NOT exist"
+- name: "{{ wiki_id }} - If no pushed SQL file, set fact if any other SQL file DOES NOT exist"
   set_fact:
     sql_file_exists: False
-  when: wiki_sql_file is not defined or wiki_sql_file.rc is not defined or wiki_sql_file.rc != 0
+  when:
+    - not sql_file_pushed_exists
+    - >
+      (
+        wiki_sql_file is not defined
+        or wiki_sql_file.rc is not defined
+        or wiki_sql_file.rc != 0
+        or wiki_sql_file.stdout == ""
+      )
 
+
+- name: Set path to pushed SQL file
+  set_fact:
+    wiki_sql_file_path: "{{ wiki_sql_push_file.stdout }}"
+  when: sql_file_pushed_exists
+
+- name: Set path to any SQL file
+  set_fact:
+    wiki_sql_file_path: "{{ wiki_sql_file.stdout }}"
+  when:
+    - not sql_file_pushed_exists
+    - sql_file_exists
+
+- debug:
+    msg: |
+      sql file: {{ wiki_sql_file_path | default('<undefined>') }}
 
 #
 # Do the rsync transfer of SQL file from backup server to DB master
@@ -57,8 +131,9 @@
     pulling_to_server:   "{{ groups['db-master'][0] }}"
     pulling_to_path:     "{{ m_tmp }}/wiki.sql"
     pulling_from_server: "{{ sql_backup_server }}"
-    pulling_from_path:   "{{ wiki_sql_file.stdout }}"
+    pulling_from_path:   "{{ wiki_sql_file_path }}"
     pulling_from_user:   "{{ db_backup_server_remote_user }}"
   run_once: true
   when:
-    sql_file_exists
+    - wiki_sql_file_path is defined
+    - wiki_sql_file_path != ""

@@ -12,6 +12,14 @@
     group: "{{ group_apache }}"
     mode: 0775
 
+- name: Ensure mw-temp directory configured
+  file:
+    state: directory
+    path: "{{ m_paths.mw_temp.path }}"
+    owner: "{{ m_paths.mw_temp.owner }}"
+    group: "{{ m_paths.mw_temp.group }}"
+    mode: "{{ m_paths.mw_temp.mode }}"
+
 - name: Ensure user meza-ansible and alt-meza-ansible in group "apache"
   user:
     name: "{{ item }}"

@@ -90,9 +90,9 @@
   file:
     path: "{{ m_local_secret }}/{{ env }}/ssl"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
+    owner: "{{ m_config_secret_owner }}"
+    group: "{{ m_config_secret_group }}"
+    mode: "{{ m_config_secret_dir_mode }}"
   delegate_to: localhost
   run_once: True
 
@@ -290,6 +290,7 @@
       # only external load balancers
     - load_balancer_handle_external
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
+    - firewall_skip_tasks is not defined or not firewall_skip_tasks
     - >
       ('load-balancers' in groups and inventory_hostname in groups['load-balancers'])
       or
@@ -307,6 +308,7 @@
   when:
     - enable_haproxy_stats
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
+    - firewall_skip_tasks is not defined or not firewall_skip_tasks
 
 - name: Ensure firewall port 1936 CLOSED when haproxy stats DISABLED
   include_role:
@@ -319,6 +321,7 @@
   when:
     - not enable_haproxy_stats
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
+    - firewall_skip_tasks is not defined or not firewall_skip_tasks
 
 - name: Ensure firewall port 8088 OPEN when PHP profiling ENABLED
   include_role:
@@ -331,6 +334,7 @@
   when:
     - m_setup_php_profiling
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
+    - firewall_skip_tasks is not defined or not firewall_skip_tasks
 
 - name: Ensure firewall port 8088 CLOSED when PHP profiling DISABLED
   include_role:
@@ -343,6 +347,8 @@
   when:
     - not m_setup_php_profiling
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
+    - firewall_skip_tasks is not defined or not firewall_skip_tasks
+
 
 # FIXME #747: haproxy will need to handle reverse proxy for Elasticsearch plugins
 # - name: Configure firewalld for Elasticsearch reverse proxy

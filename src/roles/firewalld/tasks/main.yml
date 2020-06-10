@@ -1,0 +1,84 @@
+---
+# These are handled within the base role now such that they aren't re-run
+# for each play that makes a firewall modification. Instead this role is to be
+# used sort of like a library of functions. Plays will use the uncommented-out
+# tasks below as needed.
+#
+# - name: ensure firewalld is installed
+#   yum: name=firewalld state=present
+# - name: ensure firewalld is enabled and started
+#   service: name=firewalld enabled=yes state=started
+# - name: set firewalld default zone
+#   command: /bin/firewall-cmd --set-default-zone={{default_zone|default('public')}}
+#   register: result
+#   changed_when: result.stdout == "success"
+# - name: set firewalld zone interface
+#   command: /bin/firewall-cmd --zone={{item.key}} --change-interface={{item.value}} --permanent
+#   with_dict: "{{firewalld_zone_interface|default({})}}"
+#   notify: restart firewalld
+
+# - name: set firewalld zone source
+#   firewalld:
+#     zone: "{{item.key}}"
+#     permanent: "{{item.value.permanent|default('true')}}"
+#     immediate: "{{item.value.immediate|default('true')}}"
+#     state: "{{item.value.state|default('enabled')}}"
+#     source: "{{item.value.source}}"
+#   with_dict: "{{firewalld_zone_source|default({})}}"
+
+# - name: set firewalld service rules
+#   firewalld:
+#     service: "{{item.key}}"
+#     permanent: "{{item.value.permanent|default('true')}}"
+#     immediate: "{{item.value.immediate|default('true')}}"
+#     state: "{{item.value.state|default('enabled')}}"
+#     zone: "{{item.value.zone|default('public')}}"
+#   with_dict: "{{firewalld_service_rules|default({})}}"
+
+# - name: set firewalld port rules
+#   firewalld:
+#     port: "{{item.value.port}}/{{item.value.protocol|default('tcp')}}"
+#     permanent: "{{item.value.permanent|default('true')}}"
+#     immediate: "{{item.value.immediate|default('true')}}"
+#     state: "{{item.value.state|default('enabled')}}"
+#     zone: "{{item.value.zone|default('public')}}"
+#   with_dict: "{{firewalld_port_rules|default({})}}"
+
+# - name: set firewalld rich rules
+#   firewalld:
+#     rich_rule: "{{item.value.rule}}"
+#     permanent: "{{item.value.permanent|default('true')}}"
+#     immediate: "{{item.value.immediate|default('true')}}"
+#     state: "{{item.value.state|default('enabled')}}"
+#     zone: "{{item.value.zone|default('public')}}"
+#   with_dict: "{{firewalld_rich_rules|default({})}}"
+
+- name: set firewalld allow {{ firewalld_service }} for list of servers
+  firewalld:
+    rich_rule: 'rule family="ipv4" source address="{{ item }}/32" service name="{{ firewalld_service }}" accept'
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{firewalld_zone|default('public')}}"
+  # strip "localhost" or inventory_hostname from list of servers to configure
+  with_items: "{{ firewalld_servers | difference([ 'localhost', inventory_hostname ]) }}"
+  when:
+    - firewalld_service is defined
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - firewall_skip_tasks is not defined or not firewall_skip_tasks
+
+
+- name: set firewalld allow port {{ firewalld_port }} for list of servers
+  firewalld:
+    rich_rule: 'rule family="ipv4" source address="{{ item }}/32" port port="{{ firewalld_port }}" protocol="{{ firewalld_protocol }}" accept'
+    permanent: true
+    immediate: true
+    state: enabled
+    zone: "{{firewalld_zone|default('public')}}"
+  # strip "localhost" or inventory_hostname from list of servers to configure
+  with_items: "{{ firewalld_servers | difference([ 'localhost', inventory_hostname ]) }}"
+  when:
+    - firewalld_port is defined
+    - firewalld_protocol is defined
+    - docker_skip_tasks is not defined or not docker_skip_tasks
+    - firewall_skip_tasks is not defined or not firewall_skip_tasks

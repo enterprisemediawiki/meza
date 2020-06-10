@@ -1,0 +1,399 @@
+---
+
+- hosts: localhost
+  become: yes
+  roles:
+    - set-vars
+    - umask-set
+  tasks:
+
+    - name: "Exit if at least one of the following not setup: secret, public, or Meza versions"
+      debug:
+        msg: "local_config_repo, secret_config_repo, or enforce_meza_version must be configured"
+      failed_when: True
+      when: >
+        (
+          local_config_repo is not defined
+          and local_config_repo.repo is not defined
+          and local_config_repo.version is not defined
+        )
+        and
+        (
+          secret_config_repo is not defined
+          and secret_config_repo.repo is not defined
+          and secret_config_repo.version is not defined
+        )
+        and
+        (
+          enforce_meza_version is not defined
+        )
+
+    - name:
+      set_fact:
+        autodeployer_slack_icon_url: "{{ autodeployer.slack_icon_url | default('https://github.com/enterprisemediawiki/meza/raw/master/src/roles/configure-wiki/files/logo.png') }}"
+      when: autodeployer is defined
+
+    #
+    # SECRET CONFIG
+    #
+    - name: Do secret config
+      block:
+        - name: Ensure proper secret config
+          become: yes
+          become_user: "meza-ansible"
+          # Ref #1149 for TMPDIR environment var
+          environment:
+            TMPDIR: "{{ m_tmp }}"
+          git:
+            repo: "{{ secret_config_repo.repo }}"
+            dest: "{{ m_local_secret }}"
+            version: "{{ secret_config_repo.version }}"
+            track_submodules: no
+            recursive: no
+            umask: "0002"
+          register: secret_config_git_operation
+
+        # temporary
+        - debug:
+            var: secret_config_git_operation
+
+        - name: Reset vars if secret config changed
+          include_role:
+            name: set-vars
+          when: secret_config_git_operation.changed
+
+        #
+        # Send notification for Meza changes
+        #
+        - name: Send notification via Slack
+          slack:
+            token: "{{ autodeployer.slack_token }}"
+            msg: |
+              Secret config changed versions:
+              FROM: `{{ secret_config_git_operation.before }}`
+              TO:   `{{ secret_config_git_operation.after }}`
+
+              Tracking version: `{{ secret_config_repo.version }}`
+            channel: "{{ autodeployer.slack_channel }}"
+            username: "{{ autodeployer.slack_username }}"
+            icon_url: "{{ autodeployer_slack_icon_url }}"
+            color: "good"
+            link_names: 1
+          register: secret_config_notify
+          failed_when: False
+          when:
+            - secret_config_git_operation.changed
+            - autodeployer is defined
+            - autodeployer.slack_token is defined
+            - autodeployer.slack_channel is defined
+            - autodeployer.slack_username is defined
+            - autodeployer_slack_icon_url is defined
+
+        - name: Send notification via Slack
+          slack:
+            token: "{{ autodeployer.slack_token }}"
+            msg: "Secret config slack notification error"
+            channel: "{{ autodeployer.slack_channel }}"
+            username: "{{ autodeployer.slack_username }}"
+            icon_url: "{{ autodeployer_slack_icon_url }}"
+            color: "good"
+            link_names: 1
+          failed_when: False
+          when:
+            - secret_config_git_operation.changed
+            - secret_config_notify.failed
+            - autodeployer is defined
+            - autodeployer.slack_token is defined
+            - autodeployer.slack_channel is defined
+            - autodeployer.slack_username is defined
+            - autodeployer_slack_icon_url is defined
+
+      rescue:
+        - name: Send secret config warning via Slack
+          slack:
+            token: "{{ autodeployer.slack_token }}"
+            msg: "Error with secret config git operations"
+            channel: "{{ autodeployer.slack_channel }}"
+            username: "{{ autodeployer.slack_username }}"
+            icon_url: "{{ autodeployer_slack_icon_url }}"
+            color: "danger"
+            link_names: 1
+
+        - name: "End autodeployer: Secret config Git failure"
+          debug:
+            msg: "Secret config Git failure"
+
+        - meta: end_play
+
+
+      when:
+        - secret_config_repo is defined
+        - secret_config_repo.repo is defined
+        - secret_config_repo.version is defined
+
+
+
+
+
+
+    #
+    # PUBLIC CONFIG
+    #
+    - name: Do public config
+      block:
+
+        - name: Ensure proper public config
+          become: yes
+          become_user: "meza-ansible"
+          # Ref #1149 for TMPDIR environment var
+          environment:
+            TMPDIR: "{{ m_tmp }}"
+          git:
+            repo: "{{ local_config_repo.repo }}"
+            dest: "{{ m_local_public }}"
+            version: "{{ local_config_repo.version }}"
+            track_submodules: no
+            recursive: no
+            umask: "0002"
+          register: public_config_git_operation
+
+        # temporary
+        - debug:
+            var: public_config_git_operation
+
+        - name: Reset vars if public config changed
+          include_role:
+            name: set-vars
+          when: public_config_git_operation.changed
+
+        #
+        # Send notification for public config changes
+        #
+        - name: Get diff of public config change
+          shell: >
+            cd {{ m_local_public }} &&
+            git diff "{{ public_config_git_operation.before }}" "{{ public_config_git_operation.after }}" 2>&1
+          register: public_config_git_diff
+          when: public_config_git_operation.changed
+
+        - name: Get commits in public config change
+          shell: >
+            cd {{ m_local_public }} &&
+            git log --oneline "{{ public_config_git_operation.before }}...{{ public_config_git_operation.after }}" 2>&1
+          register: public_config_git_commits
+          when: public_config_git_operation.changed
+
+        - name: Send notification via Slack
+          slack:
+            token: "{{ autodeployer.slack_token }}"
+            msg: |
+              Public config changed versions:
+              FROM: `{{ public_config_git_operation.before }}`
+              TO:   `{{ public_config_git_operation.after }}`
+
+              Tracking version: `{{ local_config_repo.version }}`
+
+              Commits:
+              {{ public_config_git_commits.stdout }}
+
+              Diff:
+              ```
+              {{ public_config_git_diff.stdout }}
+              ```
+            channel: "{{ autodeployer.slack_channel }}"
+            username: "{{ autodeployer.slack_username }}"
+            icon_url: "{{ autodeployer_slack_icon_url }}"
+            color: "good"
+            link_names: 1
+          register: public_config_notify
+          failed_when: False
+          when:
+            - public_config_git_operation.changed
+            - autodeployer is defined
+            - autodeployer.slack_token is defined
+            - autodeployer.slack_channel is defined
+            - autodeployer.slack_username is defined
+            - autodeployer_slack_icon_url is defined
+
+        - name: Send notification via Slack
+          slack:
+            token: "{{ autodeployer.slack_token }}"
+            msg: "Public config slack notification error"
+            channel: "{{ autodeployer.slack_channel }}"
+            username: "{{ autodeployer.slack_username }}"
+            icon_url: "{{ autodeployer_slack_icon_url }}"
+            color: "good"
+            link_names: 1
+          failed_when: False
+          when:
+            - public_config_git_operation.changed
+            - public_config_notify.failed
+            - autodeployer is defined
+            - autodeployer.slack_token is defined
+            - autodeployer.slack_channel is defined
+            - autodeployer.slack_username is defined
+            - autodeployer_slack_icon_url is defined
+
+      rescue:
+        - name: Send public config warning via Slack
+          slack:
+            token: "{{ autodeployer.slack_token }}"
+            msg: "Error with public config git operations"
+            channel: "{{ autodeployer.slack_channel }}"
+            username: "{{ autodeployer.slack_username }}"
+            icon_url: "{{ autodeployer_slack_icon_url }}"
+            color: "danger"
+            link_names: 1
+
+        - name: "End autodeployer: Public config Git failure"
+          debug:
+            msg: "Public config Git failure"
+
+        - meta: end_play
+
+      when:
+        - local_config_repo is defined
+        - local_config_repo.repo is defined
+        - local_config_repo.version is defined
+
+
+
+
+
+
+    #
+    # MEZA
+    #
+    - name: Do Meza
+      block:
+
+
+        - name: Ensure proper Meza version
+          become: yes
+          become_user: "meza-ansible"
+          # Ref #1149 for TMPDIR environment var
+          environment:
+            TMPDIR: "{{ m_tmp }}"
+          git:
+            repo: "https://github.com/enterprisemediawiki/meza.git"
+            dest: "{{ m_meza }}"
+            version: "{{ enforce_meza_version }}"
+            track_submodules: no
+            recursive: no
+            umask: "0002"
+          register: meza_git_operation
+
+        # temporary
+        - debug:
+            var: meza_git_operation
+
+        - name: Reset vars if Meza changed
+          include_role:
+            name: set-vars
+          when: meza_git_operation.changed
+
+        #
+        # Send notification for Meza changes
+        #
+        - name: Get commits in Meza change
+          shell: >
+            cd {{ m_meza }} &&
+            git log --oneline "{{ meza_git_operation.before }}...{{ meza_git_operation.after }}" 2>&1
+          register: meza_git_commits
+          when: meza_git_operation.changed
+
+        - name: Send notification via Slack
+          slack:
+            token: "{{ autodeployer.slack_token }}"
+            msg: |
+              Meza changed versions:
+              FROM: `{{ meza_git_operation.before }}`
+              TO:   `{{ meza_git_operation.after }}`
+
+              Tracking version: `{{ enforce_meza_version }}`
+
+              Commits:
+              {{ meza_git_commits.stdout }}
+            channel: "{{ autodeployer.slack_channel }}"
+            username: "{{ autodeployer.slack_username }}"
+            icon_url: "{{ autodeployer_slack_icon_url }}"
+            color: "good"
+            link_names: 1
+          register: meza_notify
+          failed_when: False
+          when:
+            - meza_git_operation.changed
+            - autodeployer is defined
+            - autodeployer.slack_token is defined
+            - autodeployer.slack_channel is defined
+            - autodeployer.slack_username is defined
+            - autodeployer_slack_icon_url is defined
+
+        - name: Send notification via Slack
+          slack:
+            token: "{{ autodeployer.slack_token }}"
+            msg: "Meza application slack notification error"
+            channel: "{{ autodeployer.slack_channel }}"
+            username: "{{ autodeployer.slack_username }}"
+            icon_url: "{{ autodeployer_slack_icon_url }}"
+            color: "good"
+            link_names: 1
+          failed_when: False
+          when:
+            - meza_git_operation.changed
+            - meza_notify.failed
+            - autodeployer is defined
+            - autodeployer.slack_token is defined
+            - autodeployer.slack_channel is defined
+            - autodeployer.slack_username is defined
+            - autodeployer_slack_icon_url is defined
+
+      rescue:
+        - name: Send Meza application warning via Slack
+          slack:
+            token: "{{ autodeployer.slack_token }}"
+            msg: "Error with Meza application git operations"
+            channel: "{{ autodeployer.slack_channel }}"
+            username: "{{ autodeployer.slack_username }}"
+            icon_url: "{{ autodeployer_slack_icon_url }}"
+            color: "danger"
+            link_names: 1
+
+        - name: "End autodeployer: Meza Git failure"
+          debug:
+            msg: "Meza Git failure"
+
+        - meta: end_play
+
+      when: enforce_meza_version is defined
+
+
+
+
+    #
+    # Not doing deploy? End play
+    #
+    - block:
+        - name: "End autodeployer if no changes made"
+          debug:
+            msg: "Nothing new to deploy"
+
+        - meta: end_play
+      when:
+        - ( secret_config_git_operation is not defined or not secret_config_git_operation.changed )
+        - ( public_config_git_operation is not defined or not public_config_git_operation.changed )
+        - ( meza_git_operation is not defined          or not meza_git_operation.changed )
+
+
+    #
+    # Do the deploy
+    #
+    - name: Do deploy
+      include_role:
+        name: autodeployer
+        tasks_from: do-deploy
+
+
+    - name: Remove umask setting
+      include_role:
+        name: umask-unset

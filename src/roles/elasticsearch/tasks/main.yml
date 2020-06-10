@@ -4,6 +4,7 @@
 #
 - name: Ensure Java 1.7.0 OpenJDK is absent
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: java-1.7.0-openjdk
     state: absent
   # Java 1.7 was only used when Meza only supported RedHat

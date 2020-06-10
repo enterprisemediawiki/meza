@@ -98,7 +98,7 @@ def meza_command_deploy (argv):
 		else:
 			sys.exit(rc)
 
-	more_extra_vars = False
+	more_extra_vars = {}
 
 	# strip environment off of it
 	argv = argv[1:]
@@ -111,7 +111,16 @@ def meza_command_deploy (argv):
 		# remove -o and --overwrite from args;
 		argv = [value for value in argv[:] if value not in ["-o", "--overwrite"]]
 
-		more_extra_vars = { 'force_overwrite_from_backup': True }
+		more_extra_vars['force_overwrite_from_backup'] = True
+
+	if (len( set(argv).intersection({"--no-firewall"}) )) > 0:
+		# remove --no-firewall from args:
+		argv = [value for value in argv[:] if value not in ["--no-firewall"]]
+
+		more_extra_vars['firewall_skip_tasks'] = True
+
+	if len(more_extra_vars) == 0:
+		more_extra_vars = False
 
 
 	import hashlib
@@ -141,6 +150,96 @@ def meza_command_deploy (argv):
 
 	meza_shell_exec_exit( return_code )
 
+#
+# Intended to be used by cron job to check for changes to config and meza. Can
+# also be called with `meza autodeploy <env>`
+#
+def meza_command_autodeploy (argv):
+
+	env = argv[0]
+
+	rc = check_environment(env)
+
+	lock_success = request_lock_for_deploy(env)
+
+	if not lock_success:
+		print "Deploy for environment {} in progress. Exiting".format(env)
+		sys.exit(1)
+
+	# return code != 0 means failure
+	if rc != 0:
+		sys.exit(rc)
+
+	more_extra_vars = False
+
+	# strip environment off of it
+	argv = argv[1:]
+
+	if len( argv ) > 0:
+		more_extra_vars = {
+			'deploy_type': argv[0]
+		}
+		argv = argv[1:] # strip deploy type off
+
+	if len( argv ) > 0:
+		more_extra_vars['deploy_args'] = argv[0]
+		argv = argv[1:] # strip deploy args off
+
+	shell_cmd = playbook_cmd( 'check-for-changes', env, more_extra_vars )
+	if len(argv) > 0:
+		shell_cmd = shell_cmd + argv
+
+	return_code = meza_shell_exec( shell_cmd )
+
+	unlock_deploy(env) # double check
+
+	meza_shell_exec_exit( return_code )
+
+# Just a wrapper on deploy that does some notifications. This needs some
+# improvement. FIXME. Lots of duplication between this and meza_command_deploy
+# and meza_command_autodeploy
+def meza_command_deploy_notify (argv):
+
+	env = argv[0]
+
+	rc = check_environment(env)
+
+	lock_success = request_lock_for_deploy(env)
+
+	if not lock_success:
+		print "Deploy for environment {} in progress. Exiting".format(env)
+		sys.exit(1)
+
+	# return code != 0 means failure
+	if rc != 0:
+		sys.exit(rc)
+
+	more_extra_vars = False
+
+	# strip environment off of it
+	argv = argv[1:]
+
+	if len( argv ) > 0:
+		more_extra_vars = {
+			'deploy_type': argv[0]
+		}
+		argv = argv[1:] # strip deploy type off
+
+	if len( argv ) > 0:
+		more_extra_vars['deploy_args'] = argv[0]
+		argv = argv[1:] # strip deploy args off
+
+	shell_cmd = playbook_cmd( 'deploy-notify', env, more_extra_vars )
+	if len(argv) > 0:
+		shell_cmd = shell_cmd + argv
+
+	return_code = meza_shell_exec( shell_cmd )
+
+	unlock_deploy(env) # double check
+
+	meza_shell_exec_exit( return_code )
+
+
 def request_lock_for_deploy (env):
 	import os, datetime
 	lock_file = get_lock_file_path(env)
@@ -161,6 +260,18 @@ def request_lock_for_deploy (env):
 		with open( lock_file, 'w' ) as f:
 			f.write( "{}\n{}".format(pid,timestamp) )
 			f.close()
+
+		import grp
+
+		try:
+			grp.getgrnam('apache')
+			meza_chown( lock_file, 'meza-ansible', 'apache' )
+		except KeyError:
+			print('Group apache does not exist. Set "wheel" as group for lock file.')
+			meza_chown( lock_file, 'meza-ansible', 'wheel' )
+
+		os.chmod( lock_file, 0664 )
+
 		return { "pid": pid, "timestamp": timestamp }
 
 def unlock_deploy(env):
@@ -495,7 +606,7 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	# are not written to command line. Putting in secret should make
 	# permissions acceptable since this dir will hold secret info, though it's
 	# sort of an odd place for a temporary file. Perhaps /root instead?
-	extra_vars_file = "/opt/conf-meza/secret/temp_vars.json"
+	extra_vars_file = os.path.join( defaults['m_local_secret'], "temp_vars.json" )
 	if os.path.isfile(extra_vars_file):
 		os.remove(extra_vars_file)
 	f = open(extra_vars_file, 'w')
@@ -505,6 +616,8 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	# Make sure temp_vars.json is accessible. On the first run of deploy it is
 	# possible that user meza-ansible will not be able to reach this file,
 	# specifically if the system has a restrictive umask set (e.g 077).
+	meza_chown( defaults['m_local_secret'], 'meza-ansible', 'wheel' )
+	meza_chown( extra_vars_file, 'meza-ansible', 'wheel' )
 	os.chmod(extra_vars_file, 0664)
 
 	shell_cmd = playbook_cmd( "setup-env" ) + ["--extra-vars", '@'+extra_vars_file]
@@ -549,10 +662,11 @@ def meza_command_setup_dev (argv):
 	print "https://wbond.net/sublime_packages/sftp/settings#Remote_Server_Settings"
 	sys.exit()
 
-
+# Remove in 32.x
 def meza_command_setup_dev_networking (argv):
-	rc = meza_shell_exec(["bash","/opt/meza/src/scripts/dev-networking.sh"])
-	sys.exit(rc)
+	print "Function removed. Instead do:"
+	print "  sudo bash /opt/meza/src/scripts/dev-networking.sh"
+	sys.exit(1)
 
 def meza_command_setup_docker (argv):
 	shell_cmd = playbook_cmd( "getdocker" )
@@ -866,6 +980,19 @@ def meza_command_docker (argv):
 		sys.exit(1)
 
 
+def meza_command_push_backup (argv):
+
+	env = argv[0]
+
+	rc = check_environment(env)
+	if rc != 0:
+		meza_shell_exec_exit(rc)
+
+	shell_cmd = playbook_cmd( 'push-backup', env ) + argv[1:]
+	rc = meza_shell_exec( shell_cmd )
+
+	meza_shell_exec_exit(rc)
+
 
 def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 	command = ['sudo', '-u', 'meza-ansible', 'ansible-playbook',
@@ -889,7 +1016,7 @@ def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 		extra_vars = {}
 
 	if more_extra_vars:
-		for varname, value in more_extra_vars.iteritems():
+		for varname, value in more_extra_vars.items():
 			extra_vars[varname] = value
 
 	if len(extra_vars) > 0:

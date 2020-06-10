@@ -82,8 +82,8 @@ docker_exec=( docker exec --tty "$container_id" env TERM=xterm )
 # or Ubuntu 14.04 host. Only tested on new version of Docker (docker-ce version
 # 17.something), whereas Travis is on 1.12.something.
 ${docker_exec[@]} yum -y install firewalld
+${docker_exec[@]} firewall-offline-cmd --zone=public --change-interface=docker0
 ${docker_exec[@]} systemctl start firewalld
-${docker_exec[@]} firewall-cmd --permanent --zone=public --change-interface=docker0
 
 if [ "$is_minion" == "no" ]; then
 
@@ -99,8 +99,8 @@ if [ "$is_minion" == "no" ]; then
 		docker cp "$host_meza_dir" "$container_id:/opt/meza"
 	fi
 
-	# Install meza command
-	${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh
+	# Install meza command. Connection check fails on GitHub actions.
+	${docker_exec[@]} bash /opt/meza/src/scripts/getmeza.sh --skip-conn-check
 
 fi
 # reset to no, in case follow on builds don't reset

@@ -25,6 +25,9 @@
   when: role_is_valid_master is skipped
 
 
+- set_fact:
+    role_is_valid_master: false
+  when: role_is_valid_master is skipped
 
 #
 # Make sure MySQL user for replication exists on master
@@ -97,6 +100,11 @@
   when:
     - slave_needs_configuration
     - role_is_valid_slave
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> master
 
 
 

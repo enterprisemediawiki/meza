@@ -49,11 +49,22 @@
     group: root
     mode: "0644"
 
-- name: "Ensure deltarpm is installed and latest (RedHat only)"
-  yum: name=deltarpm state=latest
-  when: ansible_os_family == "RedHat"
+# Without this get error "yum lockfile is held by another process" occasionally
+- name: Ensure PackageKit is removed so it doesn't try to upgrade packages on its own
+  yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+    name: PackageKit
+    state: absent
+  when: ansible_os_family == 'RedHat'
+
+- name: ensure deltarpm is installed and latest
+  yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+    name: deltarpm
+    state: latest
   tags:
   - latest
+  when: ansible_os_family == "RedHat"
 
 - name: Ensure apt cache updated (Debian only)
   apt:
@@ -80,6 +91,7 @@
 # FIXME #807: for RedHat may need to enable "Optional RPMs"
 - name: Ensure EPEL installed via epel-release package (CentOS only)
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: epel-release
     state: present
   when: ansible_distribution == "CentOS"
@@ -96,6 +108,7 @@
 
 - name: Ensure EPEL installed via URL (RedHat only)
   yum:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
     state: present
   register: result
@@ -249,6 +262,14 @@
 # - name: Ensure PIP cryptography package installed
 #   pip:
 #     name: cryptography
+
+- name: Ensure data directory configured
+  file:
+    path: "{{ m_meza_data }}"
+    state: directory
+    owner: "{{ m_data_owner }}"
+    group: "{{ m_data_group }}"
+    mode: "{{ m_data_mode }}"
 
 - name: Ensure deploy directory in place
   file:

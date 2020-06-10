@@ -63,8 +63,9 @@
 - name: Ensure MediaWiki core owned by meza-ansible
   file:
     path: "{{ m_mediawiki }}"
-    owner: meza-ansible
-    group: wheel
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
     state: directory
     recurse: yes
   tags:
@@ -79,6 +80,7 @@
     repo: https://github.com/wikimedia/mediawiki.git
     dest: "{{ m_mediawiki }}"
     version: "{{ mediawiki_version }}"
+    refspec: "{{ item.refspec | default('') }}"
     track_submodules: no
     recursive: no
     umask: "0002"
@@ -93,6 +95,7 @@
           ignoreSubmodules = all
   tags:
     - mediawiki-core
+
 
 #
 # EXTENSIONS AND SKINS
@@ -128,6 +131,7 @@
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
     version: "{{ item.version }}"
+    refspec: "{{ item.refspec | default('') }}"
     umask: "0002"
   with_items: "{{ meza_core_extensions.list }}"
   when: meza_core_extensions.list[0] is defined and item.repo is defined
@@ -151,6 +155,7 @@
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/skins/{{ item.name }}"
     version: "{{ item.version }}"
+    refspec: "{{ item.refspec | default('') }}"
   with_items: "{{ meza_core_skins.list }}"
   when: meza_core_skins.list[0] is defined and item.repo is defined
   tags:
@@ -167,6 +172,7 @@
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/extensions/{{ item.name }}"
     version: "{{ item.version }}"
+    refspec: "{{ item.refspec | default('') }}"
     umask: "0002"
     key_file: "{{ item.key_file | default(None) }}"
   with_items: "{{ meza_local_extensions.list }}"
@@ -184,6 +190,7 @@
     repo: "{{ item.repo }}"
     dest: "{{ m_mediawiki }}/skins/{{ item.name }}"
     version: "{{ item.version }}"
+    refspec: "{{ item.refspec | default('') }}"
   with_items: "{{ meza_local_skins.list }}"
   when: meza_local_skins.list[0] is defined and item.repo is defined
   tags:
@@ -196,8 +203,9 @@
   template:
     src: Extensions.php.j2
     dest: "{{ m_deploy }}/Extensions.php"
-    owner: meza-ansible
-    group: wheel
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
 
 # Adds extensions with composer param from MezaCoreExtensions.yml,
 # MezaLocalExtensions.yml, MezaCoreSkins.yml, and MezaLocalSkins.yml
@@ -205,8 +213,9 @@
   template:
     src: composer.local.json.j2
     dest: "{{ m_mediawiki }}/composer.local.json"
-    owner: meza-ansible
-    group: wheel
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
 
 - name: Run composer install on MediaWiki for dependencies
   become: yes
@@ -214,9 +223,7 @@
   composer:
     command: install
     working_dir: "{{ m_mediawiki }}"
-    no_dev: no
-  # FIXME #317: need ignore_errors because composer throws an error when running as root.
-  # failed_when: False
+    no_dev: yes
   tags:
     - composer-extensions
     - latest
@@ -229,9 +236,7 @@
   composer:
     command: update
     working_dir: "{{ m_mediawiki }}"
-    no_dev: no
-  # FIXME #317: need ignore_errors because composer throws an error when running as root.
-  # failed_when: False
+    no_dev: yes
   tags:
     - composer-extensions
     - latest
@@ -292,10 +297,21 @@
   template:
     src: LocalSettings.php.j2
     dest: "{{ m_mediawiki }}/LocalSettings.php"
-    # backup: yes
-    owner: meza-ansible
-    group: wheel
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
 
+- name: Ensure MediaWiki still properly owned
+  file:
+    path: "{{ m_mediawiki }}"
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
+    state: directory
+    recurse: yes
+  tags:
+    - mediawiki-core
+    - file-perms
 
 
 #
@@ -315,7 +331,18 @@
   template:
     src: BlenderSettings.php.j2
     dest: "{{ m_htdocs }}/WikiBlender/BlenderSettings.php"
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
 
+- name: Ensure WikiBlender properly owned
+  file:
+    path: "{{ m_htdocs }}/WikiBlender"
+    mode: "{{ m_htdocs_mode }}"
+    owner: "{{ m_htdocs_owner }}"
+    group: "{{ m_htdocs_group }}"
+    state: directory
+    recurse: yes
 
 
 #
@@ -441,6 +468,7 @@
     - elastic-build-index.sh
     - elastic-rebuild-all.sh
     - smw-rebuild-all.sh
+    - refresh-links.sh
 
 - name: Ensure data rebuilding logs directories exist
   file:
@@ -452,6 +480,7 @@
   with_items:
     - smw-rebuilddata
     - search-index
+    - refresh-links
 
 # FIXME: Should search and SMW building be after update.php?
 
@@ -551,14 +580,13 @@
     mode: 0755
   when: ansible_os_family == 'RedHat'
 
-- name: "Ensure pip3 symlink in place"
-  file:
-    # dest = symlink, src = dir linked to
-    src: "/usr/bin/pip3.5"
-    dest: "/usr/bin/pip3"
-    state: link
-    owner: root
-    group: root
-    mode: 0755
-  when: ansible_os_family == 'RedHat'
-
+# - name: "Ensure pip3 symlink in place"
+#   file:
+#     # dest = symlink, src = dir linked to
+#     src: "/usr/bin/pip3.5"
+#     dest: "/usr/bin/pip3"
+#     state: link
+#     owner: root
+#     group: root
+#     mode: 0755
+#   when: ansible_os_family == 'RedHat'

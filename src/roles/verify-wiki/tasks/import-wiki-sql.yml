@@ -12,6 +12,8 @@
   delegate_to: "{{ groups['db-master'][0] }}"
   run_once: true
 
+- debug:
+    var: imported_wiki_sql_on_db_master
 
 #
 # Set facts to clarify if overwriting data should actually occur
