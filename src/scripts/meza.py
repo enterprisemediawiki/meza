@@ -886,7 +886,7 @@ def meza_command_docker (argv):
 	if argv[0] == "run":
 
 		if len(argv) == 1:
-			docker_repo = "jamesmontalvo3/meza-docker-test-max:latest"
+			docker_repo = "enterprisemediawiki/meza:max"
 		else:
 			docker_repo = argv[1]
 
