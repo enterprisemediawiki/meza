@@ -7,7 +7,7 @@ set +u
 
 # Set defaults before declaring now undefined variables
 if [ -z "$docker_repo" ]; then
-	docker_repo="jamesmontalvo3/meza-docker-test-max:latest"
+	docker_repo="enterprisemediawiki/meza:max"
 	echo "Using default docker_repo = $docker_repo"
 fi
 if [ -z "$init" ]; then
@@ -87,7 +87,7 @@ ${docker_exec[@]} systemctl start firewalld
 
 if [ "$is_minion" == "no" ]; then
 
-	# Docker image "jamesmontalvo3/meza-docker-test-max:latest" has mediawiki and
+	# Docker image "enterprisemediawiki/meza:max" has mediawiki and
 	# several extensions pre-cloned, but not in the correct location. Move them
 	# into place. For some reason gives exit code 129 on Travis sometimes. Force
 	# non-failing exit code.

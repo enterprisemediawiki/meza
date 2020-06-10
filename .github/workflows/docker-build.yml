@@ -1,0 +1,56 @@
+name: Docker Build
+on:
+  push:
+    branches: ['master']
+
+jobs:
+  build-base:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: docker/build-push-action@v1
+        with:
+          path: tests/containers/base
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: enterprisemediawiki/meza
+          tags: base
+
+  build-pre-yum:
+    needs: [build-base]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: docker/build-push-action@v1
+        with:
+          path: tests/containers/pre-yum
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: enterprisemediawiki/meza
+          tags: pre-yum
+
+  build-full:
+    needs: [build-pre-yum]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: docker/build-push-action@v1
+        with:
+          path: tests/containers/full
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: enterprisemediawiki/meza
+          tags: full
+
+  build-max:
+    needs: [build-pre-yum]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: docker/build-push-action@v1
+        with:
+          path: tests/containers/max
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: enterprisemediawiki/meza
+          tags: max
