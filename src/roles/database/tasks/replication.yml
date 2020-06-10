@@ -100,12 +100,6 @@
   when:
     - slave_needs_configuration
     - role_is_valid_slave
-<<<<<<< HEAD
-
-
-=======
->>>>>>> master
-
 
 
 #
