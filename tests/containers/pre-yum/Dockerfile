@@ -1,4 +1,4 @@
-FROM jamesmontalvo3/meza-docker-base:latest
+FROM enterprisemediawiki/meza:base
 LABEL MAINTAINER James Montalvo
 ENV container=docker
 

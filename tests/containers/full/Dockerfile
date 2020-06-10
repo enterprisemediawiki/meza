@@ -1,4 +1,4 @@
-FROM jamesmontalvo3/meza-docker-pre-yum:latest
+FROM enterprisemediawiki/meza:pre-yum
 LABEL MAINTAINER James Montalvo
 ENV container=docker
 
