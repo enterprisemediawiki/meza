@@ -16,12 +16,12 @@ list:
       $smwgNamespacesWithSemanticLinks[NS_TALK] = true;
       $smwgNamespacesWithSemanticLinks[NS_TEMPLATE] = true;
 
-      // Always use DB_SLAVE for temporary table actions. Need to pick either
-      // DB_SLAVE or DB_MASTER for this, since temporary tables will either not
+      // Always use DB_REPLICA for temporary table actions. Need to pick either
+      // DB_REPLICA or DB_MASTER for this, since temporary tables will either not
       // replicate at all or won't replicate fast enough (or, even if they do
       // technically replicate, they are only available to the session that
       // created them, and thus they effectively don't replicate). Picking
-      // DB_SLAVE since temporary tables are effectively a read-action since
+      // DB_REPLICA since temporary tables are effectively a read-action since
       // they are used only for making more efficient queries.
       $smwgLocalConnectionConf['mw.db.queryengine'] = [ 'read' => DB_REPLICA, 'write' => DB_REPLICA ];
 
@@ -108,9 +108,9 @@ list:
     config: |
       $wgCiteEnablePopups = true;
 
-  - name: ParserFunctionHelper
-    repo: https://github.com/enterprisemediawiki/ParserFunctionHelper.git
-    version: tags/1.0.0
+  # - name: ParserFunctionHelper
+  #   repo: https://github.com/enterprisemediawiki/ParserFunctionHelper.git
+  #   version: tags/1.0.0
 
   - name: CharInsert
     repo: https://github.com/wikimedia/mediawiki-extensions-CharInsert.git
@@ -224,9 +224,9 @@ list:
     repo: https://github.com/wikimedia/mediawiki-extensions-ImageMap
     version: "{{ mediawiki_default_branch }}"
 
-  - name: MezaExt
-    repo: https://github.com/enterprisemediawiki/MezaExt.git
-    version: tags/0.1.0
+  # - name: MezaExt
+  #   repo: https://github.com/enterprisemediawiki/MezaExt.git
+  #   version: tags/0.1.0
 
   # Extension:PdfHandler (breaks on very large PDFs)
   # https://github.com/wikimedia/mediawiki-extensions-PdfHandler
@@ -268,10 +268,10 @@ list:
     version: "2166695159a9a5eb18cb96d4811cdefa0978ab8a"
     legacy_load: true
 
-  - name: TalkRight
-    repo: https://github.com/enterprisemediawiki/TalkRight.git
-    version: tags/2.0.0
-    legacy_load: true
+  # - name: TalkRight
+  #   repo: https://github.com/enterprisemediawiki/TalkRight.git
+  #   version: tags/2.0.0
+  #   legacy_load: true
 
   - name: AdminLinks
     repo: https://github.com/wikimedia/mediawiki-extensions-AdminLinks.git
@@ -291,13 +291,13 @@ list:
       $wgHeaderTabsEditTabLink = false;
       $wgHeaderTabsRenderSingleTab = true;
 
-  - name: CopyWatchers
-    repo: https://github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git
-    version: tags/0.10.0
+  # - name: CopyWatchers
+  #   repo: https://github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git
+  #   version: tags/0.10.0
 
-  - name: Wiretap
-    repo: https://github.com/enterprisemediawiki/Wiretap.git
-    version: tags/0.1.0
+  # - name: Wiretap
+  #   repo: https://github.com/enterprisemediawiki/Wiretap.git
+  #   version: tags/0.1.0
 
   - name: ApprovedRevs
     repo: https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git
@@ -306,19 +306,19 @@ list:
     config: |
       $egApprovedRevsAutomaticApprovals = false;
 
-  - name: ImagesLoaded
-    repo: https://github.com/enterprisemediawiki/ImagesLoaded.git
-    version: tags/0.1.0
+  # - name: ImagesLoaded
+  #   repo: https://github.com/enterprisemediawiki/ImagesLoaded.git
+  #   version: tags/0.1.0
 
-  - name: MasonryMainPage
-    repo: https://github.com/enterprisemediawiki/MasonryMainPage.git
-    version: tags/0.3.0
+  # - name: MasonryMainPage
+  #   repo: https://github.com/enterprisemediawiki/MasonryMainPage.git
+  #   version: tags/0.3.0
 
-  - name: WatchAnalytics
-    repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
-    version: tags/3.1.1
-    config: |
-      $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
+  # - name: WatchAnalytics
+  #   repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
+  #   version: tags/3.1.1
+  #   config: |
+  #     $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
 
   - name: Variables
     repo: https://github.com/wikimedia/mediawiki-extensions-Variables.git
@@ -423,19 +423,19 @@ list:
     repo: https://github.com/wikimedia/mediawiki-extensions-DataTransfer.git
     version: "tags/1.1.1"
 
-  - name: PageImporter
-    repo: https://github.com/enterprisemediawiki/PageImporter.git
-    version: tags/0.1.0
-    legacy_load: True
+  # - name: PageImporter
+  #   repo: https://github.com/enterprisemediawiki/PageImporter.git
+  #   version: tags/0.1.0
+  #   legacy_load: True
 
-  - name: SemanticMeetingMinutes
-    repo: https://github.com/enterprisemediawiki/SemanticMeetingMinutes.git
-    version: tags/1.0.0
-    legacy_load: True
+  # - name: SemanticMeetingMinutes
+  #   repo: https://github.com/enterprisemediawiki/SemanticMeetingMinutes.git
+  #   version: tags/1.0.0
+  #   legacy_load: True
 
-  - name: HeaderFooter
-    repo: https://github.com/enterprisemediawiki/HeaderFooter.git
-    version: tags/3.0.0
+  # - name: HeaderFooter
+  #   repo: https://github.com/enterprisemediawiki/HeaderFooter.git
+  #   version: tags/3.0.0
 
   - name: NumerAlpha
     repo: https://github.com/wikimedia/mediawiki-extensions-NumerAlpha.git
