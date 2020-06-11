@@ -198,8 +198,7 @@ list:
 
   - name: Elastica
     repo: https://github.com/wikimedia/mediawiki-extensions-Elastica.git
-    # Last commit before MW requirement changed to 1.34
-    version: 8bd860cd2390e4b5267dfa525aa5740227fd48fd
+    version: "{{ mediawiki_default_branch }}"
     composer_merge: True
 
   - name: Thanks
