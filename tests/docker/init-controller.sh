@@ -4,7 +4,7 @@
 
 
 # Initiate container
-docker_repo="jamesmontalvo3/meza-docker-full:latest"
+docker_repo="enterprisemediawiki/meza:full"
 source "$m_meza_host/tests/docker/init-container.sh" "${m_meza_host}" "mount"
 
 # FIXME #728: Test band-aid. This is run in init-container.sh above, but at

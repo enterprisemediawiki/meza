@@ -4,7 +4,7 @@
 
 # Initiate container
 # FIXME #828: pre-yum has more than we need. Go lighter.
-docker_repo="jamesmontalvo3/meza-docker-pre-yum:latest"
+docker_repo="enterprisemediawiki/meza:pre-yum"
 is_minion=yes
 source "$m_meza_host/tests/docker/init-container.sh" "none"
 
