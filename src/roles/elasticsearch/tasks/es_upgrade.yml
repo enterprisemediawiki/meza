@@ -112,6 +112,7 @@
     url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/settings"
     method: PUT
     body: "{{ elasticsearch_enable_allocation | string }}"
+    body_format: json
   register: response
   # next line is boolean not string, so no quotes around true
   # use python truthiness
