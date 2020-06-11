@@ -41,6 +41,9 @@ for d in $do_wikis; do
 		# FIXME #577 #681: add notification/warning system here
 		echo "elastic-build-index FAILED for \"$wiki_id\" at $endtimestamp"
 
+		# Need to fix exit code. The following may not be sufficient. Ref issue #1263.
+		exit 1
+
 	#if the above command had a passing exit code (e.g. zero)
 	else
 		echo "elastic-build-index completed for \"$wiki_id\" at $endtimestamp"
