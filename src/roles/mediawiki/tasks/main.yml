@@ -136,6 +136,7 @@
   with_items: "{{ meza_core_extensions.list }}"
   when: meza_core_extensions.list[0] is defined and item.repo is defined
   tags:
+    - extensions
     - git-extensions
     - git-core-extensions
     - latest
@@ -159,6 +160,7 @@
   with_items: "{{ meza_core_skins.list }}"
   when: meza_core_skins.list[0] is defined and item.repo is defined
   tags:
+    - extensions
     - skins
     - core-skins
 
@@ -178,6 +180,7 @@
   with_items: "{{ meza_local_extensions.list }}"
   when: meza_local_extensions.list[0] is defined and item.repo is defined
   tags:
+    - extensions
     - git-extensions
     - git-local-extensions
     - latest
@@ -238,6 +241,7 @@
     working_dir: "{{ m_mediawiki }}"
     no_dev: yes
   tags:
+    - extensions
     - composer-extensions
     - latest
     - skins
@@ -251,6 +255,7 @@
   with_items: "{{ meza_core_extensions.list }}"
   when: meza_core_extensions.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
   tags:
+    - extensions
     - git-submodules
     - latest
 
@@ -263,6 +268,7 @@
   with_items: "{{ meza_local_extensions.list }}"
   when: meza_local_extensions.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
   tags:
+    - extensions
     - git-submodules
     - latest
 
@@ -274,6 +280,7 @@
   with_items: "{{ meza_core_skins.list }}"
   when: meza_core_skins.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
   tags:
+    - extensions
     - git-submodules
     - skins
     - latest
@@ -285,6 +292,7 @@
   with_items: "{{ meza_local_skins.list }}"
   when: meza_local_skins.list[0] is defined and item.git_submodules is defined and item.git_submodules == True
   tags:
+    - extensions
     - git-submodules
     - skins
     - local-skins
