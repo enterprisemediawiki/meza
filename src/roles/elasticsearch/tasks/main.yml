@@ -10,11 +10,9 @@
   when: ansible_os_family == 'RedHat'
 
 - name: Ensure Java 1.8.0 OpenJDK is installed
-  yum:
+  package:
     name: "{{ package_java }}"
     state: present
-  when: ansible_os_family == 'RedHat'
-
 
 # Environment setup.
 - name: Set JAVA_HOME if configured.
