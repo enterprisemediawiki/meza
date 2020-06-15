@@ -18,11 +18,11 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
       - name: Install prerequisites
-        run: apt install -y git ansible
+        run: sudo apt install -y git ansible
       - name: Clone Meza
-        run: git clone https://github.com/freephile/meza /opt/meza
+        run: sudo git clone https://github.com/freephile/meza /opt/meza
       - name: Run "get meza"
-        run: bash /opt/meza/src/scripts/getmeza.sh
+        run: sudo bash /opt/meza/src/scripts/getmeza.sh
       - name: Deploy monolith
-        run: meza deploy monolith
+        run: sudo meza deploy monolith
 
