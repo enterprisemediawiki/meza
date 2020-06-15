@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        path: /opt/meza
+        with:
+          path: /opt/meza
 
       - name: Dump GitHub context
         env:
