@@ -9,18 +9,19 @@ jobs:
   one:
     runs-on: ubuntu-latest
     steps:
-    #   - uses: actions/checkout@v2
-    #     with:
-    #       path: /opt/meza
+      - uses: actions/checkout@v2
 
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
+      
+      - name: Move code
+        run: sudo mv $GITHUB_WORKSPACE/${{ github.repository }} /opt/meza
       - name: Install prerequisites
         run: sudo apt install -y git ansible
-      - name: Clone Meza
-        run: sudo git clone https://github.com/freephile/meza /opt/meza
+      # - name: Clone Meza
+      #   run: sudo git clone https://github.com/freephile/meza /opt/meza
       - name: Run "get meza"
         run: sudo bash /opt/meza/src/scripts/getmeza.sh
       - name: Deploy monolith
