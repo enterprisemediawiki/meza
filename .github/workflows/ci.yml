@@ -43,10 +43,9 @@ jobs:
       - name: Setup the monolith environment
         run: sudo meza setup env monolith --fqdn="127.0.0.1" --db_pass=1234 --private_net_zone=public
 
+      # The --no-firewall option does not exist
+      - name: Deploy Meza
+        run: meza deploy monolith
+
       - name: Print hosts file
         run: cat /opt/conf-meza/secret/monolith/hosts
-
-      # Does the --no-firewall option exist?
-      - name: Deploy Meza
-        run: meza deploy monolith --no-firewall
-
