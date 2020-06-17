@@ -201,14 +201,22 @@
     group: root
     mode: 0700
 
+- name: Find haproxy cert(s)
+  find:
+    paths: /etc/haproxy/certs
+    file_type: file
+    patterns: "*.pem"
+  register: certlist
+
 - name: Ensure haproxy cert(s) have secure permissions
   file:
-    path: /etc/haproxy/certs/*
-    recurse: no
+    path: "{{ item.path }}"
+    state: file
     owner: root
     group: root
     mode: 0600
-  
+  with_items: "{{ certlist.files }}"
+
 - name: write the haproxy config file
   template:
     src: haproxy.cfg.j2
