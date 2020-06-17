@@ -225,11 +225,6 @@
 # chkconfig ntpd on # Activate service
 # ntpdate pool.ntp.org # Synchronize the system clock with 0.pool.ntp.org server
 # service ntpd start # Start service
-# FIXME: this is duplicated from above, right? No reason it needs to be here twice?
-- name: Install NTP
-  package: name=ntp state=installed
-  tags:
-  - latest
 
 - name: Ensure NTP is running and enabled as configured.
   service:
