@@ -21,7 +21,7 @@ jobs:
       # GitHub Runners include a LOT of software by default
       # https://github.com/actions/virtual-environments/blob/master/images/linux/Ubuntu1804-README.md
       - name: Uninstall MySQL so we can use MariaDB
-        run: sudo apt-get erase mysql-server
+        run: sudo apt-get remove --purge mysql-server
 
       - name: Make target directory for sources
         run: mkdir -p /opt/meza
