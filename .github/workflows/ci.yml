@@ -45,7 +45,7 @@ jobs:
 
       # The --no-firewall option does not exist
       - name: Deploy Meza
-        run: meza deploy monolith
+        run: sudo meza deploy monolith
 
       - name: Print hosts file
         run: cat /opt/conf-meza/secret/monolith/hosts
