@@ -192,15 +192,23 @@
     - not enable_goaccess
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
 
-- name: Ensure haproxy certs have secure permissions
+- name: Ensure haproxy cert directory has secure permissions
   file:
     path: /etc/haproxy/certs
     state: directory
-    recurse: yes
+    recurse: no
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Ensure haproxy cert(s) have secure permissions
+  file:
+    path: /etc/haproxy/certs/*
+    recurse: no
     owner: root
     group: root
     mode: 0600
-
+  
 - name: write the haproxy config file
   template:
     src: haproxy.cfg.j2
