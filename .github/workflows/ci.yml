@@ -22,27 +22,24 @@ jobs:
       - name: List files in working directory
         run: ls -al
 
-      # - name: Wait for checkout to complete
-      #   run: sleep 60
-
-      - name: Make target directory
+      - name: Make target directory for sources
         run: mkdir -p /opt/meza
       
-      - name: Move code
+      - name: Copy code
         run: sudo cp -r ${{ github.workspace }} /opt/
 
-      - name: List files in working directory again
-        run: ls -al 
+      # - name: List files in /opt/meza
+      #   run: ls -al /opt/meza
 
-      - name: List files in /opt/meza
-        run: ls -al /opt/meza
-
-      # - name: Install prerequisites
-      #   run: sudo apt install -y git ansible
-      # # - name: Clone Meza
-      # #   run: sudo git clone https://github.com/freephile/meza /opt/meza
-      # - name: Run "get meza"
-      #   run: sudo bash /opt/meza/src/scripts/getmeza.sh
-      # - name: Deploy monolith
-      #   run: sudo meza deploy monolith
+      - name: Install prerequisites
+        run: sudo apt install -y git ansible
+      
+      # - name: Clone Meza
+      #   run: sudo git clone https://github.com/freephile/meza /opt/meza
+      
+      - name: Run "get meza"
+        run: sudo bash /opt/meza/src/scripts/getmeza.sh
+      
+      - name: Deploy monolith
+        run: sudo meza deploy monolith
 
