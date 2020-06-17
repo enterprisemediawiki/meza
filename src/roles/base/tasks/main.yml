@@ -128,7 +128,7 @@
   - latest
 
 - name: ensure libselinux-python installed prior to SELinux (RedHat/CentOS only)
-  yum: name=libselinux-python state=installed
+  yum: name=libselinux-python state=present
   when: ansible_os_family == "RedHat"
   tags:
   - latest

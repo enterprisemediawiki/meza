@@ -8,7 +8,9 @@
   when: mysql_initially_installed_debian.stat.exists == false
 
 - name: Ensure MySQL Python libraries are installed.
-  apt: "name=python-mysqldb state=installed"
+  apt: 
+    name: python-mysqldb 
+    state: present
 
 - name: Ensure MySQL packages are installed.
   apt:
