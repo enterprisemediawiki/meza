@@ -37,9 +37,16 @@ jobs:
       # - name: Clone Meza
       #   run: sudo git clone https://github.com/freephile/meza /opt/meza
       
-      - name: Run "get meza"
+      - name: Run "getmeza with sudo -H to avoid cache warnings"
         run: sudo -H bash /opt/meza/src/scripts/getmeza.sh
       
-      - name: Deploy monolith
-        run: sudo meza deploy monolith
+      - name: Setup the monolith environment
+        run: sudo meza setup env monolith --fqdn="127.0.0.1" --dp_pass=1234 --private_net_zone=public
+
+      - name: Print hosts file
+        run: cat /opt/conf-meza/secret/monolith/hosts
+
+      # Does the --no-firewall option exist?
+      - name: Deploy Meza
+        run: meza deploy monolith --no-firewall
 
