@@ -36,6 +36,14 @@
     name: "{{ package_goaccess }}"
     state: present
 
+- name: Ensure GoAccess config directory exists
+  file:
+    state: directory
+    path: /etc/goaccess
+    owner: root
+    group: root
+    mode: 0775
+  
 - name: Ensure /etc/goaccess/my.goaccess.conf in place
   template:
     src: my.goaccess.conf.j2
