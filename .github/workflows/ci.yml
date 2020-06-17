@@ -38,7 +38,7 @@ jobs:
       #   run: sudo git clone https://github.com/freephile/meza /opt/meza
       
       - name: Run "get meza"
-        run: sudo bash /opt/meza/src/scripts/getmeza.sh
+        run: sudo -H bash /opt/meza/src/scripts/getmeza.sh
       
       - name: Deploy monolith
         run: sudo meza deploy monolith
