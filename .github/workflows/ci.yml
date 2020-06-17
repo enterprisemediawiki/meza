@@ -22,11 +22,11 @@ jobs:
       - name: List files in working directory
         run: ls -al
 
-      - name: Wait for checkout to complete
-        run: sleep 60
+      # - name: Wait for checkout to complete
+      #   run: sleep 60
       
       - name: Move code
-        run: sudo mv ./ /opt/meza
+        run: sudo mv {{ github.workspace }} /opt/meza
 
       - name: List files in working directory again
         run: ls -al 
