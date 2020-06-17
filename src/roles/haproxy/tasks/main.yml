@@ -426,4 +426,13 @@
     name: haproxy
     state: started
     enabled: yes
+    ignore_errors: true
   when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- name: Check haproxy status 
+  command: sudo systemctl status haproxy.service
+  register: haproxy-failed
+ 
+- debug: 
+    var: haproxy-failed
+    verbosity: 4
