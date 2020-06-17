@@ -24,6 +24,9 @@ jobs:
 
       # - name: Wait for checkout to complete
       #   run: sleep 60
+
+      - name: Make target directory
+        run: mkdir -p /opt/meza
       
       - name: Move code
         run: sudo mv {{ github.workspace }} /opt/meza
