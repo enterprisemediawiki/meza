@@ -56,7 +56,8 @@
   - latest
 
 - name: Install dependency for apt
-  package: python-apt
+  package: 
+    name: python-apt
     state: present
   when: ansible_os_family == "Debian"
 
