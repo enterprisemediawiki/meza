@@ -420,6 +420,19 @@
   notify:
     - restart rsyslog
 
+# @todo remove me
+- name: Check haproxy status 
+  command: sudo systemctl status haproxy.service
+  register: haproxy-status
+ 
+# @todo remove me
+- debug: 
+    var: haproxy-status
+    verbosity: 4
+
+# @todo remove me
+- name: Dump haproxy config
+  command: sudo cat /etc/haproxy/haproxy.conf
 
 - name: ensure haproxy is running (and enable it at boot)
   service:
@@ -429,10 +442,3 @@
     ignore_errors: true
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
-- name: Check haproxy status 
-  command: sudo systemctl status haproxy.service
-  register: haproxy-failed
- 
-- debug: 
-    var: haproxy-failed
-    verbosity: 4
