@@ -428,17 +428,17 @@
 # @todo remove me
 - debug: 
     var: haproxy_status
-    verbosity: 4
+    verbosity: 3
 
 # @todo remove me
 - name: Dump haproxy config
   command: sudo cat /etc/haproxy/haproxy.cfg
 
-- name: ensure haproxy is running (and enable it at boot)
-  service:
-    name: haproxy
-    state: started
-    enabled: yes
-    ignore_errors: true
-  when: docker_skip_tasks is not defined or not docker_skip_tasks
+# - name: ensure haproxy is running (and enable it at boot)
+#   service:
+#     name: haproxy
+#     state: started
+#     enabled: yes
+#     ignore_errors: true
+#   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
