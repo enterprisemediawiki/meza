@@ -423,16 +423,16 @@
 # @todo remove me
 - name: Check haproxy status 
   command: sudo systemctl status haproxy.service
-  register: haproxy-status
+  register: haproxy_status
  
 # @todo remove me
 - debug: 
-    var: haproxy-status
+    var: haproxy_status
     verbosity: 4
 
 # @todo remove me
 - name: Dump haproxy config
-  command: sudo cat /etc/haproxy/haproxy.conf
+  command: sudo cat /etc/haproxy/haproxy.cfg
 
 - name: ensure haproxy is running (and enable it at boot)
   service:
