@@ -50,7 +50,7 @@ frontend www-http
 	bind {{ ansible_default_ipv6.address }}:80
 	{%- endif %}
 	
-	reqadd X-Forwarded-Proto:\ http
+	http-request set-header X-Forwarded-Proto http
 	default_backend www-backend
 
 frontend www-https
@@ -60,7 +60,7 @@ frontend www-https
 	bind {{ ansible_default_ipv6.address }}:443 ssl crt /etc/haproxy/certs/
 	{%- endif %}
 	
-	reqadd X-Forwarded-Proto:\ https
+	http-request set-header X-Forwarded-Proto https
 	{% if enable_goaccess %}
     # goaccess
 	# Add config for websocket server GoAccess
