@@ -433,6 +433,28 @@ SSLRandomSeed connect builtin
 #RequestHeader unset DNT env=bad_DNT
 #</IfModule>
 
+<IfModule prefork.c>
+# number of server processes to start (default 5)
+StartServers       6
+
+# minimum number of server processes in reserve for new requests
+MinSpareServers    3
+
+ # maximum number of idle server processes before they are reaped
+MaxSpareServers   6
+
+# maximum value of clients for the lifetime of the server before it is reaped to prevent mem leaks
+ServerLimit      256
+
+# MaxRequestWorkers was called MaxClients before version 2.3.13. The old name is still supported.
+# translates into the maximum number of child processes that will be launched to serve requests on prefork
+# the limit on the number of simultaneous requests that will be served; others queued.
+MaxRequestWorkers       10
+
+# Server 2.3.9 and later. The old name MaxRequestsPerChild is still supported.
+# number of connections that an individual child server will handle during its life
+MaxConnectionsPerChild  1000
+</IfModule>
 
 # main handling via http
 Listen 8080
