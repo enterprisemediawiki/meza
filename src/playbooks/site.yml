@@ -327,6 +327,13 @@
       firewall_protocol: tcp
       firewall_servers: "{{ groups['elastic-servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
+    # add port for Kibana
+    - role: firewall_port
+      firewall_action: open
+      firewall_port: 5601
+      firewall_protocol: tcp
+      firewall_servers: "{{ groups['elastic-servers'] }}"
+      firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - elasticsearch
 
 # Note: this is app-servers again, but must be after everything else is setup
