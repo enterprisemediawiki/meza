@@ -56,8 +56,9 @@
 
 - name: Ensure elasticsearch installed
   package:
-    name: elasticsearch
+    name: elasticsearch=6*
     state: present
+  notify: restart elasticsearch
 
 # Need to perform this check so `lineinfile` doesn't run in Docker. /etc/hosts
 # is special in Docker.
