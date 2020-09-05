@@ -168,11 +168,3 @@
   when: (es_version_found|int != es_version_desired|int) or (force_do_elasticsearch_upgrade is defined and force_do_elasticsearch_upgrade)
 
 
-- name: Set Elasticsearch yum repo to point to 6.x
-  template:
-    src: elasticsearch.repo.j2
-    dest: /etc/yum.repos.d/elasticsearch.repo
-    mode: 0644
-  when: ansible_os_family == 'RedHat'
-
-
