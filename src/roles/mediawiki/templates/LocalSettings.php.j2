@@ -69,9 +69,9 @@ if (empty($wikiId)) {
     if ( preg_match( '%([a-z]+)\.([a-z]+)\..{2,4}[\d]*$%im', $_SERVER['HTTP_HOST'], $matches ) ) {
         $wikiId = $matches[1];
     } 
-    {% endif %}
 
-} else {
+    {% else %}
+
     // get $wikiId from URI path
     $uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
     if ($uriParts[1] == 'wiki') {
@@ -81,8 +81,8 @@ if (empty($wikiId)) {
     } else {
         $wikiId = strtolower($uriParts[1]);  // default
     }
+    {% endif %}
 }
-
 
 {% if wiki_id_redirects is defined and wiki_id_redirects|length > 0 %}
 
