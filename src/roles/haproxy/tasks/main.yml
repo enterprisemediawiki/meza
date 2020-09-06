@@ -439,6 +439,5 @@
     name: haproxy
     state: started
     enabled: yes
-    ignore_errors: true
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
