@@ -58,27 +58,29 @@ fixApacheEnv();
 
 $mezaWikiEnvVarName='WIKI';
 
-if ( $wgCommandLineMode ) {
-	// get $wikiId from environment variable
-	$wikiId = getenv( $mezaWikiEnvVarName );
+$wikiId = getenv( $mezaWikiEnvVarName );
 
-} else {
+if (empty($wikiId)) {
 
-{% if m_use_subdomains %}
-	// get $wikiId from subdomain
-	// FIXME make regex a config variable 
-	// FIXME add 'ignore' list like 'www' that should not be a wiki
+    {% if m_use_subdomains %}
+    // get $wikiId from subdomain
+    // FIXME make regex a config variable 
+    // FIXME add 'ignore' list like 'www' that should not be a wiki
     if ( preg_match( '%([a-z]+)\.([a-z]+)\..{2,4}[\d]*$%im', $_SERVER['HTTP_HOST'], $matches ) ) {
         $wikiId = $matches[1];
-    } else {
-{% endif %}
-	// get $wikiId from URI path
-        $uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
-	$wikiId = strtolower( $uriParts[1] );
+    } 
+    {% endif %}
 
-{% if m_use_subdomains %}
+} else {
+    // get $wikiId from URI path
+    $uriParts = explode( '/', $_SERVER['REQUEST_URI'] );
+    if ($uriParts[1] == 'wiki') {
+        $wikiId = strtolower( $uriParts[2] );
+    } elseif ( in_array( $uriParts[1], ['de','en','es','fr','it','ja','ko','pt','sv','ru','zh'] ) ) {
+	$wikiId = $uriParts[1];
+    } else {
+        $wikiId = strtolower($uriParts[1]);  // default
     }
-{% endif %}
 }
 
 
@@ -113,12 +115,8 @@ $wikis = array_slice( scandir( "$m_htdocs/wikis" ), 2 );
 
 
 if ( ! in_array( $wikiId, $wikis ) && empty ( $wikiId ) ) {
-    // get $wikiId from environment variable
-	$wikiId = getenv( $mezaWikiEnvVarName );
-    if (!$wikiId) {
-		// handle invalid wiki
-		die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
-	}
+	// handle invalid wiki
+	die( "No sir, I ain't heard'a no wiki that goes by the name \"$wikiId\"\n" );
 }
 
 {% if meza_auth_type is defined %}
@@ -268,6 +266,18 @@ else {
  *
  *
  **/
+
+ if (isset($_SERVER["HTTP_HOST"])) {
+   define('WIKI_HOST', 'https://' . $_SERVER["HTTP_HOST"]);
+ } else { // probably commandline invocation
+	$fullhost =  shell_exec("hostname -f");
+	if ( strstr( $fullhost, 'qualitybox' ) ) {
+   		define('WIKI_HOST', 'https://beta.familysearch.org');
+	} else {
+   		define('WIKI_HOST', 'https://www.familysearch.org');
+	}
+ }
+
 
 // ref: https://www.mediawiki.org/wiki/Manual:$wgServer
 //   From section #Autodetection:
