@@ -15,6 +15,10 @@
     # Allow access to root index.php
     RewriteRule ^index.php(.*) - [L]
 
+    # This page can bring the wiki to it's knees
+    RewriteCond %{REQUEST_URI} ^.*Special:MostLinkedPages$ [NC] 
+    RewriteRule ^.*$ - [R=404,L]
+
     # Allow certbot access 
     RewriteRule ^.well-known(.*) - [L]
 
@@ -44,3 +48,11 @@
 
     
 </IfModule>
+
+<files Special:Wiretap>
+Require all denied
+</files>
+
+<If "%{QUERY_STRING} =~ /Special:Wiretap/">
+Require all denied
+</If>
