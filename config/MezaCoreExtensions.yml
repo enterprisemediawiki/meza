@@ -38,7 +38,7 @@ list:
       // $srfgFormats[] = 'googlebar';
       // $srfgFormats[] = 'googlepie';
 
-      // Disabled until the proper dependencies are added (PHPExcel I think)
+      // Disabled until the proper dependencies are added (the phpspreadsheet library from phpoffice)
       // $srfgFormats[] = 'excel';
 
       // Enables the "filtered" format. Where do we use this?
