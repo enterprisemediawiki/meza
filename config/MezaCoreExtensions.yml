@@ -27,7 +27,7 @@ list:
 
   - name: Semantic Result Formats
     composer: "mediawiki/semantic-result-formats"
-    version: "~3.1"
+    version: "~3.2"
     config: |
       // In SRF 3.0+ you need to do this, too:
       wfLoadExtension( 'SemanticResultFormats' );
