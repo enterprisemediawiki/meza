@@ -71,7 +71,7 @@ list:
     version: "1.6.1"
   - name: Maps
     composer: "mediawiki/maps"
-    version: "7.17.2"
+    version: "~7.0"
     config: |
       // In Maps 6.0+ you need to also load the extension
       wfLoadExtension( 'Maps' );
