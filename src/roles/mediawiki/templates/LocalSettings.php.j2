@@ -297,20 +297,26 @@ if ( ! $wgCommandLineMode ) {
 
 
 // https://www.mediawiki.org/wiki/Manual:$wgScriptPath
+// https://www.mediawiki.org/wiki/Manual:$wgLogo
+// https://www.mediawiki.org/wiki/Manual:$wgFavicon
+{% if m_mediawiki_prefix_dir is defined %}
+$mPrefix = "{{ m_mediawiki_prefix_dir|replace('/', '') }}"; 
+$wgScriptPath = "/$mPrefix/$wikiId";
+$wgArticlePath = "/$mPrefix/$wikiId/$1";
+$wgLogo = "/$mPrefix/wikis/$wikiId/config/logo.png";
+$wgFavicon = "/$mPrefix/wikis/$wikiId/config/favicon.ico";
+{% else %}
 $wgScriptPath = "/$wikiId";
 $wgArticlePath = "/$wikiId/$1";
+$wgLogo = "/wikis/$wikiId/config/logo.png";
+$wgFavicon = "/wikis/$wikiId/config/favicon.ico";
+{% endif %}
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadPath
 $wgUploadPath = "$wgScriptPath/img_auth.php";
 
 // https://www.mediawiki.org/wiki/Manual:$wgUploadDirectory
 $wgUploadDirectory = "{{ m_uploads_dir }}/$wikiId";
-
-// https://www.mediawiki.org/wiki/Manual:$wgLogo
-$wgLogo = "/wikis/$wikiId/config/logo.png";
-
-// https://www.mediawiki.org/wiki/Manual:$wgFavicon
-$wgFavicon = "/wikis/$wikiId/config/favicon.ico";
 
 
 // https://www.mediawiki.org/wiki/Manual:$wgMetaNamespace
