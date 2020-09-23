@@ -44,8 +44,11 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-l
+    {% if m_mediawiki_prefix_dir is defined %}
+    RewriteRule ^/?(?:wiki)?/(de|en|es|fr|it|ja|ko|pt|ru|sv|zh)/(.*)?$ %{DOCUMENT_ROOT}/wiki/mediawiki/ [env=WIKI:$1,L]
+    {% else %}
     RewriteRule ^/?([^/]+)/(.*)?$ %{DOCUMENT_ROOT}/mediawiki/ [env=WIKI:$1,L]
-
+    {% endif %}
     
 </IfModule>
 
