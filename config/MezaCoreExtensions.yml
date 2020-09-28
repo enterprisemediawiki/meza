@@ -136,7 +136,7 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: InputBox
     repo: https://github.com/wikimedia/mediawiki-extensions-InputBox.git
-    version: "{{ mediawiki_default_branch }}"
+    version: "master"
   - name: ReplaceText
     repo: https://github.com/wikimedia/mediawiki-extensions-ReplaceText.git
     version: "master"
