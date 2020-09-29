@@ -259,9 +259,9 @@ list:
 #  - name: CopyWatchers
 #    repo: https://github.com/jamesmontalvo3/MediaWiki-CopyWatchers.git
 #    version: tags/0.10.0
-#  - name: Wiretap
-#    repo: https://github.com/enterprisemediawiki/Wiretap.git
-#    version: tags/0.1.0
+  - name: Wiretap
+    repo: https://github.com/enterprisemediawiki/Wiretap.git
+    version: master 
   - name: ApprovedRevs
     repo: https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git
     version: master
