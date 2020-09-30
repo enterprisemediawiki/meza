@@ -486,6 +486,7 @@
   shell: WIKI={{ item }} php {{ m_mediawiki }}/extensions/SemanticMediaWiki/maintenance/setupStore.php
   with_items: "{{ list_of_wikis }}"
   run_once: true
+  when: "{{ enableSemantics | default(false,true) }}"
 
 
 # - name: Verify metastore index upgraded
