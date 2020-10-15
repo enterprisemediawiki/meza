@@ -1,6 +1,6 @@
 # QualityBox 
 
-Setup an enterprise MediaWiki server with **simple commands**. Put all components on a single monolithic server or split them out over many. Run a solitary master database or have replicas. Deploy to multiple environments. Run backups. Do it all using the `meza` command. Run `meza --help` for more info.
+Setup an enterprise MediaWiki server with **simple commands**. Put all components on a single monolithic server or split them out over many. Run a single database or have replicas. Deploy to multiple environments. Run backups. Do it all using the `meza` command. Run `meza --help` for more info.
 
 > Note: This project is a fork of the original Meza project developed at NASA. We still use the same 'meza' command internally but are gradually updating the system to be consistent with the QualityBox (or qb) brand.
 
