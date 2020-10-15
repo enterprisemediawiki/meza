@@ -1,20 +1,16 @@
-# meza
-
-[![Build Status](https://travis-ci.org/enterprisemediawiki/meza.svg?branch=master)](https://travis-ci.org/enterprisemediawiki/meza)
-[![Code Climate](https://codeclimate.com/github/enterprisemediawiki/meza/badges/gpa.svg)](https://codeclimate.com/github/enterprisemediawiki/meza)
-
-<img src="https://raw.githubusercontent.com/enterprisemediawiki/meza/master/manual/commands.gif">
+# QualityBox 
 
 Setup an enterprise MediaWiki server with **simple commands**. Put all components on a single monolithic server or split them out over many. Run a solitary master database or have replicas. Deploy to multiple environments. Run backups. Do it all using the `meza` command. Run `meza --help` for more info.
 
-## Why meza?
+> Note: This project is a fork of the original Meza project developed at NASA. We still use the same 'meza' command internally but are gradually updating the system to be consistent with the QualityBox (or qb) brand.
 
-Standard MediaWiki is easy to install, but increasingly its newer and better features are contained within extensions that are more complicated. Additionally, they may be particularly difficult to install on Enterprise Linux derivatives. This project aims to make these features (VisualEditor, CirrusSearch, etc) easy to *install, backup, reconfigure, and maintain* in a robust and well-tested way.
+## Why QualityBox?
+
+Standard MediaWiki is easy to install, but increasingly its newer and better features are contained within extensions that are more complicated. Additionally, they may be particularly difficult to install on Enterprise Linux derivatives. This project aims to make these features (VisualEditor, CirrusSearch, etc) easy to *install, backup, reconfigure, and maintain* in a robust and well-tested way.  Furthermore, we aim to package all the extra security, tools and configuration that enable scalable PUBLIC wikis to thrive in a hostile Internet.
 
 ## Requirements
 
-1. CentOS 7 or RHEL 7 (for now, with Debian support in the works)
-2. Minimal install: Attempting to install it on a server with many other things already installed may not work properly due to conflicts.
+1. CentOS 7 RHEL 7 or Debian 10
 
 ## Install and usage
 
