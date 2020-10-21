@@ -212,18 +212,20 @@
     state: installed
   tags:
   - latest
+  when: use_ntp
 
 - name: Ensure NTP is running and enabled as configured.
   service:
     name: ntpd
     state: started
     enabled: yes
-  when: docker_skip_tasks is not defined or not docker_skip_tasks
+  when: use_ntp
 
 - name: Copy the ntp.conf template file
   template: src=ntp.conf.j2 dest=/etc/ntp.conf
   notify:
     - restart ntpd
+  when: use_ntp
 
 # FIXME #809: PIP required first; has dependencies; needed on all hosts?
 # Speed up encrypt/decrypt operations

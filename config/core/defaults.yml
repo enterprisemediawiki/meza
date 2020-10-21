@@ -75,6 +75,8 @@ m_timezone: "America/Chicago"
 
 meza_server_log_db: meza_server_log
 
+use_ntp: true
+
 ntp_server: [0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org, 3.pool.ntp.org]
 
 m_language: en
