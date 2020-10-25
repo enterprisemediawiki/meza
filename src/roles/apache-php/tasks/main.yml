@@ -103,17 +103,16 @@
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 # Make sure that there's a symlink for the access and error logs
-# @TODO Test this on CentOS/RHEL and possibly source /etc/httpd/envvars
 - name: Add symbolic link to Apache's access log file for easy access
   file:
-    src: "${APACHE_LOG_DIR}/access_log"
-    dest: "${APACHE_LOG_DIR}/access.log"
+    src: "/var/log/{{ service_apache }}/access_log"
+    dest: "/var/log/{{ service_apache }}/access.log"
     state: link
 
 - name: Add symbolic link to Apache's error log file for easy access
   file:
-    src: "${APACHE_LOG_DIR}/error_log"
-    dest: "${APACHE_LOG_DIR}/error.log"
+    src: "/var/log/{{ service_apache }}/error_log"
+    dest: "/var/log/{{ service_apache }}/error.log"
     state: link
   
 # Might need these for SELinux to be turned back on
