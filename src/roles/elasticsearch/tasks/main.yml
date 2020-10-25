@@ -56,7 +56,7 @@
 
 - name: Ensure elasticsearch installed
   package:
-    name: elasticsearch=6*
+    name: elasticsearch
     state: present
   notify: restart elasticsearch
 
