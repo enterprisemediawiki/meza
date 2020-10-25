@@ -56,7 +56,9 @@ date-format %d/%b/%Y
 # Meza Custom Log format
 log-format ~h{, } %^ %e [%d:%t %z] %D "%r" %s "%R" "%u" %^ %b
 
-#
+# XFF + NCSA Combined Log Format
+log-format ~h %h %^[%d:%t %^] "%r" %s %b "%R" "%u"
+
 # The log-format variable followed by a space or \t for
 # tab-delimited, specifies the log format string.
 #

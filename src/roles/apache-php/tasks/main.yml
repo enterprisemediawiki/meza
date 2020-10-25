@@ -102,8 +102,20 @@
     enabled: yes
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
+# Make sure that there's a symlink for the access and error logs
+# @TODO Test this on CentOS/RHEL and possibly source /etc/httpd/envvars
+- name: Add symbolic link to Apache's access log file for easy access
+  file:
+    src: "${APACHE_LOG_DIR}/access_log"
+    dest: "${APACHE_LOG_DIR}/access.log"
+    state: link
 
-
+- name: Add symbolic link to Apache's error log file for easy access
+  file:
+    src: "${APACHE_LOG_DIR}/error_log"
+    dest: "${APACHE_LOG_DIR}/error.log"
+    state: link
+  
 # Might need these for SELinux to be turned back on
 # - name: Configure SELinux to start mysql on any port
 #   seboolean: name=mysql_connect_any state=true persistent=yes
