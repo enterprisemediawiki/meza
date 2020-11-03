@@ -102,18 +102,41 @@
     enabled: yes
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
+# check if a symbolic link needs to be created
+# If the file exists (and is regular) then we should not create a symlink
+- name: Check whether we need a symbolic link to the access log
+  stat:
+    path: "/var/log/{{ service_apache }}/access.log"
+  register: accesslog_details
+
+- debug:
+    msg: "access.log is NOT a symbolic link"
+  when: accesslog_details.stat.islnk is not defined
+
+- name: Check whether we need a symbolic link to the error log
+  stat:
+    path: "/var/log/{{ service_apache }}/error.log"
+  register: errorlog_details
+
+- debug:
+    msg: "error.log is NOT a symbolic link"
+  when: errorlog_details.stat.islnk is not defined
+
 # Make sure that there's a symlink for the access and error logs
+# but if the file/directory/link already exists, leave it alone
 - name: Add symbolic link to Apache's access log file for easy access
   file:
     src: "/var/log/{{ service_apache }}/access_log"
     dest: "/var/log/{{ service_apache }}/access.log"
     state: link
+  when: not accesslog_details.stat.exists
 
 - name: Add symbolic link to Apache's error log file for easy access
   file:
     src: "/var/log/{{ service_apache }}/error_log"
     dest: "/var/log/{{ service_apache }}/error.log"
     state: link
+  when: not errorlog_details.stat.exists
   
 # Might need these for SELinux to be turned back on
 # - name: Configure SELinux to start mysql on any port
