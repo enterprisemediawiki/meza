@@ -1,7 +1,7 @@
 ---
 composer_path: /usr/local/bin/composer
 composer_keep_updated: true
-composer_version: ''
+composer_version: '1.10.16' 
 
 # The directory where global packages will be installed.
 composer_home_path: '~/.composer'
