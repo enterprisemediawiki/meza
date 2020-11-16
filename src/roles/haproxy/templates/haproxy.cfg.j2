@@ -46,7 +46,7 @@ defaults
 
 frontend www-http
 	bind *:80
-	{% if ansible_default_ipv6.address | length > 0 -%}
+	{% if ansible_default_ipv6 | length > 0 -%}
 	bind {{ ansible_default_ipv6.address }}:80
 	{%- endif %}
 	
@@ -55,7 +55,7 @@ frontend www-http
 
 frontend www-https
 	bind *:443 ssl crt /etc/haproxy/certs/
-	{% if ansible_default_ipv6.address | length > 0 -%}
+	{% if ansible_default_ipv6 | length > 0 -%}
 	# Create an AAAA record in DNS using the IP below to IPv6 enable your wiki
 	bind {{ ansible_default_ipv6.address }}:443 ssl crt /etc/haproxy/certs/
 	{%- endif %}
