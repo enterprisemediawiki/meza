@@ -1,6 +1,41 @@
 Release Notes
 =============
 
+## Meza 31.12.0
+
+Testing fixes, Add LDAP module, Bump MW to 1.31.12
+
+### Commits since 31.11.0
+
+* e05ea12 Bump base Vagrant RAM from 2GB to 4GB, else problems (#1278)
+* 908ac75 Bump MW to 1.31.12 (#1277)
+* 2380aa2 Enforce Composer 1.x version (#1275)
+* 8b5c112 Added config variable use_ntp (#1271)
+* 4160ae3 Bump MediaWiki to 1.31.7 (#1267)
+* 65aa596 add ldap module (#1261)
+* 591df68 Point tests to new Docker images built from this repo; only run build process on commits to master
+* 8a22485 Remove secret.yml encryption per #1175
+* 57e8469 Need --skip-conn-check on getmeza.sh within docker; temporarily skip other builds
+* 11dc3e8 Make Dockerfiles pull FROM correct base image
+* f01ae65 Add later test images
+* 62886be Build test container 'base' on pushes to 'docker-build' branch
+* b5ce5e3 GitHub Actions fail-fast-->false, to prevent one failure from cancelling all jobs
+* 4cb414f Don't run tests twice for PRs
+* 83d4bd6 Enable testing in GitHub Actions and GitLab CI
+
+### Contributors
+
+* 16	James Montalvo
+* 1	Daren Welsh
+* 1	Vincent Brooks
+
+# How to upgrade
+
+```bash
+sudo meza update 31.12.0
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.10.1
 
 Fix PEAR channel
