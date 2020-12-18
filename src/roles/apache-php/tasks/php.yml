@@ -8,6 +8,7 @@
   include: php-redhat.yml
   when: ansible_os_family == "RedHat"
 
+
 - name: Install PHP (Debian only)
   include: php-debian.yml
   when: ansible_os_family == "Debian"

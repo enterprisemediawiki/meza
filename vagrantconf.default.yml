@@ -14,7 +14,7 @@ app1:
 
   # How much RAM to give this box. Don't assign more than your computer has
   # available. Give it 4096 (4GB) if you can.
-  memory: 2048
+  memory: 4096
 
   # How many CPUs to give the VM. 1 is probably fine.
   cpus: 1
