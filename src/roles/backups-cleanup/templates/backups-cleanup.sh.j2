@@ -3,14 +3,32 @@
 # change directory to backups location
 cd {{ m_backups }}/{{ env }}
 
-# remove all odd-numbered days (keep only even-numbered days)
+# Apply backups cleanup rules at the backups+env root (without going into each wiki's directory)
+# DEPRECATED:
+#   1. Use method below going into each directory
+#   2. This will eventually be removed, but not before providing some notification to users
 {% if backups_cleanup.removal_rules is defined %}
 {% for removal_rule in backups_cleanup.removal_rules %}
 rm {{ removal_rule }} -f
 {% endfor %}
 {% endif %}
 
-# compress all SQL files
+# Apply backups cleanup rules for each wiki directory
+{% if backups_cleanup.removal_rules_each_wiki is defined %}
+# Loop over wiki directories
+for dir in {{ m_backups }}/{{ env }}/*/
+do
+    cd ${dir}
+    echo "Running backups cleanup rules for ${dir}:"
+    # Run removal rules like: rm $(ls -F *.sql | head -n -2) -f
+    {% for removal_rule in backups_cleanup.removal_rules_each_wiki %}
+    {{ removal_rule }}
+    {% endfor %}
+    cd ..
+done
+{% endif %}
+
+# compress all SQL files following rule
 {% if backups_cleanup.gzip_rules is defined %}
 echo "gzip start time: $(date +\"%T\")"
 {% for gzip_rule in backups_cleanup.gzip_rules %}
