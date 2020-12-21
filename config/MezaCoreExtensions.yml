@@ -302,7 +302,7 @@ list:
   # Verify 34.x functionality
   - name: Wiretap
     repo: https://github.com/enterprisemediawiki/Wiretap.git
-    version: tags/0.1.0
+    version: tags/0.2.0
 
   - name: ApprovedRevs
     repo: https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git
