@@ -1,6 +1,26 @@
 Release Notes
 =============
 
+## Meza 31.13.0
+
+Add new backups-cleanup method
+
+### Commits since 31.12.0
+
+* bba5624 Add backups cleanup that goes into each wiki dir for better cleanup options
+* 805e3ed 31.12.0 release (#1279)
+
+### Contributors
+
+* 2	James Montalvo
+
+# How to upgrade
+
+```bash
+sudo meza update 31.13.0
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.12.0
 
 Testing fixes, Add LDAP module, Bump MW to 1.31.12
