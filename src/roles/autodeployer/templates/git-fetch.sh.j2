@@ -6,13 +6,13 @@
 CWD=$(pwd)
 
 # change to directory holding appropriate ansible.cfg file for this operation
-cd /opt/meza/config/adhoc
+cd {{ m_meza }}/config/adhoc
 
 REPO="$1"
 DEST="$2"
 VERSION="$3"
 
-source /opt/.deploy-meza/config.sh
+source {{ m_install }}/.deploy-meza/config.sh
 
 sudo TMPDIR="$m_tmp" -u meza-ansible ansible localhost -m git -a "repo=$REPO dest=$DEST version=$VERSION"
 

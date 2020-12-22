@@ -15,6 +15,7 @@
 //error_reporting(E_ALL);
 
 // load meza config
+// FIXME: this assumes installed in /opt, which is not guaranteed
 require_once '/opt/.deploy-meza/config.php';
 
 

@@ -5,7 +5,6 @@
 #   2. Add public key to authorized_keys
 #   3. Make user a passwordless sudoer
 
-
 #
 # The following function is from shell-functions/base.sh and is included here
 # because:
@@ -14,7 +13,16 @@
 #        don't necessarily require the whole repo, and if they do they will be
 #        controlled by the master.
 #
-meza_user_dir="/opt/conf-meza/users"
+
+MEZA_IP="${1}"
+
+if [ -z "${MEZA_IP}" ]; then
+	echo "Meza install path not set; setting to /opt"
+	MEZA_IP="/opt"
+else
+
+# Don't create meza application users under /home, ref: #727
+meza_user_dir="${MEZA_IP}/conf-meza/users"
 
 rootCheck() {
 	# must be root or sudoer

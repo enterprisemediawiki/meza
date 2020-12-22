@@ -3,8 +3,24 @@
 # meza command
 #
 
-import sys, getopt, os
+import sys, getopt, os, yaml, jinja2
 
+# Get installation directory, typically /opt, but configurable elsewhere
+install_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
+
+#
+# It'd be much better to pull this from config/paths.yml, but doing so requires processing YAML and Jinja
+# and Meza with Python 2.7 doesn't seem to have the dependiencies in place to make that happen easily.
+#
+defaults = {
+	"m_i18n": "{}/meza/config/i18n".format(install_dir),
+	"m_meza_data": "{}/data-meza".format(install_dir),
+	"m_logs_deploy": "{}/data-meza/logs/deploy/deploy.log".format(install_dir),
+	"m_logs": "{}/data-meza/logs".format(install_dir),
+	"m_local_secret": "{}/conf-meza/secret".format(install_dir),
+	"m_home": "{}/conf-meza/users".format(install_dir),
+	"m_config_vault": "{}/conf-meza/vault".format(install_dir),
+}
 
 # Handle pressing of ctrl-c. Make sure to remove lock file when deploying.
 deploy_lock_environment = False
@@ -20,20 +36,15 @@ signal.signal(signal.SIGINT, sigint_handler)
 
 
 def load_yaml ( filepath ):
-	import yaml
 	with open(filepath, 'r') as stream:
 		try:
 			return yaml.load(stream)
 		except yaml.YAMLError as exc:
 			print(exc)
 
-
-defaults = load_yaml( "/opt/meza/config/defaults.yml" )
-
 # Hard-coded for now, because I'm not sure where to set it yet
 language = "en"
 i18n = load_yaml( os.path.join( defaults['m_i18n'], language+".yml" ) )
-
 
 def main (argv):
 
@@ -47,8 +58,8 @@ def main (argv):
 		sys.exit(0) # asking for help doesn't give error code
 	elif argv[0] in ('-v', '--version'):
 		import subprocess
-		version = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "describe", "--tags" ] )
-		commit = subprocess.check_output( ["git", "--git-dir=/opt/meza/.git", "rev-parse", "HEAD" ] )
+		version = subprocess.check_output( ["git", "--git-dir={}/meza/.git".format(install_dir), "describe", "--tags" ] )
+		commit = subprocess.check_output( ["git", "--git-dir={}/meza/.git".format(install_dir), "rev-parse", "HEAD" ] )
 		print "Meza " + version.strip()
 		print "Commit " + commit.strip()
 		print "Mediawiki EZ Admin"
@@ -298,10 +309,10 @@ def write_deploy_log( datetime, env, unique, condition, args_string ):
 		env,
 		unique,
 		condition,
-		get_git_descripe_tags( "/opt/meza" ),
-		get_git_hash( "/opt/meza" ),
-		get_git_hash( "/opt/conf-meza/secret" ),
-		get_git_hash( "/opt/conf-meza/public" ),
+		get_git_descripe_tags( "{}/meza".format(install_dir) ),
+		get_git_hash( "{}/meza".format(install_dir) ),
+		get_git_hash( "{}/conf-meza/secret".format(install_dir) ),
+		get_git_hash( "{}/conf-meza/public".format(install_dir) ),
 		args_string
 	)
 
@@ -446,7 +457,7 @@ def meza_command_update (argv):
 	import subprocess
 
 	# This function executes many Git commands that need to be from /otp/meza
-	os.chdir("/opt/meza")
+	os.chdir("{}/meza".format(install_dir))
 
 	# Define a special git remote repository so we can control its settings
 	# Else, a user using Vagrant may have their origin remote setup for SSH
@@ -503,7 +514,7 @@ def meza_command_update (argv):
 			print "Meza now {} {}".format(version_type, version)
 			print "Now deploy changes with 'sudo meza deploy <environment>'"
 		else:
-			print "Files have been modified in /opt/meza. Clean them up before proceeding."
+			print "Files have been modified in {}/meza. Clean them up before proceeding.".format(install_dir)
 			print "MSG: {}".format(status)
 
 # FIXME #824: This function is big.
@@ -516,13 +527,13 @@ def meza_command_setup_env (argv, return_not_exit=False):
 	else:
 		env = argv[0]
 
-	if not os.path.isdir( "/opt/conf-meza" ):
-		os.mkdir( "/opt/conf-meza" )
+	if not os.path.isdir( "{}/conf-meza".format(install_dir) ):
+		os.mkdir( "{}/conf-meza".format(install_dir) )
 
-	if not os.path.isdir( "/opt/conf-meza/secret" ):
-		os.mkdir( "/opt/conf-meza/secret" )
+	if not os.path.isdir( "{}/conf-meza/secret".format(install_dir) ):
+		os.mkdir( "{}/conf-meza/secret".format(install_dir) )
 
-	if os.path.isdir( "/opt/conf-meza/secret/" + env ):
+	if os.path.isdir( "{}/conf-meza/secret/".format(install_dir) + env ):
 		print
 		print "Environment {} already exists".format(env)
 		sys.exit(1)
@@ -627,9 +638,9 @@ def meza_command_setup_env (argv, return_not_exit=False):
 
 	print
 	print "Please review your host file. Run command:"
-	print "  sudo vi /opt/conf-meza/secret/{}/hosts".format(env)
+	print "  sudo vi {}/conf-meza/secret/{}/hosts".format(install_dir, env)
 	print "Please review your secret config. Run command:"
-	print "  sudo vi /opt/conf-meza/secret/{}/secret.yml".format(env)
+	print "  sudo vi /conf-meza/secret/{}/secret.yml".format(install_dir, env)
 	if return_not_exit:
 		return rc
 	else:
@@ -665,7 +676,7 @@ def meza_command_setup_dev (argv):
 # Remove in 32.x
 def meza_command_setup_dev_networking (argv):
 	print "Function removed. Instead do:"
-	print "  sudo bash /opt/meza/src/scripts/dev-networking.sh"
+	print "  sudo bash {}/meza/src/scripts/dev-networking.sh".format(install_dir)
 	sys.exit(1)
 
 def meza_command_setup_docker (argv):
@@ -796,7 +807,7 @@ def meza_command_maint_runJobs (argv):
 	#             NOT WORK AND NEEDS TO BE ANSIBLE-IZED.
 	#
 
-	wikis_dir = "/opt/htdocs/wikis"
+	wikis_dir = "{}/htdocs/wikis".format(install_dir)
 	wikis = os.listdir( wikis_dir )
 	for i in wikis:
 		if os.path.isdir(os.path.join(wikis_dir, i)):
@@ -807,7 +818,7 @@ def meza_command_maint_runJobs (argv):
 		print "No wikis available to run jobs"
 		sys.exit(1)
 
-	shell_cmd = ["WIKI="+anywiki, "php", "/opt/meza/src/scripts/runAllJobs.php"]
+	shell_cmd = ["WIKI="+anywiki, "php", "{}/meza/src/scripts/runAllJobs.php".format(install_dir)]
 	if len(argv) > 0:
 		shell_cmd = shell_cmd + ["--wikis="+argv[1]]
 	rc = meza_shell_exec( shell_cmd )
@@ -955,7 +966,7 @@ def meza_command_docker (argv):
 		else:
 			docker_repo = argv[1]
 
-		rc = meza_shell_exec([ "bash", "/opt/meza/src/scripts/build-docker-container.sh", docker_repo])
+		rc = meza_shell_exec([ "bash", "{}/meza/src/scripts/build-docker-container.sh".format(install_dir), docker_repo])
 		meza_shell_exec_exit(rc)
 
 
@@ -996,13 +1007,13 @@ def meza_command_push_backup (argv):
 
 def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 	command = ['sudo', '-u', 'meza-ansible', 'ansible-playbook',
-		'/opt/meza/src/playbooks/{}.yml'.format(playbook)]
+		'{}/meza/src/playbooks/{}.yml'.format(install_dir, playbook)]
 	if env:
-		host_file = "/opt/conf-meza/secret/{}/hosts".format(env)
+		host_file = "{}/conf-meza/secret/{}/hosts".format(install_dir, env)
 
 		# Meza _needs_ to be able to load this file. Be perhaps a little
 		# overzealous and chown/chmod it everytime
-		secret_file = '/opt/conf-meza/secret/{}/secret.yml'.format(env)
+		secret_file = '{}/conf-meza/secret/{}/secret.yml'.format(install_dir, env)
 		meza_chown( secret_file, 'meza-ansible', 'wheel' )
 		os.chmod( secret_file, 0o660 )
 
@@ -1033,7 +1044,7 @@ def meza_shell_exec ( shell_cmd, print_command=True, log_file=False ):
 	# home directory if don't cd to a neutral location. By cd'ing to this
 	# location you can pick up ansible.cfg and use vars there.
 	starting_wd = os.getcwd()
-	os.chdir( "/opt/meza/config" )
+	os.chdir( "{}/meza/config".format(install_dir) )
 
 	#
 	# FIXME #874: For some reason `sudo -u meza-ansible ...` started failing in
@@ -1146,7 +1157,7 @@ def meza_chown ( path, username, groupname ):
 	os.chown( path, uid, gid )
 
 def display_docs(name):
-	f = open('/opt/meza/manual/meza-cmd/{}.txt'.format(name),'r')
+	f = open('{}/meza/manual/meza-cmd/{}.txt'.format(install_dir, name),'r')
 	print f.read()
 
 def prompt(varname,default=False):
@@ -1207,7 +1218,7 @@ def random_string(**params):
 def check_environment(env):
 	import os
 
-	conf_dir = "/opt/conf-meza/secret"
+	conf_dir = "{}/conf-meza/secret".format(install_dir)
 
 	env_dir = os.path.join( conf_dir, env )
 	if not os.path.isdir( env_dir ):

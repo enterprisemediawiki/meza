@@ -41,7 +41,7 @@ require "{{ m_deploy }}/samlLocalSettings.php";
  *  from the WIKI environment variable (for command line scripts)
  **/
 
-require '/opt/.deploy-meza/config.php';
+require '{{ m_install }}/.deploy-meza/config.php';
 
 if( $wgCommandLineMode ) {
 
@@ -213,7 +213,7 @@ if ( $debug ) {
 
 	// The file name of the debug log, or empty if disabled. wfDebug() appends
 	// to this file.
-	$wgDebugLogFile = "/opt/data-meza/logs/mw-debug.log";
+	$wgDebugLogFile = "{{ m_logs }}/mw-debug.log";
 
 	// If true, show a backtrace for database errors.
 	$wgShowDBErrorBacktrace = true;

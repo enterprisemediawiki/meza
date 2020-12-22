@@ -9,12 +9,13 @@ if [ "$(whoami)" != "root" ]; then
 	exit 1
 fi
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 for ARG in "$@"; do
 	if [ "${ARG}" = "--skip-conn-check" ]; then
 		SKIP_CONNECTION_CHECK="true"
 	fi
 done
-
 
 checkInternetConnection() {
     declare -i pingRetries=100
@@ -103,38 +104,35 @@ else
 
 fi
 
-# if /opt/meza doesn't exist, clone into and use master branch (which is the
-# default, but should we make this configurable?)
-if [ ! -d "/opt/meza" ]; then
-	git clone https://github.com/enterprisemediawiki/meza.git /opt/meza --branch master
-fi
+# SCRIPT_DIR typically /opt/meza/src/scripts, INSTALL_DIR typically /opt
+INSTALL_DIR=$(dirname $(dirname $(dirname ${SCRIPT_DIR})))
 
 # Make sure /opt/meza permissions are good in case git-cloned earlier
 #  - Ensure users can read everything
 #  - Ensure users can also execute directories
-chmod a+r /opt/meza -R
-find /opt/meza -type d -exec chmod 755 {} +
+chmod a+r "${INSTALL_DIR}/meza" -R
+find "${INSTALL_DIR}/meza" -type d -exec chmod 755 {} +
 
 if [ ! -f "/usr/bin/meza" ]; then
-	ln -s "/opt/meza/src/scripts/meza.py" "/usr/bin/meza"
+	ln -s "${INSTALL_DIR}/meza/src/scripts/meza.py" "/usr/bin/meza"
 fi
 
 # Create .deploy-meza directory and very basic config.sh if they don't exist
 # This is done to make the user setup script(s) work
-mkdir -p /opt/.deploy-meza
-chmod 755 /opt/.deploy-meza
+mkdir -p "${INSTALL_DIR}/.deploy-meza"
+chmod 755 "${INSTALL_DIR}/.deploy-meza"
 
-if [ ! -f /opt/.deploy-meza/config.sh ]; then
-	echo "m_scripts='/opt/meza/src/scripts'; ansible_user='meza-ansible';" > /opt/.deploy-meza/config.sh
+if [ ! -f "${INSTALL_DIR}/.deploy-meza/config.sh" ]; then
+	echo "m_scripts='${INSTALL_DIR}/meza/src/scripts'; ansible_user='meza-ansible';" > "${INSTALL_DIR}/.deploy-meza/config.sh"
 fi
 
 # make sure conf-meza exists and has good permissions
-mkdir -p /opt/conf-meza/secret
-chmod 755 /opt/conf-meza
-chmod 775 /opt/conf-meza/secret
+mkdir -p "${INSTALL_DIR}/conf-meza/secret"
+chmod 755 "${INSTALL_DIR}/conf-meza"
+chmod 775 "${INSTALL_DIR}/conf-meza/secret"
 
 # Required initially for creating lock files
-mkdir -p /opt/data-meza
+mkdir -p "${INSTALL_DIR}/data-meza"
 
 # If user meza-ansible already exists, make sure home directory is correct
 # (update from old meza versions)
@@ -145,23 +143,23 @@ if $ret; then
 	homedir=$( getent passwd "meza-ansible" | cut -d: -f6 )
 	if [ "$homedir" == "/home/meza-ansible" ]; then
 		echo "meza-ansible home directory not correct. moving."
-		mkdir -p "/opt/conf-meza/users"
-		usermod -m -d "/opt/conf-meza/users/meza-ansible" "meza-ansible"
-		ls -la /opt/conf-meza/users
-		ls -la /opt/conf-meza/users/meza-ansible
-		ls -la /opt/conf-meza/users/meza-ansible/.ssh
+		mkdir -p "${INSTALL_DIR}/conf-meza/users"
+		usermod -m -d "${INSTALL_DIR}/conf-meza/users/meza-ansible" "meza-ansible"
+		ls -la "${INSTALL_DIR}/conf-meza/users"
+		ls -la "${INSTALL_DIR}/conf-meza/users/meza-ansible"
+		ls -la "${INSTALL_DIR}/conf-meza/users/meza-ansible/.ssh"
 	else
 		echo "meza-ansible home-dir in correct location"
 	fi
 else
 	echo
 	echo "Add ansible master user"
-	source "/opt/meza/src/scripts/ssh-users/setup-master-user.sh"
+	source "${INSTALL_DIR}/meza/src/scripts/ssh-users/setup-master-user.sh"
 fi
 
-chown meza-ansible:wheel /opt/conf-meza
-chown meza-ansible:wheel /opt/conf-meza/secret
-chown meza-ansible:wheel /opt/meza
+chown meza-ansible:wheel "${INSTALL_DIR}/conf-meza"
+chown meza-ansible:wheel "${INSTALL_DIR}/conf-meza/secret"
+chown meza-ansible:wheel "${INSTALL_DIR}/meza"
 
 # Don't require TTY or visible password for sudo. Ref #769
 sed -r -i "s/^Defaults\\s+requiretty/#Defaults requiretty/g;" /etc/sudoers

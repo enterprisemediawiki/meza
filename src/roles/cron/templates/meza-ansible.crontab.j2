@@ -20,7 +20,7 @@
 #
 # Restart Parsoid periodically on parsoid-servers
 #
-{{ parsoid_restart_crontime }} systemctl restart parsoid > /opt/data-meza/logs/parsoid-restart.log 2>&1
+{{ parsoid_restart_crontime }} systemctl restart parsoid > {{ m_logs }}/parsoid-restart.log 2>&1
 {% endif %}
 
 {% if inventory_hostname in groups['app-servers'] %}

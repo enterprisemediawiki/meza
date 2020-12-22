@@ -2,6 +2,7 @@
 #
 # Run testssl.sh, setup if required.
 
+# FIXME: Assumes installed in /opt
 testssldir="/opt/meza/sources/testssl.sh"
 testsslcmd="$testssldir/testssl.sh"
 

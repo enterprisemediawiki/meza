@@ -1,75 +1,10 @@
 ---
 # Meza default config file
 
-# meza install location
-m_install: /opt
-m_meza: /opt/meza
-
 # Use development or production settings for this server
 # production being as performant and secure as possible
 # development being less secure and providing optional features useful for dev
 m_use_production_settings: True
-
-# config dir
-m_config_core: /opt/meza/config
-m_local_secret: /opt/conf-meza/secret
-m_local_public: /opt/conf-meza/public
-m_config_vault: /opt/conf-meza/vault
-m_home: /opt/conf-meza/users
-
-# Config files written by Ansible which need a place to live on non-controller
-# nodes.
-m_deploy: /opt/.deploy-meza
-
-# scripts dir
-m_scripts: /opt/meza/src/scripts
-
-# test dir
-m_test: /opt/meza/test
-
-# data dir
-m_meza_data: /opt/data-meza
-m_cache_directory: /opt/data-meza/cache
-m_tmp: /opt/data-meza/tmp
-m_logs: /opt/data-meza/logs
-m_logs_deploy: /opt/data-meza/logs/deploy/deploy.log
-
-# uploads dir. This WILL BE OVERIDDEN if multiple app servers are used, and
-# instead will use /opt/data-meza/uploads-gluster to use GlusterFS distributed
-# file system.
-m_uploads_dir: /opt/data-meza/uploads
-
-# GlusterFS vars
-gluster_mount_dir: /opt/data-meza/uploads-gluster
-gluster_brick_dir: /opt/data-meza/gluster/brick
-gluster_brick_name: gluster
-
-# Location where backups will go, specified by environment, e.g.
-# /opt/data-meza/backups/prod for "prod" environment
-m_backups: /opt/data-meza/backups
-
-# webserver variables
-m_htdocs: /opt/htdocs
-# crawl for default or nocrawl to disallow all
-m_robots_rules: nocrawl
-m_mediawiki: /opt/htdocs/mediawiki
-m_cert_private: /etc/pki/tls/private/meza.key
-m_cert_public: /etc/pki/tls/certs/meza.crt
-m_ca_cert: /etc/pki/tls/certs/meza-ca.crt
-
-
-# app locations
-m_apache: /etc/httpd
-m_php_ini: /etc/php.ini
-m_parsoid_path: /etc/parsoid
-m_simplesamlphp_path: /opt/simplesamlphp
-m_profiling_xhgui_directory: /opt/xhgui
-
-# files
-m_i18n: /opt/meza/config/i18n
-m_db_replication_dump_file: /opt/data-meza/db_master_for_replication.sql
-m_db_replication_log_file: /opt/data-meza/db_master_log_file
-m_db_replication_log_pos: /opt/data-meza/db_master_log_pos
 
 m_httpd_server_admin: "admin@example.com"
 m_timezone: "America/Chicago"
@@ -132,8 +67,6 @@ load_balancer_unmanaged_mediawiki_port: 8080
 
 # Netdata is a monitoring and alerting system
 m_install_netdata: True
-# we need a certificate to bind to port 20000
-ssl_certificate_file: /etc/haproxy/certs/meza.pem
 # netdata runs on 19999 by default. We'll expose it at 20000
 netdata_internal_port: 19999
 netdata_external_port: 20000
@@ -238,102 +171,6 @@ disk_space_usage_notification_icon: https://github.com/enterprisemediawiki/meza/
 
 # Cleanup upload stash (temporary files) daily at 6pm
 clean_upload_stash_crontime: "0 18 * * *"
-
-
-#
-# FILE MODES, OWNERS, GROUPS
-#
-
-#
-# PATH SPECIFICATIONS: PUT ALL PATH INFO UNDER m_paths
-# ----------------------------------------------------
-#
-# Use Capital X to give dirs "execute" (i.e. allow entry into dir) but leave
-# files' execute bit untouched.
-#
-# Examples:
-#   "u=rwX,g=rX,o="    --> 750 for dirs, files possibly between 640 and 751
-#   "u=rwX,g=rwX,o=rX" --> 775 for dirs, files possibly between 664 and 775
-#
-# Ref: https://www.g-loaded.eu/2005/11/08/the-use-of-the-uppercase-x-in-chmod/
-#
-m_paths:
-  mw_temp:
-    path: "{{ m_meza_data }}/mw-temp"
-    mode: "u=rwX,g=rwX,o=rX"
-    owner: apache
-    group: apache
-    # recurse: TBD if we want this within m_paths
-
-
-#
-# LEGACY PATH SPECIFICATIONS
-# --------------------------
-#
-
-m_meza_owner: meza-ansible
-m_meza_group: wheel
-# Don't set mode for /opt/meza for now. Don't want to impact execute bit which
-# is managed by Git
-# FIXME: Later specify read and write permissions only if Ansible supports
-
-
-m_data_mode: "0755"
-m_data_owner: meza-ansible
-m_data_group: wheel
-
-
-#
-# Used for many things within htdocs that don't require apache to manipulate
-#
-m_htdocs_mode: "u=rwX,g=rwX,o=rX"
-m_htdocs_owner: meza-ansible
-m_htdocs_group: wheel
-
-
-# uploads directory. Note: user meza-ansible is in group "apache"
-m_uploads_dir_mode: "0775"
-m_uploads_dir_owner: "{{ user_apache }}"
-m_uploads_dir_group: "{{ group_apache }}"
-
-# Per [1] this should not be accessible from the web and should have mode of
-# 0700. However, we need it to be accessible by apache httpd for page requests
-# but also allow command line scripts to run it, specifically for running jobs.
-# Fortunately jobs are run by the meza-ansible user, who is in group "apache"
-# and therefore we'll use mode=0770.
-#
-# [1] https://www.mediawiki.org/wiki/Manual:$wgCacheDirectory
-m_cache_directory_mode: "0770"
-m_cache_directory_owner: "{{ user_apache }}"
-m_cache_directory_group: "{{ group_apache }}"
-
-m_logs_mode: "0755"
-m_logs_owner: meza-ansible
-m_logs_group: wheel
-
-
-m_backups_mode: "0775"
-m_backups_owner: meza-ansible
-m_backups_group: meza-backups
-
-# mode/ownership for anything in /etc/cron.d
-m_crond_mode: "0644"
-m_crond_owner: root
-m_crond_group: root
-
-m_config_public_mode: "0755"
-m_config_public_owner: meza-ansible
-m_config_public_group: wheel
-
-m_config_secret_file_mode: "0660"
-m_config_secret_dir_mode: "0775"
-m_config_secret_owner: meza-ansible
-m_config_secret_group: wheel
-
-m_simplesamlphp_mode: "u=rwX,g=rwX,o=rX"
-m_simplesamlphp_owner: meza-ansible
-m_simplesamlphp_group: wheel
-
 
 #
 # PHP config

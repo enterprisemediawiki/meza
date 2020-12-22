@@ -122,7 +122,7 @@
 - name: Read SSL key into variable
   shell: >
     ansible-vault view
-    /opt/conf-meza/secret/{{ env }}/ssl/meza.key
+    {{ m_local_secret }}/{{ env }}/ssl/meza.key
     --vault-password-file {{ m_config_vault }}/vault-pass-{{ env }}.txt
   register: decrypted_key
   delegate_to: localhost
@@ -131,7 +131,7 @@
 - name: Read SSL cert into variable
   shell: >
     ansible-vault view
-    /opt/conf-meza/secret/{{ env }}/ssl/meza.crt
+    {{ m_local_secret }}/{{ env }}/ssl/meza.crt
     --vault-password-file {{ m_config_vault }}/vault-pass-{{ env }}.txt
   register: decrypted_cert
   delegate_to: localhost

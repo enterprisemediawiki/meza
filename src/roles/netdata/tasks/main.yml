@@ -4,7 +4,7 @@
 ## Add test to see if it's already installed and skip if it is
 - name: Check if Netdata is present
   stat:
-    path: /opt/netdata
+    path: "{{ m_install }}/netdata"
   register: netdata_present
 
 - debug: msg="netdata not installed"

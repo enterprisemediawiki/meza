@@ -5,9 +5,11 @@
 #   2. Generate SSH key pair
 #   3. Print public key and inform to put on minions
 
+MEZA_INSTALL_PATH=$(dirname $(dirname $(dirname $(dirname $(realpath $(which meza))))))
+
 # Load config constants. Unfortunately right now have to write out full path to
 # meza since we can't be certain of consistent method of accessing install.sh.
-source "/opt/.deploy-meza/config.sh"
+source "${MEZA_INSTALL_PATH}/.deploy-meza/config.sh"
 
 echo "Ansible user: $ansible_user"
 if [ -z "$ansible_user" ]; then

@@ -23,7 +23,7 @@
  * @author James Montalvo
  * @ingroup Maintenance
  */
-require_once( '/opt/htdocs/mediawiki/maintenance/Maintenance.php' );
+require_once( '/opt/htdocs/mediawiki/maintenance/Maintenance.php' ); // FIXME assumes installed in /opt
 class MezaUnifyUserTables extends Maintenance {
 
 	public $recordDir;

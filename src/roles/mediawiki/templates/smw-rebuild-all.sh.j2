@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source "/opt/.deploy-meza/config.sh"
+source "{{ m_install }}/.deploy-meza/config.sh"
 
 if [ -z "$1" ]; then
 	do_wikis="*/"
@@ -34,7 +34,7 @@ for d in $do_wikis; do
 	echo "  Output log:"
 	echo "    $out_log"
 
-	start_id_file="/opt/data-meza/logs/custom-rebuild-start-id-file"
+	start_id_file="{{ m_logs }}/custom-rebuild-start-id-file"
 
 	# on the first pass, use -f to fully rebuild the SMW structure
 	dependent_option="-f"

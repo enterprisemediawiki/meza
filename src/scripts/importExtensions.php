@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL);
 # normalize names by removing any spaces
+// FIXME: assumes installed in /opt
 $core  = `grep -Po 'name\: (.*)' /opt/meza/config/MezaCoreExtensions.yml | sort | awk --field-separator=: '{print $2}' | sed s'/[ \t]*//g'`;
 $local = `grep -Po 'name\: (.*)' /opt/conf-meza/public/MezaLocalExtensions.yml | sort | awk --field-separator=: '{print $2}' | sed s'/[ \t]*//g'`;
 

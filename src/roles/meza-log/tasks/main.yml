@@ -18,7 +18,7 @@
 
 - name: "Copy meza_server_log.sql to remote database hosts"
   copy:
-    src: "/opt/meza/src/roles/meza-log/files/meza_server_log.sql"
+    src: "{{ m_meza }}/src/roles/meza-log/files/meza_server_log.sql"
     dest: "/tmp/meza_server_log.sql"
     owner: meza-ansible
     group: meza-ansible
@@ -56,7 +56,7 @@
 
 - name: "Copy table_disk_space.sql to remote database hosts"
   copy:
-    src: "/opt/meza/src/roles/meza-log/files/table_disk_space.sql"
+    src: "{{ m_meza }}/src/roles/meza-log/files/table_disk_space.sql"
     dest: "/tmp/table_disk_space.sql"
     owner: meza-ansible
     group: meza-ansible

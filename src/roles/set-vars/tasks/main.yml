@@ -1,19 +1,48 @@
 ---
 
+#
+# Retrieve Meza install path by finding realpath of Meza.py from /user/bin/meza
+#
+- name: Get Meza install path
+  shell: "dirname $(dirname $(dirname $(dirname $(realpath $(which meza)))))"
+  register: register_install_path
+
+- set_fact:
+    m_install: "{{ register_install_path.stdout }}"
+
+#
+# OS-Family vars
 # Note: OS-family vars come before defaults.yml, so they can drive defaults.yml values
+#
 - name: Set OS-family specific variables
   include_vars:
-    file: "/opt/meza/config/{{ ansible_os_family }}.yml"
+    file: "{{ m_install }}/meza/config/{{ ansible_os_family }}.yml"
 
+#
+# Meza-core variables
+#
 - name: Set meza-core path variables
   include_vars:
-    file: /opt/meza/config/defaults.yml
+    file: "{{ m_install }}/meza/config/paths.yml"
 
+- name: Set meza-core default variables
+  include_vars:
+    file: "{{ m_install }}/meza/config/defaults.yml"
+
+#FIXME remove this
+# - debug: { msg: "{{ m_i18n }} TEST {{ m_db_replication_log_pos }} " }
+
+#
+# Gluster mods
+#
 - name: If using gluster (app-servers > 1), override m_uploads_dir
   set_fact:
     m_uploads_dir: "{{ gluster_mount_dir }}"
   when: "'app-servers' in groups and groups['app-servers']|length|int > 1"
 
+#
+# Public config
+#
 - name: Set meza local public variables
   include_vars:
     file: "{{ m_local_public }}/public.yml"
@@ -37,6 +66,9 @@
   # Ingore errors so this file is not required to be included
   failed_when: False
 
+#
+# Secret config
+#
 - name: Set meza local secret variables
   include_vars:
     file: "{{ m_local_secret }}/{{ env }}/secret.yml"

@@ -27,6 +27,7 @@ $load_ceiling = $ceiling / 100;
 $avg_response_time_ceiling = $ceiling * 100;
 
 // get config vars from config.php
+// FIXME assumes in /opt
 require_once '/opt/.deploy-meza/config.php';
 $username = $wiki_app_db_user_name;
 $password = $wiki_app_db_user_pass;

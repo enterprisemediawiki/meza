@@ -14,6 +14,7 @@
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
 
+// FIXME: this assumes installed in /opt which is not gauranteed
 require_once '/opt/.deploy-meza/config.php';
 
 // if there's a SAML config file, we need to authenticate with SAML, like, now.

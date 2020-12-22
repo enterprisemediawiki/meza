@@ -55,7 +55,8 @@
  * @author James Montalvo
  * @ingroup Maintenance
  */
-require_once( '/opt/htdocs/mediawiki/maintenance/Maintenance.php' );
+require_once( '/opt/htdocs/mediawiki/maintenance/Maintenance.php' ); // FIXME assumes installed in /opt
+
 class UniteTheWikis extends Maintenance {
 
 	protected $mergedwiki;
@@ -74,7 +75,7 @@ class UniteTheWikis extends Maintenance {
 
 	public function __construct () {
 
-		require_once '/opt/.deploy-meza/config.php';
+		require_once '/opt/.deploy-meza/config.php'; // FIXME assumes installed in /opt
 
 		parent::__construct();
 		$this->mDescription = "Merge some wikis into one wiki";

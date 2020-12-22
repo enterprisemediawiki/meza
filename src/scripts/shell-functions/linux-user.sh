@@ -2,8 +2,10 @@
 #
 # Shell functions to add and modify linux users
 
+MEZA_IP=$(dirname $(dirname $(dirname $(dirname $(realpath $(which meza))))))
+
 # Don't create meza application users under /home, ref: #727
-meza_user_dir="/opt/conf-meza/users"
+meza_user_dir="${MEZA_IP}/conf-meza/users"
 
 mf_user_exists() {
 	ret=false

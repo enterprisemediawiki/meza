@@ -1,0 +1,173 @@
+---
+# Meza default config file
+
+# meza install location
+# m_install: "/opt" <-- formerly set here, now determined in set-vars role based on `which meza`
+
+# Meza application path
+m_meza: "{{ m_install }}/meza"
+
+# config dir
+m_config_core: "{{ m_meza }}/config"
+m_local_secret: "{{ m_install }}/conf-meza/secret"
+m_local_public: "{{ m_install }}/conf-meza/public"
+m_config_vault: "{{ m_install }}/conf-meza/vault"
+m_home: "{{ m_install }}/conf-meza/users"
+
+# Config files written by Ansible which need a place to live on non-controller
+# nodes.
+m_deploy: "{{ m_install }}/.deploy-meza"
+
+# scripts dir
+m_scripts: "{{ m_meza }}/src/scripts"
+
+# test dir
+m_test: "{{ m_meza }}/test"
+
+# data dir
+m_meza_data: "{{ m_install }}/data-meza"
+m_cache_directory: "{{ m_meza_data }}/cache"
+m_tmp: "{{ m_meza_data }}/tmp"
+m_logs: "{{ m_meza_data }}/logs"
+m_logs_deploy: "{{ m_meza_data }}/logs/deploy/deploy.log"
+
+# uploads dir. This WILL BE OVERIDDEN if multiple app servers are used, and
+# instead will use /opt/data-meza/uploads-gluster to use GlusterFS distributed
+# file system.
+m_uploads_dir: "{{ m_meza_data }}/uploads"
+
+# GlusterFS vars
+gluster_mount_dir: "{{ m_meza_data }}/uploads-gluster"
+gluster_brick_dir: "{{ m_meza_data }}/gluster/brick"
+gluster_brick_name: gluster
+
+# Location where backups will go, specified by environment, e.g.
+# /opt/data-meza/backups/prod for "prod" environment
+m_backups: "{{ m_meza_data }}/backups"
+
+# webserver variables
+m_htdocs: "{{ m_install }}/htdocs"
+# crawl for default or nocrawl to disallow all
+m_robots_rules: nocrawl
+m_mediawiki: "{{ m_install }}/htdocs/mediawiki"
+m_cert_private: "/etc/pki/tls/private/meza.key"
+m_cert_public: "/etc/pki/tls/certs/meza.crt"
+m_ca_cert: "/etc/pki/tls/certs/meza-ca.crt"
+
+
+# app locations
+m_apache: "/etc/httpd"
+m_php_ini: "/etc/php.ini"
+m_parsoid_path: "/etc/parsoid"
+m_simplesamlphp_path: "{{ m_install }}/simplesamlphp"
+m_profiling_xhgui_directory: "{{ m_install }}/xhgui"
+
+# files
+m_i18n: "{{ m_config_core }}/i18n"
+m_db_replication_dump_file: "{{ m_meza_data }}/db_master_for_replication.sql"
+m_db_replication_log_file: "{{ m_meza_data }}/db_master_log_file"
+m_db_replication_log_pos: "{{ m_meza_data }}/db_master_log_pos"
+
+# Netdata needs  a certificate to bind to port 20000
+ssl_certificate_file: "/etc/haproxy/certs/meza.pem"
+
+# Deviation from geerlinguy role "database" (this was in database role's defaults/main.yml)
+# mysql_datadir: /var/lib/mysql
+mysql_datadir: "{{ m_meza_data }}/mariadb"
+
+
+#
+# FILE MODES, OWNERS, GROUPS
+#
+
+#
+# PATH SPECIFICATIONS: PUT ALL PATH INFO UNDER m_paths
+# ----------------------------------------------------
+#
+# Use Capital X to give dirs "execute" (i.e. allow entry into dir) but leave
+# files' execute bit untouched.
+#
+# Examples:
+#   "u=rwX,g=rX,o="    --> 750 for dirs, files possibly between 640 and 751
+#   "u=rwX,g=rwX,o=rX" --> 775 for dirs, files possibly between 664 and 775
+#
+# Ref: https://www.g-loaded.eu/2005/11/08/the-use-of-the-uppercase-x-in-chmod/
+#
+m_paths:
+  mw_temp:
+    path: "{{ m_meza_data }}/mw-temp"
+    mode: "u=rwX,g=rwX,o=rX"
+    owner: apache
+    group: apache
+    # recurse: TBD if we want this within m_paths
+
+
+#
+# LEGACY PATH SPECIFICATIONS
+# --------------------------
+#
+
+m_meza_owner: meza-ansible
+m_meza_group: wheel
+# Don't set mode for /opt/meza for now. Don't want to impact execute bit which
+# is managed by Git
+# FIXME: Later specify read and write permissions only if Ansible supports
+
+
+m_data_mode: "0755"
+m_data_owner: meza-ansible
+m_data_group: wheel
+
+
+#
+# Used for many things within htdocs that don't require apache to manipulate
+#
+m_htdocs_mode: "u=rwX,g=rwX,o=rX"
+m_htdocs_owner: meza-ansible
+m_htdocs_group: wheel
+
+
+# uploads directory. Note: user meza-ansible is in group "apache"
+m_uploads_dir_mode: "0775"
+# NOTE: need defaults for apache since this file is directly loaded by meza.py
+m_uploads_dir_owner: "{{ user_apache | default('unknown_apache_user', true) }}"
+m_uploads_dir_group: "{{ group_apache | default('unknown_apache_group', true) }}"
+
+# Per [1] this should not be accessible from the web and should have mode of
+# 0700. However, we need it to be accessible by apache httpd for page requests
+# but also allow command line scripts to run it, specifically for running jobs.
+# Fortunately jobs are run by the meza-ansible user, who is in group "apache"
+# and therefore we'll use mode=0770.
+#
+# [1] https://www.mediawiki.org/wiki/Manual:$wgCacheDirectory
+m_cache_directory_mode: "0770"
+# NOTE: need defaults for apache since this file is directly loaded by meza.py
+m_cache_directory_owner: "{{ user_apache | default('unknown_apache_user', true) }}"
+m_cache_directory_group: "{{ group_apache | default('unknown_apache_group', true) }}"
+
+m_logs_mode: "0755"
+m_logs_owner: meza-ansible
+m_logs_group: wheel
+
+
+m_backups_mode: "0775"
+m_backups_owner: meza-ansible
+m_backups_group: meza-backups
+
+# mode/ownership for anything in /etc/cron.d
+m_crond_mode: "0644"
+m_crond_owner: root
+m_crond_group: root
+
+m_config_public_mode: "0755"
+m_config_public_owner: meza-ansible
+m_config_public_group: wheel
+
+m_config_secret_file_mode: "0660"
+m_config_secret_dir_mode: "0775"
+m_config_secret_owner: meza-ansible
+m_config_secret_group: wheel
+
+m_simplesamlphp_mode: "u=rwX,g=rwX,o=rX"
+m_simplesamlphp_owner: meza-ansible
+m_simplesamlphp_group: wheel

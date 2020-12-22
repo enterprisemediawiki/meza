@@ -21,7 +21,7 @@ fi
 # For now this script is not called within the same shell as install.sh
 # and thus it needs to know how to get to the config.sh script on it's own
 #
-source "/opt/.deploy-meza/config.sh"
+source "/opt/.deploy-meza/config.sh" # FIXME assumes installed in /opt
 
 
 # prompt for wikis to merge
@@ -38,7 +38,7 @@ echo -e "Enter the ID of the new wiki you're creating and hit [ENTER]: "
 read wiki_id
 done
 
-
+# FIXME assumes installed in /opt
 if [ -d "/opt/.deploy-meza/public/wikis/$wiki_id" ]; then
 
 	if [ "$skip_confirm_merge" != "y" ]; then

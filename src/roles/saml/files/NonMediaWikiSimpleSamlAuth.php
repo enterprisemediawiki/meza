@@ -21,6 +21,7 @@ define( 'MEDIAWIKI', 1 );
 $wgSamlConfirmMail = false;
 
 // get SAML config, shared with MediaWiki extension SimpleSamlAuth
+// FIXME assumes installed in /opt
 require_once '/opt/.deploy-meza/SAMLConfig.php';
 
 // This class is basically a pared down version of SimpleSamlAuth.class.php, an

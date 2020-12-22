@@ -6,10 +6,20 @@
 # FIXME #729: Move this into a role
 - hosts: localhost
   become: yes
-  vars:
-    m_home: "/opt/conf-meza/users"
-    m_config_vault: "/opt/conf-meza/vault"
   tasks:
+
+  #
+  # Can't run set-vars yet, so bootstrap m_home and m_config_vault for now.
+  # Meza install path retrieved in same way in set-vars role
+  #
+  - name: Get Meza install path
+    shell: "dirname $(dirname $(dirname $(dirname $(realpath $(which meza)))))"
+    register: ip
+  - set_fact:
+      m_home: "{{ ip.stdout }}/conf-meza/users"
+      m_config_vault: "{{ ip.stdout }}/conf-meza/vault"
+      m_conf_dir: "{{ ip.stdout }}/conf-meza"
+
   - name: Ensure no password on meza-ansible user on controller
     shell: passwd --delete meza-ansible
     failed_when: False
@@ -60,14 +70,14 @@
   # impossible to include_vars later.
   - name: Ensure secret.yml owned by meza-ansible
     file:
-      path: "/opt/conf-meza/secret/{{ env }}/secret.yml"
+      path: "{{ m_conf_dir }}/secret/{{ env }}/secret.yml"
       owner: meza-ansible
       group: wheel
       mode: "0660"
 
-  - name: Ensure /opt/conf-meza owned by meza-ansible
+  - name: "Ensure {{ m_conf_dir }} owned by meza-ansible"
     file:
-      path: "/opt/conf-meza"
+      path: "{{ m_conf_dir }}"
       owner: meza-ansible
       group: wheel
       mode: "0755"
