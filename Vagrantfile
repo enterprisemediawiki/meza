@@ -16,6 +16,13 @@ else
 end
 
 
+if configuration.key?("install_directory")
+  install_directory = configuration["install_directory"]
+else
+  install_directory = "/opt"
+end
+
+
 if configuration.key?("baseBox")
 
   # Allow custom setting of base bax
@@ -98,8 +105,6 @@ Vagrant.configure("2") do |config|
 
       # Non-controlling server should not have meza
       app2.vm.synced_folder ".", "/vagrant", disabled: true
-   	  # app2.vm.synced_folder ".", "/opt/meza", type: "rsync",
-      #   rsync__args: ["--verbose", "--archive", "--delete", "-z"]
 
       # Transfer setup-minion-user.sh script to app2
       app2.vm.provision "file", source: "./src/scripts/ssh-users/setup-minion-user.sh", destination: "/tmp/minion.sh"
@@ -109,15 +114,15 @@ Vagrant.configure("2") do |config|
       # Setup SSH user and unsafe testing config
       #
       app2.vm.provision "minion-ssh", type: "shell", preserve_order: true, binary: true, inline: <<-SHELL
-        if [ ! -f /opt/conf-meza/public/public.yml ]; then
+        if [ ! -f #{install_directory}/conf-meza/public/public.yml ]; then
 
           bash /tmp/minion.sh
 
           # Turn off host key checking for user meza-ansible, to avoid prompts
           echo "setup .ssh/config"
-          bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > /opt/conf-meza/users/meza-ansible/.ssh/config'
-          sudo chown meza-ansible:meza-ansible /opt/conf-meza/users/meza-ansible/.ssh/config
-          sudo chmod 600 /opt/conf-meza/users/meza-ansible/.ssh/config
+          bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > #{install_directory}/conf-meza/users/meza-ansible/.ssh/config'
+          sudo chown meza-ansible:meza-ansible #{install_directory}/conf-meza/users/meza-ansible/.ssh/config
+          sudo chmod 600 #{install_directory}/conf-meza/users/meza-ansible/.ssh/config
 
           # Allow password auth
           echo "setup sshd_config password auth"
@@ -151,8 +156,6 @@ Vagrant.configure("2") do |config|
 
       # Non-controlling server should not have meza
       db2.vm.synced_folder ".", "/vagrant", disabled: true
-      # db2.vm.synced_folder ".", "/opt/meza", type: "rsync",
-      #   rsync__args: ["--verbose", "--archive", "--delete", "-z"]
 
       # Transfer setup-minion-user.sh script to db2
       db2.vm.provision "file", source: "./src/scripts/ssh-users/setup-minion-user.sh", destination: "/tmp/minion.sh"
@@ -162,15 +165,15 @@ Vagrant.configure("2") do |config|
       # Setup SSH user and unsafe testing config
       #
       db2.vm.provision "minion-ssh", type: "shell", preserve_order: true, binary: true, inline: <<-SHELL
-        if [ ! -f /opt/conf-meza/public/public.yml ]; then
+        if [ ! -f #{install_directory}/conf-meza/public/public.yml ]; then
 
           bash /tmp/minion.sh
 
           # Turn off host key checking for user meza-ansible, to avoid prompts
           echo "setup .ssh/config"
-          bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > /opt/conf-meza/users/meza-ansible/.ssh/config'
-          sudo chown meza-ansible:meza-ansible /opt/conf-meza/users/meza-ansible/.ssh/config
-          sudo chmod 600 /opt/conf-meza/users/meza-ansible/.ssh/config
+          bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > #{install_directory}/conf-meza/users/meza-ansible/.ssh/config'
+          sudo chown meza-ansible:meza-ansible #{install_directory}/conf-meza/users/meza-ansible/.ssh/config
+          sudo chmod 600 #{install_directory}/conf-meza/users/meza-ansible/.ssh/config
 
           # Allow password auth
           echo "setup sshd_config password auth"
@@ -208,15 +211,10 @@ Vagrant.configure("2") do |config|
       # Also, at least on Windows it's not possible to change the owner/group
       # after it is mounted, so instead we pick a UID and GID and meza-ansible
       # and wheel are changed to these IDs after they are created.
-      app1.vm.synced_folder ".", "/opt/meza", type: "virtualbox", owner: 10000, group: 10000, mount_options: ["dmode=755,fmode=755"]
+      app1.vm.synced_folder ".", install_directory + "/meza", type: "virtualbox", owner: 10000, group: 10000, mount_options: ["dmode=755,fmode=755"]
     else
-      app1.vm.synced_folder ".", "/opt/meza", type: "virtualbox", owner: 10000, group: 10000
+      app1.vm.synced_folder ".", install_directory + "/meza", type: "virtualbox", owner: 10000, group: 10000
     end
-
-    # app1.vm.synced_folder ".", "/opt/meza", type: "smb"
-    # app1.vm.synced_folder ".", "/opt/meza", type: "rsync",
-    #   rsync__args: ["--verbose", "--archive", "--delete", "-z"]
-
 
     # Transfer keys to app1
     app1.vm.provision "file", source: "./.vagrant/id_rsa", destination: "/tmp/meza-ansible.id_rsa"
@@ -227,18 +225,18 @@ Vagrant.configure("2") do |config|
     # Bootstrap meza on the controlling VM
     #
     app1.vm.provision "getmeza", type: "shell", preserve_order: true, inline: <<-SHELL
-      bash /opt/meza/src/scripts/getmeza.sh
-      rm -rf /opt/conf-meza/users/meza-ansible/.ssh/id_rsa
-      rm -rf /opt/conf-meza/users/meza-ansible/.ssh/id_rsa.pub
-      mv /tmp/meza-ansible.id_rsa /opt/conf-meza/users/meza-ansible/.ssh/id_rsa
-      mv /tmp/meza-ansible.id_rsa.pub /opt/conf-meza/users/meza-ansible/.ssh/id_rsa.pub
+      bash #{install_directory}/meza/src/scripts/getmeza.sh
+      rm -rf #{install_directory}/conf-meza/users/meza-ansible/.ssh/id_rsa
+      rm -rf #{install_directory}/conf-meza/users/meza-ansible/.ssh/id_rsa.pub
+      mv /tmp/meza-ansible.id_rsa #{install_directory}/conf-meza/users/meza-ansible/.ssh/id_rsa
+      mv /tmp/meza-ansible.id_rsa.pub #{install_directory}/conf-meza/users/meza-ansible/.ssh/id_rsa.pub
 
-      chmod 600 /opt/conf-meza/users/meza-ansible/.ssh/id_rsa
-      chown meza-ansible:meza-ansible /opt/conf-meza/users/meza-ansible/.ssh/id_rsa
-      chmod 644 /opt/conf-meza/users/meza-ansible/.ssh/id_rsa.pub
-      chown meza-ansible:meza-ansible /opt/conf-meza/users/meza-ansible/.ssh/id_rsa.pub
+      chmod 600 #{install_directory}/conf-meza/users/meza-ansible/.ssh/id_rsa
+      chown meza-ansible:meza-ansible #{install_directory}/conf-meza/users/meza-ansible/.ssh/id_rsa
+      chmod 644 #{install_directory}/conf-meza/users/meza-ansible/.ssh/id_rsa.pub
+      chown meza-ansible:meza-ansible #{install_directory}/conf-meza/users/meza-ansible/.ssh/id_rsa.pub
 
-      cat /opt/conf-meza/users/meza-ansible/.ssh/id_rsa.pub >> /opt/conf-meza/users/meza-ansible/.ssh/authorized_keys
+      cat #{install_directory}/conf-meza/users/meza-ansible/.ssh/id_rsa.pub >> #{install_directory}/conf-meza/users/meza-ansible/.ssh/authorized_keys
 
       usermod -u 10000 meza-ansible
       groupmod -g 10000 wheel
@@ -263,7 +261,7 @@ Vagrant.configure("2") do |config|
 
     # Create vagrant environment if it doesn't exist
     app1.vm.provision "setupenv", type: "shell", preserve_order: true, env: envvars, inline: <<-SHELL
-      if [ ! -d /opt/conf-meza/secret/vagrant ]; then
+      if [ ! -d #{install_directory}/conf-meza/secret/vagrant ]; then
         meza setup env vagrant --fqdn=#{app1_ip_address} --db_pass=1234 --private_net_zone=public
       fi
     SHELL
@@ -273,11 +271,11 @@ Vagrant.configure("2") do |config|
     #
     app1.vm.provision "publicconfig", type: "shell", preserve_order: true, inline: <<-SHELL
       # Create public config dir if not exists
-      [ -d /opt/conf-meza/public ] || mkdir /opt/conf-meza/public
+      [ -d #{install_directory}/conf-meza/public ] || mkdir #{install_directory}/conf-meza/public
 
       # If public config YAML file not present, create with defaults
-      if [ ! -f /opt/conf-meza/public/public.yml ]; then
-cat >/opt/conf-meza/public/public.yml <<EOL
+      if [ ! -f #{install_directory}/conf-meza/public/public.yml ]; then
+cat >#{install_directory}/conf-meza/public/public.yml <<EOL
 ---
 blender_landing_page_title: Meza Wikis
 m_setup_php_profiling: true
@@ -289,9 +287,9 @@ EOL
       fi
 
       # Make the vagrant environment configured for development
-      echo 'm_use_production_settings: False' >> /opt/conf-meza/public/public.yml
+      echo 'm_use_production_settings: False' >> #{install_directory}/conf-meza/public/public.yml
 
-      cat /opt/conf-meza/public/public.yml
+      cat #{install_directory}/conf-meza/public/public.yml
     SHELL
 
     #
@@ -302,9 +300,9 @@ EOL
       app1.vm.provision "keytransfer", type: "shell", preserve_order: true, inline: <<-SHELL
 
         # Turn off host key checking for user meza-ansible, to avoid prompts
-        bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > /opt/conf-meza/users/meza-ansible/.ssh/config'
-        sudo chown meza-ansible:meza-ansible /opt/conf-meza/users/meza-ansible/.ssh/config
-        sudo chmod 600 /opt/conf-meza/users/meza-ansible/.ssh/config
+        bash -c 'echo -e "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" > #{install_directory}/conf-meza/users/meza-ansible/.ssh/config'
+        sudo chown meza-ansible:meza-ansible #{install_directory}/conf-meza/users/meza-ansible/.ssh/config
+        sudo chmod 600 #{install_directory}/conf-meza/users/meza-ansible/.ssh/config
 
         # Allow SSH login
         # WARNING: This is INSECURE and for test environment only
@@ -317,7 +315,7 @@ EOL
         # sudo su meza-ansible
 
         # Copy id_rsa.pub to each minion
-        # sshpass -p 1234 ssh meza-ansible@INSERT_APP2_IP "echo \"$pubkey\" >> /opt/conf-meza/users/meza-ansible/.ssh/authorized_keys"
+        # sshpass -p 1234 ssh meza-ansible@INSERT_APP2_IP "echo \"$pubkey\" >> #{install_directory}/conf-meza/users/meza-ansible/.ssh/authorized_keys"
 
         # Remove password-based authentication for $ansible_user
         #echo "delete password"
