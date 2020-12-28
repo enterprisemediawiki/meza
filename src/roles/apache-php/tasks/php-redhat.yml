@@ -1,15 +1,15 @@
 ---
+- name: Import IUS Community Project GPG key
+  rpm_key:
+    key: https://repo.ius.io/RPM-GPG-KEY-IUS-7
+    state: present
+
 - name: Install IUS repo.
   yum:
     lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name:
       - "https://repo.ius.io/ius-release-el7.rpm"
       - "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
-
-- name: Import IUS Community Project GPG key
-  rpm_key:
-    key: https://repo.ius.io/RPM-GPG-KEY-IUS-7
-    state: present
 
 - name: Remove PHP 5.x packages
   package:
@@ -66,10 +66,12 @@
 
       # Available for php56u and php70u. NOT php71u or php72u
       # - "{{ php_ius_version }}-pear"
+
       # Post 7.0, use the pear1u package for all versions of PHP
       # PEAR is no longer a requirement for Meza. Mail and Net_SMTP installed with
       # Composer via MW core (MW 1.32+) or composer.local.json (MW 1.31 and lower)
-      # - pear1u
+      # However, PEAR is required for MSSQL integrations
+      - pear1u
 
       # Not available for PHP 7, due to being built into PHP 7
       # - php56u-pecl-jsonc

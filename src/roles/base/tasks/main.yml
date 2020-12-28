@@ -265,6 +265,14 @@
 #   pip:
 #     name: cryptography
 
+- name: Ensure install directory configured
+  file:
+    path: "{{ m_paths.install.path }}"
+    state: directory
+    owner: "{{ m_paths.install.owner }}"
+    group: "{{ m_paths.install.group }}"
+    mode: "{{ m_paths.install.mode }}"
+
 - name: Ensure data directory configured
   file:
     path: "{{ m_meza_data }}"

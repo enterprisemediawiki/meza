@@ -66,7 +66,7 @@ load_balancer_unmanaged_parsoid_port: 8000
 load_balancer_unmanaged_mediawiki_port: 8080
 
 # Netdata is a monitoring and alerting system
-m_install_netdata: True
+m_install_netdata: False
 # netdata runs on 19999 by default. We'll expose it at 20000
 netdata_internal_port: 19999
 netdata_external_port: 20000

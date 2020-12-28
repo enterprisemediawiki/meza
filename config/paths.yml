@@ -94,6 +94,12 @@ mysql_datadir: "{{ m_meza_data }}/mariadb"
 # Ref: https://www.g-loaded.eu/2005/11/08/the-use-of-the-uppercase-x-in-chmod/
 #
 m_paths:
+  install:
+    path: "{{ m_install }}"
+    mode: "0755"
+    owner: "meza-ansible"
+    group: "wheel"
+
   mw_temp:
     path: "{{ m_meza_data }}/mw-temp"
     mode: "u=rwX,g=rwX,o=rX"
