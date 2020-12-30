@@ -21,15 +21,16 @@
 # other versions of PHP are not installed
 - name: "Check if {{ php_ius_version }} package is installed"
   yum:
-    list: "{{ php_ius_version }}"
+    list: "{{ php_ius_version }}-cli"
   register: correct_php
 
 - debug:
     var: correct_php
 
-- name: Remove any other PHP packages from IUS repo if correct PHP is not installed
+# PHP 7.3+ dropped the "u", e.g. php71u-cli vs php73-cli. Also, see note below about mod_php
+- name: Remove php 7.x packages if correct PHP is not installed
   package:
-    name: "php*u*"
+    name: "*php7*"
     state: absent
   when: correct_php.results|length == 0
 
@@ -37,7 +38,12 @@
   yum:
     name:
       # The following items exist in php56u, php70u, php71u, and php72u
-      - "{{ php_ius_version }}"
+
+      # There is no longer a plain "php73" package as there was a php71u. The
+      # corresponding package is now called mod_php73.
+      # - "{{ php_ius_version }}"
+      - "mod_{{ php_ius_version }}"
+
       - "{{ php_ius_version }}-cli"
       - "{{ php_ius_version }}-common"
       - "{{ php_ius_version }}-devel"

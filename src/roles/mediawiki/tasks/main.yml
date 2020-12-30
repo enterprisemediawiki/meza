@@ -517,7 +517,7 @@
 
 
 - name: Verify metastore index upgraded
-  shell: WIKI={{ list_of_wikis[0] }} php {{ m_mediawiki }}/extensions/CirrusSearch/maintenance/metastore.php --upgrade
+  shell: WIKI={{ list_of_wikis[0] }} php {{ m_mediawiki }}/extensions/CirrusSearch/maintenance/Metastore.php --upgrade
   run_once: true
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 

@@ -3,7 +3,7 @@ list:
 
   - name: Semantic MediaWiki
     composer: "mediawiki/semantic-media-wiki"
-    version: "3.1.6"
+    version: "3.2.2"
     config: |
       // Enable Semantic MediaWiki semantics
       enableSemantics( $wikiId );
@@ -27,7 +27,7 @@ list:
 
   - name: Semantic Result Formats
     composer: "mediawiki/semantic-result-formats"
-    version: "3.1.0"
+    version: "3.2.0"
     config: |
       // In SRF 3.0+ you need to do this, too:
       wfLoadExtension( 'SemanticResultFormats' );
@@ -73,7 +73,7 @@ list:
 
   - name: Maps
     composer: "mediawiki/maps"
-    version: "7.17.2"
+    version: "7.20.1" # FIXME this can bump to 8.x
     config: |
       // In Maps 6.0+ you need to also load the extension
       wfLoadExtension( 'Maps' );
@@ -209,6 +209,12 @@ list:
       // $wgVisualEditorAvailableNamespaces[] = NS_CUSTOM;
       // $wgVisualEditorAvailableNamespaces[] = NS_PROJECT;
 
+      $wgVirtualRestConfig['modules']['parsoid'] = array(
+          'url' => "http://127.0.0.1/$wikiId/rest.php",
+      );
+
+      // Because we're manually setting the Virtual Rest Config above, need to load Parsoid manually
+      wfLoadExtension( 'Parsoid', 'vendor/wikimedia/parsoid/extension.json' );
 
   - name: TemplateData
     repo: https://github.com/wikimedia/mediawiki-extensions-TemplateData.git
@@ -279,7 +285,7 @@ list:
 
   - name: SemanticDrilldown
     repo: https://github.com/wikimedia/mediawiki-extensions-SemanticDrilldown.git
-    version: "tags/2.1"
+    version: "master"
     legacy_load: true
 
   - name: Arrays
@@ -295,8 +301,7 @@ list:
 
   - name: AdminLinks
     repo: https://github.com/wikimedia/mediawiki-extensions-AdminLinks.git
-    version: "{{ mediawiki_default_branch }}"
-    legacy_load: true
+    version: "master"
     config: |
       $wgGroupPermissions['sysop']['adminlinks'] = true;
 
@@ -341,7 +346,7 @@ list:
   # Verify 34.x functionality
   - name: WatchAnalytics
     repo: https://github.com/enterprisemediawiki/WatchAnalytics.git
-    version: tags/3.2.0
+    version: "master"   # FIXME set tag
     config: |
       $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
 
@@ -384,7 +389,6 @@ list:
   - name: CirrusSearch
     repo: https://github.com/wikimedia/mediawiki-extensions-CirrusSearch.git
     version: "{{ mediawiki_default_branch }}"
-    legacy_load: true
     config: |
       // CirrusSearch cluster(s) are defined based upon Ansible hosts file and thus
       // cannot be easily added to MezaCoreExtensions.yml. As such, CirrusSearch config

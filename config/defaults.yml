@@ -82,13 +82,13 @@ m_meza_sudeoers_file: "/etc/sudoers.d/meza-ansible"
 #
 
 # Version of MediaWiki core
-mediawiki_version: "REL1_34"
+mediawiki_version: "REL1_35"
 
 # Branch to use on many extensions extensions and skins
 mediawiki_default_branch: "REL1_35"
 
 # PHP version
-php_ius_version: "php73u"
+php_ius_version: "php73"
 php_debian_version: "7.3"
 
 # See Extension:CirrusSearch for ElasticSearch requirements

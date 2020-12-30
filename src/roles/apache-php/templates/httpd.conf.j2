@@ -443,6 +443,9 @@ Listen 8080
 	#      This server name causes issues with SAML setups, ref #794
 	ServerName MezaMainEntrypoint
 
+	# Required by VE/Parsoid to allow slashes in page names
+	AllowEncodedSlashes NoDecode
+
 	{% if saml_secret is defined -%}
 	# Use SimpleSamlPhp to handle authentication
 	Alias /simplesaml {{ m_simplesamlphp_path }}/www
