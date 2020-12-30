@@ -27,12 +27,16 @@
 - debug:
     var: correct_php
 
+- name: Set fact desired_PHP_version_installed
+  set_fact:
+    desired_PHP_version_installed: "{{ correct_php.results|selectattr('yumstate','match','installed')|list|length != 0 }}"
+
 # PHP 7.3+ dropped the "u", e.g. php71u-cli vs php73-cli. Also, see note below about mod_php
 - name: Remove php 7.x packages if correct PHP is not installed
   package:
     name: "*php7*"
     state: absent
-  when: correct_php.results|length == 0
+  when: not desired_PHP_version_installed
 
 - name: Ensure PHP IUS packages installed
   yum:
