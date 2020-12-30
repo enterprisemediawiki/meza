@@ -15,10 +15,3 @@
   roles:
     - set-vars
     - delete-wiki-wrapper
-
-
-- hosts: parsoid-servers
-  become: yes
-  roles:
-    - set-vars
-    - parsoid-settings

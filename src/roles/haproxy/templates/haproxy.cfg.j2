@@ -89,7 +89,7 @@ backend www-backend
 	http-response set-header Strict-Transport-Security max-age=16000000;\ includeSubDomains;\ preload;
 
     # @FIXME loop w/ index and tie all
-	# app servers together with controller as registry 
+	# app servers together with controller as registry
 	{% if m_install_netdata %}
 	frontend netdata
 		bind *:20000 ssl crt {{ ssl_certificate_file }}
@@ -116,13 +116,6 @@ listen php-profiling
 
 
 {% if load_balancer_handle_internal %}
-
-listen parsoid-internal
-	bind *:8001
-	{% for host in groups['parsoid-servers'] -%}
-		server parsoid{{ loop.index }} {{ host }}:8000 check
-	{% endfor %}
-
 
 listen mediawiki-internal
 	bind *:8081

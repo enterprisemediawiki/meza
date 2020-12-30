@@ -60,11 +60,6 @@ mysql_slow_query_time: "5"
 # https://mariadb.com/kb/en/mariadb/performance-schema-overview/
 mysql_performance_schema: "on"
 
-# If using a load balancer not managed by meza, on what port should you
-# access Parsoid and MediaWiki internal services?
-load_balancer_unmanaged_parsoid_port: 8000
-load_balancer_unmanaged_mediawiki_port: 8080
-
 # Netdata is a monitoring and alerting system
 m_install_netdata: False
 # netdata runs on 19999 by default. We'll expose it at 20000
@@ -90,14 +85,11 @@ m_meza_sudeoers_file: "/etc/sudoers.d/meza-ansible"
 mediawiki_version: "REL1_34"
 
 # Branch to use on many extensions extensions and skins
-mediawiki_default_branch: "REL1_34"
+mediawiki_default_branch: "REL1_35"
 
 # PHP version
-php_ius_version: "php72u"
-php_debian_version: "7.2"
-
-# Parsoid version
-m_parsoid_version: "tags/v0.11.0"
+php_ius_version: "php73u"
+php_debian_version: "7.3"
 
 # See Extension:CirrusSearch for ElasticSearch requirements
 # Meza before 31.x had ElasticSearch 1.6 or 2.x

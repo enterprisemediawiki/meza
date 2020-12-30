@@ -16,13 +16,6 @@
 {{ disk_space_usage_crontime }} {{ m_deploy }}/disk-space-usage.sh
 {% endif %}
 
-{% if parsoid_restart_crontime and inventory_hostname in groups['parsoid-servers'] %}
-#
-# Restart Parsoid periodically on parsoid-servers
-#
-{{ parsoid_restart_crontime }} systemctl restart parsoid > {{ m_logs }}/parsoid-restart.log 2>&1
-{% endif %}
-
 {% if inventory_hostname in groups['app-servers'] %}
 #
 # Run a small set of jobs across all wikis periodically

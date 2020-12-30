@@ -133,12 +133,6 @@
       firewall_protocol: tcp
       firewall_servers: "{{ groups['app-servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewall_port
-      firewall_action: open
-      firewall_port: 8081
-      firewall_protocol: tcp
-      firewall_servers: "{{ groups['parsoid-servers'] }}"
-      firewall_zone: "{{m_private_networking_zone|default('public')}}"
     # NOTE: firewalld ports 80 and 443 opened to ALL within haproxy role
     - haproxy
 
@@ -152,12 +146,6 @@
       firewall_port: 8080
       firewall_protocol: tcp
       firewall_servers: "{{ load_balancers_all }}"
-      firewall_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewall_port
-      firewall_action: open
-      firewall_port: 8080
-      firewall_protocol: tcp
-      firewall_servers: "{{ groups['parsoid-servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - base-extras
     - imagemagick
@@ -372,31 +360,6 @@
     - role: lua
       when: m_install_lua
     - mediawiki
-
-
-# Parsoid configuration moved after MediaWiki since Parsoid needs to know which
-# wikis exist before writing localsettings.js and (re)starting the service
-- hosts: parsoid-servers
-  become: yes
-  tags: parsoid
-  roles:
-    - set-vars
-    # Allow app servers to get to parsoid server(s) on port 8000
-    - role: firewall_port
-      firewall_action: open
-      firewall_port: 8000
-      firewall_protocol: tcp
-      firewall_servers: "{{ groups['app-servers'] }}"
-      firewall_zone: "{{m_private_networking_zone|default('public')}}"
-    - role: firewall_port
-      firewall_action: open
-      firewall_port: 8000
-      firewall_protocol: tcp
-      firewall_servers: "{{ load_balancers_all }} + {{ load_balancers_internal }}"
-      firewall_zone: "{{m_private_networking_zone|default('public')}}"
-    - nodejs
-    - parsoid
-    - parsoid-settings
 
 - hosts: logging-servers
   become: yes

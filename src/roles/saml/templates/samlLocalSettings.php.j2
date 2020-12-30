@@ -168,11 +168,10 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 # Extension:SimpleSamlAuth
 #
 # Only do auth on requests from outside the server. Requests from inside are a
-# service...probably Parsoid. Requests from outside will come from HAProxy and
+# service...in the past, Parsoid, but that's not required MW 1.35+. Requests
+# from outside will come from HAProxy and
 # therefore will have an HTTP_X_FORWARDED_FOR variable
 #
-# Ref: https://www.mediawiki.org/wiki/Talk:Parsoid/Archive#Running_Parsoid_on_a_.22private.22_wiki_-_AccessDeniedError
-# Ref: https://www.mediawiki.org/wiki/Extension:VisualEditor#Linking_with_Parsoid_in_private_wikis
 elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 
 	// wfLoadExtension( 'SimpleSamlAuth' );

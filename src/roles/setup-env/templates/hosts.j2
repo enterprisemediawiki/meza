@@ -30,11 +30,6 @@ localhost ansible_connection=local
 {{ server }}   mysql_server_id={{ loop.index + 1 }}
 {% endfor %}
 
-[parsoid-servers]
-{% for server in parsoid_servers %}
-{{ server }}
-{% endfor %}
-
 [elastic-servers]
 {% for server in elastic_servers %}
 {{ server }}

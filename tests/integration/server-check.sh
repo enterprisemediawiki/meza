@@ -7,9 +7,7 @@
 # -x: debug mode; print executed commands
 set -eux
 
-# Ensure Node.js, PHP, MariaDB installed
-which node
-node -v
+# Ensure PHP and MariaDB installed
 which php
 php --version
 which mysql
