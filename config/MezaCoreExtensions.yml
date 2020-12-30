@@ -210,11 +210,11 @@ list:
       // $wgVisualEditorAvailableNamespaces[] = NS_PROJECT;
 
       $wgVirtualRestConfig['modules']['parsoid'] = array(
-          'url' => "http://127.0.0.1/$wikiId/rest.php",
+          'url' => "http://127.0.0.1:8080/$wikiId/rest.php",
       );
 
       // Because we're manually setting the Virtual Rest Config above, need to load Parsoid manually
-      wfLoadExtension( 'Parsoid', 'vendor/wikimedia/parsoid/extension.json' );
+      wfLoadExtension( 'Parsoid', '{{ m_mediawiki }}/vendor/wikimedia/parsoid/extension.json' );
 
   - name: TemplateData
     repo: https://github.com/wikimedia/mediawiki-extensions-TemplateData.git
