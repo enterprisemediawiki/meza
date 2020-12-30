@@ -368,3 +368,12 @@
     owner: "meza-ansible"
     group: "wheel"
     mode: 0644
+
+- name: Check if obsolete Node.JS version of Parsoid exists on this server
+  stat:
+    path: "{{ m_parsoid_service_path }}"
+  register: parsoid_stat_result
+
+- name: "Do Parsoid cleanup if {{ m_parsoid_service_path }} exists"
+  include_tasks: parsoid-cleanup.yml
+  when: parsoid_stat_result.stat.exists

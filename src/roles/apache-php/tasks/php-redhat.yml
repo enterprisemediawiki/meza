@@ -66,6 +66,7 @@
       - "{{ php_ius_version }}-soap"
       - "{{ php_ius_version }}-mbstring"
       - "{{ php_ius_version }}-ldap"
+      - "{{ php_ius_version }}-pecl-zip"
 
       # php56u has memcache and memcached; php7Xu only has memcached
       # legacy Meza used php56u-pecl-memcache

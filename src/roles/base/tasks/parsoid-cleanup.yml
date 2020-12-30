@@ -1,0 +1,19 @@
+---
+
+- name: "Stop parsoid"
+  service:
+    name: parsoid
+    state: stopped
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+- name: "Ensure {{ m_parsoid_service_path }} removed"
+  file:
+    state: absent
+    path: "{{ m_parsoid_service_path }}"
+
+- name: "Ensure Parsoid removed"
+  file:
+    state: absent
+    path: "{{ m_parsoid_path }}"
+
+# NOTE that this does not remove Node.JS, in case people want to keep it installed for other purposes

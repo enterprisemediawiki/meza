@@ -61,6 +61,12 @@ m_php_ini: "/etc/php.ini"
 m_simplesamlphp_path: "{{ m_install }}/simplesamlphp"
 m_profiling_xhgui_directory: "{{ m_install }}/xhgui"
 
+# Obsolete: Parsoid is now part of MediaWiki. This path is maintained here for now
+# to allow existing Meza servers to clean it up.
+# DEPRECATED: remove in Meza 39.x
+m_parsoid_path: /etc/parsoid
+m_parsoid_service_path: /etc/init.d/parsoid
+
 # files
 m_i18n: "{{ m_config_core }}/i18n"
 m_db_replication_dump_file: "{{ m_meza_data }}/db_master_for_replication.sql"
