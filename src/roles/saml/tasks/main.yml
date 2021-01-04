@@ -104,8 +104,8 @@
     recurse: yes
 
 - name: Ensure NonMediaWikiSimpleSamlAuth.php in place
-  copy:
-    src: files/NonMediaWikiSimpleSamlAuth.php
+  template:
+    src: NonMediaWikiSimpleSamlAuth.php.j2
     dest: "{{ m_htdocs }}/NonMediaWikiSimpleSamlAuth.php"
     owner: meza-ansible
     group: apache
