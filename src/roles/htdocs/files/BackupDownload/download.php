@@ -79,13 +79,12 @@ $is_attachment = isset($_REQUEST['stream']) ? false : true;
 
 
 // if there's a SAML config file, we need to authenticate with SAML, like, now.
-if ( is_file( $m_deploy.'/SAMLConfig.php' ) ) {
-	require_once $m_htdocs.'/NonMediaWikiSimpleSamlAuth.php';
-}
-else {
+{% if saml_public is defined %}
+        require_once __DIR__ . '/NonMediaWikiSimpleSamlAuth.php';
+{% else %}
 	header('HTTP/1.0 403 Forbidden');
 	echo "Backup downloading is not permitted without Single Sign On";
-}
+{% endif %}
 
 $as = new SimpleSAML_Auth_Simple('default-sp');
 $as->requireAuth();
