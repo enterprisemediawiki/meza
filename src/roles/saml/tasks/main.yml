@@ -84,14 +84,14 @@
 
 - name: Ensure Simplesamlphp JS dependencies in place
   become: yes
-  become_user: parsoid
+  become_user: "meza-ansible"
   shell: "cd {{ m_simplesamlphp_path }} && npm install"
   tags:
     - latest
 
 - name: Ensure Simplesamlphp JS bundles built
   become: yes
-  become_user: parsoid
+  become_user: "meza-ansible"
   shell: "cd {{ m_simplesamlphp_path }} && npm run build"
   tags:
     - latest
