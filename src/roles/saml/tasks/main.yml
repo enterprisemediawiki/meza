@@ -36,7 +36,7 @@
   git:
     repo: https://github.com/simplesamlphp/simplesamlphp.git
     dest: "{{ m_simplesamlphp_path }}"
-    version: "tags/v1.16.1"
+    version: "{{ simplesamlphp_version }}"
     umask: "0002"
   tags:
     - latest
@@ -53,17 +53,48 @@
     # until meza switches to Cicalese's Extension:SimpleSamlPhp.
     repo: https://github.com/jamesmontalvo3/mwSimpleSamlAuth.git
     dest: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
-    version: master
+    version: "{{ saml_mw_extension_version }}"
     umask: "0002"
   tags:
     - latest
 
-- name: Ensure simplesamlphp dependencies in place
+- name: Ensure simplesamlphp php dependencies in place
   become: yes
   become_user: "meza-ansible"
   composer:
     command: install
     working_dir: "{{ m_simplesamlphp_path }}"
+
+- name: "Check if npm package is installed"
+  yum:
+    list: "npm"
+  register: yum_list_npm
+- debug:
+    var: yum_list_npm
+- name: Set fact npm_is_installed
+  set_fact:
+    npm_is_installed: "{{ yum_list_npm.results|selectattr('yumstate','match','installed')|list|length != 0 }}"
+
+- name: Ensure npm installed
+  yum:
+    name: npm
+    state: present
+    enablerepo: epel
+  when: not npm_is_installed
+
+- name: Ensure Simplesamlphp JS dependencies in place
+  become: yes
+  become_user: parsoid
+  shell: "cd {{ m_simplesamlphp_path }} && npm install"
+  tags:
+    - latest
+
+- name: Ensure Simplesamlphp JS bundles built
+  become: yes
+  become_user: parsoid
+  shell: "cd {{ m_simplesamlphp_path }} && npm run build"
+  tags:
+    - latest
 
 - name: Ensure config files in place
   template:
