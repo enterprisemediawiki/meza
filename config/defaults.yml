@@ -136,7 +136,7 @@ packages_php_debian:
   #   "{{ php_ius_version }}-pdo"
 
 # SAML
-simplesamlphp_version: "tags/v1.18.8"
+simplesamlphp_version: "1.18.8"
 saml_mw_extension_version: "master"
 
 
