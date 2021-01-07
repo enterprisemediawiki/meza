@@ -1,6 +1,28 @@
 Release Notes
 =============
 
+## Meza 31.14.0
+
+Bump SMW and SRF to latest
+
+### Commits since 31.13.0
+
+* 7bcb1f2 Fix typo in do-release.sh (#1284)
+* 48b8a3a Fix: improve do-release.sh, iss #1173 (#1283)
+* 17502cd SMW 3.2.2 and SRF 3.2.0 (#1282)
+
+### Contributors
+
+* 2	James Montalvo
+* 1	Daren Welsh
+
+### How to upgrade
+
+```bash
+sudo meza update 31.14.0
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.13.0
 
 Add new backups-cleanup method
