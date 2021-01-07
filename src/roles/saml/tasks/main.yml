@@ -40,6 +40,14 @@
     path: "{{ m_simplesamlphp_path }}"
     state: absent
 
+- name: "Create empty directory for {{ m_simplesamlphp_path }} if installing new version"
+  file:
+    path: "{{ m_simplesamlphp_path }}"
+    state: directory
+    owner: "{{ m_simplesamlphp_owner }}"
+    group: "{{ m_simplesamlphp_group }}"
+    mode: "{{ m_simplesamlphp_mode }}"
+
 - name: Unarchive simplesamlphp tarball if new
   become: yes
   become_user: "meza-ansible"
@@ -50,6 +58,8 @@
     group: "{{ m_simplesamlphp_group }}"
     mode: "{{ m_simplesamlphp_mode }}"
     remote_src: yes
+    extra_opts:
+      - "--strip-components=1"
   when: new_simplesamlphp_archive.changed
 
 - name: Ensure SimpleSamlAuth (MediaWiki extension) installed
