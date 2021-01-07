@@ -170,7 +170,7 @@ echo    "4. After the PR is merged create a new release of Meza with these detai
 echo    "   * Tag: $NEW_VERSION"
 echo    "   * Title: Meza $NEW_VERSION"
 echo -e "   * Description: the ${GREEN}Meza $NEW_VERSION${NC} section from RELEASE-NOTES.md"
-echo -e "   (create a release here: ${GREEN}https://github.com/enterprisemediawiki/meza/releases/new${NC})
+echo -e "   (create a release here: ${GREEN}https://github.com/enterprisemediawiki/meza/releases/new${NC})"
 echo -e "5. Move the ${GREEN}${VERSION_BRANCH}${NC} branch to the same point as the ${GREEN}${BASE_BRANCH}${NC} branch:"
 echo -e "   ${RED}git fetch"
 echo -e "   git checkout ${VERSION_BRANCH}"
