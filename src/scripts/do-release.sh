@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # Generate release notes for Meza
 
@@ -26,6 +26,38 @@ echo "*                                             *"
 echo "*           Meza Release Generator            *"
 echo "*                                             *"
 echo "* * * * * * * * * * * * * * * * * * * * * * * *"
+
+# Set current branch as base branch
+BASE_BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
+
+if [ "${BASE_BRANCH}" != "master" ]; then
+	echo
+	echo -e "${RED}You are not on the 'master' branch, and you probably want to be.${NC}"
+	printf "^"
+	for ((i=1;i<=64;i++)); do
+		sleep 0.05
+		printf "\b ^"
+	done
+	printf "\b"
+	echo
+	echo
+
+
+	echo -e "If you want to be on 'master', press ${GREEN}ctrl+c${NC} to cancel this script then"
+	echo -e "do ${GREEN}git checkout master && git pull origin master --ff-only${NC} to switch."
+	printf "^"
+	for ((i=1;i<=70;i++)); do
+		sleep 0.05
+		printf "\b ^"
+	done
+	printf "\b"
+	echo
+	echo
+
+fi
+
+echo "Checking for any changes on GitHub..."
+git fetch
 
 #
 # USER INPUT: CHOOSE OLD VERSION NUMBER TO BASE FROM
@@ -65,7 +97,7 @@ read -p "Based upon commits above, choose optional 1-line overview: " OVERVIEW
 # SETUP VARS BASED UPON USER INPUT
 #
 MAJOR_VERSION=$(echo "$NEW_VERSION" | cut -f1 -d".")
-RELEASE_BRANCH="${MAJOR_VERSION}.x"
+VERSION_BRANCH="${MAJOR_VERSION}.x"
 CONTRIBUTORS=$(git shortlog -sn "${OLD_VERSION}..HEAD" | while read line; do echo "* $line"; done)
 
 #
@@ -84,7 +116,7 @@ ${COMMITS}
 
 ${CONTRIBUTORS}
 
-# How to upgrade
+### How to upgrade
 
 \`\`\`bash
 sudo meza update ${NEW_VERSION}
@@ -111,8 +143,6 @@ sed -i "s/=============/\0\n\n## Meza $NEW_VERSION/" ./RELEASE-NOTES.md
 # COMMIT CHANGE
 #
 git add RELEASE-NOTES.md
-# Set current branch as base branch
-BASE_BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
 RELEASE_BRANCH="${NEW_VERSION}-release"
 git checkout -b "${RELEASE_BRANCH}"
 git commit -m "${NEW_VERSION} release"
@@ -130,19 +160,25 @@ echo "* * * * * * * * * * * * * * * * * * * * * * * *"
 echo
 echo    "Release notes generated, committed, and pushed. "
 echo
-echo -e "1. Check what you committed with ${RED}git diff HEAD~1..HEAD${NC}, then push"
-echo -e "2. Open a pull request at ${GREEN}https://github.com/enterprisemediawiki/meza/compare/${BASE_BRANCH}...${RELEASE_BRANCH}?expand=1${NC}"
-echo    "3. After the PR is merged create a new release of Meza with these details:"
+echo -e "1. Check what you committed with ${RED}git diff HEAD~1..HEAD${NC}"
+echo -e "   If you want to alter anything, make your changes, then do:"
+echo -e "   ${RED}git add ."
+echo -e "   git commit --amend --no-edit${NC}"
+echo -e "2. Push the change: ${GREEN}git push origin ${RELEASE_BRANCH}${NC}"
+echo -e "3. Open a pull request at ${GREEN}https://github.com/enterprisemediawiki/meza/compare/${BASE_BRANCH}...${RELEASE_BRANCH}?expand=1${NC}"
+echo    "4. After the PR is merged create a new release of Meza with these details:"
 echo    "   * Tag: $NEW_VERSION"
 echo    "   * Title: Meza $NEW_VERSION"
 echo -e "   * Description: the ${GREEN}Meza $NEW_VERSION${NC} section from RELEASE-NOTES.md"
-echo -e "4. Move the ${GREEN}$RELEASE_BRANCH${NC} branch to the same point as the ${GREEN}${NEW_VERSION}${NC} release:"
-echo -e "   ${RED}git checkout $RELEASE_BRANCH"
-echo    "   git merge $GIT_HASH --ff-only"
-echo -e "   git push origin $RELEASE_BRANCH${NC}"
-echo -e "5. Update ${GREEN}https://www.mediawiki.org/wiki/Meza/Version_history${NC}"
-echo -e "6. Announce on ${GREEN}https://riot.im/app/#/room/#mwstake-MEZA:matrix.org${NC}"
-echo -e "7. Update pages on ${GREEN}https://mediawiki.org/wiki/Meza${NC}"
+echo -e "   (create a release here: ${GREEN}https://github.com/enterprisemediawiki/meza/releases/new${NC})
+echo -e "5. Move the ${GREEN}${VERSION_BRANCH}${NC} branch to the same point as the ${GREEN}${BASE_BRANCH}${NC} branch:"
+echo -e "   ${RED}git fetch"
+echo -e "   git checkout ${VERSION_BRANCH}"
+echo    "   git merge origin/${BASE_BRANCH} --ff-only"
+echo -e "   git push origin ${VERSION_BRANCH}${NC}"
+echo -e "6. Update ${GREEN}https://www.mediawiki.org/wiki/Meza/Version_history${NC}"
+echo -e "7. Announce on ${GREEN}https://riot.im/app/#/room/#mwstake-MEZA:matrix.org${NC}"
+echo -e "8. Update pages on ${GREEN}https://mediawiki.org/wiki/Meza${NC}"
 echo
 
 rm ${RELEASE_NOTES_FILE}
