@@ -14,7 +14,7 @@ Add new backups-cleanup method
 
 * 2	James Montalvo
 
-# How to upgrade
+### How to upgrade
 
 ```bash
 sudo meza update 31.13.0
@@ -49,7 +49,7 @@ Testing fixes, Add LDAP module, Bump MW to 1.31.12
 * 1	Daren Welsh
 * 1	Vincent Brooks
 
-# How to upgrade
+### How to upgrade
 
 ```bash
 sudo meza update 31.12.0
@@ -68,7 +68,7 @@ Fix PEAR channel
 
 * 2	James Montalvo
 
-# How to upgrade
+### How to upgrade
 
 ```bash
 sudo meza update 31.10.1
@@ -96,7 +96,7 @@ Update PHP to 7.2, fix IUS repo, fix Python symlink
 * 1	Daren Welsh
 * 1	Greg Rundlett
 
-# How to upgrade
+### How to upgrade
 
 ```bash
 sudo meza update 31.10.0
@@ -129,7 +129,7 @@ Ansible 2.9 fix; Travis firewall fix
 * 1	Vincent Brooks
 * 1	XP1
 
-# How to upgrade
+### How to upgrade
 
 ```bash
 sudo meza update 31.9.0
@@ -163,7 +163,7 @@ Multiple fixes in support of bad Composer issue, push-backups, etc
 
 * 24	James Montalvo
 
-# How to upgrade
+### How to upgrade
 
 ```bash
 sudo meza update 31.8.2
@@ -185,7 +185,7 @@ Fix permissions for finicky servers; fix bad use of 'notify' tag on 'meza push-b
 
 * 6	James Montalvo
 
-# How to upgrade
+### How to upgrade
 
 ```bash
 sudo meza update 31.8.1
@@ -211,7 +211,7 @@ Standardize secret config permissions; dev-networking fix
 
 * 11	James Montalvo
 
-# How to upgrade
+### How to upgrade
 
 ```bash
 sudo meza update 31.8.0
@@ -232,7 +232,7 @@ Simplify push-backup settings and make cron configurable and with notification
 
 * James Montalvo
 
-# How to upgrade
+### How to upgrade
 
 ```bash
 sudo meza update 31.7.0
@@ -255,7 +255,7 @@ No longer require encryption of secret.yml; prefer variable-level encryption; fi
 
 * 7	James Montalvo
 
-# How to upgrade
+### How to upgrade
 
 ```bash
 sudo meza update 31.6.0
@@ -349,7 +349,7 @@ Rebuilding Docker images for testing is not required often. It really only needs
 
 * James Montalvo
 
-# How to upgrade
+### How to upgrade
 
 ```bash
 sudo meza update 31.5.0
@@ -389,7 +389,7 @@ Make importing from a live server simpler and more secure by not requiring sudo 
 * James Montalvo
 * Greg Rundlett
 
-# How to upgrade
+### How to upgrade
 
 ```bash
 sudo meza update 31.4.0
@@ -411,7 +411,7 @@ WatchAnalytics to 3.1.2 for diff in PendingReviews, improved on-page banners
 * 4	krisfield
 * 1	James Montalvo
 
-# How to upgrade
+### How to upgrade
 
 ```bash
 sudo meza update 31.3.0
