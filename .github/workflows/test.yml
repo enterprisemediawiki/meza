@@ -11,9 +11,9 @@ jobs:
         test_type:
           - monolith-from-scratch
           - monolith-from-import
-          - import-from-remote
-          - backup-to-remote
-          - import-from-alt-remote
+          # - import-from-remote
+          # - backup-to-remote
+          # - import-from-alt-remote
 
     runs-on: ubuntu-latest
 

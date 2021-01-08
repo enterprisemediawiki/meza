@@ -3,12 +3,21 @@
 
 services: docker
 
-env:
-  - test_type: monolith-from-scratch
-  - test_type: monolith-from-import
-  - test_type: import-from-remote
-  - test_type: backup-to-remote
-  - test_type: import-from-alt-remote
+jobs:
+  fast_finish: true
+  include:
+    - env: test_type=monolith-from-scratch
+    - env: test_type=monolith-from-import
+
+    # Allowed to fail
+    - env: test_type=import-from-remote
+    - env: test_type=backup-to-remote
+    - env: test_type=import-from-alt-remote
+
+  allow_failures:
+    - env: test_type=import-from-remote
+    - env: test_type=backup-to-remote
+    - env: test_type=import-from-alt-remote
 
 # before_install:
   # To upgrade Docker, uncomment the following lines. Do this only if there are
