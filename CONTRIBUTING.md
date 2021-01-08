@@ -58,3 +58,6 @@ The following tests should be performed if time allows, or if a change is likely
 #### Pre-release testing requirements
 
 TBD
+
+## Make a new release
+See [this video](https://www.youtube.com/watch?v=RwGyfkvIoNo&feature=youtu.be) for help.
