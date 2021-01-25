@@ -50,6 +50,8 @@ list:
   - name: SemanticCompoundQueries
     composer: "mediawiki/semantic-compound-queries"
     version: "2.1.0"
+    config: |
+      wfLoadExtension( 'SemanticCompoundQueries' );
   - name: SubPageList
     composer: "mediawiki/sub-page-list"
     version: "1.5.0"
