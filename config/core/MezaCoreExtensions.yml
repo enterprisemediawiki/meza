@@ -49,7 +49,7 @@ list:
 
   - name: SemanticCompoundQueries
     composer: "mediawiki/semantic-compound-queries"
-    version: "1.2.0"
+    version: "2.1.0"
   - name: SubPageList
     composer: "mediawiki/sub-page-list"
     version: "1.5.0"
