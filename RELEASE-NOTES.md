@@ -1,6 +1,27 @@
 Release Notes
 =============
 
+## Meza 31.15.0
+
+Bump SemanticCompoundQueries to 2.1.0
+
+### Commits since 31.14.0
+
+* SemanticCompoundQueries update to 2.1.0 (#1288)
+
+### Contributors
+
+* 1 Vincent Brooks
+
+### How to upgrade
+
+```bash
+sudo meza update 31.15.0
+sudo meza deploy <insert-your-environment-name>
+```
+
+
+
 ## Meza 31.14.0
 
 Bump SMW and SRF to latest
