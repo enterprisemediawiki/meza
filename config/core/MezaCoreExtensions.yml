@@ -96,7 +96,7 @@ list:
     version: "{{ mediawiki_default_branch }}"
   - name: PageForms
     repo: https://github.com/wikimedia/mediawiki-extensions-PageForms.git
-    version: "cbb0fe093075dcbb6de42e89153c5226dfa75312"
+    version: tags/4.9.5
   - name: DismissableSiteNotice
     repo: https://github.com/wikimedia/mediawiki-extensions-DismissableSiteNotice.git
     version: "{{ mediawiki_default_branch }}"
