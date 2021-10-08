@@ -40,7 +40,7 @@
     lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: "php5*"
     state: absent
-  
+
 # Check if the desired version of PHP is installed. If it is not, ensure any
 # other versions of PHP are not installed
 - name: "Check if {{ php_ius_version}} package is installed"
@@ -58,7 +58,7 @@
     name: "php*u*"
     state: absent
   when: ansible_os_family == 'RedHat' and
-        correct_php.results|length == 0
+    correct_php.results|length == 0
 
 - name: Ensure PHP IUS packages installed
   yum:
@@ -67,7 +67,7 @@
     state: installed
   with_items:
     # The following items exist in php56u, php70u, php71u, and php72u
-    - "{{ php_ius_version }}"
+    - "mod_{{ php_ius_version }}"
     - "{{ php_ius_version }}-cli"
     - "{{ php_ius_version }}-common"
     - "{{ php_ius_version }}-devel"
@@ -111,31 +111,29 @@
     # https://docs.microsoft.com/en-us/sql/connect/php/installation-tutorial-linux-mac?view=sql-server-2017#installing-the-drivers-on-red-hat-7
     # - php56u-mssql
 
-
 - name: Install MS SQL driver for PHP
   include: mssql_driver_for_php.yml
   when: install_ms_sql_driver is defined and install_ms_sql_driver
-
 
 - name: Write php.ini file
   template:
     src: php.ini.j2
     dest: "{{ m_php_ini }}"
   notify:
-  - restart apache
+    - restart apache
 
 - name: Write php.d ini files
   template:
     src: "{{ item }}.j2"
     dest: "/etc/php.d/{{ item }}"
   with_items:
-  - 10-opcache.ini
+    - 10-opcache.ini
   notify:
-  - restart apache
+    - restart apache
 
 - name: Write freetds.conf file
   template:
     src: freetds.conf.j2
     dest: /etc/freetds.conf
   notify:
-  - restart apache
+    - restart apache
