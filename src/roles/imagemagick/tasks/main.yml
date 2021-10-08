@@ -4,6 +4,8 @@
     lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: imagemagick-7.0.3-1.x86_64
     state: absent
+  tags:
+    - imagemagick
 
 - name: Ensure ImageMagick at latest version
   yum:
@@ -15,8 +17,11 @@
     state: latest
   tags:
     - latest
+    - imagemagick
 
 - name: Copy xpdf bin64 files to /usr/local/bin
   copy:
     src: xpdf-3.04-bin64/
     dest: /usr/local/bin/
+  tags:
+    - imagemagick
