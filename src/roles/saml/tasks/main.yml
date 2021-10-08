@@ -79,6 +79,16 @@
   tags:
     - latest
 
+- name: Ensure ./config directory in place
+  file:
+    path: "{{ m_simplesamlphp_path }}/config"
+    state: directory
+
+- name: Ensure ./metadata directory in place
+  file:
+    path: "{{ m_simplesamlphp_path }}/metadata"
+    state: directory
+
 - name: Ensure config files in place
   template:
     src: "{{ item.filename }}.j2"
