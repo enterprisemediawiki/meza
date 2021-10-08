@@ -1,12 +1,10 @@
 ---
-
 #
 # SYNC CONFIGS
 #
 - name: Sync configuration between controller and app servers
   include_role:
     name: sync-configs
-
 
 #
 # ENSURE APP SERVERS CAN GIT-CLONE OVER SSH
@@ -27,10 +25,10 @@
     group: wheel
     mode: "{{ item.mode }}"
   with_items:
-  - name: id_rsa
-    mode: "0600"
-  - name: id_rsa.pub
-    mode: "0644"
+    - name: id_rsa
+      mode: "0600"
+    - name: id_rsa.pub
+      mode: "0644"
 
 - name: Copy meza-ansible known_hosts to app-servers
   copy:
@@ -41,12 +39,8 @@
     mode: "{{ item.mode }}"
   failed_when: False
   with_items:
-  - name: known_hosts
-    mode: "0600"
-
-
-
-
+    - name: known_hosts
+      mode: "0600"
 
 #
 # MEDIAWIKI CORE
@@ -95,7 +89,6 @@
           ignoreSubmodules = all
   tags:
     - mediawiki-core
-
 
 #
 # EXTENSIONS AND SKINS
@@ -321,7 +314,6 @@
     - mediawiki-core
     - file-perms
 
-
 #
 # LANDING PAGE
 #
@@ -352,7 +344,6 @@
     state: directory
     recurse: yes
 
-
 #
 # Authentication roles
 #
@@ -360,7 +351,6 @@
   include_role:
     name: saml
   when: saml_public is defined
-
 
 #
 # Cache (at this time) for localization caching. Also can be used for caching
@@ -382,7 +372,6 @@
     mode: "{{ m_uploads_dir_mode }}"
     owner: "{{ m_uploads_dir_owner }}"
     group: "{{ m_uploads_dir_group }}"
-
 
 #
 # DEMO WIKI (if needed)
@@ -416,8 +405,6 @@
   when:
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
     - initial_wikis_dirs_check.files|length == 0
-
-
 
 #
 # VERIFY WIKIS
@@ -460,7 +447,7 @@
   #   filter 3: convert map object back to an Ansible-friendly list
   with_items: "{{ list_of_wikis }}"
   tags:
-  - verify-wiki
+    - verify-wiki
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 - debug: { var: wikis_to_rebuild_data }
@@ -515,7 +502,6 @@
 #     es_do_upgrade: False
 #   when: not es_do_upgrade_stat.stat.exists
 
-
 - name: Verify metastore index upgraded
   shell: WIKI={{ list_of_wikis[0] }} php {{ m_mediawiki }}/extensions/CirrusSearch/maintenance/Metastore.php --upgrade
   run_once: true
@@ -524,21 +510,19 @@
 # Wikis are totally built at this point, but SMW and search need rebuilding
 # FIXME #811: Will this work when controller is not an app server?
 - name: "(Re-)build search index for: {{ wikis_to_rebuild_data | join(', ') }}"
-  shell: "bash {{ m_deploy }}/elastic-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\""
+  shell: 'bash {{ m_deploy }}/elastic-rebuild-all.sh "{{ wikis_to_rebuild_data | join('' '') }}"'
   when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0)
   # FIXME: REMOVE? and (not es_do_upgrade)
   run_once: true
   tags:
-  - search-index
+    - search-index
 
 - name: "(Re-)build SemanticMediaWiki data for: {{ wikis_to_rebuild_data | join(', ') }}"
-  shell: "bash {{ m_deploy }}/smw-rebuild-all.sh \"{{ wikis_to_rebuild_data | join(' ') }}\"  > {{ m_logs }}/smw-rebuilddata/smw-rebuild-all.log"
+  shell: 'bash {{ m_deploy }}/smw-rebuild-all.sh "{{ wikis_to_rebuild_data | join('' '') }}"  > {{ m_logs }}/smw-rebuilddata/smw-rebuild-all.log'
   when: (docker_skip_tasks is not defined or not docker_skip_tasks) and (wikis_to_rebuild_data|length > 0)
   run_once: true
   tags:
-  - smw-data
-
-
+    - smw-data
 
 # Run update.php (MediaWiki's database update script) against all wikis. This
 # only needs to be done once, since the first app server that runs it will
@@ -550,7 +534,7 @@
   with_items: "{{ list_of_wikis }}"
   run_once: true
   tags:
-  - update.php
+    - update.php
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
 # Required because of opcache settings. When opcache.validate_timestamps=0, for
@@ -564,7 +548,6 @@
   tags:
     - httpd-reload
   when: docker_skip_tasks is not defined or not docker_skip_tasks
-
 
 # Extension:SyntaxHighlight requires Python 3.x present in path as `python3` for
 # MediaWiki 1.31+.
@@ -580,14 +563,13 @@
 - name: "Ensure python3 symlink in place"
   file:
     # dest = symlink, src = dir linked to
-    src: "/usr/bin/python3.5"
+    src: "/usr/bin/python3.6"
     dest: "/usr/bin/python3"
     state: link
     owner: root
     group: root
     mode: 0755
   when: ansible_os_family == 'RedHat'
-
 # - name: "Ensure pip3 symlink in place"
 #   file:
 #     # dest = symlink, src = dir linked to
