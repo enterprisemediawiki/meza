@@ -4,9 +4,14 @@
     path: "{{ m_simplesamlphp_path }}"
   register: simplesamlphp_exists
 
+- name: Remove Extension:SimpleSamlAuth, Meza now uses Extension:SimpleSAMLphp
+  file:
+    path: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
+    state: absent
+
 - name: "Check if SAML MW extension exists"
   stat:
-    path: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
+    path: "{{ m_mediawiki }}/extensions/SimpleSAMLphp"
   register: simplesamlextension_exists
 
 - name: Ensure good permissions on simplesamlphp directory and subs (if dir exists)
@@ -18,9 +23,9 @@
     recurse: yes
   when: simplesamlphp_exists.stat.exists and simplesamlphp_exists.stat.isdir
 
-- name: Ensure good permissions on Extension:SimpleSamlAuth directory and subs (if dir exists)
+- name: Ensure good permissions on Extension:SimpleSAMLphp directory and subs (if dir exists)
   file:
-    path: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
+    path: "{{ m_mediawiki }}/extensions/SimpleSAMLphp"
     mode: "{{ m_htdocs_mode }}"
     owner: "{{ m_htdocs_owner }}"
     group: "{{ m_htdocs_group }}"
@@ -72,19 +77,30 @@
       - "--strip-components=1"
   when: not simplesamlphp_exists.stat.exists
 
-- name: Ensure SimpleSamlAuth (MediaWiki extension) installed
+- name: Ensure Extension:PluggableAuth installed
   become: yes
   become_user: "meza-ansible"
   # Ref #1149 for TMPDIR environment var
   environment:
     TMPDIR: "{{ m_tmp }}"
   git:
-    # Main version of this extension, jornane/mwSimpleSamlAuth, is slow to
-    # update. Use this fork instead, which should stay current with jornane
-    # until meza switches to Cicalese's Extension:SimpleSamlPhp.
-    repo: https://github.com/jamesmontalvo3/mwSimpleSamlAuth.git
-    dest: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
-    version: "{{ saml_mw_extension_version }}"
+    repo: https://github.com/wikimedia/mediawiki-extensions-PluggableAuth.git
+    dest: "{{ m_mediawiki }}/extensions/PluggableAuth"
+    version: "e30458b2fea128394ea1c87cf880b1d85b3b0f65" # "{{ saml_mw_extension_version }}"
+    umask: "0002"
+  tags:
+    - latest
+
+- name: Ensure Extension:SimpleSAMLphp (MediaWiki extension) installed
+  become: yes
+  become_user: "meza-ansible"
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
+  git:
+    repo: https://github.com/jamesmontalvo3/mediawiki-extensions-SimpleSAMLphp.git
+    dest: "{{ m_mediawiki }}/extensions/SimpleSAMLphp"
+    version: "merge-test" # "{{ saml_mw_extension_version }}"
     umask: "0002"
   tags:
     - latest

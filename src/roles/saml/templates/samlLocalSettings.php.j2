@@ -174,8 +174,8 @@ if ( isset( $_SERVER['HTTP_X_SKIP_SAML'] ) ) {
 #
 elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 
-	// wfLoadExtension( 'SimpleSamlAuth' );
-	require_once "$IP/extensions/SimpleSamlAuth/SimpleSamlAuth.php";
+	wfLoadExtension( 'PluggableAuth' );
+	wfLoadExtension( 'SimpleSAMLphp' );
 
 	// the base SAML config variables exist in this file, such that it's
 	// easy for the landing page to use them, too.
@@ -212,3 +212,6 @@ elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 foreach( $wgGroupPermissions as $groupName => $perms ) {
 	$wgGroupPermissions[ $groupName ]['createaccount'] = false;
 }
+
+// Allow auto-creation by SAML extension
+$wgGroupPermissions['*']['autocreateaccount'] = true;

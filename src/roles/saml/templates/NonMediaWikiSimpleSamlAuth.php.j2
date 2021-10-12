@@ -12,16 +12,10 @@
  * @author James Montalvo
  */
 
-// Define some settings which are configured in SimpleSamlAuth.php for MediaWiki
-// and which we need to fake here.
-define( 'SAML_OPTIONAL', 0 );
-define( 'SAML_LOGIN_ONLY', 1 );
-define( 'SAML_REQUIRED', 2 );
 define( 'MEDIAWIKI', 1 );
 $wgSamlConfirmMail = false;
 
 // get SAML config, shared with MediaWiki extension SimpleSamlAuth
-// FIXME assumes installed in /opt
 require_once '{{ m_deploy }}/SAMLConfig.php';
 
 // This class is basically a pared down version of SimpleSamlAuth.class.php, an
@@ -48,24 +42,28 @@ class NonMediaWikiSimpleSamlAuth {
 	 * @return boolean
 	 */
 	private static function init() {
-		global $wgSamlSspRoot;
-		global $wgSamlAuthSource;
+		global $wgSimpleSAMLphp_InstallDir;
+		global $wgSimpleSAMLphp_AuthSourceId;
 		global $wgSessionName;
 		global $wgSessionsInMemcached;
 		global $wgSessionsInObjectCache;
+
 		if ( self::$initialised ) {
 			return true;
 		}
-		if ( ( !isset( $wgSessionName ) || !$wgSessionName )
+		if (
+			( !isset( $wgSessionName ) || !$wgSessionName )
+
+			// FIXME these don't appear to do anything. Not set in Meza or config
 			&& ( !isset( $wgSessionsInObjectCache ) || !$wgSessionsInObjectCache )
 			&& ( !isset( $wgSessionsInMemcached ) || !$wgSessionsInMemcached )
 		) {
 			$wgSessionName = ini_get( 'session.name' );
 		}
 		// Load the simpleSamlPhp service
-		require_once rtrim( $wgSamlSspRoot, DIRECTORY_SEPARATOR ) .
+		require_once rtrim( $wgSimpleSAMLphp_InstallDir, DIRECTORY_SEPARATOR ) .
 			DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . '_autoload.php';
-		self::$as = new SimpleSAML\Auth\Simple( $wgSamlAuthSource );
+		self::$as = new SimpleSAML\Auth\Simple( $wgSimpleSAMLphp_AuthSourceId );
 		self::$initialised = is_object( self::$as );
 		return self::$initialised;
 	}
@@ -75,10 +73,6 @@ class NonMediaWikiSimpleSamlAuth {
 		if ( !self::init() ) {
 			return true;
 		}
-		global $wgSamlRequirement;
-		global $wgSamlUsernameAttr;
-		global $wgBlockDisablesLogin;
-		global $wgContLang;
 
 		self::$as->requireAuth();
 
