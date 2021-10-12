@@ -189,7 +189,7 @@ elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 		//),
 	);
 
-	$GLOBALS['wgHooks']['SpecialPage_initList'][] = function (&$list) {
+	{# $GLOBALS['wgHooks']['SpecialPage_initList'][] = function (&$list) {
 		unset( $list['Userlogout'] );
 		unset( $list['Userlogin'] );
 		return true;
@@ -200,7 +200,7 @@ elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 		unset( $personal_urls["logout"] );
 		unset( $personal_urls['anonlogin'] );
 		return true;
-	};
+	}; #}
 
 }
 
