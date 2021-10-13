@@ -154,6 +154,10 @@ m_parsoid_version: "tags/v0.10.0"
 # MediaWiki 1.29 and higher require ElasticSearch 5.x
 elasticsearch_major_version: "5.x"
 
+# SAML
+simplesamlphp_version: "1.18.8"
+saml_mw_extension_version: "master"
+
 #
 # NOTIFICATIONS
 #

@@ -4,7 +4,7 @@
     path: "{{ m_simplesamlphp_path }}"
   register: simplesamlphp_exists
 
-- name: "Check if {{ m_simplesamlphp_path }} exists"
+- name: "Check if SAML MW extension exists"
   stat:
     path: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
   register: simplesamlextension_exists
@@ -27,19 +27,40 @@
     recurse: yes
   when: simplesamlphp_exists.stat.exists and simplesamlphp_exists.stat.isdir
 
-- name: Ensure SimpleSamlPhp (PHP SAML library) installed
+- name: Get simplesamlphp tarball
   become: yes
   become_user: "meza-ansible"
-  # Ref #1149 for TMPDIR environment var
-  environment:
-    TMPDIR: "{{ m_tmp }}"
-  git:
-    repo: https://github.com/simplesamlphp/simplesamlphp.git
+  get_url:
+    url: "https://github.com/simplesamlphp/simplesamlphp/releases/download/v{{ simplesamlphp_version }}/simplesamlphp-{{ simplesamlphp_version }}.tar.gz"
+    dest: "{{ m_home }}/meza-ansible/"
+  register: new_simplesamlphp_archive
+
+- name: Remove simplesamlphp directory if new version available
+  file:
+    path: "{{ m_simplesamlphp_path }}"
+    state: absent
+
+- name: "Create empty directory for {{ m_simplesamlphp_path }} if installing new version"
+  file:
+    path: "{{ m_simplesamlphp_path }}"
+    state: directory
+    owner: "{{ m_simplesamlphp_owner }}"
+    group: "{{ m_simplesamlphp_group }}"
+    mode: "{{ m_simplesamlphp_mode }}"
+
+- name: Unarchive simplesamlphp tarball if new
+  become: yes
+  become_user: "meza-ansible"
+  unarchive:
+    src: "{{ m_home }}/meza-ansible/simplesamlphp-{{ simplesamlphp_version }}.tar.gz"
     dest: "{{ m_simplesamlphp_path }}"
-    version: "tags/v1.16.1"
-    umask: "0002"
-  tags:
-    - latest
+    owner: "{{ m_simplesamlphp_owner }}"
+    group: "{{ m_simplesamlphp_group }}"
+    mode: "{{ m_simplesamlphp_mode }}"
+    remote_src: yes
+    extra_opts:
+      - "--strip-components=1"
+  when: new_simplesamlphp_archive.changed
 
 - name: Ensure SimpleSamlAuth (MediaWiki extension) installed
   become: yes
@@ -53,17 +74,10 @@
     # until meza switches to Cicalese's Extension:SimpleSamlPhp.
     repo: https://github.com/jamesmontalvo3/mwSimpleSamlAuth.git
     dest: "{{ m_mediawiki }}/extensions/SimpleSamlAuth"
-    version: master
+    version: "{{ saml_mw_extension_version }}"
     umask: "0002"
   tags:
     - latest
-
-- name: Ensure simplesamlphp dependencies in place
-  become: yes
-  become_user: "meza-ansible"
-  composer:
-    command: install
-    working_dir: "{{ m_simplesamlphp_path }}"
 
 - name: Ensure config files in place
   template:
