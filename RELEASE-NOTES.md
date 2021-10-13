@@ -1,6 +1,26 @@
 Release Notes
 =============
 
+## Meza 31.16.0
+
+Bump PHP to 7.4 and Python to 3.6
+
+### Commits since 31.15.0
+
+* 225f9f8 Change to Python 3.6
+* 3b023b9 Bump to PHP 7.4
+
+### Contributors
+
+* 3	James Montalvo
+
+### How to upgrade
+
+```bash
+sudo meza update 31.16.0
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.15.0
 
 Bump SemanticCompoundQueries to 2.1.0
