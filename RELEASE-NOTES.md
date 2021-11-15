@@ -1,6 +1,28 @@
 Release Notes
 =============
 
+## Meza 31.17.0
+
+Deploy fixes: PECL, SimpleSamlPhp
+
+### Commits since 31.16.0
+
+* 5b8a3e4 fix(pecl): make pecl packages not fail unnecessarily
+* 0f772bc chore(vagrant): bump vagrant box from bento/centos-7.4 to 7.9
+* eb47c64 fix(saml): ensure SimpleSamlPhp actually installs
+* f680a39 Fix: get simplesamlphp via tarball so later versions work; bump version
+
+### Contributors
+
+* 7	James Montalvo
+
+### How to upgrade
+
+```bash
+sudo meza update 31.17.0
+sudo meza deploy <insert-your-environment-name>
+```
+
 ## Meza 31.16.0
 
 Bump PHP to 7.4 and Python to 3.6
