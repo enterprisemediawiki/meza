@@ -27,7 +27,7 @@
     recurse: yes
   when: simplesamlphp_exists.stat.exists and simplesamlphp_exists.stat.isdir
 
-- name: Get simplesamlphp tarball
+- name: "Get simplesamlphp tarball for v{{ simplesamlphp_version }}"
   become: yes
   become_user: "meza-ansible"
   get_url:
@@ -39,6 +39,22 @@
   file:
     path: "{{ m_simplesamlphp_path }}"
     state: absent
+  when: new_simplesamlphp_archive.changed
+
+# Do this check again now in case the above command removed the directory, but something went
+# wrong and it was never created (script crashed). Without this check the deploy could be put
+# in a state where it might never recreate SimpleSamlPhp
+- name: "Check if {{ m_simplesamlphp_path }} exists again"
+  stat:
+    path: "{{ m_simplesamlphp_path }}"
+  register: simplesamlphp_exists2
+
+# Make sure there's stuff in the directory
+# Maybe would be better if this checked the version listed in composer.json against simplesamlphp_version
+- name: "Check if {{ m_simplesamlphp_path }}/composer.json exists"
+  stat:
+    path: "{{ m_simplesamlphp_path }}/composer.json"
+  register: simplesamlphp_composerjson_exists
 
 - name: "Create empty directory for {{ m_simplesamlphp_path }} if installing new version"
   file:
@@ -47,6 +63,7 @@
     owner: "{{ m_simplesamlphp_owner }}"
     group: "{{ m_simplesamlphp_group }}"
     mode: "{{ m_simplesamlphp_mode }}"
+  when: not simplesamlphp_exists2.stat.exists
 
 - name: Unarchive simplesamlphp tarball if new
   become: yes
@@ -60,7 +77,10 @@
     remote_src: yes
     extra_opts:
       - "--strip-components=1"
-  when: new_simplesamlphp_archive.changed
+  when: >
+    new_simplesamlphp_archive.changed
+    or not simplesamlphp_exists2.stat.exists
+    or not simplesamlphp_composerjson_exists.stat.exists
 
 - name: Ensure SimpleSamlAuth (MediaWiki extension) installed
   become: yes

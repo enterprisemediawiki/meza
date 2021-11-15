@@ -56,7 +56,7 @@ Vagrant.configure("2") do |config|
 
     config.vm.define "app2" do |app2|
 
-      app2.vm.box = "bento/centos-7.4"
+      app2.vm.box = "bento/centos-7.9"
       hostname = 'app2-' + box_os
       app2.vm.hostname = hostname
 
@@ -108,7 +108,7 @@ Vagrant.configure("2") do |config|
 
     config.vm.define "db2" do |db2|
 
-      db2.vm.box = "bento/centos-7.4"
+      db2.vm.box = "bento/centos-7.9"
       hostname = 'db2-' + box_os
       db2.vm.hostname = hostname
 
@@ -158,7 +158,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "app1", primary: true do |app1|
 
     # app1.vm.box = "centos/7"x
-    app1.vm.box = "bento/centos-7.4"
+    app1.vm.box = "bento/centos-7.9"
     # app1.vm.box = "geerlingguy/centos7"
     hostname = 'app1-' + box_os
     app1.vm.hostname = hostname
