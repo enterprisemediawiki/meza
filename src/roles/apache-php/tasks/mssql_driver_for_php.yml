@@ -84,17 +84,26 @@
 #
 # Install sqlsrv drivers from PECL
 #
-# Or maybe this is better?
-# sudo pecl install sqlsrv-5.2.0
-# sudo pecl install pdo_sqlsrv-5.2.0
 #
-- name: Install sqlsrv and pdo_sqlsrv PECL packages
-  pear:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - pecl/sqlsrv
-    - pecl/pdo_sqlsrv
+# This gives false failures, both done this way (pecl install sqlsrv) as well
+# as using the Ansible PEAR module. With this method it simply says "already
+# installed" then gives a non-zero return code (an error), but does nothing
+# else (it should have a way to make that not cause an error). With the Ansible
+# module it actually rebuilds the package from source before erroring, which is
+# a waste (hence switching to "pecl install ..."). In either case, it
+# successfully installs the correct version.
+#
+# In the future, perhaps install using Remi repo:
+#   sudo yum install php-sqlsrv php-pdo_sqlsrv
+#
+- name: Install sqlsrv PECL packages
+  shell: pecl install sqlsrv
+  ignore_errors: true
+  notify:
+  - restart apache
+- name: Install pdo_sqlsrv PECL packages
+  shell: pecl install pdo_sqlsrv
+  ignore_errors: true
   notify:
   - restart apache
 
