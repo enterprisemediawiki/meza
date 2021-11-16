@@ -78,7 +78,33 @@
     - debug:
         var: php_error_log_output
 
-    - name: Force failure after reporting
-      command: /bin/false
+    #
+    # IF IT'S A MULTI-CONTENT REVISIONS ISSUE
+    #
+    - debug:
+        msg: "Multi-Content Revisions error detected. Ref https://phabricator.wikimedia.org/T212428"
+      when: '"Main slot of revision not found in database" in update_php_log_output'
+
+    - name: "Run populateContentTables.php to fix Multi-Content Revisions issue"
+      shell: >
+        WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/populateContentTables.php" >> {{ update_php_log }} 2>&1
+      # run_once see [1]
+      run_once: true
+      when: '"Main slot of revision not found in database" in update_php_log_output'
+
+    - name: "Retry update.php after populateContentTables.php"
+      shell: >
+        WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/update.php" --quick >> {{ update_php_log }} 2>&1
+      # run_once see [1]
+      run_once: true
+      when: '"Main slot of revision not found in database" in update_php_log_output'
+    #
+    # END MULTI-CONTENT REVISIONS TROUBLESHOOTING
+    #
+
+    # Used to force failure here, but if update.php works the second time, don't fail. If it fails the second time
+    # then there's no reason to force the failure.
+    # - name: Force failure after reporting
+    #   command: /bin/false
   tags:
     - update.php
