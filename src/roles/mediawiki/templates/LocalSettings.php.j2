@@ -788,3 +788,15 @@ foreach ( glob("$m_deploy/public/postLocalSettings.d/*.php") as $filename) {
 foreach ( glob("$m_deploy/public/wikis/$wikiId/postLocalSettings.d/*.php") as $filename) {
     require_once $filename;
 }
+
+# -------------------------------------------------------------------------------------
+# Workaround for https://phabricator.wikimedia.org/T268277
+# Error contacting the Parsoid/RESTBase server: http-bad-status" on a private wiki
+# Ref: https://www.mediawiki.org/wiki/Topic:Vv35plp6g16qno0s
+# -------------------------------------------------------------------------------------
+if ( $_SERVER['REMOTE_ADDR'] == '127.0.0.1' ) {
+  $wgGroupPermissions['*']['read'] = true;
+  $wgGroupPermissions['*']['edit'] = true;
+  $wgGroupPermissions['*']['writeapi'] = true;
+}
+
