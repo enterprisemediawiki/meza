@@ -240,7 +240,7 @@
     - http
     - https
   when:
-    - ansible_os_family == "RedHat"
+    - ansible_distribution_file_variety == "RedHat"
     - inventory_hostname in groups['load_balancers'] or inventory_hostname in groups['load_balancers-meza-external']
 
 
@@ -250,7 +250,7 @@
     - http
     - https
   when:
-    - ansible_os_family == "RedHat"
+    - ansible_distribution_file_variety == "RedHat"
     - inventory_hostname in groups['load_balancers'] or inventory_hostname in groups['load_balancers-meza-external']
 
 

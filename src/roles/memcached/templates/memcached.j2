@@ -1,4 +1,4 @@
-{% if ansible_os_family == "RedHat" %}
+{% if ansible_distribution_file_variety == "RedHat" %}
 PORT="{{ memcached_port }}"
 USER="{{ user_memcached }}"
 MAXCONN="{{ memcached_max_connections }}"

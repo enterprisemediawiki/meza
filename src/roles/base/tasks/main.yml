@@ -55,7 +55,7 @@
     lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: PackageKit
     state: absent
-  when: ansible_os_family == 'RedHat'
+  when: ansible_distribution_file_variety == 'RedHat'
 
 - name: ensure deltarpm is installed and latest
   yum:
@@ -70,17 +70,17 @@
 - name: Ensure apt cache updated (Debian only)
   apt:
     update_cache: yes
-  when: ansible_os_family == "Debian"
+  when: ansible_distribution_file_variety == "Debian"
 
 - name: Ensure aptitude installed in order to use Ansible 'package' (Debian only)
   apt:
     name: aptitude
     state: present
     force_apt_get: yes
-  when: ansible_os_family == "Debian"
+  when: ansible_distribution_file_variety == "Debian"
 
-- name: upgrade all packages
-  package: name=* state=latest
+- name: Upgrade all packages except python and ansible
+  package: name=* state=latest exclude=python*,ansible*
   environment:
     # If `install_ms_sql_driver: True` is set in config, MS SQL drivers will be
     # installed. When these drivers are updated they require accepting end user
@@ -191,7 +191,7 @@
   yum:
     name: selinux-policy
     state: latest
-  when: ansible_os_family == "RedHat"
+  when: ansible_distribution_file_variety == "RedHat"
   tags:
   - latest
 
@@ -199,7 +199,7 @@
   selinux:
     policy: targeted
     state: permissive # log actions that would be blocked if state=enforcing
-  when: ansible_os_family == "RedHat"
+  when: ansible_distribution_file_variety == "RedHat"
 
 - name: Ensure firewalld is running and enable it at boot (RedHat/CentOS only)
   service:
@@ -208,7 +208,7 @@
     enabled: yes
   when:
     - docker_skip_tasks is not defined or not docker_skip_tasks
-    - ansible_os_family == "RedHat"
+    - ansible_distribution_file_variety == "RedHat"
 
 - name: Ensure UFW is enabled and denying access by default (Debian only)
   ufw:
@@ -217,7 +217,7 @@
     policy: deny
   when:
     - docker_skip_tasks is not defined or not docker_skip_tasks
-    - ansible_os_family == "Debian"
+    - ansible_distribution_file_variety == "Debian"
 
 # Make sure we don't block SSH right away. Not sure why this isn't required for
 # firewalld/centos...must be different defaults.
@@ -226,7 +226,7 @@
     name: OpenSSH
   when:
     - docker_skip_tasks is not defined or not docker_skip_tasks
-    - ansible_os_family == "Debian"
+    - ansible_distribution_file_variety == "Debian"
 
 
 #

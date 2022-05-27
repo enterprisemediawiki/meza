@@ -59,14 +59,14 @@
       - mod_ssl
       - mod_proxy_html
     state: present
-  when: ansible_os_family == 'RedHat'
+  when: ansible_distribution_file_variety == 'RedHat'
 
 - name: Ensure Apache modules installed (Debian only)
   apt:
     name:
       - "libapache2-mod-php{{ php_debian_version }}"
     state: present
-  when: ansible_os_family == 'Debian'
+  when: ansible_distribution_file_variety == 'Debian'
 
 - name: Ensure Apache modules enabled (Debian only)
   apache2_module:
@@ -76,7 +76,7 @@
     - proxy_html
     - ssl
     - rewrite
-  when: ansible_os_family == 'Debian'
+  when: ansible_distribution_file_variety == 'Debian'
 
 #
 # Composer

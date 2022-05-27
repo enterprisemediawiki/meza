@@ -4,7 +4,7 @@
     lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: imagemagick-7.0.3-1.x86_64
     state: absent
-  when: ansible_os_family == 'RedHat'
+  when: ansible_distribution_file_variety == 'RedHat'
 
 - name: Ensure Imagemagick and ghostscript installed
   package:

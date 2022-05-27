@@ -41,7 +41,7 @@ ServerRoot "{{ path_apache_server_root }}"
 # Mutex default:logs
 
 
-{% if ansible_os_family == 'RedHat' %}
+{% if ansible_distribution_file_variety == 'RedHat' %}
 
 #
 # Dynamic Shared Object (DSO) Support
@@ -197,7 +197,7 @@ ServerName https://{{ wiki_app_fqdn }}
 # logged here.  If you *do* define an error logfile for a <VirtualHost>
 # container, that host's errors will be logged there and not here.
 #
-{% if ansible_os_family == "RedHat" %}
+{% if ansible_distribution_file_variety == "RedHat" %}
 ErrorLog "logs/error_log"
 {% else %}
 ErrorLog ${APACHE_LOG_DIR}/error.log
@@ -240,7 +240,7 @@ LogLevel warn
 	LogFormat             "noproxy %h %l %u %t %D \"%r\" %>s \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combined
 
 	SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded
-	{% if ansible_os_family == "RedHat" %}
+	{% if ansible_distribution_file_variety == "RedHat" %}
 	CustomLog "logs/access_log" combined env=!forwarded
 	CustomLog "logs/access_log" proxy env=forwarded
 	{% else %}
