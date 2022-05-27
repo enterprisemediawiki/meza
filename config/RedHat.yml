@@ -83,11 +83,14 @@ package_imagemagick:
   - ghostscript
   - ImageMagick
   - ImageMagick-devel
+package_ntp: ntpd
+package_ntp8: chrony
 
 #
 # Services
 #
 service_ntp: ntpd
+service_ntp8: chronyd
 service_apache: httpd
 service_cron: crond
 service_ssh: sshd

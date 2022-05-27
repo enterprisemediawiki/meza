@@ -1,9 +1,31 @@
 ---
-- name: restart ntp
+- name: Check for ntp packages
+  package:
+    name:
+      - "{{ package_ntp }}"
+      - "{{ package_ntpd }}"
+    state: present
+    check_mode: true
+    register: package_check
+
+- name: restart ntp on Cent/RHEL7
   service:
     name: "{{ service_ntp }}"
     state: restarted
-  when: docker_skip_tasks is not defined or not docker_skip_tasks
+  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and
+         ansible_distribution_file_variety == "RedHat" and
+         ansible_distribution_major_version == "7" and
+         package_check is succeeded
+
+- name: restart ntp on Rocky/RHEL8
+  service:
+    name: "{{ service_ntp8 }}"
+    state: restarted
+  when: (docker_skip_tasks is not defined or not docker_skip_tasks) and
+         ansible_distribution_file_variety == "RedHat" and
+         ansible_distribution_major_version == "8" and
+         package_check is succeeded
+
 
 - name: restart sshd
   service:
