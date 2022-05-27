@@ -107,6 +107,7 @@ case ${distro} in
 
         rocky)
 		dnf install -y centos-release-ansible-29
+		dnf install -y python36
 		dnf install -y git ansible-2.9.27-1.el8.noarch
 		dnf install -y python3-libselinux
 		alternatives --set python /usr/bin/python3
