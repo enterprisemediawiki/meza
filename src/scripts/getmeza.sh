@@ -47,6 +47,9 @@ umask 002
 
 # Check distro and version to determine what needs to be installed
 #
+# FIXME: the RPM method of getting distro may fail if more than one package
+#        install on the system contains the word 'release'
+#
 if [ -f /etc/redhat-release ]; then
 	distro=$(rpm -qa | grep -v epel | grep release | awk -F\- '{print $1}')
 	version=$(rpm -qi ${distro}-release | grep -i version | awk -F\  '{print $3}')
@@ -103,7 +106,8 @@ case ${distro} in
                 ;;
 
         rocky)
-		dnf install -y git ansible ansible-collection-community-general ansible-collection-community-mysql ansible-collection-ansible-posix
+		dnf install -y centos-release-ansible-29
+		dnf install -y git ansible-2.9.27-1.el8.noarch
 		dnf install -y python3-libselinux
 		alternatives --set python /usr/bin/python3
                 ;;
