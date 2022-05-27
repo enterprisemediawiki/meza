@@ -47,12 +47,21 @@ umask 002
 
 # Check distro and version to determine what needs to be installed
 #
-# FIXME: the RPM method of getting distro may fail if more than one package
-#        install on the system contains the word 'release'
-#
 if [ -f /etc/redhat-release ]; then
-	distro=$(rpm -qa | grep -v epel | grep release | awk -F\- '{print $1}')
-	version=$(rpm -qi ${distro}-release | grep -i version | awk -F\  '{print $3}')
+	# This bit checks for the variant-release package and builds variables
+	# appropriately
+	#
+	RH_VARIANTS="centos redhat rocky"
+
+	for VARIANT in ${RH_VARIANTS}
+	do
+		version=$(rpm -q ${VARIANT}-release --queryformat "%{VERSION}" | grep -v not)
+		if [ ! -z "${version}"  ]; then
+			distro=${VARIANT}
+			break
+		fi
+	done
+
 # if Debian support still desired, add else condition here
 fi 
 
