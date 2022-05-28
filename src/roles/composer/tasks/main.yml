@@ -30,7 +30,7 @@
 # Enforce composer 1.x per #1272. Per #1273 we should make Meza support Composer 2.x.
 - name: Set Composer to version 1.10.19
   shell: >
-    {{ php_executable }} {{ composer_path }} self-update 1.10.19
+    {{ php_executable }} {{ composer_path }} self-update 2.3.5
   register: composer_update
   changed_when: "'Updating to version' in composer_update.stdout"
   when: composer_keep_updated

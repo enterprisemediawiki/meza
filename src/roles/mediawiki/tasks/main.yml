@@ -225,6 +225,14 @@
     - latest
     - skins
 
+# Remove IdeAliases before running composer update. Hopefully this keeps
+# this file from showing up in autoload_files.php
+#
+- name: Remove SMW IdeAliases
+  file:
+    state: absent
+    path: "{{ m_mediawiki }}/extensions/SemanticMediaWiki/includes/IdeAliases.php"
+
 # install doesn't appear to do extensions
 - name: Run composer update on MediaWiki for extensions
   become: yes
@@ -572,8 +580,6 @@
   tags:
     - latest
   when: ansible_distribution_file_variety == 'RedHat' and ansible_facts['distribution_major_version'] == "8")
-
-
 
 # Not needed as alternatives takes care of this from getmeza.sh
 #

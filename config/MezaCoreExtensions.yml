@@ -64,7 +64,7 @@ list:
 
   - name: "Semantic Scribunto"
     composer: "mediawiki/semantic-scribunto"
-    version: "2.1.0"
+    version: "2.2.0"
     config: |
       wfLoadExtension( 'SemanticScribunto' );
 
