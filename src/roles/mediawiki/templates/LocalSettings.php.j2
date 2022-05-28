@@ -436,18 +436,18 @@ $wgSquidServersNoPurge = array(
 	{%- endif -%}
 	{%- endfor %}
 
-	{% if 'load_balancers-nonmeza' in groups and groups['load_balancers-nonmeza']|length|int > 0 %}
+	{% if 'load_balancers_nonmeza' in groups and groups['load_balancers_nonmeza']|length|int > 0 %}
 	# unmanaged load_balancers, e.g. load balancers not maintained by meza,
 	# such as AWS or Digital Ocean
-	{% for server in groups['load_balancers-nonmeza'] -%}
+	{% for server in groups['load_balancers_nonmeza'] -%}
 	'{{ server }}',
 	{%- endfor %}
 	{% endif %}
 
-	{% if 'load_balancers-nonmeza-external' in groups and groups['load_balancers-nonmeza-external']|length|int > 0 %}
+	{% if 'load_balancers_nonmeza_external' in groups and groups['load_balancers_nonmeza_external']|length|int > 0 %}
 	# unmanaged load_balancers, e.g. load balancers not maintained by meza,
 	# such as AWS or Digital Ocean
-	{% for server in groups['load_balancers-nonmeza-external'] -%}
+	{% for server in groups['load_balancers_nonmeza_external'] -%}
 	'{{ server }}',
 	{%- endfor %}
 	{% endif %}

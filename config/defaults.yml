@@ -234,24 +234,24 @@ load_balancers_all: >
   {{ groups['load_balancers'] | default([]) }} +
   {{ groups['load_balancers-meza-internal'] | default([]) }} +
   {{ groups['load_balancers-meza-external'] | default([]) }} +
-  {{ groups['load_balancers-nonmeza'] | default([]) }} +
-  {{ groups['load_balancers-nonmeza-internal'] | default([]) }} +
-  {{ groups['load_balancers-nonmeza-external'] | default([]) }}
+  {{ groups['load_balancers_nonmeza'] | default([]) }} +
+  {{ groups['load_balancers_nonmeza_internal'] | default([]) }} +
+  {{ groups['load_balancers_nonmeza_external'] | default([]) }}
 
 # Just load balancers for handling internal services
 load_balancers_internal: >
   {{ groups['load_balancers-meza-internal'] | default([]) }} +
-  {{ groups['load_balancers-nonmeza-internal'] | default([]) }}
+  {{ groups['load_balancers_nonmeza_internal'] | default([]) }}
 
 # Just load balancers for handling external traffic
 load_balancers_external: >
   {{ groups['load_balancers-meza-external'] | default([]) }} +
-  {{ groups['load_balancers-nonmeza-external'] | default([]) }}
+  {{ groups['load_balancers_nonmeza_external'] | default([]) }}
 
 # Just load balancers that handle internal and external
 load_balancers_full: >
   {{ groups['load_balancers'] | default([]) }} +
-  {{ groups['load_balancers-nonmeza'] | default([]) }}
+  {{ groups['load_balancers_nonmeza'] | default([]) }}
 
 # Just load balancers managed by Meza
 load_balancers_meza: >
@@ -261,6 +261,6 @@ load_balancers_meza: >
 
 # Just unmanaged load balancers (AWS, etc).
 load_balancers_nonmeza: >
-  {{ groups['load_balancers-nonmeza'] | default([]) }} +
-  {{ groups['load_balancers-nonmeza-internal'] | default([]) }} +
-  {{ groups['load_balancers-nonmeza-external'] | default([]) }}
+  {{ groups['load_balancers_nonmeza'] | default([]) }} +
+  {{ groups['load_balancers_nonmeza_internal'] | default([]) }} +
+  {{ groups['load_balancers_nonmeza_external'] | default([]) }}
