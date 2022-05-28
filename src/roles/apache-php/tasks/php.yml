@@ -12,19 +12,19 @@
   when: ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "8"
 
 - name: Install PHP (RedHat/CentOS only)
-  include: php-redhat7.yml
+  include_tasks: php-redhat7.yml
   when: ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "7"
 
 - name: Install PHP (RedHat/Rocky 8+ only)
-  include: php-redhat8.yml
+  include_tasks: php-redhat8.yml
   when: ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "8"
 
 - name: Install PHP (Debian only)
-  include: php-debian.yml
+  include_tasks: php-debian.yml
   when: ansible_os_family == "Debian"
 
 - name: Install MS SQL driver for PHP (FIXME RedHat only for now)
-  include: mssql_driver_for_php.yml
+  include_tasks: mssql_driver_for_php.yml
   when:
     - install_ms_sql_driver is defined
     - install_ms_sql_driver
