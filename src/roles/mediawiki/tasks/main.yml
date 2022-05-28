@@ -551,7 +551,7 @@
 
 # Extension:SyntaxHighlight requires Python 3.x present in path as `python3` for
 # MediaWiki 1.31+.
-- name: Ensure Python3 present
+- name: Ensure Python3 present on RedHat 7 variant
   yum:
     name:
       - "{{ package_python3 }}"
@@ -559,17 +559,34 @@
     state: latest
   tags:
     - latest
+  when: ansible_os_family == 'RedHat' and ansible_facts['distribution_major_version'] == "7")
 
-- name: "Ensure python3 symlink in place"
-  file:
-    # dest = symlink, src = dir linked to
-    src: "/usr/bin/python3.6"
-    dest: "/usr/bin/python3"
-    state: link
-    owner: root
-    group: root
-    mode: 0755
-  when: ansible_os_family == 'RedHat'
+# If we're using an 8 version of RedHat family we're already using python3
+# but, belt and suspenders
+- name: Ensure Python3 present on Rocky/RHEL8
+  yum:
+    name:
+      - "{{ package_python3 }}"
+      - "{{ package_python3_pip_rhel8 }}"
+    state: latest
+  tags:
+    - latest
+  when: ansible_os_family == 'RedHat' and ansible_facts['distribution_major_version'] == "8")
+
+
+
+# Not needed as alternatives takes care of this from getmeza.sh
+#
+#- name: "Ensure python3 symlink in place"
+#  file:
+#    # dest = symlink, src = dir linked to
+#    src: "/usr/bin/python3.6"
+#    dest: "/usr/bin/python3"
+#    state: link
+#    owner: root
+#    group: root
+#    mode: 0755
+#  when: ansible_os_family == 'RedHat'
 # - name: "Ensure pip3 symlink in place"
 #   file:
 #     # dest = symlink, src = dir linked to

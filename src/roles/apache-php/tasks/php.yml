@@ -1,13 +1,23 @@
 ---
-- name: Install php dependency packages
+- name: Install Cent/RHEL7 php dependency packages
   package:
-    name: "{{ package_php_apache_deps }}"
+    name: "{{ package_php_apache_deps7 }}"
     state: present
+  when: ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "7"
+
+- name: Install Rocky/RHEL8 php dependency packages
+  package:
+    name: "{{ package_php_apache_deps8 }}"
+    state: present
+  when: ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "8"
 
 - name: Install PHP (RedHat/CentOS only)
-  include: php-redhat.yml
-  when: ansible_os_family == "RedHat"
+  include: php-redhat7.yml
+  when: ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "7"
 
+- name: Install PHP (RedHat/Rocky 8+ only)
+  include: php-redhat8.yml
+  when: ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "8"
 
 - name: Install PHP (Debian only)
   include: php-debian.yml
