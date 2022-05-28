@@ -428,7 +428,7 @@ $wgSharedTables = array(
 $wgUseSquid = true;
 $wgUsePrivateIPs = true;
 $wgSquidServersNoPurge = array(
-	{% for server in groups['load-balancers'] -%}
+	{% for server in groups['load_balancers'] -%}
 	{%- if server == inventory_hostname or server == 'localhost' -%}
 	'127.0.0.1',
 	{%- else -%}
@@ -436,18 +436,18 @@ $wgSquidServersNoPurge = array(
 	{%- endif -%}
 	{%- endfor %}
 
-	{% if 'load-balancers-nonmeza' in groups and groups['load-balancers-nonmeza']|length|int > 0 %}
-	# unmanaged load-balancers, e.g. load balancers not maintained by meza,
+	{% if 'load_balancers-nonmeza' in groups and groups['load_balancers-nonmeza']|length|int > 0 %}
+	# unmanaged load_balancers, e.g. load balancers not maintained by meza,
 	# such as AWS or Digital Ocean
-	{% for server in groups['load-balancers-nonmeza'] -%}
+	{% for server in groups['load_balancers-nonmeza'] -%}
 	'{{ server }}',
 	{%- endfor %}
 	{% endif %}
 
-	{% if 'load-balancers-nonmeza-external' in groups and groups['load-balancers-nonmeza-external']|length|int > 0 %}
-	# unmanaged load-balancers, e.g. load balancers not maintained by meza,
+	{% if 'load_balancers-nonmeza-external' in groups and groups['load_balancers-nonmeza-external']|length|int > 0 %}
+	# unmanaged load_balancers, e.g. load balancers not maintained by meza,
 	# such as AWS or Digital Ocean
-	{% for server in groups['load-balancers-nonmeza-external'] -%}
+	{% for server in groups['load_balancers-nonmeza-external'] -%}
 	'{{ server }}',
 	{%- endfor %}
 	{% endif %}

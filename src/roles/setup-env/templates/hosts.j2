@@ -5,7 +5,7 @@
 # Tell Ansible to use a local connection for localhost
 localhost ansible_connection=local
 
-[load-balancers]
+[load_balancers]
 {% for server in load_balancers %}
 {{ server }}
 {% endfor %}

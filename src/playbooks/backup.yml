@@ -1,7 +1,7 @@
 ---
 
 # Define a timestamp fact to persist throughout this playbook
-- hosts: all:!exclude-all:!load-balancers-nonmeza:!load-balancers-nonmeza-external:!load-balancers-nonmeza-internal
+- hosts: all:!exclude-all:!load_balancers-nonmeza:!load_balancers-nonmeza-external:!load_balancers-nonmeza-internal
   tasks:
     - set_fact:
         backup_timestamp: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"

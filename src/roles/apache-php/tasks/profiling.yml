@@ -95,5 +95,5 @@
   vars:
     firewall_port: 8089
     firewall_protocol: tcp
-    firewall_servers: "{{ groups['load-balancers'] }}"
+    firewall_servers: "{{ groups['load_balancers'] }}"
     firewall_zone: "{{m_private_networking_zone|default('public')}}"
