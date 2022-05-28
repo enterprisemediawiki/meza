@@ -10,37 +10,37 @@ localhost ansible_connection=local
 {{ server }}
 {% endfor %}
 
-[app-servers]
+[app_servers]
 {% for server in app_servers %}
 {{ server }}
 {% endfor %}
 
-[memcached-servers]
+[memcached_servers]
 {% for server in memcached_servers %}
 {{ server }}
 {% endfor %}
 
-[db-master]
+[db_master]
 {{ db_master }}
 
-# Note: db-slaves needs to be in the form:
+# Note: db_slaves needs to be in the form:
 # 1.2.3.4   mysql_server_id=2   # ids must be unique and greater than 1
-[db-slaves]
+[db_slaves]
 {% for server in db_slaves %}
 {{ server }}   mysql_server_id={{ loop.index + 1 }}
 {% endfor %}
 
-[elastic-servers]
+[elastic_servers]
 {% for server in elastic_servers %}
 {{ server }}
 {% endfor %}
 
-[backup-servers]
+[backup_servers]
 {% for server in backup_servers %}
 {{ server }}
 {% endfor %}
 
-[logging-servers]
+[logging_servers]
 {% for server in logging_servers %}
 {{ server }}
 {% endfor %}

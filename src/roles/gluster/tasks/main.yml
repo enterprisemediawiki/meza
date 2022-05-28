@@ -31,7 +31,7 @@
     name: "{{ gluster_brick_name }}"
     brick: "{{ gluster_brick_dir }}"
     replicas: "{{ gluster_replicas }}"
-    cluster: "{{ groups['app-servers'] | join(',') }}"
+    cluster: "{{ groups['app_servers'] | join(',') }}"
     host: "{{ inventory_hostname }}"
     force: yes
   run_once: true

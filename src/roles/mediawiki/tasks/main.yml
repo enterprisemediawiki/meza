@@ -30,7 +30,7 @@
     - name: id_rsa.pub
       mode: "0644"
 
-- name: Copy meza-ansible known_hosts to app-servers
+- name: Copy meza-ansible known_hosts to app_servers
   copy:
     src: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"
     dest: "{{ m_home }}/meza-ansible/.ssh/{{ item.name }}"

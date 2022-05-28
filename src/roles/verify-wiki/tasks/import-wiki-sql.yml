@@ -9,7 +9,7 @@
   stat:
     path: "{{ m_tmp }}/wiki.sql"
   register: imported_wiki_sql_on_db_master
-  delegate_to: "{{ groups['db-master'][0] }}"
+  delegate_to: "{{ groups['db_master'][0] }}"
   run_once: true
 
 - debug:
@@ -38,7 +38,7 @@
     dest: "{{ m_tmp }}/wiki.sql"
     force: yes
   run_once: true
-  delegate_to: "{{ groups['db-master'][0] }}"
+  delegate_to: "{{ groups['db_master'][0] }}"
   when: not wiki_exists and not imported_wiki_sql_on_db_master.stat.exists
 
 
@@ -50,7 +50,7 @@
     name: "wiki_{{ wiki_id }}"
     state: absent
   run_once: true
-  delegate_to: "{{ groups['db-master'][0] }}"
+  delegate_to: "{{ groups['db_master'][0] }}"
   when: do_overwrite_db_from_backup
 
 
@@ -64,7 +64,7 @@
     target: "{{ m_tmp }}/wiki.sql"
   run_once: true
   register: did_db_import
-  delegate_to: "{{ groups['db-master'][0] }}"
+  delegate_to: "{{ groups['db_master'][0] }}"
   when: not wiki_exists or do_overwrite_db_from_backup
 
 - name: Did DB import?

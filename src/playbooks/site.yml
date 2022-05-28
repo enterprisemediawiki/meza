@@ -131,12 +131,12 @@
       firewall_action: open
       firewall_port: 8001
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     # NOTE: firewalld ports 80 and 443 opened to ALL within haproxy role
     - haproxy
 
-- hosts: app-servers
+- hosts: app_servers
   become: yes
   tags: apache-php
   roles:
@@ -160,13 +160,13 @@
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
 
 # Keeping this as a separate play, since at some point it will make sense to
-# configure app-servers as gluster clients and have separate gluster servers
-# (which can also be app-servers, of course, like everything else in meza)
-- hosts: app-servers
+# configure app_servers as gluster clients and have separate gluster servers
+# (which can also be app_servers, of course, like everything else in meza)
+- hosts: app_servers
   become: yes
   tags: gluster
   vars:
-    gluster_replicas: "{{ groups['app-servers'] | length }}"
+    gluster_replicas: "{{ groups['app_servers'] | length }}"
   roles:
     - set-vars
 
@@ -182,16 +182,16 @@
       firewall_action: open
       firewall_port: 111
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "groups['app-servers']|length|int > 1"
+      when: "groups['app_servers']|length|int > 1"
     - role: firewall_port
       firewall_action: open
       firewall_port: 111
       firewall_protocol: udp
-      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "groups['app-servers']|length|int > 1"
+      when: "groups['app_servers']|length|int > 1"
 
     # All gluster servers, Gluster Daemon
     # maybe also: 24009, 24010, 24011
@@ -209,16 +209,16 @@
       firewall_action: open
       firewall_port: 24007
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "groups['app-servers']|length|int > 1"
+      when: "groups['app_servers']|length|int > 1"
     - role: firewall_port
       firewall_action: open
       firewall_port: 24008
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "groups['app-servers']|length|int > 1"
+      when: "groups['app_servers']|length|int > 1"
 
     # One port required for each brick (in meza, this equals each server (one
     # brick per server))
@@ -226,38 +226,38 @@
       firewall_action: open
       firewall_port: 49152
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "groups['app-servers']|length|int > 1"
+      when: "groups['app_servers']|length|int > 1"
     - role: firewall_port
       firewall_action: open
       firewall_port: 49153
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "groups['app-servers']|length|int > 1"
+      when: "groups['app_servers']|length|int > 1"
     - role: firewall_port
       firewall_action: open
       firewall_port: 49154
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "groups['app-servers']|length|int > 1"
+      when: "groups['app_servers']|length|int > 1"
     - role: firewall_port
       firewall_action: open
       firewall_port: 49155
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
-      when: "groups['app-servers']|length|int > 1"
+      when: "groups['app_servers']|length|int > 1"
 
     # FIXME #801: Some docs said ports 38465, 38466, 38467 needed for Gluster
 
     - role: gluster
-      when: "groups['app-servers']|length|int > 1"
+      when: "groups['app_servers']|length|int > 1"
 
 
-- hosts: memcached-servers
+- hosts: memcached_servers
   become: yes
   tags: memcached
   roles:
@@ -266,11 +266,11 @@
       firewall_action: open
       firewall_port: 11211
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - memcached
 
-- hosts: db-master
+- hosts: db_master
   become: yes
   tags: database
   roles:
@@ -278,48 +278,48 @@
     - role: firewall_service
       firewall_service: mysql
       # FIXME: try merging these two mysql lines with:
-      # firewall_servers: "{{ groups['app-servers'] }} + {{ groups['db-slaves'] }}"
-      firewall_servers: "{{ groups['app-servers'] }}"
+      # firewall_servers: "{{ groups['app_servers'] }} + {{ groups['db_slaves'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewall_service
       firewall_service: mysql
-      firewall_servers: "{{ groups['db-slaves'] }}"
+      firewall_servers: "{{ groups['db_slaves'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
 
     - role: database
-      # Get the one and only server that should be in the db-master group and set
+      # Get the one and only server that should be in the db_master group and set
       # it's IP address as replication master IP. Note that this can be left blank
       # or not included at all if no replication should be performed.
       # FIXME #802: Should replication master be set only if slaves exist?
-      mysql_replication_master: "{{ groups['db-master'][0] }}"
+      mysql_replication_master: "{{ groups['db_master'][0] }}"
       mysql_replication_role: master
 
 
-- hosts: db-slaves
+- hosts: db_slaves
   become: yes
   tags: database
   roles:
     - set-vars
     - role: firewall_service
       firewall_service: mysql
-      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
       when: ansible_os_family == 'RedHat'
     - role: database
-      # Get the one and only server that should be in the db-master group and set
+      # Get the one and only server that should be in the db_master group and set
       # it's IP address as replication master IP. Note that this can be left blank
       # or not included at all if no replication should be performed.
-      mysql_replication_master: "{{ groups['db-master'][0] }}"
+      mysql_replication_master: "{{ groups['db_master'][0] }}"
       mysql_replication_role: slave
 
-- hosts: backup-servers
+- hosts: backup_servers
   become: yes
-  tags: backup-servers
+  tags: backup_servers
   roles:
     - set-vars
     - backup-config
 
-- hosts: elastic-servers
+- hosts: elastic_servers
   become: yes
   tags: elasticsearch
   roles:
@@ -328,30 +328,30 @@
       firewall_action: open
       firewall_port: 9200
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewall_port
       firewall_action: open
       firewall_port: 9300
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['app-servers'] }}"
+      firewall_servers: "{{ groups['app_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewall_port
       firewall_action: open
       firewall_port: 9200
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['elastic-servers'] }}"
+      firewall_servers: "{{ groups['elastic_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - role: firewall_port
       firewall_action: open
       firewall_port: 9300
       firewall_protocol: tcp
-      firewall_servers: "{{ groups['elastic-servers'] }}"
+      firewall_servers: "{{ groups['elastic_servers'] }}"
       firewall_zone: "{{m_private_networking_zone|default('public')}}"
     - elasticsearch
 
-# Note: this is app-servers again, but must be after everything else is setup
-- hosts: app-servers
+# Note: this is app_servers again, but must be after everything else is setup
+- hosts: app_servers
   become: yes
   tags: mediawiki
   roles:
@@ -361,7 +361,7 @@
       when: m_install_lua
     - mediawiki
 
-- hosts: logging-servers
+- hosts: logging_servers
   become: yes
   tags: logging
   roles:
@@ -369,7 +369,7 @@
     - role: meza-log
       when: docker_skip_tasks is not defined or not docker_skip_tasks
 
-- hosts: backup-servers
+- hosts: backup_servers
   become: yes
   tags:
     - backup-cleanup

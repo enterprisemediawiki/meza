@@ -2,21 +2,21 @@
 #
 # crontab for meza
 
-{% if 'logging-servers' in groups and inventory_hostname in groups['logging-servers'] and server_performance_crontime %}
+{% if 'logging_servers' in groups and inventory_hostname in groups['logging_servers'] and server_performance_crontime %}
 #
 # Cron job for logging server performance info
 #
 {{ server_performance_crontime }} {{ m_deploy }}/server-performance.sh
 {% endif %}
 
-{% if disk_space_usage_mount_name is defined and 'logging-servers' in groups and inventory_hostname in groups['logging-servers'] %}
+{% if disk_space_usage_mount_name is defined and 'logging_servers' in groups and inventory_hostname in groups['logging_servers'] %}
 #
 # Check disk space usage
 #
 {{ disk_space_usage_crontime }} {{ m_deploy }}/disk-space-usage.sh
 {% endif %}
 
-{% if inventory_hostname in groups['app-servers'] %}
+{% if inventory_hostname in groups['app_servers'] %}
 #
 # Run a small set of jobs across all wikis periodically
 #
@@ -32,7 +32,7 @@
 
 {% endif %}
 
-{% if inventory_hostname in groups['app-servers'] %}
+{% if inventory_hostname in groups['app_servers'] %}
 #
 # Clean out uploads temporary files nightly
 #

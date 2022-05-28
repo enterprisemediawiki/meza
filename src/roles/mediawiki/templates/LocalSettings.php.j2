@@ -334,9 +334,9 @@ $wgEmergencyContact = '{{ wgEmergencyContact | default(wgPasswordSender) }}';
  *
  *
  **/
-$mezaDatabaseServers = array( '{{ groups['db-master'][0] }}' );
+$mezaDatabaseServers = array( '{{ groups['db_master'][0] }}' );
 
-{% for host in groups['db-slaves'] %}
+{% for host in groups['db_slaves'] %}
     $mezaDatabaseServers[] = '{{ host }}';
 {% endfor %}
 
@@ -462,7 +462,7 @@ $wgMainCacheType = CACHE_MEMCACHED;
 $wgParserCacheType = CACHE_NONE;
 $wgMessageCacheType = CACHE_MEMCACHED;
 $wgMemCachedServers = array(
-    {% for server in groups['memcached-servers'] -%}
+    {% for server in groups['memcached_servers'] -%}
     {%- if server == inventory_hostname -%}
     '127.0.0.1:11211',
     {%- else -%}
@@ -763,7 +763,7 @@ require_once "{{ m_deploy }}/Extensions.php";
  */
 $wgSearchType = 'CirrusSearch';
 $wgCirrusSearchClusters['default'] = [];
-{% for host in groups['elastic-servers'] %}
+{% for host in groups['elastic_servers'] %}
 {% if host == inventory_hostname %}
 $wgCirrusSearchClusters['default'][] = 'localhost';
 {% else %}

@@ -86,7 +86,7 @@
   vars:
     firewall_port: 27017
     firewall_protocol: tcp
-    firewall_servers: "{{ groups['app-servers'] }}"
+    firewall_servers: "{{ groups['app_servers'] }}"
     firewall_zone: "{{m_private_networking_zone|default('public')}}"
 
 - name: Open port 8089 to load balancer

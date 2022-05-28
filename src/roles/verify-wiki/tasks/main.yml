@@ -92,7 +92,7 @@
 - name: "{{ wiki_id }} - check if wiki database exists"
   shell: 'mysqlshow "wiki_{{ wiki_id }}" | grep -v Wildcard | grep -o wiki_{{ wiki_id }}'
   register: wiki_exists_check
-  delegate_to: "{{ groups['db-master'][0] }}"
+  delegate_to: "{{ groups['db_master'][0] }}"
   failed_when: False
   run_once: true
 
@@ -154,15 +154,15 @@
     sql_backup_server_set: True
   when: "not sql_backup_server_set and backups_server_alt_source is defined"
 
-- name: "{{ wiki_id }} - Set SQL source-from-backup facts IF SOURCING FROM backup-servers"
+- name: "{{ wiki_id }} - Set SQL source-from-backup facts IF SOURCING FROM backup_servers"
   set_fact:
-    sql_backup_server: "{{ groups['backup-servers'][0] }}"
+    sql_backup_server: "{{ groups['backup_servers'][0] }}"
     do_sql_dump: False
     sql_dir_path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}"
     sql_file_match: "*.sql"
     sql_file_push_match: "*push.sql"
     sql_backup_server_set: True
-  when: "not sql_backup_server_set and 'backup-servers' in groups and groups['backup-servers']|length|int > 0"
+  when: "not sql_backup_server_set and 'backup_servers' in groups and groups['backup_servers']|length|int > 0"
 
 # Set remote user to access database backup
 - name: "{{ wiki_id }} - Set fact for database backup server remote user TO DEFAULT meza-ansible"
@@ -180,7 +180,7 @@
     path: "{{ m_tmp }}/wiki.sql"
     state: absent
   run_once: true
-  delegate_to: "{{ groups['db-master'][0] }}"
+  delegate_to: "{{ groups['db_master'][0] }}"
 
 - debug:
     msg: |
@@ -193,7 +193,7 @@
       remote_server_mysql_user:      {{ db_backup_server_mysql_user | default('<undefined>') }}
       remote_server_mysql_pass:      <hidden>
       dump_database:                 wiki_{{ wiki_id | default('<undefined>') }}
-      target_server:                 {{ groups['db-master'][0] }}
+      target_server:                 {{ groups['db_master'][0] }}
       target_server_path:            {{ m_tmp }}/wiki.sql
 
 #
@@ -208,7 +208,7 @@
     remote_server_mysql_user: "{{ db_backup_server_mysql_user }}"
     remote_server_mysql_pass: "{{ backups_server_db_dump.mysql_pass }}"
     dump_database:            "wiki_{{ wiki_id }}"
-    target_server:            "{{ groups['db-master'][0] }}"
+    target_server:            "{{ groups['db_master'][0] }}"
     target_server_path:       "{{ m_tmp }}/wiki.sql"
   run_once: true
   when: do_sql_dump and (not wiki_exists or intend_overwrite_from_backup)
@@ -218,7 +218,7 @@
 # SECTION: TRANSFER SQL to DB master
 #
 - name: "{{ wiki_id }} - Transfer SQL file from backup server to DB master"
-  include: transfer-backup-to-db-master.yml
+  include: transfer-backup-to-db_master.yml
   run_once: true
   when: (not do_sql_dump) and (not wiki_exists or intend_overwrite_from_backup)
 
@@ -240,7 +240,7 @@
     path: "{{ m_tmp }}/wiki.sql"
     state: absent
   run_once: true
-  delegate_to: "{{ groups['db-master'][0] }}"
+  delegate_to: "{{ groups['db_master'][0] }}"
 
 
 
@@ -298,12 +298,12 @@
     uploads_backup_server_set: True
   when: "backups_server_alt_source is defined"
 
-- name: "{{ wiki_id }} - Set uploads-source-from-backup facts IF SOURCING FROM backup-servers"
+- name: "{{ wiki_id }} - Set uploads-source-from-backup facts IF SOURCING FROM backup_servers"
   set_fact:
-    uploads_backup_server: "{{ groups['backup-servers'][0] }}"
+    uploads_backup_server: "{{ groups['backup_servers'][0] }}"
     uploads_backup_dir_path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}/uploads"
     uploads_backup_server_set: True
-  when: "not uploads_backup_server_set and 'backup-servers' in groups and groups['backup-servers']|length|int > 0"
+  when: "not uploads_backup_server_set and 'backup_servers' in groups and groups['backup_servers']|length|int > 0"
 
 # Set remote user to access uploads backup if not set above
 - name: "{{ wiki_id }} - Set fact for uploads backup server remote user TO DEFAULT meza-ansible"
