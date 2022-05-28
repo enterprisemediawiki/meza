@@ -136,7 +136,7 @@ def meza_command_deploy (argv):
 
 	import hashlib
 	start = get_datetime_string()
-	unique = hashlib.sha1( start + env ).hexdigest()[:8]
+	unique = hashlib.sha1( (start + env).encode('utf-8') ).hexdigest()[:8]
 
 	write_deploy_log( start, env, unique, 'start', args_string )
 
@@ -1061,7 +1061,7 @@ def meza_shell_exec ( shell_cmd, print_command=True, log_file=False ):
 	import subprocess
 
 	if log_file:
-		log = open(log_file,'a')
+		log = open(log_file,'ab')
 	proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 	for line in iter(proc.stdout.readline, b''):
 		print( line.rstrip() )
