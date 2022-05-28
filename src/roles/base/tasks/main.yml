@@ -292,8 +292,10 @@
 - name: Copy the ntp.conf template file
   template: src=ntp.conf.j2 dest=/etc/ntp.conf
   notify:
-    - restart ntp
-  when: use_ntp
+    - restart ntp rhel7
+  when: use_ntp and
+        ((ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7") or
+         (ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "7"))
 
 # FIXME #809: PIP required first; has dependencies; needed on all hosts?
 # Speed up encrypt/decrypt operations

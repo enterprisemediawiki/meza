@@ -8,7 +8,7 @@
     check_mode: true
     register: package_check
 
-- name: restart ntp on Cent/RHEL7
+- name: restart ntp rhel7
   service:
     name: "{{ service_ntp }}"
     state: restarted
@@ -17,7 +17,7 @@
          ansible_distribution_major_version == "7" and
          package_check is succeeded
 
-- name: restart ntp on Rocky/RHEL8
+- name: restart ntp rhel8
   service:
     name: "{{ service_ntp8 }}"
     state: restarted
@@ -25,7 +25,6 @@
          ansible_distribution_file_variety == "RedHat" and
          ansible_distribution_major_version == "8" and
          package_check is succeeded
-
 
 - name: restart sshd
   service:
