@@ -218,7 +218,7 @@
 # SECTION: TRANSFER SQL to DB master
 #
 - name: "{{ wiki_id }} - Transfer SQL file from backup server to DB master"
-  include: transfer-backup-to-db_master.yml
+  include: transfer-backup-to-db-master.yml
   run_once: true
   when: (not do_sql_dump) and (not wiki_exists or intend_overwrite_from_backup)
 
