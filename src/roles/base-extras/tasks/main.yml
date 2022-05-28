@@ -1,6 +1,17 @@
 ---
-- name: Install base-extras packages
+- name: Install Cent/RHEL7 base-extras packages
   package:
-    name: "{{ package_base_extras }}"
+    name: "{{ package_base_extras7 }}"
     state: present
     lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+  when: ((ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7")) or
+          ((ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "7"))
+
+- name: Install Rocky/RHEL8+ base-extras packages
+  package:
+    name: "{{ package_base_extras8 }}"
+    state: present
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+  when: ((ansible_facts['distribution'] == "Rocky" and ansible_facts['distribution_major_version'] == "8")) or
+          ((ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "8"))
+
