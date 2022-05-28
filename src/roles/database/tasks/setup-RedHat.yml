@@ -5,9 +5,8 @@
     name: "{{ mysql_packages }}"
     state: present
     enablerepo: "{{ mysql_enablerepo | default(omit, true) }}"
-  register: rh_mysql_install_packages
-  when: ((ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7")) or
-        ((ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "7"))
+  when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7") or
+        (ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "7")
 
 - name: Ensure Cent/RHEL7 MySQL Python libraries are installed.
   yum:
@@ -15,24 +14,21 @@
     name: MySQL-python
     state: present
     enablerepo: "{{ mysql_enablerepo | default(omit, true) }}"
-  when: ((ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7")) or
-          ((ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "7")  
+  when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7") or
+        (ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "7") 
 
 - name: Ensure Rocky/RHEL8 MySQL packages are installed.
   dnf:
-    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: "{{ mysql_packages }}"
     state: present
     enablerepo: "{{ mysql_enablerepo | default(omit, true) }}"
-    register: rh_mysql_install_packages
-  when: ((ansible_facts['distribution'] == "Rocky" and ansible_facts['distribution_major_version'] == "8")) or
-          ((ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "8"))
+  when: (ansible_facts['distribution'] == "Rocky" and ansible_facts['distribution_major_version'] == "8") or
+        (ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "8")
 
 - name: Ensure Rocky/RHEL8 MySQL Python libraries are installed.
   dnf:
-    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: python3-mysqlclient
     state: present
     enablerepo: "{{ mysql_enablerepo | default(omit, true) }}"
-  when: ((ansible_facts['distribution'] == "Rocky" and ansible_facts['distribution_major_version'] == "8")) or
-          ((ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "8"))
+  when: (ansible_facts['distribution'] == "Rocky" and ansible_facts['distribution_major_version'] == "8") or
+        (ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "8")
