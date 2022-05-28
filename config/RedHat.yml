@@ -37,9 +37,15 @@ package_php_apache_deps:
 package_java: java-1.8.0-openjdk
 package_python3: python36
 package_python3_pip: python36-pip
-package_base_extras:
+package_base_extras7:
   - expect
   - expectk
+  - perl
+  - wget
+  - gcc
+  - cifs-utils
+package_base_extras8:
+  - expect
   - perl
   - wget
   - gcc
