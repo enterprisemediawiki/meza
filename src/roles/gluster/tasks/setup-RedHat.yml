@@ -1,24 +1,25 @@
 ---
 
-- name: Ensure repo in place for RHEL
+- name: Ensure gluster repo in place for RHEL7
   template:
     src: Gluster.repo.j2
     dest: /etc/yum.repos.d/Gluster.repo
   vars:
     rhel_gluster_minor_version: "10"
-  when: ansible_distribution == "RedHat"
+  when: ansible_distribution == "RedHat" and ansible_facts['distribution_major_version'] == "7"
 
-- name: Ensure CentOS prerequisites in place
+- name: Ensure CentOS gluster prerequisites in place
   yum:
-    name:
-      - "centos-release-gluster{{ glusterfs_default_release }}"
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+    name: "{{ item }}"
     state: present
+  with_items:
+    - "centos-release-gluster{{ glusterfs_default_release }}"
   when: ansible_distribution == "CentOS"
 
 
-- name: Install Packages
+- name: Install gluster Packages
   yum:
-    name:
-      - glusterfs-server
-      - glusterfs-client
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+    name: ['glusterfs-server', 'glusterfs-client']
     state: present
