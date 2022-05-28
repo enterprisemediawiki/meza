@@ -64,7 +64,8 @@
     state: latest
   tags:
   - latest
-  when: ansible_os_family == "RedHat"
+  when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7") or
+        (ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "7")
 
 - name: Ensure apt cache updated (Debian only)
   apt:
@@ -94,7 +95,7 @@
     lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
     name: epel-release
     state: present
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
   tags:
   - latest
 
@@ -136,9 +137,20 @@
 
 - name: ensure libselinux-python installed prior to SELinux (RedHat/CentOS only)
   yum: name=libselinux-python state=installed
-  when: ansible_os_family == "RedHat"
   tags:
   - latest
+  when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7") or
+        (ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "7")
+
+- name: ensure python3-selinux installed for Rocky/RHEL8
+  dnf:
+    lock_timeout: 180
+    name: python3-libselinux
+    state: installed
+  tags:
+    - latest
+  when:
+    (ansible_facts['distribution'] == "Rocky" and ansible_facts['distribution_major_version'] == "8")
 
 - name: Ensure base packages installed
   package:
@@ -160,6 +172,20 @@
     state: present
   tags:
   - latest
+  when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7") or
+        (ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "7") or
+        (ansible_facts['distribution'] == "Debian")
+
+- name: Install Rocky/RHEL8 base packages
+  dnf:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+    name: ['openssh-server', 'openssh-clients', 'vim', 'git', 'net-tools', 'firewalld', 'selinux-policy', 'rsyslog', 'jq', 'tree', 'chrony', 'rsync', 'python3-pip']
+    state: installed
+  tags:
+  - latest
+  when: (ansible_facts['distribution'] == "Rocky" and ansible_facts['distribution_major_version'] == "8") or
+        (ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "8")
+
 
 - name: Ensure selinux-policy installed (RedHat/CentOS only)
   yum:
@@ -239,18 +265,29 @@
 # ntpdate pool.ntp.org # Synchronize the system clock with 0.pool.ntp.org server
 # service ntpd start # Start service
 # FIXME: this is duplicated from above, right? No reason it needs to be here twice?
-- name: Install NTP
-  package: name=ntp state=installed
-  tags:
-  - latest
-  when: use_ntp
+#- name: Install NTP
+#  package: name=ntp state=installed
+#  tags:
+#  - latest
+#  when: use_ntp
 
 - name: Ensure NTP is running and enabled as configured.
   service:
     name: "{{ service_ntp }}"
     state: started
     enabled: yes
-  when: use_ntp
+  when: use_ntp and 
+        ((ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7") or
+         (ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "7"))
+
+- name: Enable chrony for Rocky/RHEL8
+  service:
+    name: chronyd
+    state: started
+    enabled: yes
+  when: use_ntp and
+        ((ansible_facts['distribution'] == "Rocky" and ansible_facts['distribution_major_version'] == "8") or
+         (ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "8"))
 
 - name: Copy the ntp.conf template file
   template: src=ntp.conf.j2 dest=/etc/ntp.conf
@@ -329,7 +366,6 @@
   # Ignore errors due issue #699: If a crontab doesn't exist yet this command
   # will fail
   failed_when: False
-
 
 - name: Ensure CA package installed
   package:
