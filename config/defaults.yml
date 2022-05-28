@@ -99,7 +99,7 @@ php_debian_version: "7.4"
 elasticsearch_major_version: "6.x"
 
 # Whether or not to install Lua/luasandbox
-m_install_lua: true
+m_install_lua: false
 
 # This can't be in Debian.yml, because that is loaded prior to defaults.yml...hmmm...
 packages_php_debian:
