@@ -3,9 +3,10 @@ list:
 
   - name: Semantic MediaWiki
     composer: "mediawiki/semantic-media-wiki"
-    version: "3.2.2"
+    version: "4.0.1"
     config: |
       // Enable Semantic MediaWiki semantics
+      wfLoadExtension( 'SemanticMediaWiki' );
       enableSemantics( $wikiId );
 
       // Semantic MediaWiki Settings
@@ -27,7 +28,7 @@ list:
 
   - name: Semantic Result Formats
     composer: "mediawiki/semantic-result-formats"
-    version: "3.2.0"
+    version: "4.0.1"
     config: |
       // In SRF 3.0+ you need to do this, too:
       wfLoadExtension( 'SemanticResultFormats' );
@@ -49,7 +50,7 @@ list:
 
   - name: SemanticCompoundQueries
     composer: "mediawiki/semantic-compound-queries"
-    version: "2.1.0"
+    version: "2.2.0"
     config: |
       wfLoadExtension( 'SemanticCompoundQueries' );
 
@@ -73,7 +74,7 @@ list:
 
   - name: Maps
     composer: "mediawiki/maps"
-    version: "7.20.1" # FIXME this can bump to 8.x
+    version: "9.0.7" 
     config: |
       // In Maps 6.0+ you need to also load the extension
       wfLoadExtension( 'Maps' );
@@ -278,9 +279,8 @@ list:
       $wgPageShowWatchingUsers = true;
 
   - name: SemanticInternalObjects
-    repo: https://github.com/wikimedia/mediawiki-extensions-SemanticInternalObjects.git
-    # Latest version is 2016. Commit below is from 2020.
-    version: "21a6af3b320160cbfbe97ba98604a1d334093e18"
+    repo: https://github.com/djflux/mediawiki-extensions-SemanticInternalObjects.git
+    version: master
     legacy_load: true
 
   - name: SemanticDrilldown
@@ -380,7 +380,7 @@ list:
 
   - name: SemanticExtraSpecialProperties
     composer: "mediawiki/semantic-extra-special-properties"
-    version: "2.0.0"
+    version: "3.0.1"
   - name: PipeEscape
     repo: https://github.com/wikimedia/mediawiki-extensions-PipeEscape.git
     version: "{{ mediawiki_default_branch }}"
