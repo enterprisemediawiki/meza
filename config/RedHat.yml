@@ -94,6 +94,7 @@ service_ntp8: chronyd
 service_apache: httpd
 service_cron: crond
 service_ssh: sshd
+service_php_fpm: php-fpm
 
 #
 # Paths
@@ -111,7 +112,7 @@ path_php_apache_conf_d: "/etc/php.d"
 path_php_lib: "/usr/lib64/php"
 # was: m_memcached_conf: /etc/sysconfig/memcached
 path_memcached_conf: /etc/sysconfig/memcached
-
+path_php_fpm_confdir: /etc/php-fpm.d
 
 #
 # Commands

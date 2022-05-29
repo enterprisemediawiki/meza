@@ -30,12 +30,21 @@
   - meza-ansible
   - alt-meza-ansible
 
-- name: write the apache config file
+- name: write the apache config file for Cent/RHEL7
   template:
     src: httpd.conf.j2
     dest: "{{ path_apache_conf }}"
   notify:
     - restart apache
+  when: ansible_distribution_file_variety == 'RedHat' and ansible_facts['distribution_major_version'] == "7"
+
+- name: Write apache config for Rocky/RHEL8 using php-fpm
+  template:
+    src: php-fpm-httpd.conf.j2
+    dest: "{{ path_apache_conf }}"
+  notify:
+    - restart apache
+  when: ansible_distribution_file_variety == 'RedHat' and ansible_facts['distribution_major_version'] == "8"
 
 - name: Ensure Apache environment variables set properly
   template:
@@ -101,6 +110,18 @@
     state: stopped
   when: mongo_service_status.stat.exists and not m_setup_php_profiling
 
+- name: Setup php-rpm for Rocky/RHEL8
+  template:
+    src: www.conf.j2
+    dest: "{{ path_php_fpm_confdir }}"
+
+- name: Enable and start php-from for Rocky/RHEL8+
+  service:
+    name: "{{ service_php_fpm }}"
+    enabled: yes
+    state: started
+  when: docker_skip_tasks is not defined or not docker_skip_tasks and
+        ansible_distribution_file_variety == 'RedHat' and ansible_facts['distribution_major_version'] == "8"
 
 # Now that PHP is installed, start apache
 - name: ensure apache is running (and enable it at boot)
@@ -109,7 +130,6 @@
     state: started
     enabled: yes
   when: docker_skip_tasks is not defined or not docker_skip_tasks
-
 
 
 # Might need these for SELinux to be turned back on

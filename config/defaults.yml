@@ -223,7 +223,9 @@ memcached_memory: 512
 # User to run memcached
 # user_memcached: see RedHat.yml and Debian.yml
 
-
+# TCP port on which to run php-fpm
+#
+m_php_fpm_port: 9090
 
 #
 # Helpers to group load balancer types
