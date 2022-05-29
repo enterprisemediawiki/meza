@@ -117,6 +117,13 @@
     backup: yes
   when: ansible_distribution_file_variety == 'RedHat' and ansible_facts['distribution_major_version'] == "8"
 
+- name: Proper php.conf for Rocky/RHEL8 httpd
+  template:
+    src: php.conf
+    dest: "{{ path_php_httpd_conf }}"
+    backup: yes
+  when: ansible_distribution_file_variety == 'RedHat' and ansible_facts['distribution_major_version'] == "8"
+
 - name: Enable and start php-from for Rocky/RHEL8+
   service:
     name: "{{ service_php_fpm }}"
@@ -129,7 +136,7 @@
 - name: ensure apache is running (and enable it at boot)
   service:
     name: "{{ service_apache }}"
-    state: started
+    state: restarted
     enabled: yes
   when: docker_skip_tasks is not defined or not docker_skip_tasks
 
