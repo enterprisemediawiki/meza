@@ -113,7 +113,9 @@
 - name: Setup php-rpm for Rocky/RHEL8
   template:
     src: www.conf.j2
-    dest: "{{ path_php_fpm_confdir }}"
+    dest: "{{ path_php_fpm_conf }}"
+    backup: yes
+  when: ansible_distribution_file_variety == 'RedHat' and ansible_facts['distribution_major_version'] == "8"
 
 - name: Enable and start php-from for Rocky/RHEL8+
   service:
