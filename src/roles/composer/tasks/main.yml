@@ -28,7 +28,7 @@
   when: not composer_bin.stat.exists
 
 # Enforce composer 1.x per #1272. Per #1273 we should make Meza support Composer 2.x.
-- name: Set Composer to version 1.10.19
+- name: Set Composer to version 2.3.5
   shell: >
     {{ php_executable }} {{ composer_path }} self-update 2.3.5
   register: composer_update
