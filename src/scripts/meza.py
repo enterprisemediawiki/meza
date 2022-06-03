@@ -1064,7 +1064,7 @@ def meza_shell_exec ( shell_cmd, print_command=True, log_file=False ):
 		log = open(log_file,'ab')
 	proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 	for line in iter(proc.stdout.readline, b''):
-		print( line.rstrip() )
+		print( line.rstrip().decode() )
 		if log_file:
 			log.write( line )
 	proc.wait()
