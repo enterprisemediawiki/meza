@@ -37,16 +37,16 @@ elsif configuration.key?("box_os")
 
   if box_os == "debian"
     baseBox = "debian/contrib-stretch64"
-  elsif box_os == "centos"
-    baseBox = "bento/centos-7.4"
+  elsif box_os == "rockylinux"
+    baseBox = "rockylinux/8"
   else
     raise Vagrant::Errors::VagrantError.new, "Configuration option 'box_os' must be 'debian' or 'centos'"
   end
 
 else
   # default to CentOS
-  baseBox = "bento/centos-7.4"
-  box_os = "centos"
+  baseBox = "rockylinux/8"
+  box_os = "rockylinux"
 end
 
 

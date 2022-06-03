@@ -1,7 +1,7 @@
 ---
 
-# Pick OS of box. Options: centos,debian
-box_os: centos
+# Pick OS of box. Options: centos,debian,rockylinux
+box_os: rockylinux
 
 # Option to use a non-standard base virtual machine. The `box_os` option above
 # will pick a supported baseBox for you. Use this only if you want to try out
