@@ -213,7 +213,9 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "app1", primary: true do |app1|
 
-    app1.vbguest.installer_options = { allow_kernel_upgrade: true }
+    # Get the kernel inside the box upgraded so VBox Guest Additions work
+    app1.vbguest.installer_options = { allow_kernel_upgrade: true, auto_reboot: true }
+    app1.vbguest.installer_hooks[:before_install] = ["dnf -y install bzip2 elfutils-libelf-devel gcc kernel kernel-devel kernel-headers make perl tar", "sleep 2"]
 
     hostname = 'meza-app1-' + box_os
     app1.vm.box = baseBox
