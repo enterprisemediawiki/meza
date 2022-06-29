@@ -131,9 +131,9 @@
 
 - name: Ensure optional repos enabled (RedHat Only)
   shell: subscription-manager repos --enable rhel-7-server-optional-rpms
-  when: ansible_distribution == "RedHat"
   tags:
   - latest
+  when: (ansible_facts['distribution'] == "RedHat" and ansible_facts['distribution_major_version'] == "7")
 
 - name: ensure libselinux-python installed prior to SELinux (RedHat/CentOS only)
   yum: name=libselinux-python state=installed
