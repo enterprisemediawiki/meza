@@ -77,7 +77,7 @@ if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 		rocky)
 			dnf install -y epel-release
 			dnf config-manager --set-enabled powertools
-			dnf module reset php
+			dnf module -y reset php
 			dnf module -y enable php:7.4
 			;;
 
@@ -93,6 +93,16 @@ if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 
 				8.*)
 					# Put RHEL8 stuff here if difference than Rocky - tested on Rocky first
+					epel_repo_url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
+					rocky_gpg_key_url="https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-rockyofficial"
+					rocky_extras_repo="${SCRIPT_DIR}/Rocky-Extras.repo"
+					rpm --import ${rocky_gpg_key_url}
+					cp ${rocky_extras_repo} /etc/yum.repos.d/
+					echo "Enabling code-ready-builder repo for RHEL. This may take some time."
+					subscription-manager repos --enable codeready-builder-for-rhel-8-$(arch)-rpms
+					dnf install -y ${epel_repo_url}
+					dnf module -y reset php
+					dnf module -y enable php:7.4
 					;;
 
 				*)
@@ -131,6 +141,11 @@ case ${distro} in
 
                         8.*)
                                 # Put RHEL8 stuff here
+				dnf install -y centos-release-ansible-29
+				dnf install -y python36
+				dnf install -y git ansible-2.9.27-1.el8.noarch
+				dnf install -y python3-libselinux
+				alternatives --set python /usr/bin/python3
                                 ;;
 
                         *)
