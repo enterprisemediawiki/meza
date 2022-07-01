@@ -286,7 +286,7 @@ list:
   - name: SemanticDrilldown
     repo: https://github.com/wikimedia/mediawiki-extensions-SemanticDrilldown.git
     version: "master"
-    legacy_load: true
+    legacy_load: false
 
   - name: Arrays
     repo: https://github.com/wikimedia/mediawiki-extensions-Arrays.git
@@ -297,7 +297,7 @@ list:
   - name: TalkRight
     repo: https://github.com/enterprisemediawiki/TalkRight.git
     version: tags/2.0.0
-    legacy_load: true
+    legacy_load: false
 
   - name: AdminLinks
     repo: https://github.com/wikimedia/mediawiki-extensions-AdminLinks.git
