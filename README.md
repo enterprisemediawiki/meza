@@ -13,7 +13,7 @@ Standard MediaWiki is easy to install, but increasingly its newer and better fea
 
 ## Requirements
 
-1. CentOS 7 or RHEL 7 (for now, with Debian support in the works)
+1. Rocky Linux 8 or RHEL 8 (for now, with Debian support in the works)
 2. Minimal install: Attempting to install it on a server with many other things already installed may not work properly due to conflicts.
 
 ## Install and usage
