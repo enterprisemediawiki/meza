@@ -92,6 +92,7 @@ if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 					;;
 
 				8.*)
+					epel_repo_url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
 					echo "Enabling code-ready-builder and ansible repo for RHEL. This may take some time."
 					subscription-manager repos --enable codeready-builder-for-rhel-8-$(arch)-rpms
 					subscription-manager repos --enable ansible-2-for-rhel-8-$(arch)-rpms
@@ -136,7 +137,7 @@ case ${distro} in
 
                         8.*)
 				dnf install -y python36
-				dnf install -y git ansible
+				dnf install -y git ansible-0:2.9.9-1.el8ae.noarch
 				dnf install -y python3-libselinux
 				alternatives --set python /usr/bin/python3
                                 ;;
