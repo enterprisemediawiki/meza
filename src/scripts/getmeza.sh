@@ -11,6 +11,8 @@ fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+INSTALL_DIR=$(dirname $(dirname $(dirname ${SCRIPT_DIR})))
+
 for ARG in "$@"; do
 	if [ "${ARG}" = "--skip-conn-check" ]; then
 		SKIP_CONNECTION_CHECK="true"
@@ -164,8 +166,6 @@ case ${distro} in
                 ;;
 esac
 
-
-INSTALL_DIR=$(dirname $(dirname $(dirname ${SCRIPT_DIR})))
 
 # if /opt/meza doesn't exist, clone into and use master branch (which is the
 # default, but should we make this configurable?)
