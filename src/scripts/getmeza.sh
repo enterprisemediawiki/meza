@@ -65,6 +65,11 @@ if [ -f /etc/redhat-release ]; then
 # if Debian support still desired, add else condition here
 fi 
 
+# make sure conf-meza exists and has good permissions
+mkdir -p ${INSTALL_DIR}/conf-meza/secret
+chmod 755 ${INSTALL_DIR}/conf-meza
+chmod 775 ${INSTALL_DIR}/conf-meza/secret
+
 # Install epel if not installed
 if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 
@@ -79,6 +84,10 @@ if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 			dnf config-manager --set-enabled powertools
 			dnf module -y reset php
 			dnf module -y enable php:7.4
+			sed -i.meza -e 's;countme=1$;countme=1\nexclude = ansible ansible-core python38;g' /etc/yum.repos.d/epel.repo
+			echo "exclude = ansible ansible-core python38" >> /etc/yum.repos.d/Rocky-AppStream.repo
+			cp /etc/yum.repos.d/epel.repo ${INSTALL_DIR}/conf-meza/epel.repo-withexcludes
+			cp /etc/yum.repos.d/Rocky-AppStream.repo ${INSTALL_DIR}/conf-meza/Rocky-AppStream.repo
 			;;
 
 		redhat)
@@ -97,6 +106,10 @@ if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 					subscription-manager repos --enable codeready-builder-for-rhel-8-$(arch)-rpms
 					subscription-manager repos --enable ansible-2-for-rhel-8-$(arch)-rpms
 					dnf install -y ${epel_repo_url}
+					sed -i.meza -e 's;countme=1$;countme=1\nexclude = ansible ansible-core python38;g' /etc/yum.repos.d/epel.repo
+					sed -i.meza -e 's;AppStream (RPMs)$;AppStream (RPMs)\nexclude = ansible ansible-core python38;g' /etc/yum.repos.d/redhat.repo
+					cp /etc/yum.repos.d/epel.repo ${INSTALL_DIR}/conf-meza/epel.repo-withexcludes
+					cp /etc/yum.repos.d/redhat.repo ${INSTALL_DIR}/conf-meza/redhat.repo-withexcludes
 					dnf module -y reset php
 					dnf module -y enable php:7.4
 					;;
@@ -136,9 +149,7 @@ case ${distro} in
                                 ;;
 
                         8.*)
-				dnf install -y python36
-				dnf install -y git ansible-0:2.9.9-1.el8ae.noarch
-				dnf install -y python3-libselinux
+				dnf install -y python36 git ansible python3-libselinux
 				alternatives --set python /usr/bin/python3
                                 ;;
 
@@ -180,11 +191,6 @@ chmod 755 ${INSTALL_DIR}/.deploy-meza
 if [ ! -f ${INSTALL_DIR}/.deploy-meza/config.sh ]; then
 	echo "m_scripts='${INSTALL_DIR}/meza/src/scripts'; ansible_user='meza-ansible';" > ${INSTALL_DIR}/.deploy-meza/config.sh
 fi
-
-# make sure conf-meza exists and has good permissions
-mkdir -p ${INSTALL_DIR}/conf-meza/secret
-chmod 755 ${INSTALL_DIR}/conf-meza
-chmod 775 ${INSTALL_DIR}/conf-meza/secret
 
 # Required initially for creating lock files
 mkdir -p ${INSTALL_DIR}/data-meza

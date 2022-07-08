@@ -79,8 +79,8 @@
     force_apt_get: yes
   when: ansible_distribution_file_variety == "Debian"
 
-- name: Upgrade all packages except python and ansible
-  package: name=* state=latest exclude=python*,ansible*
+- name: Upgrade all packages
+  package: name=* state=latest
   environment:
     # If `install_ms_sql_driver: True` is set in config, MS SQL drivers will be
     # installed. When these drivers are updated they require accepting end user
