@@ -81,7 +81,7 @@ list:
 
   - name: DisplayTitle
     repo: https://github.com/wikimedia/mediawiki-extensions-DisplayTitle.git
-    version: tags/2.1
+    version: "{{ mediawiki_default_branch }}"
 
 
   #
@@ -97,7 +97,7 @@ list:
 
   - name: ExternalData
     repo: https://github.com/wikimedia/mediawiki-extensions-ExternalData.git
-    version: "tags/2.0.1"
+    version: "{{ mediawiki_default_branch }}"
 
   - name: LabeledSectionTransclusion
     repo: https://github.com/wikimedia/mediawiki-extensions-LabeledSectionTransclusion.git
@@ -120,7 +120,7 @@ list:
 
   - name: PageForms
     repo: https://github.com/wikimedia/mediawiki-extensions-PageForms.git
-    version: "tags/4.9.3"
+    version: "tags/5.4"
     config: |
       // If enabled all "red links" will bring up a form chooser
       $wgPageFormsLinkAllRedLinksToForms = false;
@@ -154,7 +154,7 @@ list:
 
   - name: ReplaceText
     repo: https://github.com/wikimedia/mediawiki-extensions-ReplaceText.git
-    version: tags/1.4.1
+    version: "{{ mediawiki_default_branch }}"
 
   - name: Interwiki
     repo: https://github.com/wikimedia/mediawiki-extensions-Interwiki.git
