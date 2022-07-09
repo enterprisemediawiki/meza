@@ -26,6 +26,20 @@ list:
       // they are used only for making more efficient queries.
       $smwgLocalConnectionConf['mw.db.queryengine'] = [ 'read' => DB_REPLICA, 'write' => DB_REPLICA ];
 
+      // According to https://www.semantic-mediawiki.org/wiki/Help:$smwgDefaultStore
+      //
+      // From Semantic MediaWiki 1.8.0 to Semantic MediaWiki 3.2.3, the default
+      // value was SMWSQLStore3. This default value becames SMW\SQLStore\SQLStore
+      // in Semantic MediaWiki 4.0.0, but this is just a renaming of the class
+      // and SMWSQLStore3 remains a class alias. However, SemanticDrilldown
+      // does not seem to work unless this value is explicitly set to
+      // SMWSQLStore3.
+      //
+      // See https://phabricator.wikimedia.org/T305911 to determine if this has
+      // been resolved upstream.
+      //
+      $smwgDefaultStore = 'SMWSQLStore3';
+
   - name: Semantic Result Formats
     composer: "mediawiki/semantic-result-formats"
     version: "4.0.1"
