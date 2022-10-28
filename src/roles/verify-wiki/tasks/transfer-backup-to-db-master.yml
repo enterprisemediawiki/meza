@@ -128,7 +128,7 @@
   include_role:
     name: rsync
   vars:
-    pulling_to_server:   "{{ groups['db-master'][0] }}"
+    pulling_to_server:   "{{ groups['db_master'][0] }}"
     pulling_to_path:     "{{ m_tmp }}/wiki.sql"
     pulling_from_server: "{{ sql_backup_server }}"
     pulling_from_path:   "{{ wiki_sql_file_path }}"

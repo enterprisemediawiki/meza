@@ -11,6 +11,8 @@ fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+INSTALL_DIR=$(dirname $(dirname $(dirname ${SCRIPT_DIR})))
+
 for ARG in "$@"; do
 	if [ "${ARG}" = "--skip-conn-check" ]; then
 		SKIP_CONNECTION_CHECK="true"
@@ -45,73 +47,137 @@ fi
 # clones and checkouts.
 umask 002
 
+# Check distro and version to determine what needs to be installed
+#
+if [ -f /etc/redhat-release ]; then
+	# This bit checks for the variant-release package and builds variables
+	# appropriately
+	#
+	RH_VARIANTS="centos redhat rocky"
 
-if [ -f "/etc/redhat-release" ]; then
-	distro_major="redhat"
-else
-	distro_major="debian"
-fi
+	for VARIANT in ${RH_VARIANTS}
+	do
+		version=$(rpm -q ${VARIANT}-release --queryformat "%{VERSION}" | grep -v not)
+		if [ ! -z "${version}"  ]; then
+			distro=${VARIANT}
+			break
+		fi
+	done
 
+# if Debian support still desired, add else condition here
+fi 
+
+# make sure conf-meza exists and has good permissions
+mkdir -p ${INSTALL_DIR}/conf-meza/secret
+chmod 755 ${INSTALL_DIR}/conf-meza
+chmod 775 ${INSTALL_DIR}/conf-meza/secret
 
 # Install epel if not installed
-if [ $distro_major = "redhat" ] && [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
+if [ ! -f "/etc/yum.repos.d/epel.repo" ]; then
 
-	distro=$(cat /etc/redhat-release | grep -q "CentOS" && echo "CentOS" || echo "RedHat")
+	case ${distro} in
 
- 	if [ "$distro" == "CentOS" ]; then
-		yum install -y epel-release
-	else # if RedHat
-		epel_repo_url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
-		# epel_repo_gpg_key_url="/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7"
-		rpm -Uvh $epel_repo_url
-	fi
+		centos)
+			yum install -y epel-release
+			;;
+
+		rocky)
+			dnf install -y epel-release
+			dnf config-manager --set-enabled powertools
+			dnf module -y reset php
+			dnf module -y enable php:7.4
+			sed -i.meza -e 's;countme=1$;countme=1\nexclude = ansible ansible-core python38;g' /etc/yum.repos.d/epel.repo
+			echo "exclude = ansible ansible-core python38" >> /etc/yum.repos.d/Rocky-AppStream.repo
+			cp /etc/yum.repos.d/epel.repo ${INSTALL_DIR}/conf-meza/epel.repo-withexcludes
+			cp /etc/yum.repos.d/Rocky-AppStream.repo ${INSTALL_DIR}/conf-meza/Rocky-AppStream.repo
+			;;
+
+		redhat)
+			case ${version} in
+
+				7.*)
+					epel_repo_url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
+					# epel_repo_gpg_key_url="/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7"
+					rpm -Uvh $epel_repo_url
+					yum install y git ansible libselinux-python
+					;;
+
+				8.*)
+					epel_repo_url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
+					echo "Enabling code-ready-builder and ansible repo for RHEL. This may take some time."
+					subscription-manager repos --enable codeready-builder-for-rhel-8-$(arch)-rpms
+					subscription-manager repos --enable ansible-2-for-rhel-8-$(arch)-rpms
+					dnf install -y ${epel_repo_url}
+					sed -i.meza -e 's;countme=1$;countme=1\nexclude = ansible ansible-core python38;g' /etc/yum.repos.d/epel.repo
+					sed -i.meza -e 's;AppStream (RPMs)$;AppStream (RPMs)\nexclude = ansible ansible-core python38;g' /etc/yum.repos.d/redhat.repo
+					cp /etc/yum.repos.d/epel.repo ${INSTALL_DIR}/conf-meza/epel.repo-withexcludes
+					cp /etc/yum.repos.d/redhat.repo ${INSTALL_DIR}/conf-meza/redhat.repo-withexcludes
+					dnf module -y reset php
+					dnf module -y enable php:7.4
+					;;
+
+				*)
+					echo "RedHat version ${version} is not supported yet." && exit 187
+					;;
+			esac
+			;;
+
+		*)
+			echo "Cannot determine operating system distro or version" && exit 187
+			;;
+	esac
 
 fi
 
-if [ $distro_major = "redhat" ]; then
-	yum install -y git ansible libselinux-python
-else
+case ${distro} in
 
-	if grep -q 'wheel' '/etc/group'; then
-		echo "group 'wheel' exists"
-	else
-		echo "group 'wheel' does not exist. creating."
-		groupadd wheel
+        centos)
+                yum install -y git ansible libselinux-python
+                ;;
 
-		# FIXME: any reason to add this:
-		# https://wiki.debian.org/WHEEL/PAM
-	fi
+        rocky)
+		dnf install -y centos-release-ansible-29
+		dnf install -y python36
+		dnf install -y git ansible-2.9.27-1.el8.noarch
+		dnf install -y python3-libselinux
+		alternatives --set python /usr/bin/python3
+                ;;
 
-	# apt-get install -y dirmngr
-	# echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" >> /etc/apt/sources.list
+        redhat)
+                case ${version} in
 
-	# apt-get install -y software-properties-common
-	# apt-add-repository -y ppa:ansible/ansible
-	# apt-get -y update
-	# apt-get install -y ansible
-	# apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
-	# apt-get update
+                        7.*)
+                                yum install -y git ansible libselinux-python
+                                ;;
 
-	apt-get install -y git python-yaml
+                        8.*)
+				dnf install -y python36 git ansible python3-libselinux
+				alternatives --set python /usr/bin/python3
+                                ;;
 
-	# Ansible in Debian package is 2.2
-	# apt-get install -y ansible
+                        *)
+                                echo "RedHat version ${version} is not supported yet." && exit 188
+                                ;;
+                esac
+                ;;
 
-	apt-get install -y python-setuptools
-	easy_install pip
-	pip install ansible
-	# source ~/.bashrc
+        *)
+                echo "Cannot determine operating system distro or version" && exit 189
+                ;;
+esac
 
+
+# if /opt/meza doesn't exist, clone into and use master branch (which is the
+# default, but should we make this configurable?)
+if [ ! -d "${INSTALL_DIR}/meza" ]; then
+        git clone https://github.com/enterprisemediawiki/meza.git ${INSTALL_DIR}/meza --branch master
 fi
-
-# SCRIPT_DIR typically /opt/meza/src/scripts, INSTALL_DIR typically /opt
-INSTALL_DIR=$(dirname $(dirname $(dirname ${SCRIPT_DIR})))
 
 # Make sure /opt/meza permissions are good in case git-cloned earlier
 #  - Ensure users can read everything
 #  - Ensure users can also execute directories
-chmod a+r "${INSTALL_DIR}/meza" -R
-find "${INSTALL_DIR}/meza" -type d -exec chmod 755 {} +
+chmod a+r ${INSTALL_DIR}/meza -R
+find ${INSTALL_DIR}/meza -type d -exec chmod 755 {} +
 
 if [ ! -f "/usr/bin/meza" ]; then
 	ln -s "${INSTALL_DIR}/meza/src/scripts/meza.py" "/usr/bin/meza"
@@ -119,20 +185,15 @@ fi
 
 # Create .deploy-meza directory and very basic config.sh if they don't exist
 # This is done to make the user setup script(s) work
-mkdir -p "${INSTALL_DIR}/.deploy-meza"
-chmod 755 "${INSTALL_DIR}/.deploy-meza"
+mkdir -p ${INSTALL_DIR}/.deploy-meza
+chmod 755 ${INSTALL_DIR}/.deploy-meza
 
-if [ ! -f "${INSTALL_DIR}/.deploy-meza/config.sh" ]; then
-	echo "m_scripts='${INSTALL_DIR}/meza/src/scripts'; ansible_user='meza-ansible';" > "${INSTALL_DIR}/.deploy-meza/config.sh"
+if [ ! -f ${INSTALL_DIR}/.deploy-meza/config.sh ]; then
+	echo "m_scripts='${INSTALL_DIR}/meza/src/scripts'; ansible_user='meza-ansible';" > ${INSTALL_DIR}/.deploy-meza/config.sh
 fi
 
-# make sure conf-meza exists and has good permissions
-mkdir -p "${INSTALL_DIR}/conf-meza/secret"
-chmod 755 "${INSTALL_DIR}/conf-meza"
-chmod 775 "${INSTALL_DIR}/conf-meza/secret"
-
 # Required initially for creating lock files
-mkdir -p "${INSTALL_DIR}/data-meza"
+mkdir -p ${INSTALL_DIR}/data-meza
 
 # If user meza-ansible already exists, make sure home directory is correct
 # (update from old meza versions)
@@ -145,9 +206,9 @@ if $ret; then
 		echo "meza-ansible home directory not correct. moving."
 		mkdir -p "${INSTALL_DIR}/conf-meza/users"
 		usermod -m -d "${INSTALL_DIR}/conf-meza/users/meza-ansible" "meza-ansible"
-		ls -la "${INSTALL_DIR}/conf-meza/users"
-		ls -la "${INSTALL_DIR}/conf-meza/users/meza-ansible"
-		ls -la "${INSTALL_DIR}/conf-meza/users/meza-ansible/.ssh"
+		ls -la ${INSTALL_DIR}/conf-meza/users
+		ls -la ${INSTALL_DIR}/conf-meza/users/meza-ansible
+		ls -la ${INSTALL_DIR}/conf-meza/users/meza-ansible/.ssh
 	else
 		echo "meza-ansible home-dir in correct location"
 	fi
@@ -157,9 +218,9 @@ else
 	source "${INSTALL_DIR}/meza/src/scripts/ssh-users/setup-master-user.sh"
 fi
 
-chown meza-ansible:wheel "${INSTALL_DIR}/conf-meza"
-chown meza-ansible:wheel "${INSTALL_DIR}/conf-meza/secret"
-chown meza-ansible:wheel "${INSTALL_DIR}/meza"
+chown meza-ansible:wheel ${INSTALL_DIR}/conf-meza
+chown meza-ansible:wheel ${INSTALL_DIR}/conf-meza/secret
+chown meza-ansible:wheel ${INSTALL_DIR}/meza
 
 # Don't require TTY or visible password for sudo. Ref #769
 sed -r -i "s/^Defaults\\s+requiretty/#Defaults requiretty/g;" /etc/sudoers

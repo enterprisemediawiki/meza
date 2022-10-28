@@ -13,18 +13,18 @@
     mode: "{{ m_backups_mode }}"
     owner: "{{ m_backups_owner }}"
     group: "{{ m_backups_group }}"
-  delegate_to: "{{ groups['backup-servers'][0] }}"
+  delegate_to: "{{ groups['backup_servers'][0] }}"
 
 #
-# DUMP SQL from DB Master to backup-servers[0]
+# DUMP SQL from DB Master to backup_servers[0]
 #
 - name: "Backup wiki database prior to running update.php"
   import_role:
     name: remote-mysqldump
   vars:
-    remote_server:      "{{ groups['db-master'][0] }}"
+    remote_server:      "{{ groups['db_master'][0] }}"
     dump_database:      "wiki_{{ wiki_id }}"
-    target_server:      "{{ groups['backup-servers'][0] }}"
+    target_server:      "{{ groups['backup_servers'][0] }}"
     target_server_path: "{{ m_backups }}/{{ env }}/{{ wiki_id }}/{{ backup_timestamp }}_wiki.sql"
   run_once: true
   tags:

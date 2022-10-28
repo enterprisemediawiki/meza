@@ -1,28 +1,28 @@
 ---
 
 # Define a timestamp fact to persist throughout this playbook
-- hosts: all:!exclude-all:!load-balancers-nonmeza:!load-balancers-nonmeza-external:!load-balancers-nonmeza-internal
+- hosts: all:!exclude-all:!load_balancers_nonmeza:!load_balancers_nonmeza_external:!load_balancers_nonmeza_internal
   tasks:
     - set_fact:
         backup_timestamp: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
 
 
 # FIXME #803: If a slave is available, maybe pull from there
-- hosts: db-master
+- hosts: db_master
   become: yes
   roles:
     - set-vars
     - dump-db-wikis
   tags: db
 
-- hosts: backup-servers
+- hosts: backup_servers
   become: yes
   roles:
     - set-vars
     - backup-db-wikis
   tags: db
 
-- hosts: backup-servers
+- hosts: backup_servers
   become: yes
   roles:
     - set-vars

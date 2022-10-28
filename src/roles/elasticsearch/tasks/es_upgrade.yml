@@ -78,7 +78,7 @@
 #   until: "response.json.relocating_shards == 0"
 #   retries: 10
 #   delay: 30
-#   when: "groups['elastic-servers']|length|int > 1"
+#   when: "groups['elastic_servers']|length|int > 1"
 
 - name: Ensure Elasticsearch is latest version
   yum:

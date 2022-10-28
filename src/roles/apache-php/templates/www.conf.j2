@@ -1,0 +1,95 @@
+[www]
+
+user = apache
+group = apache
+
+listen = /run/php-fpm/www.sock
+listen = 127.0.0.1:{{ m_php_fpm_port }}
+
+listen.backlog = 511
+
+;listen.owner = nobody
+;listen.group = nobody
+;listen.mode = 0660
+
+listen.acl_users = apache,nginx
+;listen.acl_groups =
+
+; Default Value: any
+listen.allowed_clients = 127.0.0.1
+
+; Default Value: no set
+; process.priority = -19
+
+; Note: This value is mandatory.
+pm = dynamic
+
+pm.max_children = 50
+
+; Default Value: min_spare_servers + (max_spare_servers - min_spare_servers) / 2
+pm.start_servers = 5
+
+pm.min_spare_servers = 5
+
+pm.max_spare_servers = 35
+
+;pm.process_idle_timeout = 10s;
+
+;pm.max_requests = 500
+
+pm.status_path = /status
+
+;ping.path = /ping
+
+;ping.response = pong
+
+access.log = /var/log/php-fpm/$pool.access.log
+access.format = "%R - %u %t \"%m %r%Q%q\" %s %f %{mili}d %{kilo}M %C%%"
+
+slowlog = /var/log/php-fpm/www-slow.log
+
+;request_slowlog_timeout = 0
+
+;request_slowlog_trace_depth = 20
+
+;request_terminate_timeout = 0
+
+;rlimit_files = 1024
+
+; Default Value: system defined value
+;rlimit_core = 0
+
+; Default Value: not set
+;chroot =
+
+; Default Value: current directory or / when chroot
+;chdir = /var/www
+
+; Default Value: no
+;catch_workers_output = yes
+
+; Default Value: yes
+;clear_env = no
+
+; Default Value: .php
+;security.limit_extensions = .php .php3 .php4 .php5 .php7
+
+; Default Value: clean env
+;env[HOSTNAME] = $HOSTNAME
+;env[PATH] = /usr/local/bin:/usr/bin:/bin
+;env[TMP] = /tmp
+;env[TMPDIR] = /tmp
+;env[TEMP] = /tmp
+
+;php_admin_value[sendmail_path] = /usr/sbin/sendmail -t -i -f www@my.domain.com
+;php_flag[display_errors] = off
+php_admin_value[error_log] = /var/log/php-fpm/www-error.log
+php_admin_flag[log_errors] = on
+;php_admin_value[memory_limit] = 128M
+
+; See warning about choosing the location of these directories on your system
+; at http://php.net/session.save-path
+php_value[session.save_handler] = files
+php_value[session.save_path]    = /var/lib/php/session
+php_value[soap.wsdl_cache_dir]  = /var/lib/php/wsdlcache
+;php_value[opcache.file_cache]  = /var/lib/php/opcache

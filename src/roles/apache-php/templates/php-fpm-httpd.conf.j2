@@ -502,16 +502,8 @@ Listen 8090
 # Handle files ending in .php, .php5, .php6, etc with PHP
 #
 <FilesMatch "\.ph(p[2-6]?|tml)$">
-	SetHandler application/x-httpd-php
+	SetHandler "proxy:fcgi://127.0.0.1:{{ m_php_fpm_port }}"
 </FilesMatch>
-<IfModule !php7_module>
-	<FilesMatch "\.ph(p[2-6]?|tml)$">
-		Order allow,deny
-		Deny from all
-	</FilesMatch>
-</IfModule>
-
-
 
 
 # Don't allow access to images directories. Will allow access via img_auth.php

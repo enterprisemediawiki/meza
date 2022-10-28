@@ -7,7 +7,7 @@ package_firewall: firewalld
 package_openssh_client: openssh-clients
 package_cron: cronie
 package_apache: httpd-devel
-package_php_apache_deps:
+package_php_apache_deps7:
   - zlib-devel
   - sqlite-devel
   - bzip2-devel
@@ -34,12 +34,45 @@ package_php_apache_deps:
   - m4
   - xz-libs
   - mariadb-libs
+package_php_apache_deps8:
+  - zlib-devel
+  - sqlite-devel
+  - bzip2-devel
+  - pcre-devel
+  - openssl-devel
+  - curl-devel
+  - libxml2-devel
+  - libXpm-devel
+  - gmp-devel
+  - libicu-devel
+  - t1lib-devel
+  - aspell-devel
+  - libcurl-devel
+  - libjpeg-devel
+  - libvpx-devel
+  - libpng-devel
+  - freetype-devel
+  - readline-devel
+  - libtidy-devel
+  - libmcrypt-devel
+  - pam-devel
+  - sendmail
+  - sendmail-cf
+  - m4
+  - xz-libs
 package_java: java-1.8.0-openjdk
 package_python3: python36
 package_python3_pip: python36-pip
-package_base_extras:
+package_python3_pip_rhel8: python3-pip
+package_base_extras7:
   - expect
   - expectk
+  - perl
+  - wget
+  - gcc
+  - cifs-utils
+package_base_extras8:
+  - expect
   - perl
   - wget
   - gcc
@@ -50,14 +83,18 @@ package_imagemagick:
   - ghostscript
   - ImageMagick
   - ImageMagick-devel
+package_ntp: ntpd
+package_ntp8: chrony
 
 #
 # Services
 #
 service_ntp: ntpd
+service_ntp8: chronyd
 service_apache: httpd
 service_cron: crond
 service_ssh: sshd
+service_php_fpm: php-fpm
 
 #
 # Paths
@@ -75,7 +112,8 @@ path_php_apache_conf_d: "/etc/php.d"
 path_php_lib: "/usr/lib64/php"
 # was: m_memcached_conf: /etc/sysconfig/memcached
 path_memcached_conf: /etc/sysconfig/memcached
-
+path_php_fpm_conf: /etc/php-fpm.d/www.conf
+path_php_httpd_conf: /etc/httpd/conf.d/php.conf
 
 #
 # Commands

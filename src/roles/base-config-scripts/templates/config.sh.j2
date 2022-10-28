@@ -35,7 +35,7 @@ m_mediawiki="{{ m_mediawiki }}"
 m_apache="{{ m_apache }}"
 
 ### DATABASE DATA AND CREDENTIALS ###
-db_master="{{ groups['db-master'][0] }}"
+db_master="{{ groups['db_master'][0] }}"
 wiki_app_db_user_name='{{ wiki_app_db_user.name }}'
 wiki_app_db_user_pass='{{ wiki_app_db_user.password }}'
 

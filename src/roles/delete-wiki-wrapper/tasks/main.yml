@@ -30,7 +30,7 @@
 # FIXME: Does this need to happen on all ES servers, or just one?
 - name: Delete Elasticsearch indices
   shell: "{{ item }}"
-  delegate_to: "{{ groups['elastic-servers'][0] }}"
+  delegate_to: "{{ groups['elastic_servers'][0] }}"
   with_items:
     - curl -XDELETE "localhost:9200/wiki_{{ wiki_id }}_general_first/"
     - curl -XDELETE "localhost:9200/wiki_{{ wiki_id }}_content_first/"
@@ -41,4 +41,4 @@
   mysql_db:
     name: "wiki_{{ wiki_id }}"
     state: absent
-  delegate_to: "{{ groups['db-master'][0] }}"
+  delegate_to: "{{ groups['db_master'][0] }}"

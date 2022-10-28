@@ -30,12 +30,21 @@
   - meza-ansible
   - alt-meza-ansible
 
-- name: write the apache config file
+- name: write the apache config file for Cent/RHEL7
   template:
     src: httpd.conf.j2
     dest: "{{ path_apache_conf }}"
   notify:
     - restart apache
+  when: ansible_distribution_file_variety == 'RedHat' and ansible_facts['distribution_major_version'] == "7"
+
+- name: Write apache config for Rocky/RHEL8 using php-fpm
+  template:
+    src: php-fpm-httpd.conf.j2
+    dest: "{{ path_apache_conf }}"
+  notify:
+    - restart apache
+  when: ansible_distribution_file_variety == 'RedHat' and ansible_facts['distribution_major_version'] == "8"
 
 - name: Ensure Apache environment variables set properly
   template:
@@ -59,14 +68,14 @@
       - mod_ssl
       - mod_proxy_html
     state: present
-  when: ansible_os_family == 'RedHat'
+  when: ansible_distribution_file_variety == 'RedHat'
 
 - name: Ensure Apache modules installed (Debian only)
   apt:
     name:
       - "libapache2-mod-php{{ php_debian_version }}"
     state: present
-  when: ansible_os_family == 'Debian'
+  when: ansible_distribution_file_variety == 'Debian'
 
 - name: Ensure Apache modules enabled (Debian only)
   apache2_module:
@@ -76,7 +85,7 @@
     - proxy_html
     - ssl
     - rewrite
-  when: ansible_os_family == 'Debian'
+  when: ansible_distribution_file_variety == 'Debian'
 
 #
 # Composer
@@ -101,15 +110,35 @@
     state: stopped
   when: mongo_service_status.stat.exists and not m_setup_php_profiling
 
+- name: Setup php-rpm for Rocky/RHEL8
+  template:
+    src: www.conf.j2
+    dest: "{{ path_php_fpm_conf }}"
+    backup: yes
+  when: ansible_distribution_file_variety == 'RedHat' and ansible_facts['distribution_major_version'] == "8"
+
+- name: Proper php.conf for Rocky/RHEL8 httpd
+  template:
+    src: php.conf
+    dest: "{{ path_php_httpd_conf }}"
+    backup: yes
+  when: ansible_distribution_file_variety == 'RedHat' and ansible_facts['distribution_major_version'] == "8"
+
+- name: Enable and start php-from for Rocky/RHEL8+
+  service:
+    name: "{{ service_php_fpm }}"
+    enabled: yes
+    state: started
+  when: docker_skip_tasks is not defined or not docker_skip_tasks and
+        ansible_distribution_file_variety == 'RedHat' and ansible_facts['distribution_major_version'] == "8"
 
 # Now that PHP is installed, start apache
 - name: ensure apache is running (and enable it at boot)
   service:
     name: "{{ service_apache }}"
-    state: started
+    state: restarted
     enabled: yes
   when: docker_skip_tasks is not defined or not docker_skip_tasks
-
 
 
 # Might need these for SELinux to be turned back on

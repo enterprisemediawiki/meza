@@ -15,11 +15,11 @@ return array(
     // to reduce locking problems (eg uniqid, time ...)
     //'save.handler.filename' => __DIR__.'/../data/xhgui_'.date('Ymd').'.dat',
 
-    {% if inventory_hostname == groups['app-servers'][0] %}
+    {% if inventory_hostname == groups['app_servers'][0] %}
     'db.host' => 'mongodb://127.0.0.1:27017',
     {% else %}
     // mongodb server is on first app server
-    'db.host' => 'mongodb://{{ groups["app-servers"][0] }}:27017',
+    'db.host' => 'mongodb://{{ groups["app_servers"][0] }}:27017',
     {% endif %}
 
     //'db.db' => 'xhprof',

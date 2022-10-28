@@ -12,11 +12,11 @@
     load_balancer_handle_external: True
   when: >
     (
-      'load-balancers' in groups
-      and inventory_hostname in groups['load-balancers']
+      'load_balancers' in groups
+      and inventory_hostname in groups['load_balancers']
     ) or (
-      'load-balancers-meza-external' in groups
-      and inventory_hostname in groups['load-balancers-meza-external']
+      'load_balancers-meza-external' in groups
+      and inventory_hostname in groups['load_balancers-meza-external']
     )
 
 - name: Set fact if this load balancer will NOT handle external connections
@@ -25,11 +25,11 @@
   when: >
     not (
       (
-        'load-balancers' in groups
-        and inventory_hostname in groups['load-balancers']
+        'load_balancers' in groups
+        and inventory_hostname in groups['load_balancers']
       ) or (
-        'load-balancers-meza-external' in groups
-        and inventory_hostname in groups['load-balancers-meza-external']
+        'load_balancers-meza-external' in groups
+        and inventory_hostname in groups['load_balancers-meza-external']
       )
     )
 
@@ -38,11 +38,11 @@
     load_balancer_handle_internal: True
   when: >
     (
-      'load-balancers' in groups
-      and inventory_hostname in groups['load-balancers']
+      'load_balancers' in groups
+      and inventory_hostname in groups['load_balancers']
     ) or (
-      'load-balancers-meza-internal' in groups
-      and inventory_hostname in groups['load-balancers-meza-internal']
+      'load_balancers-meza-internal' in groups
+      and inventory_hostname in groups['load_balancers-meza-internal']
     )
 
 - name: Set fact if this load balancer will NOT handle internal connections
@@ -51,11 +51,11 @@
   when: >
     not (
       (
-        'load-balancers' in groups
-        and inventory_hostname in groups['load-balancers']
+        'load_balancers' in groups
+        and inventory_hostname in groups['load_balancers']
       ) or (
-        'load-balancers-meza-internal' in groups
-        and inventory_hostname in groups['load-balancers-meza-internal']
+        'load_balancers-meza-internal' in groups
+        and inventory_hostname in groups['load_balancers-meza-internal']
       )
     )
 
@@ -240,8 +240,8 @@
     - http
     - https
   when:
-    - ansible_os_family == "RedHat"
-    - inventory_hostname in groups['load-balancers'] or inventory_hostname in groups['load-balancers-meza-external']
+    - ansible_distribution_file_variety == "RedHat"
+    - inventory_hostname in groups['load_balancers'] or inventory_hostname in groups['load_balancers-meza-external']
 
 
 - name: Ensure SELinux context for firewalld haproxy service files
@@ -250,8 +250,8 @@
     - http
     - https
   when:
-    - ansible_os_family == "RedHat"
-    - inventory_hostname in groups['load-balancers'] or inventory_hostname in groups['load-balancers-meza-external']
+    - ansible_distribution_file_variety == "RedHat"
+    - inventory_hostname in groups['load_balancers'] or inventory_hostname in groups['load_balancers-meza-external']
 
 
 # Allow http and https through firewall
@@ -292,9 +292,9 @@
     - (docker_skip_tasks is not defined or not docker_skip_tasks)
     - firewall_skip_tasks is not defined or not firewall_skip_tasks
     - >
-      ('load-balancers' in groups and inventory_hostname in groups['load-balancers'])
+      ('load_balancers' in groups and inventory_hostname in groups['load_balancers'])
       or
-      ('load-balancers-meza-external' in groups and inventory_hostname in groups['load-balancers-meza-external'])
+      ('load_balancers-meza-external' in groups and inventory_hostname in groups['load_balancers-meza-external'])
 
 
 - name: Ensure firewall port 1936 OPEN when haproxy stats ENABLED

@@ -1,6 +1,6 @@
 ---
 
-- hosts: elastic-servers
+- hosts: elastic_servers
   become: yes
 
   vars_prompt:

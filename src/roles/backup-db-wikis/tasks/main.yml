@@ -31,7 +31,7 @@
   vars:
     pulling_to_server:   "{{ inventory_hostname }}"
     pulling_to_path:     "{{ m_backups }}/{{ env }}/{{ item }}/{{ backup_timestamp }}_wiki.sql"
-    pulling_from_server: "{{ groups['db-master'][0] }}"
+    pulling_from_server: "{{ groups['db_master'][0] }}"
     pulling_from_path:   "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
     pulling_from_user:   "meza-ansible"
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
@@ -41,7 +41,7 @@
   file:
     path: "{{ m_tmp }}/{{ env }}_{{ item }}.sql"
     state: absent
-  delegate_to: "{{ groups['db-master'][0] }}"
+  delegate_to: "{{ groups['db_master'][0] }}"
   with_items: "{{ wiki_dirs.files | map(attribute='path') | map('basename') | list }}"
   run_once: true
 

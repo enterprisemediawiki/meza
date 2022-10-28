@@ -31,7 +31,7 @@ $m_htdocs = "{{ m_htdocs }}";
 $m_mediawiki = "{{ m_mediawiki }}";
 
 # Installation configuration
-$db_master = "{{ groups['db-master'][0] }}";
+$db_master = "{{ groups['db_master'][0] }}";
 $wiki_app_db_user_name = '{{ wiki_app_db_user.name }}';
 $wiki_app_db_user_pass = '{{ wiki_app_db_user.password }}';
 

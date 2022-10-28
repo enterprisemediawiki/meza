@@ -16,7 +16,7 @@
 #
 - name: Set OS-family specific variables
   include_vars:
-    file: "{{ m_install }}/meza/config/{{ ansible_os_family }}.yml"
+    file: "{{ m_install }}/meza/config/{{ ansible_distribution_file_variety }}.yml"
 
 #
 # Meza-core variables
@@ -35,10 +35,10 @@
 #
 # Gluster mods
 #
-- name: If using gluster (app-servers > 1), override m_uploads_dir
+- name: If using gluster (app_servers > 1), override m_uploads_dir
   set_fact:
     m_uploads_dir: "{{ gluster_mount_dir }}"
-  when: "'app-servers' in groups and groups['app-servers']|length|int > 1"
+  when: "'app_servers' in groups and groups['app_servers']|length|int > 1"
 
 #
 # Public config

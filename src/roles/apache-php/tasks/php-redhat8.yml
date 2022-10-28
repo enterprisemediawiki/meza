@@ -1,0 +1,16 @@
+---
+- name: Remove IUS Repo since we're at distro 8+
+  package:
+    name: "ius-release"
+    state: absent
+
+- name: Remove PHP 5.x packages
+  package:
+    lock_timeout: 180 # wait up to 3 minutes for a lock ansible/ansible#57189
+    name: "php5*"
+    state: absent
+
+- name: Ensure PHP packages for Rocky/RHEL8 installed
+  package:
+    name: ['php-cli', 'php-common', 'php-devel', 'php-gd', 'php-json', 'php-snmp', 'php-xml', 'php-xmlrpc', 'php-mysqlnd', 'php-pdo', 'php-odbc', 'php-process', 'php-bcmath', 'php-intl', 'php-opcache', 'php-soap', 'php-mbstring', 'php-ldap', 'php-fpm']
+    state: present

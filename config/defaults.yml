@@ -99,7 +99,7 @@ php_debian_version: "7.4"
 elasticsearch_major_version: "6.x"
 
 # Whether or not to install Lua/luasandbox
-m_install_lua: true
+m_install_lua: false
 
 # This can't be in Debian.yml, because that is loaded prior to defaults.yml...hmmm...
 packages_php_debian:
@@ -223,7 +223,9 @@ memcached_memory: 512
 # User to run memcached
 # user_memcached: see RedHat.yml and Debian.yml
 
-
+# TCP port on which to run php-fpm
+#
+m_php_fpm_port: 9090
 
 #
 # Helpers to group load balancer types
@@ -231,36 +233,36 @@ memcached_memory: 512
 
 # All load balancer types
 load_balancers_all: >
-  {{ groups['load-balancers'] | default([]) }} +
-  {{ groups['load-balancers-meza-internal'] | default([]) }} +
-  {{ groups['load-balancers-meza-external'] | default([]) }} +
-  {{ groups['load-balancers-nonmeza'] | default([]) }} +
-  {{ groups['load-balancers-nonmeza-internal'] | default([]) }} +
-  {{ groups['load-balancers-nonmeza-external'] | default([]) }}
+  {{ groups['load_balancers'] | default([]) }} +
+  {{ groups['load_balancers-meza-internal'] | default([]) }} +
+  {{ groups['load_balancers-meza-external'] | default([]) }} +
+  {{ groups['load_balancers_nonmeza'] | default([]) }} +
+  {{ groups['load_balancers_nonmeza_internal'] | default([]) }} +
+  {{ groups['load_balancers_nonmeza_external'] | default([]) }}
 
 # Just load balancers for handling internal services
 load_balancers_internal: >
-  {{ groups['load-balancers-meza-internal'] | default([]) }} +
-  {{ groups['load-balancers-nonmeza-internal'] | default([]) }}
+  {{ groups['load_balancers-meza-internal'] | default([]) }} +
+  {{ groups['load_balancers_nonmeza_internal'] | default([]) }}
 
 # Just load balancers for handling external traffic
 load_balancers_external: >
-  {{ groups['load-balancers-meza-external'] | default([]) }} +
-  {{ groups['load-balancers-nonmeza-external'] | default([]) }}
+  {{ groups['load_balancers-meza-external'] | default([]) }} +
+  {{ groups['load_balancers_nonmeza_external'] | default([]) }}
 
 # Just load balancers that handle internal and external
 load_balancers_full: >
-  {{ groups['load-balancers'] | default([]) }} +
-  {{ groups['load-balancers-nonmeza'] | default([]) }}
+  {{ groups['load_balancers'] | default([]) }} +
+  {{ groups['load_balancers_nonmeza'] | default([]) }}
 
 # Just load balancers managed by Meza
 load_balancers_meza: >
-  {{ groups['load-balancers'] | default([]) }} +
-  {{ groups['load-balancers-meza-internal'] | default([]) }} +
-  {{ groups['load-balancers-meza-external'] | default([]) }}
+  {{ groups['load_balancers'] | default([]) }} +
+  {{ groups['load_balancers-meza-internal'] | default([]) }} +
+  {{ groups['load_balancers-meza-external'] | default([]) }}
 
 # Just unmanaged load balancers (AWS, etc).
 load_balancers_nonmeza: >
-  {{ groups['load-balancers-nonmeza'] | default([]) }} +
-  {{ groups['load-balancers-nonmeza-internal'] | default([]) }} +
-  {{ groups['load-balancers-nonmeza-external'] | default([]) }}
+  {{ groups['load_balancers_nonmeza'] | default([]) }} +
+  {{ groups['load_balancers_nonmeza_internal'] | default([]) }} +
+  {{ groups['load_balancers_nonmeza_external'] | default([]) }}

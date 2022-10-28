@@ -3,6 +3,32 @@
 require 'yaml'
 require 'digest/sha1'
 
+# Vagrant Plugins required
+#
+# FIXME
+#
+# There's probably a better way to check if the vagrant-vbguest plugin is
+# installed.
+#
+if ARGV[0] != 'plugin' && ARGV[0] != 'destroy'
+
+  # Define the plugins in an array format
+  required_plugins = [
+    'vagrant-vbguest'
+  ]
+  plugins_to_install = required_plugins.select { |plugin| not Vagrant.has_plugin? plugin }
+  if not plugins_to_install.empty?
+
+    puts "Installing plugins: #{plugins_to_install.join(' ')}"
+    if system "vagrant plugin install --local #{plugins_to_install.join(' ')}"
+      exec "vagrant #{ARGV.join(' ')}"
+    else
+      abort "Installation of one or more plugins has failed. Aborting."
+    end
+
+  end
+end
+
 if not File.file?("#{File.dirname(__FILE__)}/.vagrant/id_rsa")
   system("
     ssh-keygen -f \"./.vagrant/id_rsa\" -t rsa -N \"\" -C \"vagrant@vagrant\"
@@ -37,16 +63,16 @@ elsif configuration.key?("box_os")
 
   if box_os == "debian"
     baseBox = "debian/contrib-stretch64"
-  elsif box_os == "centos"
-    baseBox = "bento/centos-7.4"
+  elsif box_os == "rockylinux"
+    baseBox = "rockylinux/8"
   else
     raise Vagrant::Errors::VagrantError.new, "Configuration option 'box_os' must be 'debian' or 'centos'"
   end
 
 else
   # default to CentOS
-  baseBox = "bento/centos-7.4"
-  box_os = "centos"
+  baseBox = "rockylinux/8"
+  box_os = "rockylinux"
 end
 
 
@@ -186,6 +212,10 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "app1", primary: true do |app1|
+
+    # Get the kernel inside the box upgraded so VBox Guest Additions work
+    app1.vbguest.installer_options = { allow_kernel_upgrade: true, auto_reboot: true }
+    app1.vbguest.installer_hooks[:before_install] = ["dnf -y install bzip2 elfutils-libelf-devel gcc kernel kernel-devel kernel-headers make perl tar", "sleep 2"]
 
     hostname = 'meza-app1-' + box_os
     app1.vm.box = baseBox

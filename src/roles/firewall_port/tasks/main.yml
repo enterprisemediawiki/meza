@@ -23,7 +23,7 @@
   with_items: "{{ firewall_servers | difference([ 'localhost', inventory_hostname ]) }}"
 
   when:
-    - ansible_os_family == 'RedHat'
+    - ansible_distribution_file_variety == 'RedHat'
     - firewall_servers is defined
     - firewall_port is defined
     - firewall_protocol is defined
@@ -37,7 +37,7 @@
     state: "{{ firewalld_state }}"
     zone: "{{firewall_zone|default('public')}}"
   when:
-    - ansible_os_family == 'RedHat'
+    - ansible_distribution_file_variety == 'RedHat'
     - firewall_servers is not defined
     - firewall_port is defined
     - firewall_protocol is defined
@@ -59,7 +59,7 @@
   with_items: "{{ firewall_servers | difference([ 'localhost', inventory_hostname ]) }}"
 
   when:
-    - ansible_os_family == 'Debian'
+    - ansible_distribution_file_variety == 'Debian'
     - firewall_servers is defined
     - firewall_port is defined
     - firewall_protocol is defined
@@ -77,7 +77,7 @@
     comment: "{{ firewall_action }} {{ firewall_port }}"
 
   when:
-    - ansible_os_family == 'Debian'
+    - ansible_distribution_file_variety == 'Debian'
     - firewall_servers is not defined
     - firewall_port is defined
     - firewall_protocol is defined

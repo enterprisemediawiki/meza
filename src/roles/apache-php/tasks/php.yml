@@ -1,24 +1,34 @@
 ---
-- name: Install php dependency packages
+- name: Install Cent/RHEL7 php dependency packages
   package:
-    name: "{{ package_php_apache_deps }}"
+    name: "{{ package_php_apache_deps7 }}"
     state: present
+  when: ansible_distribution_file_variety == "RedHat" and ansible_facts['distribution_major_version'] == "7"
+
+- name: Install Rocky/RHEL8 php dependency packages
+  package:
+    name: "{{ package_php_apache_deps8 }}"
+    state: present
+  when: ansible_distribution_file_variety == "RedHat" and ansible_facts['distribution_major_version'] == "8"
 
 - name: Install PHP (RedHat/CentOS only)
-  include: php-redhat.yml
-  when: ansible_os_family == "RedHat"
+  include_tasks: php-redhat7.yml
+  when: ansible_distribution_file_variety == "RedHat" and ansible_facts['distribution_major_version'] == "7"
 
+- name: Install PHP (RedHat/Rocky 8+ only)
+  include_tasks: php-redhat8.yml
+  when: ansible_distribution_file_variety == "RedHat" and ansible_facts['distribution_major_version'] == "8"
 
 - name: Install PHP (Debian only)
-  include: php-debian.yml
-  when: ansible_os_family == "Debian"
+  include_tasks: php-debian.yml
+  when: ansible_distribution_file_variety == "Debian"
 
 - name: Install MS SQL driver for PHP (FIXME RedHat only for now)
-  include: mssql_driver_for_php.yml
+  include_tasks: mssql_driver_for_php.yml
   when:
     - install_ms_sql_driver is defined
     - install_ms_sql_driver
-    - ansible_os_family == "RedHat"
+    - ansible_distribution_file_variety == "RedHat"
 
 - name: Write php.ini file
   template:
@@ -43,4 +53,4 @@
     dest: /etc/freetds.conf
   notify:
     - restart apache
-  when: ansible_os_family == "RedHat"
+  when: ansible_distribution_file_variety == "RedHat"
