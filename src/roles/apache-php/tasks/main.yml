@@ -7,7 +7,6 @@
   with_items:
     - httpd-devel
     - mod_ssl
-    - mod_proxy_html
 
 - name: Make apache own htdocs directory
   file:

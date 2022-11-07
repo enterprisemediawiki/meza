@@ -32,7 +32,6 @@ RUN yum -y install \
 RUN yum -y install \
     httpd-devel \
     mod_ssl \
-    mod_proxy_html \
     zlib-devel \
     sqlite-devel \
     bzip2-devel \
