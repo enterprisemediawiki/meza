@@ -15,8 +15,8 @@
       'load_balancers' in groups
       and inventory_hostname in groups['load_balancers']
     ) or (
-      'load_balancers-meza-external' in groups
-      and inventory_hostname in groups['load_balancers-meza-external']
+      'load_balancers_meza_external' in groups
+      and inventory_hostname in groups['load_balancers_meza_external']
     )
 
 - name: Set fact if this load balancer will NOT handle external connections
@@ -28,8 +28,8 @@
         'load_balancers' in groups
         and inventory_hostname in groups['load_balancers']
       ) or (
-        'load_balancers-meza-external' in groups
-        and inventory_hostname in groups['load_balancers-meza-external']
+        'load_balancers_meza_external' in groups
+        and inventory_hostname in groups['load_balancers_meza_external']
       )
     )
 
@@ -241,7 +241,7 @@
     - https
   when:
     - ansible_distribution_file_variety == "RedHat"
-    - inventory_hostname in groups['load_balancers'] or inventory_hostname in groups['load_balancers-meza-external']
+    - inventory_hostname in groups['load_balancers'] or inventory_hostname in groups['load_balancers_meza_external']
 
 
 - name: Ensure SELinux context for firewalld haproxy service files
@@ -251,7 +251,7 @@
     - https
   when:
     - ansible_distribution_file_variety == "RedHat"
-    - inventory_hostname in groups['load_balancers'] or inventory_hostname in groups['load_balancers-meza-external']
+    - inventory_hostname in groups['load_balancers'] or inventory_hostname in groups['load_balancers_meza_external']
 
 
 # Allow http and https through firewall
@@ -294,7 +294,7 @@
     - >
       ('load_balancers' in groups and inventory_hostname in groups['load_balancers'])
       or
-      ('load_balancers-meza-external' in groups and inventory_hostname in groups['load_balancers-meza-external'])
+      ('load_balancers_meza_external' in groups and inventory_hostname in groups['load_balancers_meza_external'])
 
 
 - name: Ensure firewall port 1936 OPEN when haproxy stats ENABLED
