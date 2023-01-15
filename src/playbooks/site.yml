@@ -119,7 +119,7 @@
     - base-config-scripts
   tags: base
 
-- hosts: load_balancers,load_balancers-meza-internal,load_balancers-meza-external
+- hosts: load_balancers,load_balancers_meza_internal,load_balancers_meza_external
   become: yes
   tags:
     - load-balancer

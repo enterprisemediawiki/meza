@@ -41,8 +41,8 @@
       'load_balancers' in groups
       and inventory_hostname in groups['load_balancers']
     ) or (
-      'load_balancers-meza-internal' in groups
-      and inventory_hostname in groups['load_balancers-meza-internal']
+      'load_balancers_meza_internal' in groups
+      and inventory_hostname in groups['load_balancers_meza_internal']
     )
 
 - name: Set fact if this load balancer will NOT handle internal connections
@@ -54,8 +54,8 @@
         'load_balancers' in groups
         and inventory_hostname in groups['load_balancers']
       ) or (
-        'load_balancers-meza-internal' in groups
-        and inventory_hostname in groups['load_balancers-meza-internal']
+        'load_balancers_meza_internal' in groups
+        and inventory_hostname in groups['load_balancers_meza_internal']
       )
     )
 
