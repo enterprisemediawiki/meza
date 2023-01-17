@@ -93,6 +93,19 @@
     - "{{ m_meza_data }}/elasticsearch/scripts"
     - "{{ m_meza_data }}/elasticsearch/log"
 
+# Copy java cacerts to /etc/elasticsearch to resolve issue with openjdk RPM
+# update. See:
+#
+# https://discuss.elastic.co/t/elasticsearch-is-incompatible-with-new-versions-of-openjdk-from-redhat/318928/7
+#
+- name: Copy extracted java cacerts to /etc/elasticsearch
+  copy:
+    src: /etc/pki/ca-trust/extracted/java/cacerts
+    dest: /etc/elasticsearch/cacerts-java-extracted
+    owner: elasticsearch
+    group: elasticsearch
+    mode: '0444'
+
 
 # CONFIGURE AND START ELASTICSEARCH
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html

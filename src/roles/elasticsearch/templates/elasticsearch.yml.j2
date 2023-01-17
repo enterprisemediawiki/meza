@@ -35,3 +35,13 @@ path.data: {{ m_meza_data }}/elasticsearch/data
 #
 path.logs: {{ m_meza_data }}/elasticsearch/log
 
+# Workaround for openjdk policy update which breaks elasticsearch's ability
+# to read /etc/pki/ca-trust/extracted/java/cacerts.
+#
+# Fixes xpack SSL java access denied at ES startup.
+#
+# Probably not the best way to do this. Suggestions welcome
+xpack.ssl.truststore.path: /etc/elasticsearch/cacerts-java-extracted
+xpack.ssl.truststore.password: changeit
+reindex.ssl.truststore.path: /etc/elasticsearch/cacerts-java-extracted
+reindex.ssl.truststore.password: changeit
