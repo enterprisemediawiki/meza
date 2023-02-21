@@ -12,5 +12,25 @@
 
 - name: Ensure PHP packages for Rocky/RHEL8 installed
   package:
-    name: ['php-cli', 'php-common', 'php-devel', 'php-gd', 'php-json', 'php-snmp', 'php-xml', 'php-xmlrpc', 'php-mysqlnd', 'php-pdo', 'php-odbc', 'php-process', 'php-bcmath', 'php-intl', 'php-opcache', 'php-soap', 'php-mbstring', 'php-ldap', 'php-fpm']
+    name:
+      - php-cli
+      - php-common
+      - php-devel
+      - php-gd
+      - php-json
+      - php-snmp
+      - php-xml
+      - php-xmlrpc
+      - php-mysqlnd
+      - php-pdo
+      - php-odbc
+      - php-process
+      - php-bcmath
+      - php-intl
+      - php-opcache
+      - php-soap
+      - php-mbstring
+      - php-ldap
+      - php-fpm
+      - php-pear
     state: present
