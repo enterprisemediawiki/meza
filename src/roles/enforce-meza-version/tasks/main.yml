@@ -1,0 +1,16 @@
+---
+
+- name: Ensure proper Meza version
+  become: yes
+  become_user: "meza-ansible"
+  # Ref #1149 for TMPDIR environment var
+  environment:
+    TMPDIR: "{{ m_tmp }}"
+  git:
+    repo: "https://github.com/enterprisemediawiki/meza.git"
+    dest: "{{ m_meza }}"
+    version: "{{ enforce_meza_version }}"
+    track_submodules: no
+    recursive: no
+    umask: "0002"
+  when: enforce_meza_version is defined

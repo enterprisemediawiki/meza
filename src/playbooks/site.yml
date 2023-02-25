@@ -96,6 +96,7 @@
     - init-controller-config
     - role: autodeployer
       when: force_deploy is defined or autodeployer is defined
+    - enforce-meza-version
   tags:
     - autodeployer
     - controller
