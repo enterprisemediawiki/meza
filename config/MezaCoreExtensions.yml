@@ -88,7 +88,7 @@ list:
 
   - name: Maps
     composer: "mediawiki/maps"
-    version: "9.0.7" 
+    version: "9.0.7"
     config: |
       // In Maps 6.0+ you need to also load the extension
       wfLoadExtension( 'Maps' );
@@ -298,7 +298,7 @@ list:
     legacy_load: true
 
   - name: SemanticDrilldown
-    repo: https://github.com/wikimedia/mediawiki-extensions-SemanticDrilldown.git
+    repo: https://github.com/SemanticMediaWiki/SemanticDrilldown.git
     version: "master"
     legacy_load: false
 
