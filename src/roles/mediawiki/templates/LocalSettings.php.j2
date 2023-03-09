@@ -471,14 +471,6 @@ $wgMemCachedServers = array(
     {%- endfor %}
 );
 
-// memcached is setup and will work for sessions with meza, unless you use
-// SimpleSamlPhp. Previous versions of meza had this set to CACHE_NONE, but
-// MW 1.27 requires a session cache. Setting this to CACHE_MEMCACHED as it
-// is the ultimate goal. A separate branch contains pulling PHP from the
-// IUS repository, which should simplify integrating PHP and memcached in a
-// way that SimpleSamlPhp likes. So this may be temporarily breaking for
-// SAML, but MW 1.27 may be breaking for SAML anyway due to changes in
-// AuthPlugin/AuthManager.
 $wgSessionCacheType = CACHE_MEMCACHED;
 
 ## To enable image uploads, make sure the 'images' directory

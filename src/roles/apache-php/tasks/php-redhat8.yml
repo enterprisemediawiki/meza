@@ -33,4 +33,36 @@
       - php-ldap
       - php-fpm
       - php-pear
+      - libmemcached-devel
     state: present
+
+# PHP memcached extension needed for SAML auth
+- name: Ensure PEAR channel up-to-date
+  shell: pear channel-update pecl.php.net
+
+- name: Install memcached PECL packages
+  shell: >
+    pecl install
+    --configureoptions
+    'with-libmemcached-dir="no"
+    with-zlib-dir="no"
+    with-system-fastlz="no"
+    enable-memcached-igbinary="no"
+    enable-memcached-msgpack="no"
+    enable-memcached-json="no"
+    enable-memcached-protocol="no"
+    enable-memcached-sasl="yes"
+    enable-memcached-session="yes"'
+    memcached
+  ignore_errors: true
+  notify:
+    - restart apache
+
+- template:
+    src: 40-memcached.ini.j2
+    dest: /etc/php.d/40-memcached.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+  - restart apache
