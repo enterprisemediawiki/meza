@@ -78,6 +78,12 @@
     track_submodules: no
     recursive: no
     umask: "0002"
+
+  # this sucks to have to do this but I'm repeatedly getting submodule errors
+  # so it's this or stop using git (which would also mean changing how
+  # extensions/skins/vendor is stored so it didn't wipe them out each time)
+  failed_when: False
+
   tags:
     - latest
     - mediawiki-core
