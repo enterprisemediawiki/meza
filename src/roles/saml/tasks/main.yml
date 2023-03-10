@@ -75,7 +75,7 @@
     remote_src: yes
     extra_opts:
       - "--strip-components=1"
-  when: not simplesamlphp_exists.stat.exists
+  when: not simplesamlphp_exists.stat.exists or new_simplesamlphp_archive.changed
 
 - name: Ensure Extension:PluggableAuth installed
   become: yes
