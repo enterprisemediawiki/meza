@@ -38,7 +38,7 @@ signal.signal(signal.SIGINT, sigint_handler)
 def load_yaml ( filepath ):
 	with open(filepath, 'r') as stream:
 		try:
-			return yaml.load(stream, Loader=yaml.loader)
+			return yaml.load(stream, Loader=yaml.Loader)
 		except yaml.YAMLError as exc:
 			print(exc)
 
