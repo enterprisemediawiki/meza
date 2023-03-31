@@ -32,6 +32,7 @@
     ACCEPT_EULA: 'y'
   notify:
   - restart apache
+  - restart php-fpm
 
 - name: install ODBC driver devel package
   yum:
@@ -97,12 +98,14 @@
   shell: pecl install sqlsrv
   ignore_errors: true
   notify:
-  - restart apache
+    - restart apache
+    - restart php-fpm
 - name: Install pdo_sqlsrv PECL packages
   shell: pecl install pdo_sqlsrv
   ignore_errors: true
   notify:
-  - restart apache
+    - restart apache
+    - restart php-fpm
 
 - template:
     src: 30-pdo_sqlsrv.ini.j2
@@ -111,7 +114,8 @@
     group: root
     mode: 0644
   notify:
-  - restart apache
+    - restart apache
+    - restart php-fpm
 
 - template:
     src: 20-sqlsrv.ini.j2
@@ -120,4 +124,5 @@
     group: root
     mode: 0644
   notify:
-  - restart apache
+    - restart apache
+    - restart php-fpm

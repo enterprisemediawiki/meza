@@ -425,9 +425,9 @@ $wgSharedTables = array(
  *
  **/
 // proxy setup
-$wgUseSquid = true;
+$wgUseCdn = true;
 $wgUsePrivateIPs = true;
-$wgSquidServersNoPurge = array(
+$wgCdnServersNoPurge = array(
 	{% for server in groups['load_balancers'] -%}
 	{%- if server == inventory_hostname or server == 'localhost' -%}
 	'127.0.0.1',

@@ -36,6 +36,7 @@
     dest: "{{ m_php_ini }}"
   notify:
     - restart apache
+    - restart php-fpm
 
 - name: Write php.d ini files
   template:
@@ -44,6 +45,7 @@
   with_items: "{{ path_php_conf_d_files }}"
   notify:
     - restart apache
+    - restart php-fpm
 
 # FIXME: Is this left over from old method of supporting MSSQL? Not required now
 #        that MS-provided drivers are used?
@@ -53,4 +55,5 @@
     dest: /etc/freetds.conf
   notify:
     - restart apache
+    - restart php-fpm
   when: ansible_distribution_file_variety == "RedHat"

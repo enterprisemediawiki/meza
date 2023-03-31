@@ -57,6 +57,7 @@
   ignore_errors: true
   notify:
     - restart apache
+    - restart php-fpm
 
 - template:
     src: 40-memcached.ini.j2
@@ -65,4 +66,5 @@
     group: root
     mode: 0644
   notify:
-  - restart apache
+    - restart apache
+    - restart php-fpm
