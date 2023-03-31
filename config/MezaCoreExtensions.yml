@@ -304,8 +304,7 @@ list:
 
   - name: Arrays
     repo: https://github.com/wikimedia/mediawiki-extensions-Arrays.git
-    version: "2166695159a9a5eb18cb96d4811cdefa0978ab8a"
-    legacy_load: true
+    version: "8ffa3c6a4ae43824d8128c120ff25d569bae3d53"
 
   # Verify 34.x functionality
   - name: TalkRight
