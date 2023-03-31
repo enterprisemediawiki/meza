@@ -71,4 +71,6 @@
     state: latest
     install_recommends: true
   register: php_package_install
-  notify: restart apache
+  notify:
+    - restart apache
+    - restart php-fpm

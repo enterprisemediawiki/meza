@@ -52,6 +52,7 @@
     dest: "{{ path_apache_startup_config }}"
   notify:
     - restart apache
+    - restart php-fpm
 
 - name: Install PHP
   import_tasks: php.yml

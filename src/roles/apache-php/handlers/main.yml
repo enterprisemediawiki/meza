@@ -4,3 +4,10 @@
     name: "{{ service_apache }}"
     state: restarted
   when: docker_skip_tasks is not defined or not docker_skip_tasks
+
+
+- name: restart php-fpm
+  service:
+    name: "{{ service_php_fpm }}"
+    state: restarted
+  when: docker_skip_tasks is not defined or not docker_skip_tasks
