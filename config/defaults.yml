@@ -1,6 +1,9 @@
 ---
 # Meza default config file
 
+enforce_meza_version: main
+meza_repository: https://github.com/nasa/meza.git
+
 # Use development or production settings for this server
 # production being as performant and secure as possible
 # development being less secure and providing optional features useful for dev
