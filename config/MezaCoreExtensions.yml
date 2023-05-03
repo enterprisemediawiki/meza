@@ -483,5 +483,5 @@ list:
 
   - name: NumerAlpha
     repo: https://github.com/wikimedia/mediawiki-extensions-NumerAlpha.git
-    version: tags/0.7.0
+    version: "{{ mediawiki_default_branch }}"
     legacy_load: True
