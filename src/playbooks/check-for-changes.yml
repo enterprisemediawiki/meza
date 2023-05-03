@@ -275,7 +275,7 @@
           environment:
             TMPDIR: "{{ m_tmp }}"
           git:
-            repo: "https://github.com/enterprisemediawiki/meza.git"
+            repo: "{{ meza_repository }}"
             dest: "{{ m_meza }}"
             version: "{{ enforce_meza_version }}"
             track_submodules: no
