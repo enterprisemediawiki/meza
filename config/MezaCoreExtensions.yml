@@ -324,7 +324,7 @@ list:
 
   - name: HeaderTabs
     repo: https://github.com/wikimedia/mediawiki-extensions-HeaderTabs.git
-    version: tags/1.2
+    version: tags/2.2.1
     config: |
       $wgHeaderTabsEditTabLink = false;
       $wgHeaderTabsRenderSingleTab = true;
