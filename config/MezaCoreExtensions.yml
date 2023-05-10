@@ -240,12 +240,12 @@ list:
     version: "{{ mediawiki_default_branch }}"
     composer_merge: True
 
-  - name: Thanks
-    repo: https://github.com/wikimedia/mediawiki-extensions-Thanks.git
-    version: "{{ mediawiki_default_branch }}"
-    config: |
-      $wgThanksConfirmationRequired = false;
-
+#   - name: Thanks
+#     repo: https://github.com/wikimedia/mediawiki-extensions-Thanks.git
+#     version: "{{ mediawiki_default_branch }}"
+#     config: |
+#       $wgThanksConfirmationRequired = false;
+#
   - name: RevisionSlider
     repo: https://github.com/wikimedia/mediawiki-extensions-RevisionSlider.git
     version: "{{ mediawiki_default_branch }}"
