@@ -11,7 +11,7 @@
 # Install ODBC driver
 - name: install mssql-server repo (CentOS, RedHat)
   get_url:
-    url: https://packages.microsoft.com/config/rhel/7/prod.repo
+    url: https://packages.microsoft.com/config/rhel/8/prod.repo
     dest: /etc/yum.repos.d/mssql-release.repo
   when: ansible_distribution in ['CentOS', 'RedHat']
 
