@@ -10,6 +10,10 @@
 
 # Install ODBC driver
 - name: install mssql-server repo (CentOS, RedHat)
+  retries: 5
+  delay: 5
+  register: repo_result
+  until: repo_result is success
   get_url:
     url: https://packages.microsoft.com/config/rhel/8/prod.repo
     dest: /etc/yum.repos.d/mssql-release.repo
