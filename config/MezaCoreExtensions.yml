@@ -342,7 +342,7 @@ list:
   - name: ApprovedRevs
     repo: https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git
     # Use this commit until a release tag for v1.0 is created
-    version: tags/1.2.2
+    version: tags/1.7.2
     config: |
       $egApprovedRevsAutomaticApprovals = false;
 
