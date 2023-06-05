@@ -88,6 +88,7 @@
     ACCEPT_EULA: 'y'
   tags:
   - latest
+  - upgrade-packages
 
 # FIXME #807: for RedHat may need to enable "Optional RPMs"
 - name: Ensure EPEL installed via epel-release package (CentOS only)
