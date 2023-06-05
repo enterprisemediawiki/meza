@@ -393,7 +393,8 @@ max_input_vars = {{ php_max_input_vars }}
 
 ; Maximum amount of memory a script may consume (128MB)
 ; http://php.net/memory-limit
-memory_limit = 128M
+;memory_limit = 128M ; Original value. Probably should set this as a variable to allow this to be set manually
+memory_limit = 1024M
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Error handling and logging ;

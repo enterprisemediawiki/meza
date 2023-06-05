@@ -287,8 +287,8 @@ $wgScriptExtension = ".php";
 $wgStylePath = "$wgScriptPath/skins";
 $wgResourceBasePath = $wgScriptPath;
 
-
-
+## This is the base URL that will be used to construct all internal links. Without this, the title will append to the end of the URL when switching wikis in a wiki farm
+$wgArticlePath = "/$wikiId/index.php/$1";
 
 
 

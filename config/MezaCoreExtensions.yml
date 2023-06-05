@@ -240,19 +240,19 @@ list:
     version: "{{ mediawiki_default_branch }}"
     composer_merge: True
 
-  - name: Thanks
-    repo: https://github.com/wikimedia/mediawiki-extensions-Thanks.git
-    version: "{{ mediawiki_default_branch }}"
-    config: |
-      $wgThanksConfirmationRequired = false;
-
+#   - name: Thanks
+#     repo: https://github.com/wikimedia/mediawiki-extensions-Thanks.git
+#     version: "{{ mediawiki_default_branch }}"
+#     config: |
+#       $wgThanksConfirmationRequired = false;
+#
   - name: RevisionSlider
     repo: https://github.com/wikimedia/mediawiki-extensions-RevisionSlider.git
     version: "{{ mediawiki_default_branch }}"
 
   - name: CollapsibleVector
     repo: https://github.com/wikimedia/mediawiki-extensions-CollapsibleVector
-    version: "{{ mediawiki_default_branch }}"
+    version: 7b71b1b04cc77eb4621e55b3dda6b9e15f4dd029
 
   - name: SimpleMathJax
     repo: https://github.com/jamesmontalvo3/SimpleMathJax.git
@@ -324,7 +324,7 @@ list:
 
   - name: HeaderTabs
     repo: https://github.com/wikimedia/mediawiki-extensions-HeaderTabs.git
-    version: tags/1.2
+    version: tags/2.2.1
     config: |
       $wgHeaderTabsEditTabLink = false;
       $wgHeaderTabsRenderSingleTab = true;
@@ -342,7 +342,7 @@ list:
   - name: ApprovedRevs
     repo: https://github.com/wikimedia/mediawiki-extensions-ApprovedRevs.git
     # Use this commit until a release tag for v1.0 is created
-    version: tags/1.2.2
+    version: tags/1.7.2
     config: |
       $egApprovedRevsAutomaticApprovals = false;
 
@@ -358,8 +358,8 @@ list:
 
   # Verify 34.x functionality
   - name: WatchAnalytics
-    repo: https://github.com/wikimedia/mediawiki-extensions-WatchAnalytics.git
-    version: tags/4.1.0
+    repo: https://github.com/djflux/WatchAnalytics.git
+    version: "7f9c0b74f815f7cb55fe2b7ea6b8bd3bcc8f4357"
     config: |
       $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
 
