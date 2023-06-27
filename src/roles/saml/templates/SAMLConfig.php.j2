@@ -9,13 +9,3 @@ $wgPluggableAuth_EnableAutoLogin = true;
 
 // SimpleSamlPhp settings
 $wgSimpleSAMLphp_InstallDir = '{{ m_install }}/simplesamlphp';
-$wgPluggableAuth_Config['Login with SAML'] = [
-	'plugin' => 'SimpleSAMLphp',
-	'data' => [
-		'authSourceId' => 'default-sp',
-		'usernameAttribute' => '{{ saml_public.idp_username_attr }}',
-		'realNameAttribute' => '{{ saml_public.idp_realname_attr }}',
-		'emailAttribute' => '{{ saml_public.idp_email_attr }}'
-	]
-    // add `groupsyncs` in local config
-];
