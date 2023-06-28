@@ -9,8 +9,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 /**
  *  TABLE OF CONTENTS
  *
-{% if saml_secret is defined %} *    0) SAML AUTH
-{% endif %} *    1) WIKI-SPECIFIC SETUP
+ *    1) WIKI-SPECIFIC SETUP
  *    2) DEBUG
  *    3) PATH SETUP
  *    4) EMAIL
@@ -22,17 +21,6 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  *
  **/
 
-{% if saml_secret is defined %}
-/**
- *  0) SAML AUTH
- *
- *  Perform authentication up front.
- *
- **/
-require "{{ m_deploy }}/samlLocalSettings.php";
-
-
-{% endif %}
 
 /**
  *  1) WIKI-SPECIFIC SETUP
@@ -58,6 +46,17 @@ else {
 	$wikiId = strtolower( $uriParts[1] ); // URI has leading slash, so $uriParts[0] is empty string
 
 }
+
+
+{% if saml_secret is defined %}
+/**
+ *  0) SAML AUTH
+ *
+ *  Perform authentication up front, immediately after $wikiId is setup.
+ *
+ **/
+require "{{ m_deploy }}/samlLocalSettings.php";
+{% endif %}
 
 
 {% if wiki_id_redirects is defined and wiki_id_redirects|length > 0 %}

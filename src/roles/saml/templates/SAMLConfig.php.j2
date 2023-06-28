@@ -1,7 +1,6 @@
 <?php
 
-// make sure that session storage matches to the one used in simplesaml most likely default PHPSESSID
-$wgSessionName = "PHPSESSID";
+$wgSessionName = "wiki_session_$wikiId";
 
 // Should login occur automatically when a user visits the wiki?
 $wgPluggableAuth_EnableAutoLogin = true;
