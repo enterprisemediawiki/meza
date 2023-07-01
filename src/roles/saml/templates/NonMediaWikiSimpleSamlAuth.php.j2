@@ -43,7 +43,6 @@ class NonMediaWikiSimpleSamlAuth {
 	 */
 	private static function init() {
 		global $wgSimpleSAMLphp_InstallDir;
-		global $wgSimpleSAMLphp_AuthSourceId;
 		global $wgSessionName;
 		global $wgSessionsInMemcached;
 		global $wgSessionsInObjectCache;
@@ -63,7 +62,7 @@ class NonMediaWikiSimpleSamlAuth {
 		// Load the simpleSamlPhp service
 		require_once rtrim( $wgSimpleSAMLphp_InstallDir, DIRECTORY_SEPARATOR ) .
 			DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . '_autoload.php';
-		self::$as = new SimpleSAML\Auth\Simple( $wgSimpleSAMLphp_AuthSourceId );
+		self::$as = new SimpleSAML\Auth\Simple('default-sp');
 		self::$initialised = is_object( self::$as );
 		return self::$initialised;
 	}
