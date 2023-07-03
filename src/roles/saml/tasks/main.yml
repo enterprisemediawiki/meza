@@ -65,7 +65,6 @@
 
 - name: Unarchive simplesamlphp tarball if new
   become: yes
-  become_user: "meza-ansible"
   unarchive:
     src: "{{ m_home }}/meza-ansible/simplesamlphp-{{ simplesamlphp_version }}.tar.gz"
     dest: "{{ m_simplesamlphp_path }}"
