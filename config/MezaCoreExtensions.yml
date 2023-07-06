@@ -469,11 +469,6 @@ list:
     version: tags/1.0.0
     legacy_load: True
 
-  # Verify 34.x functionality
-  - name: HeaderFooter
-    repo: https://github.com/enterprisemediawiki/HeaderFooter.git
-    version: tags/3.0.1
-
   - name: NumerAlpha
     repo: https://github.com/wikimedia/mediawiki-extensions-NumerAlpha.git
     version: "{{ mediawiki_default_branch }}"
