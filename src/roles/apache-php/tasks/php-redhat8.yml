@@ -10,6 +10,9 @@
     name: "php5*"
     state: absent
 
+- name: Switch to php 7.4
+  shell: dnf -y module switch-to php:7.4
+
 - name: Ensure PHP packages for Rocky/RHEL8 installed
   package:
     name:
@@ -33,27 +36,22 @@
       - php-ldap
       - php-fpm
       - php-pear
-      - libmemcached-devel
     state: present
+
+- name: install libmemcached-devel
+  dnf:
+    name: libmemcached-devel
+    enablerepo: devel
 
 # PHP memcached extension needed for SAML auth
 - name: Ensure PEAR channel up-to-date
   shell: pear channel-update pecl.php.net
 
+# --configureoptions parameter is not supported in our version of pecl.
 - name: Install memcached PECL packages
   shell: >
-    pecl install
-    --configureoptions
-    'with-libmemcached-dir="no"
-    with-zlib-dir="no"
-    with-system-fastlz="no"
-    enable-memcached-igbinary="no"
-    enable-memcached-msgpack="no"
-    enable-memcached-json="no"
-    enable-memcached-protocol="no"
-    enable-memcached-sasl="yes"
-    enable-memcached-session="yes"'
-    memcached
+    printf 'no\nno\nno\nno\nno\nno\nno\nyes\nyes\n' |
+    pecl install memcached
   ignore_errors: true
   notify:
     - restart apache

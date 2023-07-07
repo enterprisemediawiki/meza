@@ -8,58 +8,18 @@ package_openssh_client: openssh-clients
 package_cron: cronie
 package_apache: httpd-devel
 package_php_apache_deps7:
-  - zlib-devel
-  - sqlite-devel
-  - bzip2-devel
-  - pcre-devel
-  - openssl-devel
-  - curl-devel
-  - libxml2-devel
-  - libXpm-devel
-  - gmp-devel
-  - libicu-devel
-  - t1lib-devel
-  - aspell-devel
-  - libcurl-devel
-  - libjpeg-devel
-  - libvpx-devel
-  - libpng-devel
-  - freetype-devel
-  - readline-devel
-  - libtidy-devel
-  - libmcrypt-devel
-  - pam-devel
   - sendmail
   - sendmail-cf
   - m4
   - xz-libs
   - mariadb-libs
-package_php_apache_deps8:
   - zlib-devel
-  - sqlite-devel
-  - bzip2-devel
-  - pcre-devel
-  - openssl-devel
-  - curl-devel
-  - libxml2-devel
-  - libXpm-devel
-  - gmp-devel
-  - libicu-devel
-  - t1lib-devel
-  - aspell-devel
-  - libcurl-devel
-  - libjpeg-devel
-  - libvpx-devel
-  - libpng-devel
-  - freetype-devel
-  - readline-devel
-  - libtidy-devel
-  - libmcrypt-devel
-  - pam-devel
+package_php_apache_deps8:
   - sendmail
   - sendmail-cf
   - m4
   - xz-libs
+  - zlib-devel
 package_java: java-1.8.0-openjdk
 package_python3: python36
 package_python3_pip: python36-pip
@@ -82,7 +42,6 @@ package_lua: [ 'lua', 'lua-devel' ]
 package_imagemagick:
   - ghostscript
   - ImageMagick
-  - ImageMagick-devel
 package_ntp: ntpd
 package_ntp8: chrony
 
