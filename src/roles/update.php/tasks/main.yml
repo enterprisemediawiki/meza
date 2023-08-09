@@ -58,7 +58,7 @@
 
     - name: Run update.php on this wiki
       shell: >
-        WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/update.php" --quick >> {{ update_php_log }} 2>&1
+        WIKI="{{ wiki_id }}" php "{{ m_mediawiki }}/maintenance/update.php" --quick --doshared >> {{ update_php_log }} 2>&1
       # run_once see [1]
       run_once: true
 
