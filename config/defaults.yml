@@ -240,9 +240,9 @@ load_balancers_all: >
   ( groups.get('load_balancers', [] ) ) +
   ( groups.get('load_balancers_meza_internal', [] ) ) +
   ( groups.get('load_balancers_meza_external', [] ) ) +
-  ( groups.get('load_balancers_meza_nonmeza', [] ) ) +
-  ( groups.get('load_balancers_meza_nonmeza_internal', [] ) ) +
-  ( groups.get('load_balancers_meza_nonmeza_external', [] ) )
+  ( groups.get('load_balancers_nonmeza', [] ) ) +
+  ( groups.get('load_balancers_nonmeza_internal', [] ) ) +
+  ( groups.get('load_balancers_nonmeza_external', [] ) )
   }}
 
 
@@ -250,14 +250,14 @@ load_balancers_all: >
 load_balancers_internal: >
   {{
   ( groups.get('load_balancers_meza_internal', [] ) ) +
-  ( groups.get('load_balancers_meza_nonmeza_internal', [] ) )
+  ( groups.get('load_balancers_nonmeza_internal', [] ) )
   }}
 
 # Just load balancers for handling external traffic
 load_balancers_external: >
   {{
   ( groups.get('load_balancers_meza_external', [] ) ) +
-  ( groups.get('load_balancers_meza_nonmeza_external', [] ) )
+  ( groups.get('load_balancers_nonmeza_external', [] ) )
   }}
 
 # Just load balancers that handle internal and external

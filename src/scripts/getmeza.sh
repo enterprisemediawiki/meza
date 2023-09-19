@@ -65,7 +65,7 @@ if [ -f /etc/redhat-release ]; then
 	done
 
 # if Debian support still desired, add else condition here
-fi 
+fi
 
 # make sure conf-meza exists and has good permissions
 mkdir -p ${INSTALL_DIR}/conf-meza/secret
