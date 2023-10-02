@@ -351,8 +351,8 @@ list:
 
   # Verify 34.x functionality
   - name: WatchAnalytics
-    repo: https://github.com/djflux/WatchAnalytics.git
-    version: "7f9c0b74f815f7cb55fe2b7ea6b8bd3bcc8f4357"
+    repo: https://github.com/V-Brooks/WatchAnalytics.git
+    version: "48063e29bd2d0dceaea08640d5f408ea817c1308"
     config: |
       $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
 
