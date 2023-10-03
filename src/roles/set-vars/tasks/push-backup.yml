@@ -1,0 +1,71 @@
+---
+#
+# Set variables associated with pushing backups. Previously these variables were only
+# set like:
+#
+# push_backup:
+#   crontime: "0 18 * * *"
+#   remote_user: meza-ansible
+#   short_name: "staging"
+#   db:
+#     addr: "staging.example.com"
+#     path: /opt/data-meza/backups/staging/<id>/
+#   uploads:
+#     addr: "staging.example.com"
+#     path: /opt/data-meza/uploads/<id>
+#
+# In order to support running push-backup only with environment variables, the above
+# variables (which are all properties based off push_backup root variable) have been
+# re-written in the following form:
+#
+#   push_backup.db.addr --> push_backup_db_addr
+#
+# This file enables backwards compatibility by taking values like `push_backup.db.addr`
+# and creating `push_backup_db_addr`.
+#
+
+- set_fact:
+    push_backup_crontime: "{{ push_backup.crontime }}"
+  when:
+    - push_backup is defined
+    - push_backup.crontime is defined
+
+- set_fact:
+    push_backup_remote_user: "{{ push_backup.remote_user }}"
+  when:
+    - push_backup is defined
+    - push_backup.remote_user is defined
+
+- set_fact:
+    push_backup_short_name: "{{ push_backup.short_name }}"
+  when:
+    - push_backup is defined
+    - push_backup.short_name is defined
+
+- set_fact:
+    push_backup_db_addr: "{{ push_backup.db.addr }}"
+  when:
+    - push_backup is defined
+    - push_backup.db is defined
+    - push_backup.db.addr is defined
+
+- set_fact:
+    push_backup_db_path: "{{ push_backup.db.path }}"
+  when:
+    - push_backup is defined
+    - push_backup.db is defined
+    - push_backup.db.path is defined
+
+- set_fact:
+    push_backup_uploads_addr: "{{ push_backup.uploads.addr }}"
+  when:
+    - push_backup is defined
+    - push_backup.uploads is defined
+    - push_backup.uploads.addr is defined
+
+- set_fact:
+    push_backup_uploads_path: "{{ push_backup.uploads.path }}"
+  when:
+    - push_backup is defined
+    - push_backup.uploads is defined
+    - push_backup.uploads.path is defined

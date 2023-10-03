@@ -18,10 +18,10 @@ MAILTO=root
 {{ autodeployer.crontime }} root meza autodeploy "{{ env }}" "Deploy" "" >> {{ m_logs }}/deploy/check-for-changes-`date "+\%Y\%m\%d"`.log 2>&1
 
 
-{% if push_backup is defined and push_backup.crontime is defined %}
+{% if push_backup is defined and push_backup_crontime is defined %}
 #
 # Push backup (db and uploads) to another server periodically
 #
-{{ push_backup.crontime }} root meza push-backup "{{ env }}" >> {{ m_logs }}/deploy/push-backup-`date "+\%Y\%m\%d"`.log 2>&1
+{{ push_backup_crontime }} root meza push-backup "{{ env }}" >> {{ m_logs }}/deploy/push-backup-`date "+\%Y\%m\%d"`.log 2>&1
 {% endif %}
 {% endif %}

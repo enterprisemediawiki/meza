@@ -75,3 +75,9 @@
   # Can't load secret.yml when it doesn't exist yet, so skip this while setting
   # up an environment
   when: not allow_missing_secret_config|default(false)
+
+#
+# Misc
+#
+- name: Include push_backup backwards compatibility
+  include: push-backup.yml
