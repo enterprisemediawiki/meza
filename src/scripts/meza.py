@@ -1001,6 +1001,20 @@ def meza_command_push_backup (argv):
 	meza_shell_exec_exit(rc)
 
 
+def meza_command_enforce_meza_version (argv):
+
+	env = argv[0]
+
+	rc = check_environment(env)
+	if rc != 0:
+		meza_shell_exec_exit(rc)
+
+	shell_cmd = playbook_cmd( 'enforce-meza-version', env ) + argv[1:]
+	rc = meza_shell_exec( shell_cmd )
+
+	meza_shell_exec_exit(rc)
+
+
 def playbook_cmd ( playbook, env=False, more_extra_vars=False ):
 	command = ['sudo', '-u', 'meza-ansible', 'ansible-playbook',
 		'{}/meza/src/playbooks/{}.yml'.format(install_dir, playbook)]

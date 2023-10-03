@@ -1,0 +1,7 @@
+---
+
+- hosts: localhost
+  become: yes
+  roles:
+    - set-vars
+    - enforce-meza-version
