@@ -299,7 +299,7 @@ list:
 
   - name: SemanticDrilldown
     repo: https://github.com/SemanticMediaWiki/SemanticDrilldown.git
-    version: "master"
+    version: "8262c2a17d5eac3db68f1cc909df92f455740a5e"
     legacy_load: false
 
   - name: Arrays
