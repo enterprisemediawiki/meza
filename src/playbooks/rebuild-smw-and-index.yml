@@ -1,4 +1,7 @@
 ---
+# Run with command `meza maint rebuild $envName`
+# Just search: `meza maint rebuild $envName --skip-tags smw-data`
+# Just SMW: `meza maint rebuild $envName --skip-tags search-index`
 
 - hosts: app_servers
   become: yes
