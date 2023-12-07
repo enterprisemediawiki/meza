@@ -1,9 +1,7 @@
 echo "******* Generating elasticsearch index *******"
 
-disable_search_file="{{ m_deploy }}/public/wikis/$wiki_id/postLocalSettings.d/disable-search-update.php"
-
-# disable search update in wiki-specific settings
-echo -e "<?php\n\$wgDisableSearchUpdate = true;\n" > "$disable_search_file"
+# Remove any broken cirrus update jobs
+mysql "wiki_$wiki_id" -e "DELETE FROM job WHERE job_cmd = 'cirrusSearchElasticaWrite'"
 
 # Run script to generate elasticsearch index
 cd "{{ m_mediawiki }}"
@@ -11,6 +9,10 @@ WIKI="$wiki_id" php "{{ m_mediawiki }}/extensions/CirrusSearch/maintenance/Updat
 
 # Remove search-update disable in wiki-specific settings
 rm -f "$disable_search_file"
+
+# Restart PHP/Apache to ensure ^ change is picked up
+systemctl restart httpd
+systemctl restart php-fpm
 
 # Bootstrap the search index
 #

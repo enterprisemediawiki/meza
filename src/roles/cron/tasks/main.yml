@@ -12,13 +12,13 @@
     state: started
     enabled: yes
 
-- name: Ensure crontab file up-to-date
+- name: Ensure runjobs/custom-crons cron file in place
   template:
-    src: meza-ansible.crontab.j2
-    dest: "{{ m_home }}/meza-ansible/.ansible-cronfile"
-    owner: meza-ansible
-    group: wheel
-    mode: 0755
+    src: "run-jobs-and-custom-crons.j2"
+    dest: "/etc/cron.d/run-jobs-and-custom-crons-{{ env }}"
+    owner: "{{ m_crond_owner }}"
+    group: "{{ m_crond_group }}"
+    mode: "{{ m_crond_mode }}"
 
 - name: Ensure runAllJobs.php in place
   template:

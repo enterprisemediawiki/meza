@@ -9,6 +9,47 @@ fi
 wiki_dir="{{ m_htdocs }}/wikis"
 
 cd "$wiki_dir"
+
+# Before processing any wikis, stop search indexing on all. We're gonna nuke the whole index, across
+# all wikis before starting indexing, and we don't want any wikis to try to index anything until
+# their proper index is recreated.
+for d in $do_wikis; do
+
+	if [ -z "$1" ]; then
+		wiki_id=${d%/}
+	else
+		wiki_id="$d"
+	fi
+
+	if [ ! -d "$wiki_dir/$wiki_id" ]; then
+		echo "\"$wiki_id\" not a valid wiki ID"
+		continue
+	fi
+
+	# Disable search indexing in wiki-specific settings, and tell the
+	# wiki to not use CirrusSearch for now by nullifying $wgSearchType.
+	echo -e "<?php"                           >  "{{ m_deploy }}/public/wikis/$wiki_id/postLocalSettings.d/disable-search-update.php"
+	echo -e "\$wgDisableSearchUpdate = true;" >> "{{ m_deploy }}/public/wikis/$wiki_id/postLocalSettings.d/disable-search-update.php"
+	echo -e "\$wgSearchType = null;"          >> "{{ m_deploy }}/public/wikis/$wiki_id/postLocalSettings.d/disable-search-update.php"
+
+	# Restart PHP/Apache to ensure ^ change is picked up
+	systemctl restart httpd
+	systemctl restart php-fpm
+
+done
+
+# Print elasticsearch indexes
+curl -X GET 'http://localhost:9200/_cat/indices?v'
+
+# Nuke all the indexes
+curl -X DELETE 'http://localhost:9200/_all'
+
+# Print again (should be empty)
+curl -X GET 'http://localhost:9200/_cat/indices?v'
+
+# Create metastore index (used by all wikis)
+sudo WIKI="$wiki_id" php Metastore.php --upgrade
+
 for d in $do_wikis; do
 
 	if [ -z "$1" ]; then
@@ -49,4 +90,16 @@ for d in $do_wikis; do
 		echo "elastic-build-index completed for \"$wiki_id\" at $endtimestamp"
 	fi
 
+	# Run all the jobs for this wiki
+	maxjobs=1000
+	while [ $(WIKI="$wiki_id" php /opt/htdocs/mediawiki/maintenance/showJobs.php) -gt 0 ]; do
+		WIKI="$wiki_id" php /opt/htdocs/mediawiki/maintenance/runJobs.php --maxjobs="$maxjobs"
+		echo
+		echo "Up to 1000 jobs complete. Pausing for 5 seconds."
+		echo
+		sleep 5
+	done;
+
 done
+
+
