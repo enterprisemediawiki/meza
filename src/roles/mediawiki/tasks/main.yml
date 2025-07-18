@@ -132,6 +132,7 @@
     version: "{{ item.version }}"
     refspec: "{{ item.refspec | default('') }}"
     umask: "0002"
+    force: yes
   with_items: "{{ meza_core_extensions.list }}"
   when: meza_core_extensions.list[0] is defined and item.repo is defined
   tags:
