@@ -177,6 +177,7 @@
     refspec: "{{ item.refspec | default('') }}"
     umask: "0002"
     key_file: "{{ item.key_file | default(None) }}"
+    force: true
   with_items: "{{ meza_local_extensions.list }}"
   when: meza_local_extensions.list[0] is defined and item.repo is defined
   tags:
