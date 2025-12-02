@@ -47,12 +47,23 @@
 - name: Ensure PEAR channel up-to-date
   shell: pear channel-update pecl.php.net
 
-# --configureoptions parameter is not supported in our version of pecl.
-- name: Install memcached PECL packages
-  shell: >
-    printf 'no\nno\nno\nno\nno\nno\nno\nyes\nyes\n' |
-    pecl install memcached
-  ignore_errors: true
+- name: Check if memcached.so exists
+  stat:
+    path: /usr/lib64/php/modules/memcached.so
+  register: memcached_so
+
+- name: Reinstall memcached if .so file missing
+  block:
+    - name: Uninstall existing memcached PECL package
+      shell: pecl uninstall memcached
+      ignore_errors: true
+    
+    # --configureoptions parameter is not supported in all versions of pecl.
+    - name: Install memcached PECL packages
+      shell: >
+        printf 'no\nno\nno\nno\nno\nno\nno\nyes\nyes\n' |
+        pecl install memcached
+  when: not memcached_so.stat.exists
   notify:
     - restart apache
     - restart php-fpm
