@@ -64,6 +64,11 @@
         printf 'no\nno\nno\nno\nno\nno\nno\nyes\nyes\n' |
         pecl install memcached
   when: not memcached_so.stat.exists
+
+- name: Trigger restart if memcached was reinstalled
+  debug:
+    msg: "Memcached was reinstalled"
+  changed_when: not memcached_so.stat.exists
   notify:
     - restart apache
     - restart php-fpm
