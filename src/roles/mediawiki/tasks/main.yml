@@ -78,6 +78,7 @@
     track_submodules: no
     recursive: no
     umask: "0002"
+    force: true
 
   # this sucks to have to do this but I'm repeatedly getting submodule errors
   # so it's this or stop using git (which would also mean changing how
