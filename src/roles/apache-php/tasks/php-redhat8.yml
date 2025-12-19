@@ -10,8 +10,8 @@
     name: "php5*"
     state: absent
 
-- name: Switch to php 7.4
-  shell: dnf -y module switch-to php:7.4
+- name: Switch to php {{ php_debian_version }}
+  shell: dnf -y module switch-to php:{{ php_debian_version }}
 
 - name: Ensure PHP packages for Rocky/RHEL8 installed
   package:
