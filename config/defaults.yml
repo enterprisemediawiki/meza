@@ -92,7 +92,7 @@ mediawiki_default_branch: "REL1_39"
 
 # PHP version
 php_ius_version: "php81"
-php_debian_version: "8.1"
+php_debian_version: "8.2"
 
 # See Extension:CirrusSearch for ElasticSearch requirements
 # Meza before 31.x had ElasticSearch 1.6 or 2.x
