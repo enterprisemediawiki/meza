@@ -84,23 +84,34 @@
     path: /usr/lib64/php/modules/memcached.so
   register: memcached_so
 
-- name: Reinstall memcached if .so file missing
+- name: Check if memcached extension loads without errors
+  shell: php -d display_errors=on -d display_startup_errors=on -m 2>&1 | grep -q "^memcached$"
+  register: memcached_loads
+  failed_when: false
+  changed_when: false
+
+- name: Reinstall memcached if missing or incompatible
   block:
+    - name: Remove old memcached.so before reinstalling
+      file:
+        path: /usr/lib64/php/modules/memcached.so
+        state: absent
+    
     - name: Uninstall existing memcached PECL package
       shell: pecl uninstall memcached
       ignore_errors: true
     
-    # --configureoptions parameter is not supported in all versions of pecl.
+    # --configureoptions parameter is not supported in all versions of pecl.    
     - name: Install memcached PECL packages
       shell: >
         printf 'no\nno\nno\nno\nno\nno\nno\nyes\nyes\n' |
         pecl install memcached
-  when: not memcached_so.stat.exists
+  when: not memcached_so.stat.exists or memcached_loads.rc != 0
 
 - name: Trigger restart if memcached was reinstalled
   debug:
     msg: "Memcached was reinstalled"
-  changed_when: not memcached_so.stat.exists
+  changed_when: not memcached_so.stat.exists or memcached_loads.rc != 0
   notify:
     - restart apache
     - restart php-fpm
