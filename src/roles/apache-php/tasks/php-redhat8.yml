@@ -10,6 +10,38 @@
     name: "php5*"
     state: absent
 
+- name: Reset PHP module before switching versions
+  shell: dnf -y module reset php
+  when: php_debian_version != '7.4'
+
+- name: Remove old PHP packages before version switch
+  package:
+    lock_timeout: 180
+    name:
+      - php
+      - php-cli
+      - php-common
+      - php-devel
+      - php-gd
+      - php-json
+      - php-snmp
+      - php-xml
+      - php-xmlrpc
+      - php-mysqlnd
+      - php-pdo
+      - php-odbc
+      - php-process
+      - php-bcmath
+      - php-intl
+      - php-opcache
+      - php-soap
+      - php-mbstring
+      - php-ldap
+      - php-fpm
+      - php-pear
+    state: absent
+  when: php_debian_version != '7.4'
+
 - name: Switch to php {{ php_debian_version }}
   shell: dnf -y module switch-to php:{{ php_debian_version }}
 
@@ -20,10 +52,10 @@
       - php-common
       - php-devel
       - php-gd
-      - php-json
+      # - php-json  # Removed - not available in PHP 8.x (built-in)
       - php-snmp
       - php-xml
-      - php-xmlrpc
+      # - php-xmlrpc  # Removed - not available in PHP 8.x
       - php-mysqlnd
       - php-pdo
       - php-odbc
