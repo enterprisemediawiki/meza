@@ -222,6 +222,10 @@
     owner: "{{ m_htdocs_owner }}"
     group: "{{ m_htdocs_group }}"
 
+- name: Remove composer.lock before composer install and update
+  shell: "rm {{ m_mediawiki }}/composer.lock"
+  run_once: true
+
 - name: Run composer install on MediaWiki for dependencies
   become: yes
   become_user: "meza-ansible"
