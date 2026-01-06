@@ -18,7 +18,7 @@ list:
 
   - name: SubPageList
     composer: "mediawiki/sub-page-list"
-    version: "3.0.0"
+    version: "3.0.1"
     config: |
       // In SubPageList 2.1+ you need to also load the extension
       wfLoadExtension( 'SubPageList' );
