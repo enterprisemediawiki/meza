@@ -85,10 +85,10 @@ m_meza_sudeoers_file: "/etc/sudoers.d/meza-ansible"
 #
 
 # Version of MediaWiki core
-mediawiki_version: "REL1_39" # FIXME set a specific version
+mediawiki_version: "REL1_43" # FIXME set a specific version
 
 # Branch to use on many extensions extensions and skins
-mediawiki_default_branch: "REL1_39"
+mediawiki_default_branch: "REL1_43"
 
 # PHP version
 php_ius_version: "php81"
