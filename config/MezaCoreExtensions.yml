@@ -178,8 +178,8 @@ list:
     version: a5cf7b5cb68f0d49152812bb61056870c894a402
 
   - name: SimpleMathJax
-    repo: https://github.com/jamesmontalvo3/SimpleMathJax.git
-    version: e94afaffcdde8d926b166fdd166162f9519beaa1
+    repo: https://github.com/jmnote/SimpleMathJax.git
+    version: "tags/v0.8.10"
     legacy_load: True
 
   - name: ImageMap
