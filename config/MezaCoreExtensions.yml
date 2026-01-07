@@ -25,7 +25,7 @@ list:
 
   - name: Maps
     composer: "mediawiki/maps"
-    version: "9.0.7"
+    version: "12.0.0"
     config: |
       // In Maps 6.0+ you need to also load the extension
       wfLoadExtension( 'Maps' );
@@ -231,7 +231,7 @@ list:
 
   - name: HeaderTabs
     repo: https://github.com/wikimedia/mediawiki-extensions-HeaderTabs.git
-    version: tags/1.3
+    version: tags/2.0
     config: |
       $wgHeaderTabsEditTabLink = false;
       $wgHeaderTabsRenderSingleTab = true;
@@ -259,7 +259,7 @@ list:
   # Verify 34.x functionality
   - name: WatchAnalytics
     repo: https://github.com/wikimedia/mediawiki-extensions-WatchAnalytics.git
-    version: tags/4.1.2
+    version: tags/4.3
     config: |
       $egPendingReviewsEmphasizeDays = 10; // makes Pending Reviews shake after X days
 
