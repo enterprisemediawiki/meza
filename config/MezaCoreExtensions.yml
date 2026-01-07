@@ -58,8 +58,8 @@ list:
 
   # Verify 34.x functionality
   - name: ParserFunctionHelper
-    repo: https://github.com/enterprisemediawiki/ParserFunctionHelper.git
-    version: tags/1.0.0
+    repo: https://github.com/V-Brooks/ParserFunctionHelper.git
+    version: 1cb516908e4f6fc185ff85775ebd12ce84997e54
 
   - name: CharInsert
     repo: https://github.com/wikimedia/mediawiki-extensions-CharInsert.git
