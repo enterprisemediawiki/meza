@@ -85,7 +85,7 @@
   git:
     repo: https://github.com/wikimedia/mediawiki-extensions-PluggableAuth.git
     dest: "{{ m_mediawiki }}/extensions/PluggableAuth"
-    version: "tags/6.3" # "{{ saml_mw_extension_version }}"
+    version: "tags/7.5.0" # "{{ saml_mw_extension_version }}"
     umask: "0002"
   tags:
     - latest
@@ -99,7 +99,7 @@
   git:
     repo: https://github.com/wikimedia/mediawiki-extensions-SimpleSAMLphp.git
     dest: "{{ m_mediawiki }}/extensions/SimpleSAMLphp"
-    version: "tags/5.0.1" # "{{ saml_mw_extension_version }}"
+    version: "tags/7.0.0" # "{{ saml_mw_extension_version }}"
     umask: "0002"
   tags:
     - latest
