@@ -27,7 +27,10 @@ $config = array(
         'entityID' => null,
         {% endif %}
 
-        'NameIDPolicy' => '{{ saml_public.name_id_policy }}',
+        'NameIDPolicy' => [
+            'Format' => '{{ saml_public.name_id_policy }}',
+            'AllowCreate' => true,
+        ],
 
         // The entity ID of the IdP this should SP should contact.
         // Can be NULL/unset, in which case the user will be shown a list of available IdPs.

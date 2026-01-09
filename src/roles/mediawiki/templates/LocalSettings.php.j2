@@ -47,6 +47,16 @@ else {
 
 }
 
+// DEBUG: Test if statement from above
+error_log("=== WIKI ID DEBUG ===");
+error_log("wgCommandLineMode: " . ($wgCommandLineMode ? "TRUE (CLI)" : "FALSE (Web)"));
+error_log("wikiId value: " . (isset($wikiId) ? var_export($wikiId, true) : "NOT SET"));
+if (!$wgCommandLineMode) {
+    error_log("REQUEST_URI: " . $_SERVER['REQUEST_URI']);
+    error_log("uriParts: " . print_r($uriParts, true));
+}
+error_log("===================");
+
 
 {% if saml_secret is defined %}
 /**
