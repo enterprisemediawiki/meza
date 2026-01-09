@@ -61,7 +61,7 @@
     owner: "{{ m_simplesamlphp_owner }}"
     group: "{{ m_simplesamlphp_group }}"
     mode: "{{ m_simplesamlphp_mode }}"
-  when: not simplesamlphp_exists.stat.exists
+  when: not simplesamlphp_exists2.stat.exists
 
 - name: Unarchive simplesamlphp tarball if new
   become: yes
@@ -74,7 +74,7 @@
     remote_src: yes
     extra_opts:
       - "--strip-components=1"
-  when: not simplesamlphp_exists.stat.exists or new_simplesamlphp_archive.changed
+  when: not simplesamlphp_exists2.stat.exists or new_simplesamlphp_archive.changed
 
 - name: Ensure Extension:PluggableAuth installed
   become: yes
