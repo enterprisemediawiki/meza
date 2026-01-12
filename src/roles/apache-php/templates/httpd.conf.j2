@@ -448,8 +448,8 @@ Listen 8080
 
 	{% if saml_secret is defined -%}
 	# Use SimpleSamlPhp to handle authentication
-	Alias /simplesaml {{ m_simplesamlphp_path }}/www
-	<Directory {{ m_simplesamlphp_path }}/www>
+	Alias /simplesaml {{ m_simplesamlphp_path }}/public
+	<Directory {{ m_simplesamlphp_path }}/public>
 		Require all granted
 		Options All -Indexes
 	</Directory>
