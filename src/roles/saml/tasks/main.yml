@@ -48,7 +48,7 @@
 - name: Check current SimpleSAMLphp version if installed
   shell: |
     if [ -f "{{ m_simplesamlphp_path }}/composer.lock" ]; then
-      grep -A 3 '"name": "simplesamlphp/simplesamlphp"' {{ m_simplesamlphp_path }}/composer.lock | grep '"version"' | head -1 | cut -d'"' -f4
+      grep -A 3 '"name": "simplesamlphp/simplesamlphp"' {{ m_simplesamlphp_path }}/composer.lock | grep '"version"' | head -1 | cut -d'"' -f4 | sed 's/^v//'
     else
       echo "not_installed"
     fi
@@ -56,14 +56,21 @@
   changed_when: false
   when: simplesamlphp_composer.stat.exists
 
-- name: Remove SimpleSAMLphp if version mismatch
+- name: Remove SimpleSAMLphp directory for fresh install (if wrong version or missing)
   file:
     path: "{{ m_simplesamlphp_path }}"
     state: absent
   when: 
     - simplesamlphp_composer.stat.exists
     - current_ssp_version.stdout != simplesamlphp_version
-    - current_ssp_version.stdout != "v{{ simplesamlphp_version }}"
+
+- name: Recreate SimpleSAMLphp directory
+  file:
+    path: "{{ m_simplesamlphp_path }}"
+    state: directory
+    owner: "{{ m_simplesamlphp_owner }}"
+    group: "{{ m_simplesamlphp_group }}"
+    mode: "{{ m_simplesamlphp_mode }}"
 
 - name: Install SimpleSAMLphp {{ simplesamlphp_version }} via Composer
   become: yes
@@ -73,20 +80,7 @@
     arguments: simplesamlphp/simplesamlphp:{{ simplesamlphp_version }} .
     working_dir: "{{ m_simplesamlphp_path }}"
     no_dev: no
-  when: not simplesamlphp_composer.stat.exists
-
-- name: Update SimpleSAMLphp to {{ simplesamlphp_version }} via Composer
-  become: yes
-  become_user: "{{ m_simplesamlphp_owner }}"
-  composer:
-    command: require
-    arguments: simplesamlphp/simplesamlphp:{{ simplesamlphp_version }}
-    working_dir: "{{ m_simplesamlphp_path }}"
-    no_dev: no
-  when: 
-    - simplesamlphp_composer.stat.exists
-    - current_ssp_version.stdout != simplesamlphp_version
-    - current_ssp_version.stdout != ("v" + simplesamlphp_version)
+  when: not simplesamlphp_composer.stat.exists or current_ssp_version.stdout != simplesamlphp_version
 
 - name: Ensure required SimpleSAMLphp directories exist
   file:
