@@ -21,18 +21,38 @@ $metadata['{{ saml_public.idp_entity_id }}'] = array(
 	// merged automatically rather than on a case-by-case basis like this.
 
 	{% if saml_secret.single_sign_on_service is defined %}
-	'SingleSignOnService' => '{{ saml_secret.single_sign_on_service }}',
+	'SingleSignOnService' => array(
+		array(
+			'Binding' => 'urn:oasis:names:tc:SAML2:bindings:HTTP-Redirect',
+			'Location' => '{{ saml_secret.single_sign_on_service }}',
+		),
+	),
 	{% elif saml_public.single_sign_on_service is defined %}
-	'SingleSignOnService' => '{{ saml_public.single_sign_on_service }}',
+	'SingleSignOnService' => array(
+		array(
+			'Binding' => 'urn:oasis:names:tc:SAML2:bindings:HTTP-Redirect',
+			'Location' => '{{ saml_public.single_sign_on_service }}',
+		),
+	),
 	{% else %}
 	// neither {{ saml_secret.single_sign_on_service }} nor {{ saml_public.single_sign_on_service }} is defined
 	{% endif %}
 
 
 	{% if saml_secret.single_logout_service is defined %}
-	'SingleLogoutService' => '{{ saml_secret.single_logout_service }}',
+	'SingleLogoutService' => array(
+		array(
+			'Binding' => 'urn:oasis:names:tc:SAML2:bindings:HTTP-Redirect',
+			'Location' => '{{ saml_secret.single_logout_service }}',
+		),
+	),
 	{% elif saml_public.single_logout_service is defined %}
-	'SingleLogoutService' => '{{ saml_public.single_logout_service }}',
+	'SingleLogoutService' => array(
+		array(
+			'Binding' => 'urn:oasis:names:tc:SAML2:bindings:HTTP-Redirect',
+			'Location' => '{{ saml_public.single_logout_service }}',
+		),
+	),
 	{% else %}
 	// neither {{ saml_secret.single_logout_service }} nor {{ saml_public.single_logout_service }} is defined
 	{% endif %}
