@@ -5,9 +5,9 @@ $config = array(
 
 	'application' => [ 'baseURL' => 'https://{{ wiki_app_fqdn }}' ],
 
-	'certdir' => 'cert/',
-	'loggingdir' => 'log/',
-	'datadir' => 'data/',
+	'certdir' => '{{ m_simplesamlphp_path }}/cert',
+	'loggingdir' => '{{ m_simplesamlphp_path }}/log',
+	'datadir' => '{{ m_simplesamlphp_path }}/data',
 	'tempdir' => '/tmp/simplesaml',
 
 	'technicalcontact_name' => '{{ saml_public.technicalcontact_name }}',
