@@ -113,6 +113,7 @@
     msg: "Memcached was reinstalled"
   changed_when: not memcached_so.stat.exists or memcached_loads.rc != 0
   notify:
+    - restart memcached
     - restart apache
     - restart php-fpm
 
@@ -123,5 +124,6 @@
     group: root
     mode: 0644
   notify:
+    - restart memcached
     - restart apache
     - restart php-fpm

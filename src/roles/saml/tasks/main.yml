@@ -56,6 +56,10 @@
   changed_when: false
   when: simplesamlphp_composer.stat.exists
 
+- name: Set fact for SimpleSAMLphp upgrade
+  set_fact:
+    simplesamlphp_will_upgrade: "{{ simplesamlphp_composer.stat.exists and current_ssp_version.stdout != simplesamlphp_version }}"
+
 - name: Remove SimpleSAMLphp directory for fresh install (if wrong version or missing)
   file:
     path: "{{ m_simplesamlphp_path }}"
@@ -195,3 +199,10 @@
     owner: meza-ansible
     group: apache
     mode: 0755
+
+- name: Trigger memcached restart after SimpleSAMLphp upgrade
+  debug:
+    msg: "SimpleSAMLphp was upgraded, memcached needs restart"
+  changed_when: simplesamlphp_will_upgrade or not simplesamlphp_composer.stat.exists
+  notify:
+    - restart memcached
