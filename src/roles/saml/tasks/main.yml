@@ -205,4 +205,4 @@
     msg: "SimpleSAMLphp was upgraded, memcached needs restart"
   changed_when: simplesamlphp_will_upgrade or not simplesamlphp_composer.stat.exists
   notify:
-    - restart memcached
+    - memcached : restart memcached
