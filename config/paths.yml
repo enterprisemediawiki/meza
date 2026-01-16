@@ -181,4 +181,4 @@ m_config_secret_group: wheel
 
 m_simplesamlphp_mode: "u=rwX,g=rwX,o=rX"
 m_simplesamlphp_owner: meza-ansible
-m_simplesamlphp_group: wheel
+m_simplesamlphp_group: apache
