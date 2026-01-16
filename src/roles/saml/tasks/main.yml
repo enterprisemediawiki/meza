@@ -200,9 +200,10 @@
     group: apache
     mode: 0755
 
-- name: Trigger memcached restart after SimpleSAMLphp upgrade
-  debug:
-    msg: "SimpleSAMLphp was upgraded, memcached needs restart"
-  changed_when: simplesamlphp_will_upgrade or not simplesamlphp_composer.stat.exists
-  notify:
-    - memcached : restart memcached
+- name: Restart memcached to clear old serialized sessions after SimpleSAMLphp upgrade
+  systemd:
+    name: memcached
+    state: restarted
+  when: 
+    - simplesamlphp_will_upgrade or not simplesamlphp_composer.stat.exists
+    - docker_skip_tasks is not defined or not docker_skip_tasks
